@@ -1,0 +1,6 @@
+/access-token/client_secret.json
+.htaccess
+.env
+/vendor
+/.vscode
+tareas.md
