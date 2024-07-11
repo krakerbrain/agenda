@@ -4,3 +4,10 @@
 /vendor
 /.vscode
 tareas.md
+composer.json 
+composer.lock 
+.env-example 
+/access-token/credentials.json 
+composer.phar 
+README.MD
+.gitignore
