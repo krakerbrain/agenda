@@ -76,7 +76,7 @@ $baseUrl = ConfigUrl::get();
             event.preventDefault();
 
             const formData = new FormData(this);
-            formData.append('master_admin');
+            // formData.append('master_admin', 'master_admin');
             fetch(`${baseUrl}login/registra_usuario.php`, {
                     method: 'POST',
                     body: formData

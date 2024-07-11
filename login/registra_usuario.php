@@ -11,7 +11,7 @@ if (isset($_POST['usuario']) && isset($_POST['correo']) && isset($_POST['passwor
     $pass = $_POST['password'];
     $pass2 = $_POST['password2'];
     $company_id = $_POST['company_id'];
-    $master_admin = isset($_POST['master_admin']) ? 1 : 0;
+    // $master_admin = isset($_POST['master_admin']) ? 1 : 0;
 
     if (!empty($usuario_registro) && !empty($correo) && !empty($pass) && !empty($pass2) && !empty($company_id)) {
         // Los campos no están vacíos, proceder con la validación y la inserción en la base de datos
