@@ -7,6 +7,11 @@ use Dotenv\Dotenv;
 use Google_Client;
 use Google_Service_Calendar;
 
+// Habilitar el modo de depuración
+// ini_set('display_errors', 1);
+// ini_set('display_startup_errors', 1);
+// error_reporting(E_ALL);
+
 try {
     // Cargar variables de entorno desde el archivo .env
     $dotenv = Dotenv::createImmutable(dirname(__DIR__));
@@ -16,8 +21,11 @@ try {
 
     $client = new Google_Client();
     $client->setAuthConfig($_ENV['GOOGLE_APPLICATION_CREDENTIALS_PATH']); // Ruta al archivo de configuración de credenciales de Google
-
+    // PRODUCCION
     $redirect_uri = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'];
+    //DESARROLLO
+    $redirect_uri = 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'];
+
     $client->setRedirectUri($redirect_uri);
     $client->addScope(Google_Service_Calendar::CALENDAR);
 
@@ -25,13 +33,17 @@ try {
     if (!isset($_SESSION['access_token']) && !isset($_GET['code'])) {
         // Redirigir al usuario para iniciar sesión
         $auth_url = $client->createAuthUrl();
+
         header('Location: ' . filter_var($auth_url, FILTER_SANITIZE_URL));
         exit();
     }
-
     if (isset($_GET['code'])) {
+
         // Intercambiar el código de autorización por un token de acceso
         $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
+        if (isset($token['error'])) {
+            throw new Exception('Error al obtener el token: ' . $token['error']);
+        }
         $_SESSION['access_token'] = $token;
 
 

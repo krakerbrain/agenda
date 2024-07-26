@@ -13,7 +13,8 @@ $eventId = $data['event_id'];
 deleteCalendarEvent($conn, $client, $eventId, $appointmentId);
 function deleteCalendarEvent($conn, $client, $eventId, $appointmentId)
 {
-
+    $calendarService = new Google_Service_Calendar($client);
+    $calendarId = 'primary'; // ID de tu calendario
 
     try {
         if ($eventId != "") {

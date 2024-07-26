@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
   document.getElementById("admin").classList.add("active");
-  fetch("../../user_admin/admin.php")
+  fetch("../user_admin/admin.php")
     .then((response) => response.text())
     .then((data) => {
       document.getElementById("main-content").innerHTML = data;
@@ -17,7 +17,7 @@ document.querySelectorAll(".nav-link").forEach((link) => {
     event.preventDefault();
     document.querySelectorAll(".nav-link").forEach((nav) => nav.classList.remove("active"));
     this.classList.add("active");
-    fetch(`../../user_admin/${this.id}.php`)
+    fetch(`../user_admin/${this.id}.php`)
       .then((response) => response.text())
       .then((data) => {
         document.getElementById("main-content").innerHTML = data;

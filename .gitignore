@@ -10,4 +10,3 @@ composer.lock
 /access-token/credentials.json 
 composer.phar 
 README.MD
-.gitignore
