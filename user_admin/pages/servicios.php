@@ -4,6 +4,7 @@
         <table class="table table-borderless table-striped table-sm">
             <thead>
                 <tr>
+                    <th>Habilitado</th>
                     <th>Nombre del Servicio</th>
                     <th>Duración (horas)</th>
                     <th>Observaciones</th>

@@ -1,4 +1,5 @@
 <?php
+
 require_once dirname(__DIR__, 2) . '/classes/DatabaseSessionManager.php';
 require_once dirname(__DIR__, 2) . '/classes/ConfigUrl.php';
 require_once dirname(__DIR__, 2) . '/classes/Services.php';
@@ -8,17 +9,19 @@ $manager->startSession();
 $conn = $manager->getDB();
 
 try {
-
-    // Obtener el ID de la empresa (esto podría venir de una sesión, un parámetro GET/POST, etc.)
     $company_id = $_SESSION['company_id'];
-
-    // Instanciar la clase Services
     $services = new Services($conn, $company_id);
 
-    // Obtener los servicios y devolver el JSON
-    header('Content-Type: application/json');
-    //devolver un json con succes y ladata
-    echo json_encode(['success' => true, 'data' => $services->getServices()]);
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        // Procesar la data del formulario
+        $servicesData = $_POST; // Asume que estás enviando los datos como application/x-www-form-urlencoded
+        $services->saveServices($servicesData);
+        echo json_encode(['success' => true, 'message' => 'Servicios guardados exitosamente.']);
+    } else {
+        // Obtener los servicios y devolver el JSON
+        header('Content-Type: application/json');
+        echo json_encode(['success' => true, 'data' => $services->getServices()]);
+    }
 } catch (PDOException $e) {
-    echo 'Connection failed: ' . $e->getMessage();
+    echo json_encode(['success' => false, 'message' => 'Connection failed: ' . $e->getMessage()]);
 }

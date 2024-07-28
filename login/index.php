@@ -23,7 +23,8 @@ if (isset($_POST['usuario']) && isset($_POST['contrasenia'])) {
                 if (password_verify($pass, $datos['password'])) {
                     session_start();
                     $_SESSION['company_id'] = $result[0]['company_id'];
-                    header("Location: " . $baseUrl . "google_services/google_auth.php");
+                    // header("Location: " . $baseUrl . "google_services/google_auth.php");
+                    header("Location: " . $baseUrl . "user_admin/index.php");
                 } else {
                     $error = "true";
                     session_abort();
