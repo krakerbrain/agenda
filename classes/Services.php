@@ -18,6 +18,7 @@ class Services
             FROM services s
             LEFT JOIN service_categories sc ON s.id = sc.service_id
             WHERE s.company_id = :company_id
+            ORDER BY s.id, sc.id
         ");
         $servicesSql->bindParam(':company_id', $this->company_id);
         $servicesSql->execute();

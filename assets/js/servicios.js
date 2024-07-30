@@ -4,32 +4,32 @@ export function initServicios() {
   const form = document.getElementById("servicesForm");
   const tableBody = document.getElementById("servicesTableBody");
 
-  function loadServices() {
-    fetch(`${baseUrl}user_admin/controllers/services.php`, {
-      method: "GET",
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.success) {
-          // Limpiar el cuerpo de la tabla
-          tableBody.innerHTML = "";
-
-          const servicesData = data.data;
-
-          if (servicesData.length > 0) {
-            // Llenar la página con los datos obtenidos
-            servicesData.forEach((service) => {
-              addService(service);
-            });
-          }
-          // Añadir una fila en blanco para un nuevo servicio
-          addEmptyServiceRow();
-        }
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-        alert("Hubo un error al guardar la configuración.");
+  async function loadServices() {
+    try {
+      const response = await fetch(`${baseUrl}user_admin/controllers/services.php`, {
+        method: "GET",
       });
+      const data = await response.json();
+
+      if (data.success) {
+        // Limpiar el cuerpo de la tabla
+        tableBody.innerHTML = "";
+
+        const servicesData = data.data;
+
+        if (servicesData.length > 0) {
+          // Llenar la página con los datos obtenidos
+          servicesData.forEach((service) => {
+            addService(service);
+          });
+        }
+        // Añadir una fila en blanco para un nuevo servicio
+        addEmptyServiceRow();
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Hubo un error al cargar los servicios.");
+    }
   }
 
   loadServices();
@@ -62,7 +62,7 @@ export function initServicios() {
     return hasValidData;
   }
 
-  form.addEventListener("submit", function (event) {
+  form.addEventListener("submit", async function (event) {
     event.preventDefault();
 
     const isValid = validateAndCleanForm();
@@ -72,24 +72,21 @@ export function initServicios() {
     }
 
     const formData = new FormData(form);
-
-    fetch(`${baseUrl}user_admin/controllers/services.php`, {
-      method: "POST",
-      body: formData,
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.success) {
-          alert("Configuración guardada exitosamente.");
-          loadServices(); // Recargar los datos después de guardar
-        } else {
-          console.error("Error en la respuesta del servidor:", data);
-        }
-      })
-      .catch((error) => {
-        console.error("Error en la petición:", error);
-        alert("Hubo un error al guardar la configuración.");
+    try {
+      const response = await fetch(`${baseUrl}user_admin/controllers/services.php`, {
+        method: "POST",
+        body: formData,
       });
+      const data = await response.json();
+
+      if (data.success) {
+        alert("Configuración guardada exitosamente.");
+        loadServices(); // Recargar los datos después de guardar
+      }
+    } catch (error) {
+      console.error("Error en la respuesta del servidor:", error);
+      alert("Hubo un error al guardar la configuración.");
+    }
   });
 
   // Función para añadir una fila de servicio en blanco
@@ -297,26 +294,26 @@ async function removeCategory(button) {
       // Solo eliminar del DOM
       categoryRow.remove();
     } else {
-      // Enviar solicitud al backend para eliminar la categoría existente
-      await fetch(`${baseUrl}user_admin/controllers/services.php`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: `category_id=${categoryId}`,
-      })
-        .then((response) => response.json())
-        .then((result) => {
-          if (result.success) {
-            categoryRow.remove();
-          } else {
-            alert(result.message);
-          }
-        })
-        .catch((error) => {
-          console.error("Error eliminando la categoría:", error);
-          alert("Hubo un error al intentar eliminar la categoría. Por favor, inténtalo de nuevo.");
+      try {
+        // Enviar solicitud al backend para eliminar la categoría existente
+        const response = await fetch(`${baseUrl}user_admin/controllers/services.php`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: `category_id=${categoryId}`,
         });
+        const result = await response.json();
+
+        if (result.success) {
+          categoryRow.remove();
+        } else {
+          alert(result.message);
+        }
+      } catch (error) {
+        console.error("Error eliminando la categoría:", error);
+        alert("Hubo un error al intentar eliminar la categoría. Por favor, inténtalo de nuevo.");
+      }
     }
   } else {
     categoryRow.remove();
