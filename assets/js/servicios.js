@@ -123,7 +123,7 @@ export function initServicios() {
   }
 
   // Llamar a la función para agregar una fila de servicio en blanco al cargar la página
-  addEmptyServiceRow();
+  // addEmptyServiceRow();
 
   document.getElementById("addServiceButton").addEventListener("click", addService);
 
@@ -147,7 +147,7 @@ function addService(service = null) {
   let serviceDuration = "";
   let serviceObservations = "";
 
-  if (service) {
+  if (service && typeof service === "object" && !service.isTrusted) {
     serviceId = service.service_id;
     serviceName = service.service_name;
     serviceDuration = service.duration;
@@ -199,19 +199,21 @@ function addService(service = null) {
 function addCategoryToService(serviceId, category) {
   const tableBody = document.getElementById("servicesTableBody");
   const categoryRow = document.createElement("tr");
+  const categoryId = category.category_id;
   categoryRow.classList.add("category-item");
   categoryRow.innerHTML = `
     <td></td>
     <td class="text-center">CATEGORÍA</td>
-    <td><input type="text" class="form-control mb-1" name="category_name[${serviceId}][]" value="${category.category_name}" placeholder="Nombre de la Categoría"></td>
-    <td><textarea class="form-control mb-1" name="category_description[${serviceId}][]" placeholder="Descripción de la Categoría">${category.category_description}</textarea></td>
+    <td><input type="text" class="form-control mb-1" name="category_name[${serviceId}][${categoryId}]" value="${category.category_name}" placeholder="Nombre de la Categoría"></td>
+    <td><textarea class="form-control mb-1" name="category_description[${serviceId}][${categoryId}]" placeholder="Descripción de la Categoría">${category.category_description}</textarea></td>
     <td><button type="button" class="btn btn-outline-danger btn-sm remove-category">Eliminar</button></td>
   `;
   tableBody.appendChild(categoryRow);
 
   // Registrar el evento de eliminación de la categoría
   categoryRow.querySelector(".remove-category").addEventListener("click", function () {
-    categoryRow.remove();
+    // categoryRow.remove();
+    removeCategory(this);
   });
 }
 
@@ -234,9 +236,10 @@ function addCategory(button) {
   categoryRow.querySelector(".remove-category").addEventListener("click", function () {
     removeCategory(this);
   });
+  tempServiceCounter++;
 }
 
-function deleteService(button) {
+async function deleteService(button) {
   // Encuentra la fila del servicio a eliminar
   const serviceRow = button.closest(".service-row");
 
@@ -246,20 +249,76 @@ function deleteService(button) {
     .querySelector("input[name^='service_name']")
     .name.match(/\[(.*?)\]/)[1];
 
-  // Encuentra todas las filas de categorías asociadas a este servicio
-  const categories = document.querySelectorAll(`input[name^='category_name[${serviceId}]']`);
-  categories.forEach((categoryInput) => {
-    const categoryRow = categoryInput.closest(".category-item");
-    if (categoryRow) {
-      categoryRow.remove();
-    }
-  });
+  // Enviar solicitud al backend para verificar si el servicio tiene citas agendadas
+  try {
+    const response = await fetch(`${baseUrl}user_admin/controllers/services.php`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: `service_id=${serviceId}`,
+    });
+    const result = await response.json();
 
-  // Elimina la fila del servicio
-  serviceRow.remove();
+    if (result.success) {
+      // Encuentra todas las filas de categorías asociadas a este servicio
+      const categories = document.querySelectorAll(`input[name^='category_name[${serviceId}]']`);
+      categories.forEach((categoryInput) => {
+        const categoryRow = categoryInput.closest(".category-item");
+        if (categoryRow) {
+          categoryRow.remove();
+        }
+      });
+
+      // Elimina la fila del servicio
+      serviceRow.remove();
+    } else {
+      alert(result.message);
+    }
+  } catch (error) {
+    console.error("Error eliminando el servicio:", error);
+    alert("Hubo un error al intentar eliminar el servicio. Por favor, inténtalo de nuevo.");
+  }
 }
 
-function removeCategory(button) {
+async function removeCategory(button) {
   const categoryRow = button.closest(".category-item");
-  categoryRow.remove();
+
+  // Encuentra el id de la categoría usando una expresión regular para capturar ambos valores dentro de los corchetes
+  const nameAttribute = categoryRow.querySelector("input[name^='category_name']").name;
+  const matches = nameAttribute.match(/\[(\d+)\]\[(\d+)\]/);
+
+  if (matches) {
+    const serviceId = matches[1];
+    const categoryId = matches[2];
+
+    // Verificar si la categoría es nueva (ID temporal) o existente
+    if (categoryId.includes("new-category")) {
+      // Solo eliminar del DOM
+      categoryRow.remove();
+    } else {
+      // Enviar solicitud al backend para eliminar la categoría existente
+      await fetch(`${baseUrl}user_admin/controllers/services.php`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: `category_id=${categoryId}`,
+      })
+        .then((response) => response.json())
+        .then((result) => {
+          if (result.success) {
+            categoryRow.remove();
+          } else {
+            alert(result.message);
+          }
+        })
+        .catch((error) => {
+          console.error("Error eliminando la categoría:", error);
+          alert("Hubo un error al intentar eliminar la categoría. Por favor, inténtalo de nuevo.");
+        });
+    }
+  } else {
+    categoryRow.remove();
+  }
 }

@@ -117,4 +117,42 @@ class Services
         $stmt->bindParam(':category_description', $categoryDescription);
         $stmt->execute();
     }
+
+    public function checkAppointments($serviceId)
+    {
+        $appointmentSql = $this->conn->prepare("
+            SELECT COUNT(*) AS count
+            FROM appointments
+            WHERE id_service = :service_id
+        ");
+        $appointmentSql->bindParam(':service_id', $serviceId);
+        $appointmentSql->execute();
+        $result = $appointmentSql->fetch(PDO::FETCH_ASSOC);
+
+        return $result['count'] > 0;
+    }
+
+    public function deleteService($serviceId)
+    {
+        $deleteServiceSql = $this->conn->prepare("
+            DELETE FROM services
+            WHERE id = :service_id
+        ");
+        $deleteServiceSql->bindParam(':service_id', $serviceId);
+        $deleteServiceSql->execute();
+
+        $deleteCategoriesSql = $this->conn->prepare("
+            DELETE FROM service_categories
+            WHERE service_id = :service_id
+        ");
+        $deleteCategoriesSql->bindParam(':service_id', $serviceId);
+        $deleteCategoriesSql->execute();
+    }
+
+    public function deleteCategory($categoryId)
+    {
+        $deleteCategorySql = $this->conn->prepare("DELETE FROM service_categories WHERE id = :category_id");
+        $deleteCategorySql->bindParam(':category_id', $categoryId);
+        $deleteCategorySql->execute();
+    }
 }
