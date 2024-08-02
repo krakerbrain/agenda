@@ -21,20 +21,25 @@ export function initHorarios() {
   }
 
   function addScheduleToTable(horario) {
-    const { schedule_id, day, work_start, work_end, break_start, break_end, is_enabled } = horario;
+    const { schedule_id, day_id, day, work_start, work_end, break_start, break_end, is_enabled } = horario;
 
     const tableBody = document.getElementById("scheduleTableBody");
     const tr = document.createElement("tr");
+    tr.classList.add("work-day");
     const copiaTodo = day === "Lunes" ? "<button type='button' class='btn btn-link copy-all'>Copiar en todos</button>" : "";
     const checked = is_enabled === 1 ? "checked" : "";
     const disabled = is_enabled === 1 ? "" : "disabled";
 
     tr.innerHTML = `
       <tr class='work-day'>
-        <td>${day}</td>
+      <input type='hidden' name='schedule[${day}][schedule_id]' value='${schedule_id}'>
+        <td>${day}
+          <input type='hidden' name='schedule[${day}][day_id]' value='${day_id}'>
+        </td>
         <td>
           <div class='form-check form-switch'>
-            <input class='form-check-input' type='checkbox' name='schedule[${day}]'  ${checked}>
+            <input class='form-check-input' type='checkbox' ${checked}>
+            <input type='hidden' name='schedule[${day}][is_enabled]' value='${is_enabled}'>
           </div>
         </td>
         <td>
@@ -51,29 +56,172 @@ export function initHorarios() {
         </td>
       </tr>
     `;
-    debugger;
+
     tableBody.appendChild(tr);
 
     tr.querySelector(".descanso").addEventListener("click", () => {
-      addBreakTime(tr.querySelector(".descanso"), day);
+      addNewBreakTime(tr.querySelector(".descanso"), day);
+    });
+
+    tr.querySelector(".form-check-input").addEventListener("change", async (e) => {
+      changeDayStatus(e, day);
+    });
+
+    // Si hay un horario de descanso, agregar la fila del descanso
+    if (break_start && break_end && is_enabled) {
+      addBreakTimeElement(tr, day, break_start, break_end);
+    }
+    document.querySelector(".copy-all").addEventListener("click", copiarEnTodos);
+  }
+  function addNewBreakTime(button, day) {
+    const tr = button.closest(".work-day");
+    const breakRow = document.createElement("tr");
+    breakRow.classList.add("break-row");
+
+    breakRow.innerHTML = `
+      <td colspan="2">Hora de descanso</td>
+      <td class='break-time'>
+        <input type='time' class='form-control' name='schedule[${day}][break_start]' value='' required>
+      </td>
+      <td>
+        <input type='time' class='form-control' name='schedule[${day}][break_end]' value='' required>
+      </td>
+      <td>
+        <button type='button' class='btn btn-outline-danger btn-sm remove-break'>Eliminar</button>
+      </td>
+      <td></td>
+    `;
+
+    button.disabled = true;
+    tr.parentNode.insertBefore(breakRow, tr.nextSibling);
+
+    breakRow.querySelector(".remove-break").addEventListener("click", () => {
+      removeBreakTime(breakRow);
     });
   }
 
-  getHorarios();
-
-  function addBreakTime(button, day) {
-    const tr = button.closest(".work-day");
+  function addBreakTimeElement(tr, day, break_start, break_end) {
     const breakRow = document.createElement("tr");
-    const breakCell = document.createElement("td");
-    breakCell.setAttribute("colspan", "6");
-    breakCell.innerHTML = `
-      <div class='break-time'>
-        <input type='time' class='form-control' name='schedule[${day}][break_start]' value='' required>
-        <input type='time' class='form-control' name='schedule[${day}][break_end]' value='' required>
-      </div>
+    breakRow.classList.add("break-row");
+
+    breakRow.innerHTML = `
+      <td colspan="2">Hora de descanso</td>
+      <td class='break-time'>
+        <input type='time' class='form-control' name='schedule[${day}][break_start]' value='${break_start}' required>
+      </td>
+      <td>
+        <input type='time' class='form-control' name='schedule[${day}][break_end]' value='${break_end}' required>
+      </td>
+      <td>
+        <button type='button' class='btn btn-outline-danger btn-sm remove-break'>Eliminar</button>
+      </td>
+      <td></td>
     `;
-    breakRow.appendChild(breakCell);
-    debugger;
-    tr.insertAdjacentElement("afterend", breakRow);
+
+    tr.parentNode.insertBefore(breakRow, tr.nextSibling);
+
+    breakRow.querySelector(".remove-break").addEventListener("click", () => {
+      removeBreakTime(breakRow);
+    });
+
+    tr.querySelector(".descanso").disabled = true;
   }
+
+  function removeBreakTime(breakRow) {
+    const tr = breakRow.previousElementSibling;
+    const scheduleId = tr.querySelector("input[name*='schedule_id']").value;
+    breakRow.remove();
+    tr.querySelector(".descanso").disabled = false;
+
+    async function removeBreakTimeFromDB(scheduleId) {
+      try {
+        const response = await fetch(`${baseUrl}user_admin/controllers/schedulesController.php`, {
+          method: "POST",
+          body: JSON.stringify({ action: "remove_break", scheduleId }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        const { success, message } = await response.json();
+
+        if (success) {
+          alert(message);
+          getHorarios();
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    removeBreakTimeFromDB(scheduleId);
+  }
+
+  function changeDayStatus(e, day) {
+    const workDay = e.target.closest(".work-day");
+    const descansoButton = workDay.querySelector(".descanso");
+
+    if (e.target.checked) {
+      workDay.querySelectorAll("input").forEach((input) => {
+        input.removeAttribute("disabled");
+        if (input.name === `schedule[${day}][is_enabled]`) {
+          input.value = 1;
+        }
+      });
+      descansoButton.removeAttribute("disabled");
+    } else {
+      workDay.querySelector("input[name='schedule[" + day + "][start]']").setAttribute("disabled", "");
+      workDay.querySelector("input[name='schedule[" + day + "][end]']").setAttribute("disabled", "");
+      descansoButton.setAttribute("disabled", "");
+      workDay.querySelector("input[name='schedule[" + day + "][is_enabled]']").value = 0;
+
+      if (workDay.nextElementSibling && workDay.nextElementSibling.classList.contains("break-row")) {
+        workDay.nextElementSibling.remove();
+      }
+    }
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const formData = new FormData(form);
+    try {
+      const response = await fetch(`${baseUrl}user_admin/controllers/schedulesController.php`, {
+        method: "POST",
+        body: formData,
+      });
+
+      const { success, message } = await response.json();
+
+      if (success) {
+        alert(message);
+        getHorarios();
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  });
+
+  async function copiarEnTodos() {
+    const formData = new FormData(form);
+    formData.append("copy_from_monday", true);
+    try {
+      const response = await fetch(`${baseUrl}user_admin/controllers/schedulesController.php`, {
+        method: "POST",
+        body: formData,
+      });
+
+      const { success, message } = await response.json();
+
+      if (success) {
+        alert(message);
+        getHorarios();
+      } else {
+        alert("Error al copiar los horarios: " + message);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  getHorarios();
 }
