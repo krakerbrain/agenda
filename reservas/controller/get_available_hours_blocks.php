@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/classes/DatabaseSessionManager.php';
+require_once dirname(__DIR__, 2) . '/classes/DatabaseSessionManager.php';
 $manager = new DatabaseSessionManager();
 $conn = $manager->getDB();
 
@@ -7,6 +7,7 @@ $data = json_decode(file_get_contents('php://input'), true);
 $date = $data['date'];
 $service_id = $data['service_id'];
 $company_id = $data['company_id'];
+
 // Obtener datos de la empresa
 $sql = $conn->prepare("SELECT * FROM companies WHERE id = :company_id AND is_active = 1");
 $sql->bindParam(':company_id', $company_id);
@@ -33,11 +34,30 @@ if (!$service) {
 $service_duration = floatval($service['duration']);
 $service_duration_minutes = (int)($service_duration * 60);
 
-// Obtener horas de trabajo y descanso
-$work_start = new DateTime($company['work_start']);
-$work_end = new DateTime($company['work_end']);
-$break_start = new DateTime($company['break_start']);
-$break_end = new DateTime($company['break_end']);
+// Calcular day_id basado en la fecha seleccionada
+$dateObj = new DateTime($date);
+$day_id = (int)$dateObj->format('N'); // ISO-8601 (1=Lunes, 7=Domingo)
+
+// Obtener horas de trabajo y descanso desde company_schedules
+$sql_schedules = $conn->prepare("
+    SELECT work_start, work_end, break_start, break_end 
+    FROM company_schedules 
+    WHERE company_id = :company_id AND day_id = :day_id AND is_enabled = 1
+");
+$sql_schedules->bindParam(':company_id', $company_id);
+$sql_schedules->bindParam(':day_id', $day_id);
+$sql_schedules->execute();
+$schedule = $sql_schedules->fetch(PDO::FETCH_ASSOC);
+
+if (!$schedule) {
+    echo json_encode(['success' => false, 'message' => 'No hay horario de trabajo definido para esta fecha.']);
+    exit;
+}
+
+$work_start = new DateTime($schedule['work_start']);
+$work_end = new DateTime($schedule['work_end']);
+$break_start = new DateTime($schedule['break_start']);
+$break_end = new DateTime($schedule['break_end']);
 
 // Calcular la duración disponible antes del descanso
 $duration_before_break = $work_start->diff($break_start);
@@ -103,8 +123,6 @@ if ($service_duration_minutes > $minutes_before_break) {
 $sql_appointments = $conn->prepare("SELECT start_time, end_time FROM appointments WHERE company_id = ? AND date = ?");
 $sql_appointments->execute([$company['id'], $date]);
 $appointments = $sql_appointments->fetchAll(PDO::FETCH_ASSOC);
-
-
 
 // Filtrar horas disponibles eliminando las que ya están reservadas
 foreach ($appointments as $appointment) {

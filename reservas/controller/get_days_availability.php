@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/classes/DatabaseSessionManager.php';
+require_once dirname(__DIR__, 2) . '/classes/DatabaseSessionManager.php';
 $manager = new DatabaseSessionManager();
 $conn = $manager->getDB();
 
@@ -35,24 +35,39 @@ $service_duration = floatval($service['duration']);
 $service_duration_minutes = (int)($service_duration * 60);
 
 // Obtener días laborales y fechas bloqueadas
-$work_days = explode(',', $company['work_days']);
 $blocked_dates = explode(',', $company['blocked_dates']);
+// Obtener días laborables y horarios de trabajo desde company_schedules
+$sql_schedules = $conn->prepare("
+    SELECT day_id, work_start, work_end, break_start, break_end 
+    FROM company_schedules 
+    WHERE company_id = :company_id AND is_enabled = 1
+");
+$sql_schedules->bindParam(':company_id', $company_id);
+$sql_schedules->execute();
+$schedules = $sql_schedules->fetchAll(PDO::FETCH_ASSOC);
 
 // Mapeo de días de la semana
 $work_days_map = [
-    "Sunday" => 0,
-    "Monday" => 1,
-    "Tuesday" => 2,
-    "Wednesday" => 3,
-    "Thursday" => 4,
-    "Friday" => 5,
-    "Saturday" => 6
+    1 => "Lunes",
+    2 => "Martes",
+    3 => "Miércoles",
+    4 => "Jueves",
+    5 => "Viernes",
+    6 => "Sábado",
+    7 => "Domingo"
 ];
 
-// Convertir work_days a números
-$work_days_numeric = array_map(function ($day) use ($work_days_map) {
-    return $work_days_map[$day];
-}, $work_days);
+// Convertir los horarios de trabajo en un array de acceso rápido
+$work_days = [];
+foreach ($schedules as $schedule) {
+    $work_days[$schedule['day_id']] = [
+        'work_start' => new DateTime($schedule['work_start']),
+        'work_end' => new DateTime($schedule['work_end']),
+        'break_start' => new DateTime($schedule['break_start']),
+        'break_end' => new DateTime($schedule['break_end'])
+    ];
+}
+
 
 // Rango de fechas (hoy + 30 días)
 
@@ -85,15 +100,15 @@ $daterange = new DatePeriod($start_date, $interval, $end_date);
 $available_days = [];
 
 foreach ($daterange as $date) {
-    $day_of_week = $date->format('w');
+    $day_of_week = $date->format('w'); // Obtiene el día de la semana en formato numérico
     $date_str = $date->format('Y-m-d');
 
-    if (in_array($day_of_week, $work_days_numeric) && !in_array($date_str, $blocked_dates)) {
+    if (isset($work_days[$day_of_week]) && !in_array($date_str, $blocked_dates)) {
         // Obtener horarios disponibles para el día
-        $work_start = new DateTime($company['work_start']);
-        $work_end = new DateTime($company['work_end']);
-        $break_start = new DateTime($company['break_start']);
-        $break_end = new DateTime($company['break_end']);
+        $work_start = $work_days[$day_of_week]['work_start'];
+        $work_end = $work_days[$day_of_week]['work_end'];
+        $break_start = $work_days[$day_of_week]['break_start'];
+        $break_end = $work_days[$day_of_week]['break_end'];
 
         // Obtener citas reservadas para la fecha seleccionada
         $day_appointments = isset($appointments_by_date[$date_str]) ? $appointments_by_date[$date_str] : [];

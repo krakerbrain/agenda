@@ -1,4 +1,4 @@
-import { initAdmin } from "./admin.js";
+import { initDateList } from "./datesList.js";
 import { initHorarios } from "./horarios.js";
 import { initServicios } from "./servicios.js";
 import { initConfiguraciones } from "./configuraciones.js";
@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // Load the default content when the page loads, after registering all event listeners
-  loadContent("admin");
+  loadContent("dateList");
 
   function loadContent(page) {
     fetch(`pages/${page}.php`)
@@ -37,8 +37,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Ejecutar el código específico de la página cargada
         switch (page) {
-          case "admin":
-            initAdmin();
+          case "dateList":
+            initDateList();
             break;
           case "horarios":
             initHorarios();

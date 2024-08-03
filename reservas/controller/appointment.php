@@ -1,11 +1,11 @@
 <?php
-require_once __DIR__ . '/classes/DatabaseSessionManager.php';
+require_once dirname(__DIR__, 2) . '/classes/DatabaseSessionManager.php';
 $manager = new DatabaseSessionManager();
 $conn = $manager->getDB();
 
 try {
     // Recibir los datos del cuerpo de la solicitud
-    $data = json_decode(file_get_contents('php://input'), true);
+    $data = $_POST;
     if (!$data) {
         echo json_encode(['message' => 'Datos inválidos recibidos']);
         http_response_code(400);
@@ -17,10 +17,19 @@ try {
     $phone = $data['phone'];
     $mail = $data['mail'];
     $date = $data['date'];
-    $start_time = $data['start_time'];
-    $end_time = $data['end_time'];
-    $id_service = $data['id_service'];
+    $time = $data['time'];
+    $id_service = $data['service'];
 
+    // Separar el tiempo en inicio y fin
+    list($start_time, $end_time) = explode(' - ', $time);
+
+    // Crear objetos DateTime a partir de las cadenas de tiempo
+    $startDateTime = new DateTime($date . ' ' . $start_time);
+    $endDateTime = new DateTime($date . ' ' . $end_time);
+
+    // Formatear el tiempo en "H:i" (horas:minutos)
+    $formattedStartTime = $startDateTime->format('H:i');
+    $formattedEndTime = $endDateTime->format('H:i');
     // Preparar la consulta SQL
     $stmt = $conn->prepare("INSERT INTO appointments (company_id, name, phone, mail, date, start_time, end_time, id_service) VALUES (:company_id, :name, :phone, :mail, :date, :start_time, :end_time, :id_service)");
 
@@ -30,8 +39,8 @@ try {
     $stmt->bindParam(':phone', $phone);
     $stmt->bindParam(':mail', $mail);
     $stmt->bindParam(':date', $date);
-    $stmt->bindParam(':start_time', $start_time);
-    $stmt->bindParam(':end_time', $end_time);
+    $stmt->bindParam(':start_time', $formattedStartTime);
+    $stmt->bindParam(':end_time', $formattedEndTime);
     $stmt->bindParam(':id_service', $id_service);
 
     // Ejecutar la consulta

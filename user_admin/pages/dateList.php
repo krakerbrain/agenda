@@ -21,7 +21,7 @@ $result = $sql->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
 
-<div>
+<div class="container mt-4">
     <div class="table-responsive">
         <table class="table table-striped table-hover">
             <thead class="">
