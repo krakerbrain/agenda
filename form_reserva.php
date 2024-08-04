@@ -14,9 +14,13 @@ $sql->bindParam(':token', $token);
 $sql->execute();
 $company = $sql->fetch(PDO::FETCH_ASSOC);
 $manager->setCompanyId($company['id']);
-$primary_color = $company['primary_color'];
-$secondary_color = $company['secondary_color'];
-$background_color = $company['background_color'];
+
+$primary_color = $company['font_color'] ?? '#007bff';
+$secondary_color = $company['btn2'] ?? '#6c757d';
+$background_color = $company['bg_color'] ?? '#ffffff';
+$button_color = $company['btn1'] ?? '#007bff';
+$border_color = $company['font_color'] ?? '#007bff';
+
 
 if (!$company) {
     header("Location: " . $baseUrl . "error.html");
@@ -40,34 +44,46 @@ $services = $sql_services->fetchAll(PDO::FETCH_ASSOC);
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <style>
-    body {
-        background-color: <?php echo htmlspecialchars($background_color);
+    :root {
+        --primary-color: <?php echo htmlspecialchars($primary_color);
                             ?>;
+        --secondary-color: <?php echo htmlspecialchars($secondary_color);
+                            ?>;
+        --background-color: <?php echo htmlspecialchars($background_color);
+                            ?>;
+        --button-color: <?php echo htmlspecialchars($button_color);
+                        ?>;
+        --border-color: <?php echo htmlspecialchars($border_color);
+                        ?>;
+    }
+
+    body {
+        background-color: var(--background-color);
+    }
+
+    h2 {
+        color: var(--primary-color);
     }
 
     .btn-primary {
-        background-color: <?php echo htmlspecialchars($primary_color);
-                            ?>;
-        border-color: <?php echo htmlspecialchars($primary_color);
-                        ?>;
+        background-color: var(--button-color);
+        border-color: var(--button-color);
+        color: var(--primary-color)
     }
 
     .btn-secondary {
-        background-color: <?php echo htmlspecialchars($secondary_color);
-                            ?>;
-        border-color: <?php echo htmlspecialchars($secondary_color);
-                        ?>;
+        background-color: var(--secondary-color);
+        border-color: var(--secondary-color);
+        color: var(--primary-color)
     }
 
     .form-control,
     .form-select {
-        border-color: <?php echo htmlspecialchars($primary_color);
-                        ?>;
+        border-color: var(--border-color);
     }
 
     .form-label {
-        color: <?php echo htmlspecialchars($primary_color);
-                ?>;
+        color: var(--primary-color);
     }
 </style>
 

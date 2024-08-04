@@ -45,4 +45,23 @@ export function initConfiguraciones() {
       button.parentElement.remove();
     });
   });
+
+  document.getElementById("background-color").addEventListener("input", function () {
+    document.getElementById("example-card").style.backgroundColor = this.value;
+  });
+
+  document.getElementById("font-color").addEventListener("input", function () {
+    document.getElementById("card-title").style.color = this.value;
+    document.getElementById("card-text").style.color = this.value;
+    document.getElementById("btn-primary-example").style.color = this.value;
+    document.getElementById("btn-secondary-example").style.color = this.value;
+  });
+
+  document.getElementById("btn-primary-color").addEventListener("input", function () {
+    document.getElementById("btn-primary-example").style.backgroundColor = this.value;
+  });
+
+  document.getElementById("btn-secondary-color").addEventListener("input", function () {
+    document.getElementById("btn-secondary-example").style.backgroundColor = this.value;
+  });
 }

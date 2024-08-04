@@ -55,10 +55,44 @@ if (!$company) {
                           </div>";
             }
             ?>
-        </div>
-        <div class="d-flex flex-column row-cols-md-4">
             <button type="button" id="addBlockedDate" class="btn btn-primary mb-4">Añadir Fecha Bloqueada</button>
-            <button type="submit" class="btn btn-success">Guardar Configuración</button>
         </div>
+
+        <div class="container">
+            <div class="row">
+                <h3 class="mb-3">Color del Formulario</h3>
+                <div class="col-md-6 color-inputs d-flex">
+                    <div class="form-color-group w-25">
+                        <label for="background-color" class="form-label">Fondo:</label>
+                        <input type="color" class="form-control" style="height: 50px" id="background-color" name="background-color" value="<?php echo $company['bg_color'] ?>">
+                    </div>
+                    <div class="form-color-group w-25">
+                        <label for="font-color" class="form-label">Texto:</label>
+                        <input type="color" class="form-control" style="height: 50px" id="font-color" name="font-color" value="<?php echo $company['font_color'] ?>">
+                    </div>
+                    <div class="form-color-group w-25">
+                        <label for="btn-primary-color" class="form-label">Btn Anterior:</label>
+                        <input type="color" class="form-control" style="height: 50px" id="btn-primary-color" name="btn-primary-color" value="<?php echo $company['btn1'] ?>">
+                    </div>
+                    <div class="form-color-group w-25">
+                        <label for="btn-secondary-color" class="form-label">Btn Siguiente:</label>
+                        <input type="color" class="form-control" style="height: 50px" id="btn-secondary-color" name="btn-secondary-color" value="<?php echo $company['btn2'] ?>">
+                    </div>
+                </div>
+                <div class="col-md-6 example-card">
+                    <div class="card" id="example-card">
+                        <div class="card-body">
+                            <h5 class="card-title" id="card-title">Título del ejemplo</h5>
+                            <p class="card-text" id="card-text">Este es un texto de ejemplo que mostrará los cambios de
+                                color en tiempo real.</p>
+                            <button class="btn" id="btn-primary-example">Anterior</button>
+                            <button class="btn" id="btn-secondary-example">Siguiente</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-success">Guardar Configuración</button>
     </form>
 </div>
