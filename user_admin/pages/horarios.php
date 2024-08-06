@@ -8,7 +8,7 @@
                     <th>Estado</th>
                     <th>Inicio de la jornada</th>
                     <th>Fin de la jornada</th>
-                    <th>Descanso</th>
+                    <th>Acción</th>
                     <th></th>
                 </tr>
             </thead>

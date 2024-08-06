@@ -22,7 +22,7 @@ try {
     $client = new Google_Client();
     $client->setAuthConfig($_ENV['GOOGLE_APPLICATION_CREDENTIALS_PATH']); // Ruta al archivo de configuración de credenciales de Google
     // PRODUCCION
-    $redirect_uri = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'];
+    // $redirect_uri = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'];
     //DESARROLLO
     $redirect_uri = 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'];
 

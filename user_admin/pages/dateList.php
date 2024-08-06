@@ -21,6 +21,7 @@ $result = $sql->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
 
+
 <div class="container mt-4">
     <div class="table-responsive">
         <table class="table table-striped table-hover">
@@ -39,16 +40,16 @@ $result = $sql->fetchAll(PDO::FETCH_ASSOC);
             <tbody>
                 <?php foreach ($result as $row) : ?>
                     <tr>
-                        <td><?php echo htmlspecialchars($row['service']); ?></td>
-                        <td><?php echo htmlspecialchars($row['name']); ?></td>
-                        <td><?php echo htmlspecialchars($row['phone']); ?></td>
-                        <td><?php echo htmlspecialchars($row['mail']); ?></td>
-                        <td><?php echo htmlspecialchars($row['date']); ?></td>
-                        <td><?php echo htmlspecialchars($row['start_time']); ?></td>
-                        <td><?php echo $row['status'] ? 'Confirmada' : 'Pendiente'; ?></td>
+                        <td data-cell="servicio" class="data"><?php echo htmlspecialchars($row['service']); ?></td>
+                        <td data-cell="nombre" class="data"><?php echo htmlspecialchars($row['name']); ?></td>
+                        <td data-cell="telefono" class="data"><?php echo htmlspecialchars($row['phone']); ?></td>
+                        <td data-cell="correo" class="data"><?php echo htmlspecialchars($row['mail']); ?></td>
+                        <td data-cell="fecha" class="data"><?php echo htmlspecialchars($row['date']); ?></td>
+                        <td data-cell="hora" class="data"><?php echo htmlspecialchars($row['start_time']); ?></td>
+                        <td data-cell="estado" class="data"><?php echo $row['status'] ? 'Confirmada' : 'Pendiente'; ?></td>
                         <td class="d-flex justify-content-around">
                             <?php if (!$row['status']) : ?>
-                                <button class="btn btn-success btn-sm" onclick="confirmReservation(<?php echo $row['id']; ?>)" title="Confirmar reserva">
+                                <button class="btn btn-success btn-sm confirm" title="Confirmar reserva" data-id="<?php echo htmlspecialchars($row['id']); ?>">
                                     <i class="fas fa-check"></i>
                                 </button>
                             <?php endif; ?>

@@ -33,25 +33,25 @@ export function initHorarios() {
     tr.innerHTML = `
       <tr class='work-day'>
       <input type='hidden' name='schedule[${day}][schedule_id]' value='${schedule_id}'>
-        <td>${day}
+        <td data-cell="día" class="data">${day}
           <input type='hidden' name='schedule[${day}][day_id]' value='${day_id}'>
         </td>
-        <td>
+        <td data-cell="estado" class="data">
           <div class='form-check form-switch'>
             <input class='form-check-input' type='checkbox' ${checked}>
             <input type='hidden' name='schedule[${day}][is_enabled]' value='${is_enabled}'>
           </div>
         </td>
-        <td>
+        <td data-cell="Inicio Jornada" class="data">
           <input type='time' class='form-control' name='schedule[${day}][start]' value='${work_start}' ${disabled}>
         </td>
-        <td>
+        <td data-cell="Fin Jornada" class="data">
           <input type='time' class='form-control' name='schedule[${day}][end]' value='${work_end}'${disabled}>
         </td>
         <td>
           <button type='button' name='schedule[${day}]' class='btn btn-outline-primary btn-sm descanso' ${disabled}>+ Descanso</button>
         </td>
-        <td>
+        <td data-cell="">
           ${copiaTodo}
         </td>
       </tr>
@@ -106,10 +106,10 @@ export function initHorarios() {
 
     breakRow.innerHTML = `
       <td colspan="2">Hora de descanso</td>
-      <td class='break-time'>
+      <td data-cell="inicio descanso" class='break-time data'>
         <input type='time' class='form-control' name='schedule[${day}][break_start]' value='${break_start}' required>
       </td>
-      <td>
+      <td data-cell="fin descanso" class="data">
         <input type='time' class='form-control' name='schedule[${day}][break_end]' value='${break_end}' required>
       </td>
       <td>

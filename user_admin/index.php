@@ -20,6 +20,24 @@ include dirname(__DIR__) . '/partials/head.php';
 <script>
 const baseUrl = '<?php echo $baseUrl; ?>';
 </script>
+<style>
+@media(max-width:1000px) {
+
+    th {
+        display: none;
+    }
+
+    td {
+        display: block;
+    }
+
+    .data::before {
+        content: attr(data-cell) ": ";
+        font-weight: 700;
+        text-transform: capitalize;
+    }
+}
+</style>
 
 <body>
     <div class="container mt-4">

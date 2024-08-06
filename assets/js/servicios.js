@@ -95,15 +95,15 @@ export function initServicios() {
     emptyServiceRow.classList.add("service-row");
     const tempServiceId = `new-service-${tempServiceCounter}`;
     emptyServiceRow.innerHTML = `
-      <td>
+      <td data-cell="Habilitado" class="data">
         <div class="form-check form-switch">
             <input type="checkbox" class="form-check-input" name="service_enabled[${tempServiceId}]">
         </div>
       </td>
-      <td><input type="text" class="form-control" name="service_name[${tempServiceId}]" value=""></td>
-      <td><input type="number" class="form-control" name="service_duration[${tempServiceId}]" value=""></td>
-      <td><textarea class="form-control" name="service_observations[${tempServiceId}]"></textarea></td>
-      <td>
+      <td data-cell="nombre servicio" class="data"><input type="text" class="form-control" name="service_name[${tempServiceId}]" value=""></td>
+      <td data-cell="horas duración" class="data"><input type="number" class="form-control" name="service_duration[${tempServiceId}]" value=""></td>
+      <td data-cell="observaciones" class="data"><textarea class="form-control" name="service_observations[${tempServiceId}]"></textarea></td>
+      <td data-cell="agrega categorías" class="data">
         <button type="button" class="btn btn-outline-primary btn-sm add-category" data-service-id="${tempServiceId}">+Categoría</button>
       </td>
       <td>
@@ -158,15 +158,15 @@ function addService(service = null) {
   serviceRow.classList.add("service-row");
   const isChecked = service.is_enabled ? "checked" : "";
   serviceRow.innerHTML = `
-    <td>
+     <td data-cell="Habilitado" class="data">
       <div class="form-check form-switch">
           <input type="checkbox" class="form-check-input" name="service_enabled[${serviceId}]" ${isChecked}>
       </div>
     </td>
-    <td><input type="text" class="form-control" name="service_name[${serviceId}]" value="${serviceName}"></td>
-    <td><input type="number" class="form-control" name="service_duration[${serviceId}]" value="${serviceDuration}"></td>
-    <td><textarea class="form-control" name="service_observations[${serviceId}]">${serviceObservations}</textarea></td>
-    <td>
+    <td data-cell="nombre servicio" class="data"><input type="text" class="form-control" name="service_name[${serviceId}]" value="${serviceName}"></td>
+    <td data-cell="horas duración" class="data"><input type="number" class="form-control" name="service_duration[${serviceId}]" value="${serviceDuration}"></td>
+    <td data-cell="observaciones" class="data"><textarea class="form-control" name="service_observations[${serviceId}]">${serviceObservations}</textarea></td>
+    <td data-cell="agrega categorías" class="data">
       <button type="button" class="btn btn-outline-primary btn-sm add-category" data-service-id="${serviceId}">+Categoría</button>
     </td>
     <td>
@@ -201,8 +201,8 @@ function addCategoryToService(serviceId, category) {
   categoryRow.innerHTML = `
     <td></td>
     <td class="text-center">CATEGORÍA</td>
-    <td><input type="text" class="form-control mb-1" name="category_name[${serviceId}][${categoryId}]" value="${category.category_name}" placeholder="Nombre de la Categoría"></td>
-    <td><textarea class="form-control mb-1" name="category_description[${serviceId}][${categoryId}]" placeholder="Descripción de la Categoría">${category.category_description}</textarea></td>
+    <td data-cell="nombre categoría" class="data"><input type="text" class="form-control mb-1" name="category_name[${serviceId}][${categoryId}]" value="${category.category_name}" placeholder="Nombre de la Categoría"></td>
+    <td data-cell="descripción categoría" class="data"><textarea class="form-control mb-1" name="category_description[${serviceId}][${categoryId}]" placeholder="Descripción de la Categoría">${category.category_description}</textarea></td>
     <td><button type="button" class="btn btn-outline-danger btn-sm remove-category">Eliminar</button></td>
   `;
   tableBody.appendChild(categoryRow);
@@ -223,8 +223,8 @@ function addCategory(button) {
   categoryRow.innerHTML = `
       <td></td>
       <td class="text-center">Agregar categoría</td>
-      <td><input type="text" class="form-control mb-1" name="category_name[${serviceId}][${categoryId}]" value="" placeholder="Nombre de la Categoría"></td>
-      <td><textarea class="form-control mb-1" name="category_description[${serviceId}][${categoryId}]" placeholder="Descripción de la Categoría"></textarea></td>
+      <td data-cell="nombre categoría" class="data"><input type="text" class="form-control mb-1" name="category_name[${serviceId}][${categoryId}]" value="" placeholder="Nombre de la Categoría"></td>
+      <td data-cell="descripción categoría" class="data"><textarea class="form-control mb-1" name="category_description[${serviceId}][${categoryId}]" placeholder="Descripción de la Categoría"></textarea></td>
       <td><button type="button" class="btn btn-outline-danger btn-sm remove-category">Eliminar</button></td>
   `;
   row.insertAdjacentElement("afterend", categoryRow);
