@@ -6,21 +6,22 @@ $dotenv->load();
 class DatabaseSessionManager
 {
     private $db;
-    public $companyId;
+    // public $companyId;
 
     public function __construct()
     {
-        $this->startSession();
+        // $this->startSession();
         $this->connectDB();
-        $this->companyId = $_SESSION['company_id'] ?? null;
+        // $this->companyId = $_SESSION['company_id'] ?? null;
     }
 
-    public function startSession()
-    {
-        if (session_status() == PHP_SESSION_NONE) {
-            session_start();
-        }
-    }
+    // public function startSession()
+    // {
+
+    //     if (session_status() == PHP_SESSION_NONE) {
+    //         session_start();
+    //     }
+    // }
 
     private function connectDB()
     {

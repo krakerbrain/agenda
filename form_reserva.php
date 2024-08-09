@@ -3,7 +3,8 @@
 require_once __DIR__ . '/classes/DatabaseSessionManager.php';
 require_once __DIR__ . '/classes/ConfigUrl.php';
 $manager = new DatabaseSessionManager();
-$manager->startSession();
+// $manager->startSession();
+session_start();
 $conn = $manager->getDB();
 $baseUrl = ConfigUrl::get();
 
@@ -161,11 +162,25 @@ $services = $sql_services->fetchAll(PDO::FETCH_ASSOC);
                 <button type="submit" class="btn btn-primary">Reservar</button>
             </div>
         </form>
-        <div id="response" class="mt-4"></div>
+        <div class="modal fade" id="responseModal" tabindex="-1" aria-labelledby="responseModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="responseModalLabel">Reserva exitosa</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body"></div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" id="acceptButton" data-bs-dismiss="modal">Aceptar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
         function showStep(step) {
+
             document.querySelectorAll('.step').forEach(function(element) {
                 element.classList.add('d-none');
             });
@@ -349,10 +364,18 @@ $services = $sql_services->fetchAll(PDO::FETCH_ASSOC);
                     return response.json();
                 })
                 .then((data) => {
-                    document.getElementById("response").innerText = data.message;
-                    if (data.message === "Cita reservada exitosamente!") {
-                        document.getElementById("appointmentForm").reset();
-                    }
+                    var modalBody = document.querySelector('.modal-body');
+                    modalBody.innerText = data.message;
+                    var modal = new bootstrap.Modal(document.getElementById('responseModal'));
+                    modal.show();
+
+                    // Recargar la página al hacer clic en "Aceptar" si la reserva fue exitosa
+                    var acceptButton = document.getElementById('acceptButton');
+                    acceptButton.addEventListener('click', function() {
+                        if (data.message === "Cita reservada exitosamente!") {
+                            location.reload();
+                        }
+                    });
                 })
                 .catch((error) => {
                     document.getElementById("response").innerText = "Error al reservar la cita.";

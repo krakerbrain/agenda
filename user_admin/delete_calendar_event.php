@@ -2,7 +2,8 @@
 require_once dirname(__DIR__) . '/google_services/google_client.php';
 require_once dirname(__DIR__) . '/classes/DatabaseSessionManager.php';
 $manager = new DatabaseSessionManager();
-$manager->startSession();
+// $manager->startSession();
+session_start();
 $conn = $manager->getDB();
 
 $client = getClient();

@@ -1,7 +1,8 @@
 <?php
 require_once dirname(__DIR__) . '/classes/DatabaseSessionManager.php';
 $manager = new DatabaseSessionManager();
-$manager->startSession();
+// $manager->startSession();
+session_start();
 $conn = $manager->getDB();
 
 $data = json_decode(file_get_contents('php://input'), true);

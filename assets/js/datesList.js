@@ -1,10 +1,11 @@
 export function initDateList() {
-  console.log("aqui");
-
-  document.querySelector(".confirm").addEventListener("click", function (event) {
-    event.preventDefault();
-    confirmReservation(event.currentTarget.dataset.id);
-  });
+  const confirmButton = document.querySelector(".confirm");
+  if (confirmButton) {
+    confirmButton.addEventListener("click", function (event) {
+      event.preventDefault();
+      confirmReservation(event.currentTarget.dataset.id);
+    });
+  }
 
   function confirmReservation(id) {
     fetch(`${baseUrl}user_admin/confirm.php`, {

@@ -51,46 +51,47 @@ $baseUrl = ConfigUrl::get();
         </div>
     </div>
     <script>
-        const baseUrl = '<?php echo $baseUrl; ?>';
+    const baseUrl = '<?php echo $baseUrl; ?>';
 
-        document.getElementById('addCompanyForm').addEventListener('submit', function(event) {
-            event.preventDefault();
+    document.getElementById('addCompanyForm').addEventListener('submit', function(event) {
+        event.preventDefault();
 
-            const formData = new FormData(this);
-            fetch(`${baseUrl}master_admin/add_company.php`, {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Empresa agregada exitosamente');
-                    } else {
-                        alert('Error al agregar la empresa');
-                    }
-                })
-                .catch(error => console.error('Error:', error));
-        });
+        const formData = new FormData(this);
+        fetch(`${baseUrl}master_admin/add_company.php`, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('company_id').value = data.company_id;
+                    alert('Empresa agregada exitosamente');
+                } else {
+                    alert('Error al agregar la empresa');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    });
 
-        document.getElementById('addUserForm').addEventListener('submit', function(event) {
-            event.preventDefault();
+    document.getElementById('addUserForm').addEventListener('submit', function(event) {
+        event.preventDefault();
 
-            const formData = new FormData(this);
-            // formData.append('master_admin', 'master_admin');
-            fetch(`${baseUrl}login/registra_usuario.php`, {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Usuario agregado exitosamente');
-                    } else {
-                        alert('Error al agregar el usuario');
-                    }
-                })
-                .catch(error => console.error('Error:', error));
-        });
+        const formData = new FormData(this);
+        // formData.append('master_admin', 'master_admin');
+        fetch(`${baseUrl}login/registra_usuario.php`, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Usuario agregado exitosamente');
+                } else {
+                    alert('Error al agregar el usuario');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    });
     </script>
 </body>
 

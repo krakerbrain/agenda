@@ -4,6 +4,7 @@ require_once dirname(__DIR__) . '/classes/ConfigUrl.php';
 $baseUrl = ConfigUrl::get();
 $manager = new DatabaseSessionManager();
 $conn = $manager->getDB();
+$title = "Login";
 
 $error = "false";
 $creado = isset($_REQUEST['creado']) ? $_REQUEST['creado'] : "";
@@ -23,8 +24,8 @@ if (isset($_POST['usuario']) && isset($_POST['contrasenia'])) {
                 if (password_verify($pass, $datos['password'])) {
                     session_start();
                     $_SESSION['company_id'] = $result[0]['company_id'];
-                    header("Location: " . $baseUrl . "google_services/google_auth.php");
-                    // header("Location: " . $baseUrl . "user_admin/index.php");
+                    // header("Location: " . $baseUrl . "google_services/google_auth.php");
+                    header("Location: " . $baseUrl . "user_admin/index.php");
                 } else {
                     $error = "true";
                     session_abort();

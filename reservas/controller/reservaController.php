@@ -3,7 +3,8 @@ require_once dirname(__DIR__, 2) . '/classes/DatabaseSessionManager.php';
 require_once dirname(__DIR__, 2) . '/classes/ConfigUrl.php';
 
 $manager = new DatabaseSessionManager();
-$manager->startSession();
+// $manager->startSession();
+session_start();
 $conn = $manager->getDB();
 
 $input = json_decode(file_get_contents('php://input'), true);

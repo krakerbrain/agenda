@@ -11,7 +11,11 @@ document.addEventListener("DOMContentLoaded", function () {
     link.addEventListener("click", function (event) {
       event.preventDefault();
       const page = this.id;
-      loadContent(page);
+      if (page === "logout") {
+        logout();
+      } else {
+        loadContent(page);
+      }
     });
   });
 
@@ -55,6 +59,23 @@ document.addEventListener("DOMContentLoaded", function () {
       })
       .catch((error) => {
         mainContent.innerHTML = error.message;
+      });
+  }
+
+  function logout() {
+    fetch(`${baseUrl}login/logout.php`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Error al cerrar la sesión.");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        window.location.href = data.redirect;
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        window.location.href = "index.php"; // Redirigir incluso si hay un error
       });
   }
 });

@@ -3,10 +3,12 @@ require_once dirname(__DIR__, 2) . '/classes/DatabaseSessionManager.php';
 require_once dirname(__DIR__, 2) . '/classes/ConfigUrl.php';
 $baseUrl = ConfigUrl::get();
 $manager = new DatabaseSessionManager();
-$manager->startSession();
+// $manager->startSession();
+session_start();
 $conn = $manager->getDB();
 
 $sesion = isset($_SESSION['company_id']);
+
 if (!$sesion) {
     header("Location: " . $baseUrl . "login/index.php");
 }

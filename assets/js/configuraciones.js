@@ -1,27 +1,28 @@
 export function initConfiguraciones() {
   const form = document.getElementById("companyConfigForm");
+  if (form) {
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();
+      const formData = new FormData(form);
 
-  form.addEventListener("submit", function (event) {
-    event.preventDefault();
-    const formData = new FormData(form);
-
-    fetch(`${baseUrl}user_admin/controllers/configuraciones.php`, {
-      method: "POST",
-      body: formData,
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.success) {
-          alert("Configuración guardada correctamente.");
-        } else {
-          alert("Hubo un error al guardar la configuración.");
-        }
+      fetch(`${baseUrl}user_admin/controllers/configuraciones.php`, {
+        method: "POST",
+        body: formData,
       })
-      .catch((error) => {
-        console.error("Error:", error);
-        alert("Hubo un error al guardar la configuración.");
-      });
-  });
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            alert("Configuración guardada correctamente.");
+          } else {
+            alert("Hubo un error al guardar la configuración.");
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          alert("Hubo un error al guardar la configuración.");
+        });
+    });
+  }
 
   document.getElementById("addBlockedDate").addEventListener("click", function () {
     const container = document.getElementById("blockedDatesContainer");
