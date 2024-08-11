@@ -1,7 +1,9 @@
 <?php
 require_once dirname(__DIR__) . '/classes/ConfigUrl.php';
 $baseUrl = ConfigUrl::get();
-session_start();
-session_destroy();
-echo json_encode(['redirect' => $baseUrl]);
+
+// Remove JWT from cookies
+setcookie('jwt', '', time() - 3600, '/');
+
+header("Location: $baseUrl"); // Redirect to baseUrl
 exit();

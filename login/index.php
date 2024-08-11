@@ -1,6 +1,7 @@
 <?php
 require_once dirname(__DIR__) . '/classes/DatabaseSessionManager.php';
 require_once dirname(__DIR__) . '/classes/ConfigUrl.php';
+require_once dirname(__DIR__) . '/access-token/seguridad/jwt.php';
 $baseUrl = ConfigUrl::get();
 $manager = new DatabaseSessionManager();
 $conn = $manager->getDB();
@@ -22,10 +23,13 @@ if (isset($_POST['usuario']) && isset($_POST['contrasenia'])) {
         foreach ($result as $datos) {
             if ($datos['conteo'] > 0) {
                 if (password_verify($pass, $datos['password'])) {
-                    session_start();
-                    $_SESSION['company_id'] = $result[0]['company_id'];
-                    // header("Location: " . $baseUrl . "google_services/google_auth.php");
+                    // session_start();
+                    // $_SESSION['company_id'] = $result[0]['company_id'];
+                    // // header("Location: " . $baseUrl . "google_services/google_auth.php");
+                    // header("Location: " . $baseUrl . "user_admin/index.php");
+                    generarTokenYConfigurarCookie($result[0]['company_id']);
                     header("Location: " . $baseUrl . "user_admin/index.php");
+                    exit;
                 } else {
                     $error = "true";
                     session_abort();
@@ -68,13 +72,15 @@ include '../partials/head.php';
                         <div class="input-group-text">
                             <i class="fa-solid fa-user text-secondary"></i>
                         </div>
-                        <input type="mail" name="usuario" id="usuario" class="form-control" placeholder="Ingrese correo" autocomplete="email" required>
+                        <input type="mail" name="usuario" id="usuario" class="form-control" placeholder="Ingrese correo"
+                            autocomplete="email" required>
                     </div>
                     <div class="input-group mt-3">
                         <div class="input-group-text">
                             <i class="fa-solid fa-key text-secondary"></i>
                         </div>
-                        <input type="password" name="contrasenia" id="contrasenia" class="form-control" placeholder="Ingrese su contraseña" autocomplete="current-password" required>
+                        <input type="password" name="contrasenia" id="contrasenia" class="form-control"
+                            placeholder="Ingrese su contraseña" autocomplete="current-password" required>
                         <div class="input-group-text bg-light">
                             <a href="#" class="text-secondary pe-auto">
                                 <i class="fa-solid fa-eye" onclick="verpass()"></i>
@@ -99,7 +105,9 @@ include '../partials/head.php';
                 <!-- <a href="recupera.php" class="text-decoration-none">
                     <p class="text-center text-success">¿Olvidó su contraseña?</p>
                 </a> -->
-                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
+                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+                    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+                    crossorigin="anonymous">
                 </script>
                 <script>
                     function verpass() {

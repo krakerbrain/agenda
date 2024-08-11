@@ -1,13 +1,15 @@
 <?php
 require_once dirname(__DIR__) . '/classes/DatabaseSessionManager.php';
 require_once dirname(__DIR__) . '/classes/ConfigUrl.php';
+require_once dirname(__DIR__) . '/access-token/seguridad/jwt.php';
 $baseUrl = ConfigUrl::get();
 $manager = new DatabaseSessionManager();
 // $manager->startSession();
-session_start();
+// session_start();
 $title = "Configuraciones";
-$sesion = isset($_SESSION['company_id']);
-if (!$sesion) {
+// $sesion = isset($_SESSION['company_id']);
+$datosUsuario = validarToken();
+if (!$datosUsuario) {
     header("Location: " . $baseUrl . "login/index.php");
 }
 
@@ -57,7 +59,8 @@ include dirname(__DIR__) . '/partials/head.php';
     </div>
     <div id="main-content" class="container mt-5"></div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
     </script>
     <script type="module" src="<?php echo $baseUrl; ?>assets/js/navbar.js"></script>
 </body>

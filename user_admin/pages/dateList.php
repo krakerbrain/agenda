@@ -1,26 +1,30 @@
 <?php
 require_once dirname(__DIR__, 2) . '/classes/DatabaseSessionManager.php';
 require_once dirname(__DIR__, 2) . '/classes/ConfigUrl.php';
+require_once dirname(__DIR__, 2) . '/access-token/seguridad/jwt.php';
 $baseUrl = ConfigUrl::get();
 $manager = new DatabaseSessionManager();
 // $manager->startSession();
-session_start();
-$conn = $manager->getDB();
+// session_start();
 
-$sesion = isset($_SESSION['company_id']);
-
-if (!$sesion) {
+// $sesion = isset($_SESSION['company_id']);
+$datosUsuario = validarToken();
+// $_SESSION['companyID'] = $_SESSION['company_id'];
+if (!$datosUsuario) {
     header("Location: " . $baseUrl . "login/index.php");
 }
+// Usar $datosUsuario['company_id'] donde sea necesario
+$company_id = $datosUsuario['company_id'];
+$conn = $manager->getDB();
 $sql = $conn->prepare("SELECT a.*, s.name AS service FROM appointments a 
                         inner join services s 
                         on a.id_service = s.id
-                        WHERE a.company_id = $_SESSION[company_id]
+                        WHERE a.company_id = :company_id
                         AND status != 2
                         ORDER BY date DESC");
+$sql->bindParam(':company_id', $_SESSION['companyID']);
 $sql->execute();
 $result = $sql->fetchAll(PDO::FETCH_ASSOC);
-
 ?>
 
 
@@ -51,11 +55,13 @@ $result = $sql->fetchAll(PDO::FETCH_ASSOC);
                         <td data-cell="estado" class="data"><?php echo $row['status'] ? 'Confirmada' : 'Pendiente'; ?></td>
                         <td class="d-flex justify-content-around">
                             <?php if (!$row['status']) : ?>
-                                <button class="btn btn-success btn-sm confirm" title="Confirmar reserva" data-id="<?php echo htmlspecialchars($row['id']); ?>">
+                                <button class="btn btn-success btn-sm confirm" title="Confirmar reserva"
+                                    data-id="<?php echo htmlspecialchars($row['id']); ?>">
                                     <i class="fas fa-check"></i>
                                 </button>
                             <?php endif; ?>
-                            <button class="btn btn-danger btn-sm" title="Eliminar reserva" onclick="deleteAppointment('<?php echo $row['event_id']; ?>', <?php echo $row['id']; ?>)">
+                            <button class="btn btn-danger btn-sm" title="Eliminar reserva"
+                                onclick="deleteAppointment('<?php echo $row['event_id']; ?>', <?php echo $row['id']; ?>)">
                                 <i class="fas fa-times"></i>
                             </button>
                         </td>
