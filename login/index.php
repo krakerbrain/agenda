@@ -15,33 +15,26 @@ if (isset($_POST['usuario']) && isset($_POST['contrasenia'])) {
     $pass = $_POST['contrasenia'];
     $usuario = $_POST['usuario'];
     if ($pass != "" && $usuario != "") {
-        $query = $conn->prepare("SELECT count(*) as conteo, password, company_id FROM users WHERE email = :usuario");
-        $query->bindParam(':usuario', $usuario);
-        $query->execute();
-        $result = $query->fetchAll(PDO::FETCH_ASSOC);
+        try {
+            $query = $conn->prepare("SELECT password, company_id FROM users WHERE email = :usuario LIMIT 1");
+            $query->bindParam(':usuario', $usuario);
+            $query->execute();
+            $datos = $query->fetch(PDO::FETCH_ASSOC);
 
-        foreach ($result as $datos) {
-            if ($datos['conteo'] > 0) {
+            if ($datos) {
                 if (password_verify($pass, $datos['password'])) {
-                    // session_start();
-                    // $_SESSION['company_id'] = $result[0]['company_id'];
-                    // // header("Location: " . $baseUrl . "google_services/google_auth.php");
-                    // header("Location: " . $baseUrl . "user_admin/index.php");
-                    generarTokenYConfigurarCookie($result[0]['company_id']);
+                    generarTokenYConfigurarCookie($datos['company_id']);
                     header("Location: " . $baseUrl . "user_admin/index.php");
                     exit;
                 } else {
                     $error = "true";
-                    session_abort();
                 }
             } else {
                 $error = "noexiste";
-                session_abort();
             }
+        } catch (PDOException $e) {
+            echo "Error de conexión: " . $e->getMessage();
         }
-    } else {
-        $error = "vacio";
-        session_abort();
     }
 }
 
@@ -60,11 +53,11 @@ include '../partials/head.php';
                     <div class="form-group text-center mt-3">
                         <div class="mb-3">
                             <?php if ($creado == "true") { ?>
-                                <span class="text-success fw-semibold">¡Se ha registrado correctamente!</span><br>
-                                <small>Por favor ingrese al sistema.</small>
+                            <span class="text-success fw-semibold">¡Se ha registrado correctamente!</span><br>
+                            <small>Por favor ingrese al sistema.</small>
                             <?php } else if ($cambio_clave == "true") { ?>
-                                <span class="text-success fw-semibold">¡El cambio de clave ha sido exitoso!</span><br>
-                                <small>Por favor ingrese al sistema.</small>
+                            <span class="text-success fw-semibold">¡El cambio de clave ha sido exitoso!</span><br>
+                            <small>Por favor ingrese al sistema.</small>
                             <?php } ?>
                         </div>
                     </div>
@@ -91,11 +84,11 @@ include '../partials/head.php';
                         <input type="submit" value="Ingresar" class="btn btn-info w-100">
                     </div>
                     <?php if ($error == "true") { ?>
-                        <span class=" d-flex justify-content-center mt-1">Password incorrecto.</span>
+                    <span class=" d-flex justify-content-center mt-1">Credenciales incoorrectas.</span>
                     <?php } else if ($error == "vacio") { ?>
-                        <span class=" d-flex justify-content-center mt-1">Debe llenar todos los campos.</span>
+                    <span class=" d-flex justify-content-center mt-1">Debe llenar todos los campos.</span>
                     <?php } else if ($error == "noexiste") { ?>
-                        <span class=" d-flex justify-content-center mt-1">Usuario No Existe.</span>
+                    <span class=" d-flex justify-content-center mt-1">Usuario No Existe.</span>
                     <?php } ?>
                 </form>
                 <div class="d-flex gap-1 justify-content-center mt-1">
@@ -110,8 +103,8 @@ include '../partials/head.php';
                     crossorigin="anonymous">
                 </script>
                 <script>
-                    function verpass() {
-                        var pass = document.getElementById('contrasenia');
-                        pass.type = pass.type == "password" ? "text" : "password"
-                    }
+                function verpass() {
+                    var pass = document.getElementById('contrasenia');
+                    pass.type = pass.type == "password" ? "text" : "password"
+                }
                 </script>
