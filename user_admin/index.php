@@ -50,6 +50,9 @@ include dirname(__DIR__) . '/partials/head.php';
                 <a class="nav-link" href="#" id="servicios">Servicios</a>
             </li>
             <li class="nav-item">
+                <a class="nav-link" href="#" id="correos">Correos</a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link" href="#" id="configuraciones">Otras configuraciones</a>
             </li>
             <li class="nav-item">

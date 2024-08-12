@@ -2,6 +2,7 @@ import { initDateList } from "./datesList.js";
 import { initHorarios } from "./horarios.js";
 import { initServicios } from "./servicios.js";
 import { initConfiguraciones } from "./configuraciones.js";
+import { initCorreos } from "./correos.js";
 
 document.addEventListener("DOMContentLoaded", function () {
   const links = document.querySelectorAll(".nav-link");
@@ -52,6 +53,9 @@ document.addEventListener("DOMContentLoaded", function () {
             break;
           case "configuraciones":
             initConfiguraciones();
+            break;
+          case "correos":
+            initCorreos();
             break;
           default:
             console.error("No hay un módulo para la página:", page);
