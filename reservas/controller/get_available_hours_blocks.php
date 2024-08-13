@@ -69,18 +69,10 @@ $current_time = clone $work_start;
 
 // Si la duración del servicio es mayor que el tiempo disponible antes del descanso, saltar el descanso
 if ($service_duration_minutes > $minutes_before_break) {
-    $end_time = clone $current_time;
-    $end_time->add(new DateInterval('PT' . $service_duration_minutes . 'M'));
 
-    if ($end_time <= $work_end) {
-        $available_times[] = [
-            'start' => $current_time->format('H:i'),
-            'end' => $end_time->format('H:i')
-        ];
-    } else {
-        echo json_encode(['success' => false, 'message' => 'La duración del servicio excede el horario laboral.']);
-        exit;
-    }
+    // Invocar la función para generar los horarios disponibles
+    $leave_gap = true; // Puedes cambiar este valor a true si quieres dejar una hora de espacio entre servicios
+    $available_times = generateAvailableTimeSlots($work_start, $work_end, $break_start, $break_end, $service_duration_minutes, $leave_gap);
 } else {
     // Calcular bloques de tiempo normalmente si el servicio cabe antes del descanso
     while ($current_time < $work_end) {
@@ -151,4 +143,56 @@ if (empty($available_times)) {
     echo json_encode(['success' => false, 'message' => 'No hay horas disponibles para la fecha seleccionada.']);
 } else {
     echo json_encode(['success' => true, 'available_times' => $available_times]);
+}
+
+function generateAvailableTimeSlots($work_start, $work_end, $break_start, $break_end, $service_duration_minutes, $leave_gap = false)
+{
+    $available_times = [];
+
+    // Calcular el tiempo antes y después del descanso
+    $minutes_before_break = $work_start->diff($break_start)->h * 60 + $work_start->diff($break_start)->i;
+    $minutes_after_break = $break_end->diff($work_end)->h * 60 + $break_end->diff($work_end)->i;
+
+    // Opción 1: Servicio antes del descanso
+    if ($service_duration_minutes <= $minutes_before_break) {
+        $end_time = clone $work_start;
+        $end_time->add(new DateInterval('PT' . $service_duration_minutes . 'M'));
+        $available_times[] = [
+            'start' => $work_start->format('H:i'),
+            'end' => $end_time->format('H:i')
+        ];
+    }
+
+    // Opción 2: Servicio después del descanso
+    if ($service_duration_minutes <= $minutes_after_break) {
+        $end_time = clone $break_end;
+        $end_time->add(new DateInterval('PT' . $service_duration_minutes . 'M'));
+
+        // Si se debe dejar una hora entre servicios, ajustar el final del intervalo
+        if ($leave_gap) {
+            $break_end = clone $break_end; // Clonar para evitar modificar el original
+            $break_end->add(new DateInterval('PT1H')); // Añadir una hora de separación al final del período de descanso
+            $end_time->add(new DateInterval('PT1H')); // Añadir una hora al final del servicio
+        }
+
+        // Asegurarse de que el nuevo intervalo no exceda el horario laboral
+        if ($end_time <= $work_end) {
+            $available_times[] = [
+                'start' => $break_end->format('H:i'),
+                'end' => $end_time->format('H:i')
+            ];
+        }
+    }
+
+    // Opción 3: Saltar el descanso y usar la duración completa
+    if ($service_duration_minutes > $minutes_before_break && $service_duration_minutes <= ($minutes_before_break + $minutes_after_break)) {
+        $end_time = clone $work_start;
+        $end_time->add(new DateInterval('PT' . $service_duration_minutes . 'M'));
+        $available_times[] = [
+            'start' => $work_start->format('H:i'),
+            'end' => $end_time->format('H:i')
+        ];
+    }
+
+    return $available_times;
 }
