@@ -12,13 +12,13 @@ function sendConfirmationEmail($name, $email, $date, $time)
         $mail->isSMTP();
         $mail->Host = 'smtp.gmail.com';
         $mail->SMTPAuth = true;
-        $mail->Username = 'krakerbrain@gmail.com'; // Tu dirección de correo de Gmail
-        $mail->Password = 'xfem ehce lpps owrj'; // Tu contraseña de Gmail
+        $mail->Username = 'agendaroad@gmail.com'; // Tu dirección de correo de Gmail
+        $mail->Password = 'ngua iwiw vogx xkwx'; // Tu contraseña de Gmail
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port = 587;
 
         // Configuración del correo electrónico
-        $mail->setFrom('krakerbrain@gmail.com', 'Mario Montenegro');
+        $mail->setFrom('agendaroad@gmail.com', 'Agenda Road');
         $mail->addAddress($email, $name);
         $mail->isHTML(true);
         $mail->Subject = 'Confirmación de cita';
@@ -28,5 +28,35 @@ function sendConfirmationEmail($name, $email, $date, $time)
         $mail->send();
     } catch (Exception $e) {
         throw new Exception("Error al enviar el correo: " . $email . " {$mail->ErrorInfo}");
+    }
+}
+
+
+function sendEmail($to, $mailContent)
+{
+    $mail = new PHPMailer(true);
+    $mail->Subject = $mailContent['subject'];
+    $mail->Body = $mailContent['body'];
+
+    try {
+        // Configuración del servidor SMTP
+        $mail->isSMTP();
+        $mail->Host = 'smtp.gmail.com';
+        $mail->SMTPAuth = true;
+        $mail->Username = 'agendaroad@gmail.com'; // Tu dirección de correo de Gmail
+        $mail->Password = 'ngua iwiw vogx xkwx'; // Tu contraseña de Gmail
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port = 587;
+
+        // Configuración del correo electrónico
+        $mail->setFrom('agendaroad@gmail.com', 'Agenda Road');
+        $mail->addAddress($to);
+        $mail->isHTML(true);
+        $mail->Subject = $mail->Subject;
+        $mail->Body = $mail->Body;
+
+        $mail->send();
+    } catch (Exception $e) {
+        echo "Error al enviar el correo: {$mail->ErrorInfo}";
     }
 }

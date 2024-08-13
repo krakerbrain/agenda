@@ -1,15 +1,19 @@
 <?php
 require_once dirname(__DIR__, 2) . '/classes/DatabaseSessionManager.php';
+require_once dirname(__DIR__, 2) . '/classes/EmailTemplateBuilder.php';
+require_once dirname(__DIR__, 2) . '/send_email.php';
 $manager = new DatabaseSessionManager();
 $conn = $manager->getDB();
 
 try {
+    // Iniciar la transacción
+    $conn->beginTransaction();
+
     // Recibir los datos del cuerpo de la solicitud
     $data = $_POST;
+
     if (!$data) {
-        echo json_encode(['message' => 'Datos inválidos recibidos']);
-        http_response_code(400);
-        exit;
+        throw new Exception('Datos inválidos recibidos');
     }
 
     $company_id = $data['company_id'];
@@ -30,6 +34,7 @@ try {
     // Formatear el tiempo en "H:i" (horas:minutos)
     $formattedStartTime = $startDateTime->format('H:i');
     $formattedEndTime = $endDateTime->format('H:i');
+
     // Preparar la consulta SQL
     $stmt = $conn->prepare("INSERT INTO appointments (company_id, name, phone, mail, date, start_time, end_time, id_service) VALUES (:company_id, :name, :phone, :mail, :date, :start_time, :end_time, :id_service)");
 
@@ -45,14 +50,25 @@ try {
 
     // Ejecutar la consulta
     if ($stmt->execute()) {
-        echo json_encode(['message' => 'Cita reservada exitosamente!']);
+        // Obtener el email template y el logo
+        $emailTemplateBuilder = new EmailTemplateBuilder();
+        $emailContent = $emailTemplateBuilder->buildEmail($company_id, 'Reserva', $name, $date, $formattedStartTime, $formattedEndTime);
+
+        // Enviar el correo
+        sendEmail($mail, $emailContent);
+
+        // Confirmar la transacción
+        $conn->commit();
+
+        echo json_encode(['message' => 'Cita reservada exitosamente y correo enviado!']);
         http_response_code(200);
     } else {
-        echo json_encode(['message' => 'Error al reservar la cita.']);
-        http_response_code(500);
+        throw new Exception('Error al reservar la cita.');
     }
-} catch (PDOException $e) {
-    echo json_encode(['message' => 'Error en la base de datos: ' . $e->getMessage()]);
+} catch (Exception $e) {
+    // Revertir la transacción en caso de error
+    $conn->rollBack();
+    echo json_encode(['message' => 'Error: ' . $e->getMessage()]);
     http_response_code(500);
 } finally {
     // Cerrar la conexión

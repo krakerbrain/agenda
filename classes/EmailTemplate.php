@@ -82,4 +82,28 @@ class EmailTemplate
         }
         return $errors;
     }
+
+    public function buildEmail($company_id, $templateType, $name, $date, $startTime, $endTime)
+    {
+        $query = $this->conn->prepare("SELECT subject, body FROM email_templates WHERE company_id = :company_id AND template_name = :template_type LIMIT 1");
+        $query->bindParam(':company_id', $company_id);
+        $query->bindParam(':template_type', $templateType);
+        $query->execute();
+        $template = $query->fetch(PDO::FETCH_ASSOC);
+
+        if (!$template) {
+            return "Template no encontrado.";
+        }
+
+        $subject = $template['subject'];
+        $body = $template['body'];
+        $subject = str_replace('{fecha_reserva}', $date, $subject);
+        // Reemplazar los placeholders en el cuerpo del email
+        $body = str_replace(
+            ['{nombre_cliente}', '{fecha_reserva}', '{start_time}',],
+            [$name, $date, $startTime],
+            $body
+        );
+        return ['subject' => $subject, 'body' => $body];
+    }
 }
