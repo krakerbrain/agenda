@@ -1,7 +1,7 @@
 <?php
 require_once dirname(__DIR__, 2) . '/classes/DatabaseSessionManager.php';
-require_once dirname(__DIR__, 2) . '/classes/EmailTemplateBuilder.php';
-require_once dirname(__DIR__, 2) . '/send_email.php';
+require_once dirname(__DIR__, 2) . '/classes/EmailTemplate.php';
+require_once dirname(__DIR__, 2) . '/user_admin/send_email.php';
 $manager = new DatabaseSessionManager();
 $conn = $manager->getDB();
 
@@ -51,8 +51,8 @@ try {
     // Ejecutar la consulta
     if ($stmt->execute()) {
         // Obtener el email template y el logo
-        $emailTemplateBuilder = new EmailTemplateBuilder();
-        $emailContent = $emailTemplateBuilder->buildEmail($company_id, 'Reserva', $name, $date, $formattedStartTime, $formattedEndTime);
+        $emailTemplateBuilder = new EmailTemplate();
+        $emailContent = $emailTemplateBuilder->buildEmail($company_id, 'Reserva', $id_service, $name, $date, $formattedStartTime);
 
         // Enviar el correo
         sendEmail($mail, $emailContent);

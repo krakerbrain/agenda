@@ -3,6 +3,9 @@
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
+require_once dirname(__DIR__) . '/classes/ConfigUrl.php';
+
+$baseUrl = ConfigUrl::get();
 function sendConfirmationEmail($name, $email, $date, $time)
 {
     $mail = new PHPMailer(true);
@@ -34,7 +37,12 @@ function sendConfirmationEmail($name, $email, $date, $time)
 
 function sendEmail($to, $mailContent)
 {
+    $baseUrl = ConfigUrl::get();
     $mail = new PHPMailer(true);
+
+
+    // Asignar el asunto y el cuerpo del correo
+    // $mail->Subject = $mailContent['subject'];
     $mail->Subject = $mailContent['subject'];
     $mail->Body = $mailContent['body'];
 
@@ -52,8 +60,7 @@ function sendEmail($to, $mailContent)
         $mail->setFrom('agendaroad@gmail.com', 'Agenda Road');
         $mail->addAddress($to);
         $mail->isHTML(true);
-        $mail->Subject = $mail->Subject;
-        $mail->Body = $mail->Body;
+
 
         $mail->send();
     } catch (Exception $e) {

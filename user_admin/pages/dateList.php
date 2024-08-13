@@ -22,9 +22,10 @@ $sql = $conn->prepare("SELECT a.*, s.name AS service FROM appointments a
                         WHERE a.company_id = :company_id
                         AND status != 2
                         ORDER BY date DESC");
-$sql->bindParam(':company_id', $_SESSION['companyID']);
+$sql->bindParam(':company_id', $company_id);
 $sql->execute();
 $result = $sql->fetchAll(PDO::FETCH_ASSOC);
+
 ?>
 
 

@@ -1,5 +1,6 @@
 <?php
 require_once dirname(__DIR__) . '/classes/DatabaseSessionManager.php';
+require_once dirname(__DIR__) . '/classes/EmailTemplate.php';
 $manager = new DatabaseSessionManager();
 // $manager->startSession();
 session_start();
@@ -34,8 +35,10 @@ try {
     // Crear evento en Google Calendar
     createCalendarEvent($client, $appointment['name'], $appointment['service'], $startDateTimeFormatted, $endDateTimeFormatted, $appointment['id'], $conn);
 
+    $emailTemplateBuilder = new EmailTemplate();
+    $emailContent = $emailTemplateBuilder->buildEmail($appointment['company_id'], 'Confirmación', $appointment['id_service'], $appointment['name'], $appointment['date'], $appointment['start_time']);
     // Enviar confirmación por correo electrónico
-    sendConfirmationEmail($appointment['name'], $appointment['mail'], $appointment['date'], $appointment['start_time']);
+    sendEmail($appointment['mail'], $emailContent);
 
     // Marcar la cita como confirmada en la base de datos
     confirmAppointment($conn, $id);

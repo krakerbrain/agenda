@@ -1,6 +1,7 @@
 <?php
 
 require_once 'DatabaseSessionManager.php'; // Asegúrate de tener la ruta correcta
+require_once 'ConfigUrl.php'; // Asegúrate de tener la ruta correcta
 
 class EmailTemplate
 {
@@ -9,7 +10,9 @@ class EmailTemplate
     public function __construct()
     {
         $manager = new DatabaseSessionManager();
+        $baseUrl = new ConfigUrl();
         $this->conn = $manager->getDB();
+        $this->baseUrl = $baseUrl->get();
     }
 
     // Obtener plantillas por company_id
@@ -83,9 +86,10 @@ class EmailTemplate
         return $errors;
     }
 
-    public function buildEmail($company_id, $templateType, $name, $date, $startTime, $endTime)
+    public function buildEmail($company_id, $templateType, $service_id, $name, $date, $startTime)
     {
-        $query = $this->conn->prepare("SELECT subject, body FROM email_templates WHERE company_id = :company_id AND template_name = :template_type LIMIT 1");
+        // Obtener el asunto de la tabla email_templates
+        $query = $this->conn->prepare("SELECT subject FROM email_templates WHERE company_id = :company_id AND template_name = :template_type LIMIT 1");
         $query->bindParam(':company_id', $company_id);
         $query->bindParam(':template_type', $templateType);
         $query->execute();
@@ -95,15 +99,40 @@ class EmailTemplate
             return "Template no encontrado.";
         }
 
-        $subject = $template['subject'];
-        $body = $template['body'];
-        $subject = str_replace('{fecha_reserva}', $date, $subject);
+        // Obtener el nombre y logo de la empresa
+        $companyQuery = $this->conn->prepare("SELECT name, logo FROM companies WHERE id = :company_id LIMIT 1");
+        $companyQuery->bindParam(':company_id', $company_id);
+        $companyQuery->execute();
+        $company = $companyQuery->fetch(PDO::FETCH_ASSOC);
+        $logo = 'https://agenda2024.online/' . $company['logo'];
+        if (!$company) {
+            return "Empresa no encontrada.";
+        }
+
+        // Obtener el nombre del servicio
+        $serviceQuery = $this->conn->prepare("SELECT name FROM services WHERE id = :service_id LIMIT 1");
+        $serviceQuery->bindParam(':service_id', $service_id);
+        $serviceQuery->execute();
+        $service = $serviceQuery->fetch(PDO::FETCH_ASSOC);
+
+        if (!$service) {
+            return "Servicio no encontrado.";
+        }
+
+        // Leer la plantilla desde el archivo
+        $templatePath = $this->baseUrl . 'correos_template/correo_confirmacion.php';
+        $templateContent = file_get_contents($templatePath);
+
+        // Reemplazar los placeholders en el asunto
+        $subject = str_replace('{fecha_reserva}', $date, $template['subject']);
+
         // Reemplazar los placeholders en el cuerpo del email
         $body = str_replace(
-            ['{nombre_cliente}', '{fecha_reserva}', '{start_time}',],
-            [$name, $date, $startTime],
-            $body
+            ['{nombre_cliente}', '{fecha_reserva}', '{hora_reserva}', '{servicio_reservado}', '{notas}', '{ruta_logo}', '{nombre_empresa}'],
+            [$name, $date, $startTime, $service['name'], 'nada', $logo, $company['name']],
+            $templateContent
         );
+
         return ['subject' => $subject, 'body' => $body];
     }
 }
