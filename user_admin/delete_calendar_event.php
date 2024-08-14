@@ -3,7 +3,7 @@ require_once dirname(__DIR__) . '/google_services/google_client.php';
 require_once dirname(__DIR__) . '/classes/DatabaseSessionManager.php';
 $manager = new DatabaseSessionManager();
 // $manager->startSession();
-// session_start();
+session_start();
 $conn = $manager->getDB();
 
 $client = getClient();
@@ -28,7 +28,7 @@ function deleteCalendarEvent($conn, $client, $eventId, $appointmentId)
         $sql->bindParam(':appointment_id', $appointmentId, PDO::PARAM_INT);
         $sql->execute();
 
-        echo json_encode(['success' => true]);
+        echo json_encode(['success' => true, 'message' => 'Evento eliminado exitosamente']);
     } catch (Exception $e) {
         throw new Exception('Failed to delete event: ' . $e->getMessage());
     }

@@ -2,7 +2,7 @@
 
 // require_once dirname(__DIR__) . '/classes/DatabaseSessionManager.php';
 // $manager = new DatabaseSessionManager();
-// session_start();
+session_start();
 // $manager->startSession();
 function createCalendarEvent($client, $name, $service, $startDateTimeFormatted, $endDateTimeFormatted, $appointmentId, $conn)
 {

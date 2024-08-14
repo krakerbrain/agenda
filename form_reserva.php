@@ -359,18 +359,13 @@ h2 {
 
     function sendAppointment(formData) {
         const BASE_URL = "<?php echo $baseUrl; ?>reservas/controller/";
-        debugger
         fetch(BASE_URL + "appointment.php", {
                 method: "POST",
                 body: formData,
             })
-            .then((response) => {
-                return response.text(); // Cambia a 'text' para ver la respuesta tal cual
-            })
-            .then((text) => {
+            .then((response) => response.json())
+            .then((data) => {
                 try {
-                    const data = JSON.parse(text); // Intenta convertirla a JSON si es posible
-
                     // Aquí puedes seguir con la lógica anterior si el JSON es válido
                     var modalBody = document.querySelector('.modal-body');
                     modalBody.innerText = data.message;

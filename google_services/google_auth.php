@@ -1,5 +1,5 @@
 <?php
-// session_start();
+session_start();
 require_once dirname(__DIR__) . '/vendor/autoload.php'; // Cargar dependencias
 require_once dirname(__DIR__) . '/classes/ConfigUrl.php';
 

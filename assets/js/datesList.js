@@ -1,6 +1,6 @@
 export function initDateList() {
   const confirmButton = document.querySelector(".confirm");
-  const eliminarReserva = document.querySelector(".eliminarReserva");
+  const eliminarReserva = document.querySelectorAll(".eliminarReserva");
   if (confirmButton) {
     confirmButton.addEventListener("click", function (event) {
       event.preventDefault();
@@ -8,9 +8,11 @@ export function initDateList() {
     });
   }
   if (eliminarReserva) {
-    eliminarReserva.addEventListener("click", function (event) {
-      event.preventDefault();
-      deleteAppointment(event.currentTarget.dataset.id, event.currentTarget.dataset.eventID);
+    eliminarReserva.forEach((button) => {
+      button.addEventListener("click", function (event) {
+        event.preventDefault();
+        deleteAppointment(event.currentTarget.dataset.id, event.currentTarget.dataset.eventid);
+      });
     });
   }
 

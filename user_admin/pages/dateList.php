@@ -46,28 +46,28 @@ $result = $sql->fetchAll(PDO::FETCH_ASSOC);
             </thead>
             <tbody>
                 <?php foreach ($result as $row) : ?>
-                    <tr>
-                        <td data-cell="servicio" class="data"><?php echo htmlspecialchars($row['service']); ?></td>
-                        <td data-cell="nombre" class="data"><?php echo htmlspecialchars($row['name']); ?></td>
-                        <td data-cell="telefono" class="data"><?php echo htmlspecialchars($row['phone']); ?></td>
-                        <td data-cell="correo" class="data"><?php echo htmlspecialchars($row['mail']); ?></td>
-                        <td data-cell="fecha" class="data"><?php echo htmlspecialchars($row['date']); ?></td>
-                        <td data-cell="hora" class="data"><?php echo htmlspecialchars($row['start_time']); ?></td>
-                        <td data-cell="estado" class="data"><?php echo $row['status'] ? 'Confirmada' : 'Pendiente'; ?></td>
-                        <td class="d-flex justify-content-around">
-                            <?php if (!$row['status']) : ?>
-                                <button class="btn btn-success btn-sm confirm" title="Confirmar reserva"
-                                    data-id="<?php echo htmlspecialchars($row['id']); ?>">
-                                    <i class="fas fa-check"></i>
-                                </button>
-                            <?php endif; ?>
-                            <button class="btn btn-danger btn-sm eliminarReserva" title="Eliminar reserva"
-                                data-id="<?php echo htmlspecialchars($row['id']); ?>"
-                                data-eventId="<?php echo htmlspecialchars($row['event_id']); ?>">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </td>
-                    </tr>
+                <tr>
+                    <td data-cell="servicio" class="data"><?php echo htmlspecialchars($row['service']); ?></td>
+                    <td data-cell="nombre" class="data"><?php echo htmlspecialchars($row['name']); ?></td>
+                    <td data-cell="telefono" class="data"><?php echo htmlspecialchars($row['phone']); ?></td>
+                    <td data-cell="correo" class="data"><?php echo htmlspecialchars($row['mail']); ?></td>
+                    <td data-cell="fecha" class="data"><?php echo htmlspecialchars($row['date']); ?></td>
+                    <td data-cell="hora" class="data"><?php echo htmlspecialchars($row['start_time']); ?></td>
+                    <td data-cell="estado" class="data"><?php echo $row['status'] ? 'Confirmada' : 'Pendiente'; ?></td>
+                    <td class="d-flex justify-content-around">
+                        <?php if (!$row['status']) : ?>
+                        <button class="btn btn-success btn-sm confirm" title="Confirmar reserva"
+                            data-id="<?php echo htmlspecialchars($row['id']); ?>">
+                            <i class="fas fa-check"></i>
+                        </button>
+                        <?php endif; ?>
+                        <button class="btn btn-danger btn-sm eliminarReserva" title="Eliminar reserva"
+                            data-id="<?php echo htmlspecialchars($row['id']); ?>"
+                            data-eventid="<?php echo htmlspecialchars($row['event_id']); ?>">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </td>
+                </tr>
                 <?php endforeach; ?>
             </tbody>
         </table>

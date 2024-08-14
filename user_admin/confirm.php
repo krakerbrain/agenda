@@ -3,7 +3,7 @@ require_once dirname(__DIR__) . '/classes/DatabaseSessionManager.php';
 require_once dirname(__DIR__) . '/classes/EmailTemplate.php';
 $manager = new DatabaseSessionManager();
 // $manager->startSession();
-session_start();
+// session_start();
 $conn = $manager->getDB();
 
 require_once dirname(__DIR__) . '/google_services/google_client.php';
