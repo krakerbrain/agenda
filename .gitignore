@@ -9,4 +9,5 @@ composer.lock
 .env-example 
 /access-token/credentials.json 
 composer.phar 
+tareas.md
 README.MD

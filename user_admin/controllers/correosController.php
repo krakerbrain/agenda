@@ -31,22 +31,21 @@ switch ($action) {
     case 'saveTemplate':
         // Asume que los datos llegan en el cuerpo de la solicitud JSON
         $template_name = $input['template_name'] ?? '';
-        $subject = $input['subject'] ?? '';
-        $body = $input['body'] ?? '';
+        $notas = $input['notas'] ?? [];
 
+        // Validación de las notas y otros datos
         $errors = EmailTemplate::validateTemplateData([
             'company_id' => $company_id,
             'template_name' => $template_name,
-            'subject' => $subject,
-            'body' => $body
+            'notas' => $notas
         ]);
 
         if (empty($errors)) {
             $emailTemplate = new EmailTemplate();
             if ($template_name) { // Asume que si template_name existe, es una actualización
-                $result = $emailTemplate->updateTemplate($company_id, $template_name, $subject, $body);
+                $result = $emailTemplate->updateTemplate($company_id, $template_name, $notas);
             } else {
-                $result = $emailTemplate->insertTemplate($company_id, $template_name, $subject, $body);
+                $result = $emailTemplate->insertTemplate($company_id, $template_name, $notas);
             }
             $response = $result;
         } else {

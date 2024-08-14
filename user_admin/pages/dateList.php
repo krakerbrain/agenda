@@ -61,8 +61,9 @@ $result = $sql->fetchAll(PDO::FETCH_ASSOC);
                                     <i class="fas fa-check"></i>
                                 </button>
                             <?php endif; ?>
-                            <button class="btn btn-danger btn-sm" title="Eliminar reserva"
-                                onclick="deleteAppointment('<?php echo $row['event_id']; ?>', <?php echo $row['id']; ?>)">
+                            <button class="btn btn-danger btn-sm eliminarReserva" title="Eliminar reserva"
+                                data-id="<?php echo htmlspecialchars($row['id']); ?>"
+                                data-eventId="<?php echo htmlspecialchars($row['event_id']); ?>">
                                 <i class="fas fa-times"></i>
                             </button>
                         </td>

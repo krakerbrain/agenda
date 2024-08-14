@@ -19,7 +19,7 @@ class EmailTemplate
     public function getTemplatesByCompanyId($company_id)
     {
         try {
-            $query = $this->conn->prepare("SELECT template_name, subject, body FROM email_templates WHERE company_id = :company_id");
+            $query = $this->conn->prepare("SELECT template_name, notas FROM email_templates WHERE company_id = :company_id");
             $query->bindParam(':company_id', $company_id, PDO::PARAM_INT);
             $query->execute();
             return $query->fetchAll(PDO::FETCH_ASSOC);
@@ -29,17 +29,18 @@ class EmailTemplate
     }
 
     // Insertar una nueva plantilla
-    public function insertTemplate($company_id, $template_name, $subject, $body)
+    public function insertTemplate($company_id, $template_name, $notas)
     {
         try {
             $query = $this->conn->prepare("
-                INSERT INTO email_templates (company_id, template_name, subject, body)
-                VALUES (:company_id, :template_name, :subject, :body)
-            ");
+            INSERT INTO email_templates (company_id, template_name, notas)
+            VALUES (:company_id, :template_name, :notas)
+        ");
+            // Almacenar el JSON en una variable antes de pasarlo a bindParam
+            $notasJson = json_encode($notas);
             $query->bindParam(':company_id', $company_id, PDO::PARAM_INT);
             $query->bindParam(':template_name', $template_name, PDO::PARAM_STR);
-            $query->bindParam(':subject', $subject, PDO::PARAM_STR);
-            $query->bindParam(':body', $body, PDO::PARAM_STR);
+            $query->bindParam(':notas',  $notasJson, PDO::PARAM_STR);
             $query->execute();
             return ['success' => true];
         } catch (PDOException $e) {
@@ -47,25 +48,29 @@ class EmailTemplate
         }
     }
 
+
     // Actualizar una plantilla existente
-    public function updateTemplate($company_id, $template_name, $subject, $body)
+    public function updateTemplate($company_id, $template_name, $notas)
     {
         try {
             $query = $this->conn->prepare("
-                UPDATE email_templates
-                SET subject = :subject, body = :body
-                WHERE company_id = :company_id AND template_name = :template_name
-            ");
+            UPDATE email_templates
+            SET notas = :notas
+            WHERE company_id = :company_id AND template_name = :template_name
+        ");
+
+            // Almacenar el JSON en una variable antes de pasarlo a bindParam
+            $notasJson = json_encode($notas);
             $query->bindParam(':company_id', $company_id, PDO::PARAM_INT);
             $query->bindParam(':template_name', $template_name, PDO::PARAM_STR);
-            $query->bindParam(':subject', $subject, PDO::PARAM_STR);
-            $query->bindParam(':body', $body, PDO::PARAM_STR);
+            $query->bindParam(':notas', $notasJson, PDO::PARAM_STR);
             $query->execute();
             return ['success' => true];
         } catch (PDOException $e) {
             return ['success' => false, 'message' => $e->getMessage()];
         }
     }
+
 
     // Validar datos de la plantilla
     public static function validateTemplateData($data)
@@ -77,19 +82,13 @@ class EmailTemplate
         if (empty($data['template_name'])) {
             $errors[] = 'Nombre de plantilla es requerido.';
         }
-        if (empty($data['subject'])) {
-            $errors[] = 'Asunto es requerido.';
-        }
-        if (empty($data['body'])) {
-            $errors[] = 'Cuerpo del mensaje es requerido.';
-        }
         return $errors;
     }
 
     public function buildEmail($company_id, $templateType, $service_id, $name, $date, $startTime)
     {
         // Obtener el asunto de la tabla email_templates
-        $query = $this->conn->prepare("SELECT subject FROM email_templates WHERE company_id = :company_id AND template_name = :template_type LIMIT 1");
+        $query = $this->conn->prepare("SELECT subject, notas FROM email_templates WHERE company_id = :company_id AND template_name = :template_type LIMIT 1");
         $query->bindParam(':company_id', $company_id);
         $query->bindParam(':template_type', $templateType);
         $query->execute();
@@ -119,6 +118,19 @@ class EmailTemplate
             return "Servicio no encontrado.";
         }
 
+        // Decodificar el JSON de notas
+        $notes = json_decode($template['notas'], true);
+
+        // Construir el HTML de las notas
+        $notesHtml = '';
+        if (!empty($notes)) {
+            foreach ($notes as $note) {
+                $notesHtml .= "<li>{$note}</li>";
+            }
+        } else {
+            $notesHtml = '<li>No hay notas adicionales.</li>';
+        }
+
         // Leer la plantilla desde el archivo
         $templatePath = $this->baseUrl . 'correos_template/correo_confirmacion.php';
         $templateContent = file_get_contents($templatePath);
@@ -129,7 +141,7 @@ class EmailTemplate
         // Reemplazar los placeholders en el cuerpo del email
         $body = str_replace(
             ['{nombre_cliente}', '{fecha_reserva}', '{hora_reserva}', '{servicio_reservado}', '{notas}', '{ruta_logo}', '{nombre_empresa}'],
-            [$name, $date, $startTime, $service['name'], 'nada', $logo, $company['name']],
+            [$name, $date, $startTime, $service['name'], $notesHtml, $logo, $company['name']],
             $templateContent
         );
 
