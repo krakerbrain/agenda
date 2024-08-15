@@ -27,12 +27,14 @@ try {
     }
 
     // Formatear las fechas para Google Calendar
-    list($startDateTimeFormatted, $endDateTimeFormatted) = formatDateTime($appointment['date'], $appointment['start_time'], $appointment['end_time']);
+    // list($startDateTimeFormatted, $endDateTimeFormatted) = formatDateTime($appointment['date'], $appointment['start_time'], $appointment['end_time']);
+
 
     // Configurar cliente de Google
     $client = getClient();
 
-    // Crear evento en Google Calendar
+    $timeZone = getUserTimeZone($client);
+    list($startDateTimeFormatted, $endDateTimeFormatted) = formatDateTime($appointment['date'], $appointment['start_time'], $appointment['end_time'], $timeZone);
     createCalendarEvent($client, $appointment['name'], $appointment['service'], $startDateTimeFormatted, $endDateTimeFormatted, $appointment['id'], $conn);
 
     $emailTemplateBuilder = new EmailTemplate();

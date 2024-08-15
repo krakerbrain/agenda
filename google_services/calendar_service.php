@@ -4,6 +4,14 @@
 // $manager = new DatabaseSessionManager();
 session_start();
 // $manager->startSession();
+
+function getUserTimeZone($client)
+{
+    $calendarService = new Google_Service_Calendar($client);
+    $calendar = $calendarService->calendars->get('primary');
+    return $calendar->getTimeZone();
+}
+
 function createCalendarEvent($client, $name, $service, $startDateTimeFormatted, $endDateTimeFormatted, $appointmentId, $conn)
 {
     // Establecer el token de acceso del usuario autenticado
@@ -23,17 +31,21 @@ function createCalendarEvent($client, $name, $service, $startDateTimeFormatted, 
 
     $calendarService = new Google_Service_Calendar($client);
 
+    // Obtener la zona horaria del calendario principal del usuario
+    $userTimeZone = getUserTimeZone($client);
+
     $event = new Google_Service_Calendar_Event(array(
         'summary' => $service . " con " . $name,
         'start' => array(
             'dateTime' => $startDateTimeFormatted,
-            'timeZone' => 'America/Santiago',
+            'timeZone' => $userTimeZone, // Asegurar que coincida la zona horaria
         ),
         'end' => array(
             'dateTime' => $endDateTimeFormatted,
-            'timeZone' => 'America/Santiago',
+            'timeZone' => $userTimeZone, // Asegurar que coincida la zona horaria
         )
     ));
+
 
     try {
         // Obtén el ID del calendario principal del usuario autenticado
@@ -53,14 +65,13 @@ function createCalendarEvent($client, $name, $service, $startDateTimeFormatted, 
     }
 }
 
-
-function formatDateTime($date, $startTime, $endTime)
+function formatDateTime($date, $startTime, $endTime, $timeZone = 'America/Santiago')
 {
-    $startDateTime = new DateTime("$date $startTime", new DateTimeZone('America/Santiago'));
-    $endDateTime = new DateTime("$date $endTime", new DateTimeZone('America/Santiago'));
+    $startDateTime = new DateTime("$date $startTime", new DateTimeZone($timeZone));
+    $endDateTime = new DateTime("$date $endTime", new DateTimeZone($timeZone));
 
-    $startDateTimeFormatted = $startDateTime->format('Y-m-d\TH:i:sP');
-    $endDateTimeFormatted = $endDateTime->format('Y-m-d\TH:i:sP');
+    $startDateTimeFormatted = $startDateTime->format(DateTime::RFC3339);  // Incluye la zona horaria
+    $endDateTimeFormatted = $endDateTime->format(DateTime::RFC3339);  // Incluye la zona horaria
 
     return [$startDateTimeFormatted, $endDateTimeFormatted];
 }
