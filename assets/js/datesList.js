@@ -17,6 +17,7 @@ export function initDateList() {
   }
 
   function confirmReservation(id) {
+    addSpinner(id, true, "confirmar");
     fetch(`${baseUrl}user_admin/confirm.php`, {
       method: "POST",
       headers: {
@@ -40,10 +41,15 @@ export function initDateList() {
       .catch((error) => {
         console.error("Error:", error);
         alert("Error al confirmar la reserva.");
+      })
+      .finally(() => {
+        // Ocultar spinner y habilitar botón después de que la solicitud se complete
+        addSpinner(id, false, "confirmar");
       });
   }
 
   function deleteAppointment(appointmentID, calendarEventID) {
+    addSpinner(appointmentID, true, "eliminar");
     fetch(`${baseUrl}user_admin/delete_calendar_event.php`, {
       method: "POST",
       headers: {
@@ -66,6 +72,27 @@ export function initDateList() {
       .catch((error) => {
         console.error("Error:", error);
         alert("Error al eliminar la reserva.");
+      })
+      .finally(() => {
+        // Ocultar spinner y habilitar botón después de que la solicitud se complete
+        addSpinner(appointmentID, false, "eliminar");
       });
+  }
+
+  function addSpinner(appointmentID, activar, btn) {
+    const button = document.getElementById(btn + "Btn" + appointmentID);
+    const spinner = button.querySelector(".spinner-border");
+    const buttonText = button.querySelector(".button-text");
+    const icon = button.querySelector(".fas");
+    // Mostrar spinner y deshabilitar botón
+    if (activar) {
+      spinner.classList.remove("d-none");
+      icon.classList.add("d-none");
+      button.disabled = true;
+    } else {
+      spinner.classList.add("d-none");
+      icon.classList.remove("d-none");
+      button.disabled = false;
+    }
   }
 }

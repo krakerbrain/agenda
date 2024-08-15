@@ -165,7 +165,10 @@ h2 {
                     <input type="email" id="mail" name="mail" class="form-control" required>
                 </div>
                 <button type="button" class="btn btn-secondary" onclick="showStep(2)">Anterior</button>
-                <button type="submit" class="btn btn-primary">Reservar</button>
+                <button id="reservarBtn" class="btn btn-primary" type="submit">
+                    <span class="spinner-border spinner-border-sm d-none" aria-hidden="true"></span>
+                    <span class="button-text">Reservar</span>
+                </button>
             </div>
         </form>
         <div class="modal fade" id="responseModal" tabindex="-1" aria-labelledby="responseModalLabel"
@@ -359,6 +362,16 @@ h2 {
 
     function sendAppointment(formData) {
         const BASE_URL = "<?php echo $baseUrl; ?>reservas/controller/";
+
+        const reservarBtn = document.getElementById('reservarBtn');
+        const spinner = reservarBtn.querySelector('.spinner-border');
+        const buttonText = reservarBtn.querySelector('.button-text');
+
+        // Mostrar spinner y deshabilitar botón
+        spinner.classList.remove('d-none');
+        buttonText.textContent = 'Procesando...';
+        reservarBtn.disabled = true;
+
         fetch(BASE_URL + "appointment.php", {
                 method: "POST",
                 body: formData,
@@ -386,6 +399,11 @@ h2 {
             })
             .catch((error) => {
                 console.error("Fetch error:", error);
+            }).finally(() => {
+                // Ocultar spinner y habilitar botón después de que la solicitud se complete
+                spinner.classList.add('d-none');
+                buttonText.textContent = 'Reservar';
+                reservarBtn.disabled = false;
             });
     }
     </script>

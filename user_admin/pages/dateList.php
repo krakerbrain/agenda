@@ -56,15 +56,21 @@ $result = $sql->fetchAll(PDO::FETCH_ASSOC);
                     <td data-cell="estado" class="data"><?php echo $row['status'] ? 'Confirmada' : 'Pendiente'; ?></td>
                     <td class="d-flex justify-content-around">
                         <?php if (!$row['status']) : ?>
-                        <button class="btn btn-success btn-sm confirm" title="Confirmar reserva"
+                        <button id="confirmarBtn<?php echo htmlspecialchars($row['id']); ?>"
+                            class="btn btn-success btn-sm confirm" title="Confirmar reserva"
                             data-id="<?php echo htmlspecialchars($row['id']); ?>">
                             <i class="fas fa-check"></i>
+                            <span class="spinner-border spinner-border-sm d-none" aria-hidden="true"></span>
+                            <span class="button-text"></span>
                         </button>
                         <?php endif; ?>
-                        <button class="btn btn-danger btn-sm eliminarReserva" title="Eliminar reserva"
+                        <button id="eliminarBtn<?php echo htmlspecialchars($row['id']); ?>"
+                            class="btn btn-danger btn-sm eliminarReserva" title="Eliminar reserva"
                             data-id="<?php echo htmlspecialchars($row['id']); ?>"
                             data-eventid="<?php echo htmlspecialchars($row['event_id']); ?>">
                             <i class="fas fa-times"></i>
+                            <span class="spinner-border spinner-border-sm d-none" aria-hidden="true"></span>
+                            <span class="button-text"></span>
                         </button>
                     </td>
                 </tr>
