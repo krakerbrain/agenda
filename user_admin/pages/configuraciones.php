@@ -139,7 +139,12 @@ $btnSecondaryColor = $company['btn2'];
                 </div>
             </div>
         </div>
-
+        <h3 class="mb-3">URL Formulario de Reserva</h3>
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" id="urlToCopy" value="<?php echo $baseUrl . $company['token']; ?>"
+                readonly>
+            <button class="btn btn-outline-secondary copyToClipboard" type="button">Copiar URL</button>
+        </div>
         <button type="submit" class="btn btn-success">Guardar Configuración</button>
     </form>
 </div>

@@ -65,4 +65,25 @@ export function initConfiguraciones() {
   document.getElementById("btn-secondary-color").addEventListener("input", function () {
     document.getElementById("btn-secondary-example").style.backgroundColor = this.value;
   });
+
+  document.querySelector(".copyToClipboard").addEventListener("click", function () {
+    // Selecciona el input que contiene la URL
+    var copyText = document.getElementById("urlToCopy");
+
+    // Selecciona el texto dentro del input
+    copyText.select();
+    copyText.setSelectionRange(0, 99999); // Para dispositivos móviles
+
+    // Copia el texto al portapapeles
+    navigator.clipboard
+      .writeText(copyText.value)
+      .then(() => {
+        // Opción: muestra una alerta o un mensaje para confirmar la copia
+        alert("URL copiada al portapapeles: " + copyText.value);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        alert("Hubo un error al copiar la URL al portapapeles.");
+      });
+  });
 }
