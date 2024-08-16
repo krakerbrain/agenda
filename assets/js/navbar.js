@@ -24,6 +24,7 @@ document.addEventListener("DOMContentLoaded", function () {
   loadContent("dateList");
 
   function loadContent(page) {
+    document.querySelector(".titulo").textContent = document.querySelector("#" + page).innerHTML;
     fetch(`pages/${page}.php`)
       .then((response) => {
         if (!response.ok) {
@@ -32,6 +33,7 @@ document.addEventListener("DOMContentLoaded", function () {
         return response.text();
       })
       .then((data) => {
+        hideCanvas();
         mainContent.innerHTML = data;
         document.getElementById(page).classList.add("active");
         links.forEach((link) => {
@@ -81,5 +83,20 @@ document.addEventListener("DOMContentLoaded", function () {
         console.error("Error:", error);
         window.location.href = "index.php"; // Redirigir incluso si hay un error
       });
+  }
+
+  function hideCanvas() {
+    // Selecciona todos los enlaces dentro del offcanvas
+    const offcanvasMenu = document.getElementById("offcanvasMenu");
+    const offcanvasLinks = offcanvasMenu.querySelectorAll(".nav-link");
+
+    offcanvasLinks.forEach((link) => {
+      link.addEventListener("click", () => {
+        // Obtén o crea la instancia del offcanvas
+        const bsOffcanvas = bootstrap.Offcanvas.getOrCreateInstance(offcanvasMenu);
+        // Cierra el offcanvas
+        bsOffcanvas.hide();
+      });
+    });
   }
 });

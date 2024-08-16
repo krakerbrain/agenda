@@ -24,8 +24,8 @@ if (isset($_POST['usuario']) && isset($_POST['contrasenia'])) {
             if ($datos) {
                 if (password_verify($pass, $datos['password'])) {
                     generarTokenYConfigurarCookie($datos['company_id']);
-                    // header("Location: " . $baseUrl . "user_admin/index.php");
-                    header("Location: " . $baseUrl . "google_services/google_auth.php");
+                    header("Location: " . $baseUrl . "user_admin/index.php");
+                    // header("Location: " . $baseUrl . "google_services/google_auth.php");
                     exit;
                 } else {
                     $error = "true";
