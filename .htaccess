@@ -1,0 +1,14 @@
+<IfModule mod_rewrite.c>
+RewriteEngine On
+
+# Reglas para permitir acceso directo a carpetas específicas
+RewriteRule ^(login|user_admin|master_admin)/(.*)$ $1/$2 [L]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Redirigir URLs bajo "agenda" a "index.php" con el token como parámetro
+RewriteRule ^([^/]+)$ form_reserva.php?path=$1 [L]
+# Negar acceso al archivo client_secret.json
+  RewriteRule ^access-token/client_secret\.json$ - [F,NC]
+</IfModule>
