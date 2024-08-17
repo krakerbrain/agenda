@@ -53,9 +53,8 @@ try {
         // Obtener el email template y el logo
         $emailTemplateBuilder = new EmailTemplate();
         $emailContent = $emailTemplateBuilder->buildEmail($company_id, 'Reserva', $id_service, $name, $date, $formattedStartTime);
-
         // Enviar el correo
-        sendEmail($mail, $emailContent);
+        sendEmail($mail, $emailContent, 'Reserva');
 
         // Confirmar la transacción
         $conn->commit();

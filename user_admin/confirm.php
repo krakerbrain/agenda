@@ -40,7 +40,7 @@ try {
     $emailTemplateBuilder = new EmailTemplate();
     $emailContent = $emailTemplateBuilder->buildEmail($appointment['company_id'], 'Confirmación', $appointment['id_service'], $appointment['name'], $appointment['date'], $appointment['start_time']);
     // Enviar confirmación por correo electrónico
-    sendEmail($appointment['mail'], $emailContent);
+    sendEmail($appointment['mail'], $emailContent, 'Confirmación');
 
     // Marcar la cita como confirmada en la base de datos
     confirmAppointment($conn, $id);

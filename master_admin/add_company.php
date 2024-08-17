@@ -48,6 +48,8 @@ try {
         $sql->execute();
     }
 
+
+
     $conn->commit();
 
     echo json_encode(['success' => true, 'token' => $token, 'company_id' => $company_id]);

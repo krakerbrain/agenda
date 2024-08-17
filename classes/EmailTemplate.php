@@ -88,7 +88,7 @@ class EmailTemplate
     public function buildEmail($company_id, $templateType, $service_id, $name, $date, $startTime)
     {
         // Obtener el asunto de la tabla email_templates
-        $query = $this->conn->prepare("SELECT subject, notas FROM email_templates WHERE company_id = :company_id AND template_name = :template_type LIMIT 1");
+        $query = $this->conn->prepare("SELECT notas FROM email_templates WHERE company_id = :company_id AND template_name = :template_type LIMIT 1");
         $query->bindParam(':company_id', $company_id);
         $query->bindParam(':template_type', $templateType);
         $query->execute();
@@ -135,8 +135,15 @@ class EmailTemplate
         $templatePath = $this->baseUrl . 'correos_template/correo_confirmacion.php';
         $templateContent = file_get_contents($templatePath);
 
+        // Modificar el formato de la fecha a dd/mm/yyyy
+        $date = date('d/m/Y', strtotime($date));
+
+        // Modificar el formato de la hora a 12h
+        $startTime = date('h:i a', strtotime($startTime));
         // Reemplazar los placeholders en el asunto
-        $subject = str_replace('{fecha_reserva}', $date, $template['subject']);
+        $subject_msg = $templateType == 'Reserva' ? 'Solicitud de reserva recibida - {fecha_reserva}' : '¡Tu reserva ha sido confirmada! - {fecha_reserva}';
+        $subject_msg = str_replace('{fecha_reserva}', $date, $subject_msg);
+        $subject = mb_encode_mimeheader($subject_msg, 'UTF-8', 'B', "\n");
 
         // Reemplazar los placeholders en el cuerpo del email
         $body = str_replace(
@@ -145,6 +152,6 @@ class EmailTemplate
             $templateContent
         );
 
-        return ['subject' => $subject, 'body' => $body];
+        return ['subject' => $subject, 'body' => $body, 'company_name' => $company['name']];
     }
 }
