@@ -1,5 +1,13 @@
 <div class="container mt-5">
-    <h2 class="mb-4">Notas para correos</h2>
+
+    <div class="d-flex align-items-baseline">
+        <h2 class="mb-4">Notas para correos</h2>
+        <a tabindex="0" role="button" data-bs-trigger="focus" class="btn" data-bs-toggle="popover"
+            data-bs-title="Notas para correos"
+            data-bs-content="Los correos de reserva y confirmación tienen una estructura fija. Aquí puedes agregar notas que se van a agregar al correo para darle más información al cliente. Por ejemplo: 'Recuerda que debes depositar un adelanto de $10.000 para poder confirmar la reserva.'">
+            <i class="fa fa-circle-question text-primary" style="font-size: 1.5rem;"></i>
+        </a>
+    </div>
 
     <!-- Formulario para el correo de reserva -->
     <form id="reservaForm" class="mb-5">

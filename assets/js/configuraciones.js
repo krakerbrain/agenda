@@ -86,4 +86,7 @@ export function initConfiguraciones() {
         alert("Hubo un error al copiar la URL al portapapeles.");
       });
   });
+
+  const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
+  const popoverList = [...popoverTriggerList].map((popoverTriggerEl) => new bootstrap.Popover(popoverTriggerEl));
 }
