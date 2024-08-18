@@ -44,8 +44,6 @@ switch ($action) {
             $emailTemplate = new EmailTemplate();
             if ($template_name) { // Asume que si template_name existe, es una actualización
                 $result = $emailTemplate->updateTemplate($company_id, $template_name, $notas);
-            } else {
-                $result = $emailTemplate->insertTemplate($company_id, $template_name, $notas);
             }
             $response = $result;
         } else {

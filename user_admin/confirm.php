@@ -1,15 +1,19 @@
 <?php
 require_once dirname(__DIR__) . '/classes/DatabaseSessionManager.php';
 require_once dirname(__DIR__) . '/classes/EmailTemplate.php';
+require_once dirname(__DIR__) . '/classes/Appointments.php';
 $manager = new DatabaseSessionManager();
 // $manager->startSession();
 // session_start();
 $conn = $manager->getDB();
 
+// Crear instancia de la clase Appointments
+$appointments = new Appointments($conn);
+
+
 require_once dirname(__DIR__) . '/google_services/google_client.php';
 require_once dirname(__DIR__) . '/google_services/calendar_service.php';
 include 'send_email.php';
-include '../db/db_functions.php';
 
 
 $data = json_decode(file_get_contents('php://input'), true);
@@ -20,15 +24,11 @@ try {
     $conn->beginTransaction();
 
     // Obtener la cita desde la base de datos
-    $appointment = getAppointment($conn, $id);
+    $appointment = $appointments->getAppointment($id);
 
     if (!$appointment) {
         throw new Exception('Cita no encontrada.');
     }
-
-    // Formatear las fechas para Google Calendar
-    // list($startDateTimeFormatted, $endDateTimeFormatted) = formatDateTime($appointment['date'], $appointment['start_time'], $appointment['end_time']);
-
 
     // Configurar cliente de Google
     $client = getClient();
@@ -42,8 +42,8 @@ try {
     // Enviar confirmación por correo electrónico
     sendEmail($appointment['mail'], $emailContent, 'Confirmación');
 
-    // Marcar la cita como confirmada en la base de datos
-    confirmAppointment($conn, $id);
+    // Confirmar la cita
+    $appointments->confirmAppointment($id);
 
     // Confirmar la transacción
     $conn->commit();
