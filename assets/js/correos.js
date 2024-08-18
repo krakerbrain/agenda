@@ -22,11 +22,8 @@ export function initCorreos() {
       document.getElementById("confirmacionNotas").innerHTML = "";
 
       data.forEach((template) => {
-        if (template.template_name === "Reserva") {
-          cargarNotas(JSON.parse(template.notas), "reserva");
-        } else if (template.template_name === "Confirmación") {
-          cargarNotas(JSON.parse(template.notas), "confirmacion");
-        }
+        cargarNotas(JSON.parse(template.reserva), "reserva");
+        cargarNotas(JSON.parse(template.confirmacion), "confirmacion");
       });
     }
   }
@@ -66,7 +63,7 @@ export function initCorreos() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        template_name: tipo === "reserva" ? "Reserva" : "Confirmación",
+        template_name: tipo,
         notas,
         action: "saveTemplate",
       }),

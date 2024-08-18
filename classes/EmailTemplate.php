@@ -19,7 +19,7 @@ class EmailTemplate
     public function getTemplatesByCompanyId($company_id)
     {
         try {
-            $query = $this->conn->prepare("SELECT template_name, notas FROM email_templates WHERE company_id = :company_id");
+            $query = $this->conn->prepare("SELECT notas_correo_reserva as reserva, notas_correo_confirmacion as confirmacion FROM companies WHERE id = :company_id");
             $query->bindParam(':company_id', $company_id, PDO::PARAM_INT);
             $query->execute();
             return $query->fetchAll(PDO::FETCH_ASSOC);
@@ -28,41 +28,18 @@ class EmailTemplate
         }
     }
 
-    // Insertar una nueva plantilla
-    public function insertTemplate($company_id, $template_name, $notas)
-    {
-        try {
-            $query = $this->conn->prepare("
-            INSERT INTO email_templates (company_id, template_name, notas)
-            VALUES (:company_id, :template_name, :notas)
-        ");
-            // Almacenar el JSON en una variable antes de pasarlo a bindParam
-            $notasJson = json_encode($notas);
-            $query->bindParam(':company_id', $company_id, PDO::PARAM_INT);
-            $query->bindParam(':template_name', $template_name, PDO::PARAM_STR);
-            $query->bindParam(':notas',  $notasJson, PDO::PARAM_STR);
-            $query->execute();
-            return ['success' => true];
-        } catch (PDOException $e) {
-            return ['success' => false, 'message' => $e->getMessage()];
-        }
-    }
-
-
     // Actualizar una plantilla existente
     public function updateTemplate($company_id, $template_name, $notas)
     {
         try {
             $query = $this->conn->prepare("
-            UPDATE email_templates
-            SET notas = :notas
-            WHERE company_id = :company_id AND template_name = :template_name
-        ");
+            UPDATE companies
+            SET notas_correo_" . $template_name . " = :notas
+            WHERE id = :company_id");
 
             // Almacenar el JSON en una variable antes de pasarlo a bindParam
             $notasJson = json_encode($notas);
             $query->bindParam(':company_id', $company_id, PDO::PARAM_INT);
-            $query->bindParam(':template_name', $template_name, PDO::PARAM_STR);
             $query->bindParam(':notas', $notasJson, PDO::PARAM_STR);
             $query->execute();
             return ['success' => true];
