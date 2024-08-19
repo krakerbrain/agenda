@@ -272,6 +272,7 @@ async function deleteService(button) {
 
       // Elimina la fila del servicio
       serviceRow.remove();
+      alert(result.message);
     } else {
       alert(result.message);
     }
