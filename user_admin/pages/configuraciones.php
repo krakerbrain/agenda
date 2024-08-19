@@ -32,38 +32,47 @@ $btnSecondaryColor = $company['btn2'];
 
 ?>
 <style>
-    #example-card {
-        background-color: <?= $bgColor ?>;
-    }
+#example-card {
+    background-color: <?=$bgColor ?>;
+}
 
-    #card-title {
-        color: <?= $fontColor ?>;
-    }
+#card-title {
+    color: <?=$fontColor ?>;
+}
 
-    #card-text {
-        color: <?= $fontColor ?>;
-    }
+#card-text {
+    color: <?=$fontColor ?>;
+}
 
-    #btn-primary-example {
-        background-color: <?= $btnPrimaryColor ?>;
-        border-color: <?= $btnPrimaryColor ?>;
-        color: <?= $fontColor ?>;
-    }
+#btn-primary-example {
+    background-color: <?=$btnPrimaryColor ?>;
+    border-color: <?=$btnPrimaryColor ?>;
+    color: <?=$fontColor ?>;
+}
 
-    #btn-secondary-example {
-        background-color: <?= $btnSecondaryColor ?>;
-        border-color: <?= $btnSecondaryColor ?>;
-        color: <?= $fontColor ?>;
-    }
+#btn-secondary-example {
+    background-color: <?=$btnSecondaryColor ?>;
+    border-color: <?=$btnSecondaryColor ?>;
+    color: <?=$fontColor ?>;
+}
+
+.help i {
+    font-size: 1.4rem;
+}
 </style>
 <div class="container my-4">
     <form id="companyConfigForm">
         <input type="hidden" name="company_id" id="company_id" value="<?= $company_id; ?>">
-
-        <h3 class="mb-3">Modo de Horario</h3>
+        <div class="d-flex align-items-baseline">
+            <h3 class="mb-3">Modo de Horario</h3>
+            <a tabindex="0" role="button" data-bs-trigger="focus" class="btn help" data-bs-toggle="popover"
+                data-bs-title="Modo de horario"
+                data-bs-content="Puedes permitir que el cliente elija libremente la hora de la reserva o puedes elegir bloques de horarios acorde a la duración de los servicios"><i
+                    class="fa fa-circle-question text-primary"></i></a>
+        </div>
         <div class="form-check">
             <input class="form-check-input" type="radio" name="schedule_mode" id="freeChoice" value="free"
-                <?php echo $company['schedule_mode'] == 'free' ? 'checked' : ''; ?>>
+                <?php echo $company['schedule_mode'] == 'free' ? 'checked' : ''; ?> disabled>
             <label class="form-check-label" for="freeChoice">Libre Elección</label>
         </div>
         <div class="form-check">
@@ -71,16 +80,26 @@ $btnSecondaryColor = $company['btn2'];
                 <?php echo $company['schedule_mode'] == 'blocks' ? 'checked' : ''; ?>>
             <label class="form-check-label" for="blocks">Bloques de Horarios</label>
         </div>
-
-        <h3 class="mt-4 mb-3">Disponibilidad del calendario</h3>
+        <div class="d-flex align-items-baseline">
+            <h3 class="mt-4 mb-3">Disponibilidad del calendario</h3>
+            <a tabindex="0" role="button" data-bs-trigger="focus" class=" btn help" data-bs-toggle="popover"
+                data-bs-title="Disponibilidad"
+                data-bs-content="La cantidad de días que elijas es la que el cliente tendrá permitido reservar. Si por ejemplo seleccionas 20 días el cliente no podrá hacer una cita con más de 20 días de antelación"><i
+                    class="fa fa-circle-question text-primary"></i></a>
+        </div>
         <div class="mb-3">
             <label for="calendar_days_available" class="form-label">Días disponibles para reservar:</label>
             <input type="number" class="form-control" id="calendar_days_available" name="calendar_days_available"
                 value="<?php echo $company['calendar_days_available']; ?>">
         </div>
 
-
-        <h3 class="mb-3">Fechas Bloqueadas</h3>
+        <div class="d-flex align-items-baseline">
+            <h3 class="mb-3">Fechas Bloqueadas</h3>
+            <a tabindex="0" role="button" data-bs-trigger="focus" class="btn help" data-bs-toggle="popover"
+                data-bs-title="Fechas Bloqueadas"
+                data-bs-content="Puedes bloquear fechas específicas para que no se puedan hacer reservas en esos días"><i
+                    class="fa fa-circle-question text-primary"></i></a>
+        </div>
         <div id="blockedDatesContainer" class="mb-4">
             <?php
             $blocked_dates = explode(',', $company['blocked_dates']);
@@ -96,7 +115,13 @@ $btnSecondaryColor = $company['btn2'];
 
         <div class="container mb-4">
             <div class="row">
-                <h3 class="mb-3">Color del Formulario</h3>
+                <div class="d-flex align-items-baseline">
+                    <h3 class="mb-3">Color del Formulario</h3>
+                    <a tabindex="0" role="button" data-bs-trigger="focus" class="btn help" data-bs-toggle="popover"
+                        data-bs-title="Color del Formulario"
+                        data-bs-content="Puedes personalizar los colores del formulario de reserva para que se ajusten a la identidad de tu empresa. Puedes ver en el cuadro un ejemplo interactivo de la personalización"><i
+                            class="fa fa-circle-question text-primary"></i></a>
+                </div>
                 <div class="col-md-6 color-inputs d-flex mb-2">
                     <div class="form-color-group w-25">
                         <label for="background-color" class="form-label">Fondo:</label>
@@ -139,7 +164,13 @@ $btnSecondaryColor = $company['btn2'];
                 </div>
             </div>
         </div>
-        <h3 class="mb-3">URL Formulario de Reserva</h3>
+        <div class="d-flex align-items-baseline">
+            <h3 class="mb-3">URL Formulario de Reserva</h3>
+            <a tabindex="0" role="button" data-bs-trigger="focus" class="btn help" data-bs-toggle="popover"
+                data-bs-title="URL Formulario de Reserva"
+                data-bs-content="Esta es la URL que debes compartir con tus clientes para que puedan hacer reservas en tu empresa. También podrás usarla para crear el botón de reservas de tu pagina web o red social"><i
+                    class="fa fa-circle-question text-primary"></i></a>
+        </div>
         <div class="input-group mb-3">
             <input type="text" class="form-control" id="urlToCopy" value="<?php echo $baseUrl . $company['token']; ?>"
                 readonly>

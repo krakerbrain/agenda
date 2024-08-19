@@ -52,7 +52,7 @@ try {
     if ($stmt->execute()) {
         // Obtener el email template y el logo
         $emailTemplateBuilder = new EmailTemplate();
-        $emailContent = $emailTemplateBuilder->buildEmail($company_id, 'Reserva', $id_service, $name, $date, $formattedStartTime);
+        $emailContent = $emailTemplateBuilder->buildEmail($company_id, 'reserva', $id_service, $name, $date, $formattedStartTime);
         // Enviar el correo
         sendEmail($mail, $emailContent, 'Reserva');
 

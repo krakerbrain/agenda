@@ -36,8 +36,8 @@ export function initCorreos() {
       notaDiv.innerHTML = `
       <div class="d-flex justify-content-between mb-1"> 
         <label for="${tipo}Nota${notaIndex}" class="form-label">Nota ${notaIndex}:</label>
-        <button type="button" class="btn btn-danger btn-sm eliminarNota">
-          <i class="fas fa-x"></i>
+        <button type="button" class="btn btn-danger eliminarNota" style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;">
+          Eliminar Nota
         </button>
       </div>
       <textarea class="form-control" id="${tipo}Nota${notaIndex}" name="notas[]" rows="3">${nota}</textarea>
@@ -108,8 +108,8 @@ export function initCorreos() {
     notaDiv.innerHTML = `
       <div class="d-flex justify-content-between mb-1"> 
         <label for="${tipo}Nota${notaIndex}" class="form-label">Nota ${notaIndex}:</label>
-        <button type="button" class="btn btn-danger btn-sm eliminarNota">
-          <i class="fas fa-x"></i>
+        <button type="button" class="btn btn-danger eliminarNota" style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;">
+          Eliminar Nota
         </button>
       </div>
       <textarea class="form-control" id="${tipo}Nota${notaIndex}" name="notas[]" rows="3" placeholder="Escribe la nota ${notaIndex}"></textarea>
@@ -122,4 +122,7 @@ export function initCorreos() {
       enviarFormulario(tipo);
     });
   }
+
+  const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
+  const popoverList = [...popoverTriggerList].map((popoverTriggerEl) => new bootstrap.Popover(popoverTriggerEl));
 }

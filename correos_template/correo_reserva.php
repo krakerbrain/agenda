@@ -6,72 +6,72 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Solicitud de reserva recibida</title>
     <style>
-        body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            background-color: #f8f9fa;
-            margin: 0;
-            padding: 0;
-            color: #333333;
-        }
+    body {
+        font-family: 'Helvetica Neue', Arial, sans-serif;
+        background-color: #f8f9fa;
+        margin: 0;
+        padding: 0;
+        color: #333333;
+    }
 
-        .container {
-            max-width: 600px;
-            margin: 40px auto;
-            background-color: #ffffff;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
+    .container {
+        max-width: 600px;
+        margin: 40px auto;
+        background-color: #ffffff;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
 
-        .header {
-            padding: 20px;
-            text-align: center;
-            position: relative;
-        }
+    .header {
+        padding: 20px;
+        text-align: center;
+        position: relative;
+    }
 
-        .header img {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            height: 50px;
-        }
+    .header img {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        height: 50px;
+    }
 
-        .header h1 {
-            margin: 0;
-            font-size: 24px;
-            font-weight: normal;
-        }
+    .header h1 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: normal;
+    }
 
-        .content {
-            padding: 30px;
-        }
+    .content {
+        padding: 30px;
+    }
 
-        .content p {
-            margin: 15px 0;
-            line-height: 1.6;
-        }
+    .content p {
+        margin: 15px 0;
+        line-height: 1.6;
+    }
 
-        .content ul {
-            list-style-type: none;
-            padding: 0;
-        }
+    .content ul {
+        list-style-type: none;
+        padding: 0;
+    }
 
-        .content ul li {
-            padding: 10px 0;
-            border-bottom: 1px solid #dddddd;
-        }
+    .content ul li {
+        padding: 10px 0;
+        border-bottom: 1px solid #dddddd;
+    }
 
-        .content ul li:last-child {
-            border-bottom: none;
-        }
+    .content ul li:last-child {
+        border-bottom: none;
+    }
 
-        .footer {
-            background-color: #f8f9fa;
-            text-align: center;
-            padding: 20px;
-            color: #777777;
-            font-size: 12px;
-        }
+    .footer {
+        background-color: #f8f9fa;
+        text-align: center;
+        padding: 20px;
+        color: #777777;
+        font-size: 12px;
+    }
     </style>
 </head>
 
@@ -93,10 +93,10 @@
             </ul>
             <p>Tu reserva está pendiente de confirmación. Te enviaremos otro correo cuando se haya confirmado.</p>
             <p>Gracias por elegirnos.</p>
-            <p>Atentamente,<br>[Nombre de la Empresa]</p>
+            <p>Atentamente,<br>{nombre_empresa}</p>
         </div>
         <div class="footer">
-            &copy; 2024 [Nombre de la Empresa]. Todos los derechos reservados.
+            &copy; 2024 {nombre_empresa}. Todos los derechos reservados.
         </div>
     </div>
 </body>
