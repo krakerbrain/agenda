@@ -65,25 +65,14 @@ class EmailTemplate
     public function buildEmail($company_id, $templateType, $service_id, $name, $date, $startTime)
     {
         // Obtener el asunto de la tabla email_templates
-        $query = $this->conn->prepare("SELECT notas FROM email_templates WHERE company_id = :company_id AND template_name = :template_type LIMIT 1");
+        $query = $this->conn->prepare("SELECT name, logo, notas_correo_" . $templateType . " as notas FROM companies WHERE id = :company_id LIMIT 1");
         $query->bindParam(':company_id', $company_id);
-        $query->bindParam(':template_type', $templateType);
         $query->execute();
-        $template = $query->fetch(PDO::FETCH_ASSOC);
-
-        if (!$template) {
-            return "Template no encontrado.";
-        }
-
-        // Obtener el nombre y logo de la empresa
-        $companyQuery = $this->conn->prepare("SELECT name, logo FROM companies WHERE id = :company_id LIMIT 1");
-        $companyQuery->bindParam(':company_id', $company_id);
-        $companyQuery->execute();
-        $company = $companyQuery->fetch(PDO::FETCH_ASSOC);
-        $logo = 'https://agenda2024.online/' . $company['logo'];
+        $company = $query->fetch(PDO::FETCH_ASSOC);
         if (!$company) {
             return "Empresa no encontrada.";
         }
+        $logo = 'https://agenda2024.online/' . $company['logo'];
 
         // Obtener el nombre del servicio
         $serviceQuery = $this->conn->prepare("SELECT name FROM services WHERE id = :service_id LIMIT 1");
@@ -96,7 +85,7 @@ class EmailTemplate
         }
 
         // Decodificar el JSON de notas
-        $notes = json_decode($template['notas'], true);
+        $notes = json_decode($company['notas'], true);
 
         // Construir el HTML de las notas
         $notesHtml = '';
@@ -109,7 +98,7 @@ class EmailTemplate
         }
 
         // Leer la plantilla desde el archivo
-        $templatePath = $this->baseUrl . 'correos_template/correo_confirmacion.php';
+        $templatePath = $this->baseUrl . 'correos_template/correo_' . $templateType . '.php';
         $templateContent = file_get_contents($templatePath);
 
         // Modificar el formato de la fecha a dd/mm/yyyy
@@ -118,7 +107,7 @@ class EmailTemplate
         // Modificar el formato de la hora a 12h
         $startTime = date('h:i a', strtotime($startTime));
         // Reemplazar los placeholders en el asunto
-        $subject_msg = $templateType == 'Reserva' ? 'Solicitud de reserva recibida - {fecha_reserva}' : '¡Tu reserva ha sido confirmada! - {fecha_reserva}';
+        $subject_msg = $templateType == 'reserva' ? 'Solicitud de reserva recibida - {fecha_reserva}' : '¡Tu reserva ha sido confirmada! - {fecha_reserva}';
         $subject_msg = str_replace('{fecha_reserva}', $date, $subject_msg);
         $subject = mb_encode_mimeheader($subject_msg, 'UTF-8', 'B', "\n");
 

@@ -38,7 +38,7 @@ try {
     createCalendarEvent($client, $appointment['name'], $appointment['service'], $startDateTimeFormatted, $endDateTimeFormatted, $appointment['id'], $conn);
 
     $emailTemplateBuilder = new EmailTemplate();
-    $emailContent = $emailTemplateBuilder->buildEmail($appointment['company_id'], 'Confirmación', $appointment['id_service'], $appointment['name'], $appointment['date'], $appointment['start_time']);
+    $emailContent = $emailTemplateBuilder->buildEmail($appointment['company_id'], 'confirmacion', $appointment['id_service'], $appointment['name'], $appointment['date'], $appointment['start_time']);
     // Enviar confirmación por correo electrónico
     sendEmail($appointment['mail'], $emailContent, 'Confirmación');
 
