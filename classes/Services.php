@@ -57,103 +57,174 @@ class Services
 
     public function saveServices($servicesData)
     {
-        foreach ($servicesData['service_name'] as $serviceId => $serviceName) {
-            $isEnabled = isset($servicesData['service_enabled'][$serviceId]) ? 1 : 0;
-            if (strpos($serviceId, 'new-service') !== false) {
-                // Nuevo servicio
-                $newServiceId = $this->addService($serviceName, $servicesData['service_duration'][$serviceId], $servicesData['service_observations'][$serviceId], $isEnabled);
+        try {
+            foreach ($servicesData['service_name'] as $serviceId => $serviceName) {
+                $isEnabled = isset($servicesData['service_enabled'][$serviceId]) ? 1 : 0;
+                if (strpos($serviceId, 'new-service') !== false) {
+                    // Nuevo servicio
+                    $newServiceId = $this->addService($serviceName, $servicesData['service_duration'][$serviceId], $servicesData['service_observations'][$serviceId], $isEnabled);
 
-                if (isset($servicesData['category_name'][$serviceId])) {
-                    foreach ($servicesData['category_name'][$serviceId] as $categoryIndex => $categoryName) {
-                        $this->addCategory($newServiceId, $categoryName, $servicesData['category_description'][$serviceId][$categoryIndex]);
+                    if (isset($servicesData['category_name'][$serviceId])) {
+                        foreach ($servicesData['category_name'][$serviceId] as $categoryIndex => $categoryName) {
+                            $this->addCategory($newServiceId, $categoryName, $servicesData['category_description'][$serviceId][$categoryIndex]);
+                        }
                     }
-                }
-            } else {
-                // Servicio existente
-                $this->updateService($serviceId, $serviceName, $servicesData['service_duration'][$serviceId], $servicesData['service_observations'][$serviceId], $isEnabled);
+                } else {
+                    // Servicio existente
+                    $this->updateService($serviceId, $serviceName, $servicesData['service_duration'][$serviceId], $servicesData['service_observations'][$serviceId], $isEnabled);
 
-                if (isset($servicesData['category_name'][$serviceId])) {
-                    foreach ($servicesData['category_name'][$serviceId] as $categoryIndex => $categoryName) {
-                        // Verificar si la categoría es nueva o existente
-                        if (strpos($categoryIndex, 'new-category') !== false) {
-                            $this->addCategory($serviceId, $categoryName, $servicesData['category_description'][$serviceId][$categoryIndex]);
-                        } else {
-                            // Update existing category if needed
+                    if (isset($servicesData['category_name'][$serviceId])) {
+                        foreach ($servicesData['category_name'][$serviceId] as $categoryIndex => $categoryName) {
+                            if (strpos($categoryIndex, 'new-category') !== false) {
+                                $this->addCategory($serviceId, $categoryName, $servicesData['category_description'][$serviceId][$categoryIndex]);
+                            } else {
+                                // Aquí se podría lanzar una excepción si falla
+                                $this->updateCategory($categoryIndex, $categoryName, $servicesData['category_description'][$serviceId][$categoryIndex]);
+                            }
                         }
                     }
                 }
             }
+            // Si todo fue bien
+            return json_encode(['success' => true, 'message' => 'Servicios guardados exitosamente.']);
+        } catch (Exception $e) {
+            // Devuelve un mensaje de error si ocurre alguna excepción
+            return json_encode(['success' => false, 'message' => 'Error al guardar los servicios: ' . $e->getMessage()]);
         }
     }
 
     private function addService($name, $duration, $observations, $isEnabled)
     {
-        $stmt = $this->conn->prepare("INSERT INTO services (company_id, name, duration, observations, is_enabled) VALUES (:company_id, :name, :duration, :observations, :is_enabled)");
-        $stmt->bindParam(':company_id', $this->company_id);
-        $stmt->bindParam(':name', $name);
-        $stmt->bindParam(':duration', $duration);
-        $stmt->bindParam(':observations', $observations);
-        $stmt->bindParam(':is_enabled', $isEnabled);
-        $stmt->execute();
-        return $this->conn->lastInsertId();
+        try {
+
+            $stmt = $this->conn->prepare("INSERT INTO services (company_id, name, duration, observations, is_enabled) VALUES (:company_id, :name, :duration, :observations, :is_enabled)");
+            $stmt->bindParam(':company_id', $this->company_id);
+            $stmt->bindParam(':name', $name);
+            $stmt->bindParam(':duration', $duration);
+            $stmt->bindParam(':observations', $observations);
+            $stmt->bindParam(':is_enabled', $isEnabled);
+            $stmt->execute();
+            return $this->conn->lastInsertId();
+        } catch (PDOException $e) {
+            // Aquí puedes manejar el error, por ejemplo, registrarlo en un log
+            error_log("Error al agregar el servicio: " . $e->getMessage());
+
+            // Luego, puedes lanzar una excepción o devolver un mensaje de error
+            throw new Exception('No se pudo agregar el servicio.');
+        }
     }
 
     private function updateService($serviceId, $name, $duration, $observations, $isEnabled)
     {
-        $stmt = $this->conn->prepare("UPDATE services SET name = :name, duration = :duration, observations = :observations, is_enabled = :is_enabled WHERE id = :service_id AND company_id = :company_id");
-        $stmt->bindParam(':service_id', $serviceId);
-        $stmt->bindParam(':company_id', $this->company_id);
-        $stmt->bindParam(':name', $name);
-        $stmt->bindParam(':duration', $duration);
-        $stmt->bindParam(':observations', $observations);
-        $stmt->bindParam(':is_enabled', $isEnabled);
-        $stmt->execute();
+        try {
+
+            $stmt = $this->conn->prepare("UPDATE services SET name = :name, duration = :duration, observations = :observations, is_enabled = :is_enabled WHERE id = :service_id AND company_id = :company_id");
+            $stmt->bindParam(':service_id', $serviceId);
+            $stmt->bindParam(':company_id', $this->company_id);
+            $stmt->bindParam(':name', $name);
+            $stmt->bindParam(':duration', $duration);
+            $stmt->bindParam(':observations', $observations);
+            $stmt->bindParam(':is_enabled', $isEnabled);
+            $stmt->execute();
+        } catch (PDOException $e) {
+            // Aquí puedes manejar el error, por ejemplo, registrarlo en un log
+            error_log("Error al actualizar el servicio: " . $e->getMessage());
+
+            // Luego, puedes lanzar una excepción o devolver un mensaje de error
+            throw new Exception('No se pudo actualizar el servicio.');
+        }
     }
 
     private function addCategory($serviceId, $categoryName, $categoryDescription)
     {
-        $stmt = $this->conn->prepare("INSERT INTO service_categories (service_id, category_name, category_description) VALUES (:service_id, :category_name, :category_description)");
-        $stmt->bindParam(':service_id', $serviceId);
-        $stmt->bindParam(':category_name', $categoryName);
-        $stmt->bindParam(':category_description', $categoryDescription);
-        $stmt->execute();
+        try {
+
+            $stmt = $this->conn->prepare("INSERT INTO service_categories (service_id, category_name, category_description) VALUES (:service_id, :category_name, :category_description)");
+            $stmt->bindParam(':service_id', $serviceId);
+            $stmt->bindParam(':category_name', $categoryName);
+            $stmt->bindParam(':category_description', $categoryDescription);
+            $stmt->execute();
+        } catch (PDOException $e) {
+            // Aquí puedes manejar el error, por ejemplo, registrarlo en un log
+            error_log("Error al agregar la categoría: " . $e->getMessage());
+
+            // Luego, puedes lanzar una excepción o devolver un mensaje de error
+            throw new Exception('No se pudo agregar la categoría.');
+        }
     }
+
+    private function updateCategory($categoryId, $categoryName, $categoryDescription)
+    {
+        try {
+            $stmt = $this->conn->prepare("UPDATE service_categories SET category_name = :category_name, category_description = :category_description WHERE id = :category_id");
+            $stmt->bindParam(':category_id', $categoryId);
+            $stmt->bindParam(':category_name', $categoryName);
+            $stmt->bindParam(':category_description', $categoryDescription);
+            $stmt->execute();
+        } catch (PDOException $e) {
+            // Aquí puedes manejar el error, por ejemplo, registrarlo en un log
+            error_log("Error al actualizar la categoría: " . $e->getMessage());
+
+            // Luego, puedes lanzar una excepción o devolver un mensaje de error
+            throw new Exception('No se pudo actualizar la categoría.');
+        }
+    }
+
 
     public function checkAppointments($serviceId)
     {
-        $appointmentSql = $this->conn->prepare("
+        try {
+
+            $appointmentSql = $this->conn->prepare("
             SELECT COUNT(*) AS count
             FROM appointments
             WHERE id_service = :service_id
-        ");
-        $appointmentSql->bindParam(':service_id', $serviceId);
-        $appointmentSql->execute();
-        $result = $appointmentSql->fetch(PDO::FETCH_ASSOC);
+            ");
+            $appointmentSql->bindParam(':service_id', $serviceId);
+            $appointmentSql->execute();
+            $result = $appointmentSql->fetch(PDO::FETCH_ASSOC);
 
-        return $result['count'] > 0;
+            return $result['count'] > 0;
+        } catch (PDOException $e) {
+            // Aquí puedes manejar el error, por ejemplo, registrarlo en un log
+            error_log("Error al verificar las citas: " . $e->getMessage());
+
+            // Luego, puedes lanzar una excepción o devolver un mensaje de error
+            throw new Exception('No se pudo verificar las citas.');
+        }
     }
 
     public function deleteService($serviceId)
     {
-        $deleteServiceSql = $this->conn->prepare("
-            DELETE FROM services
-            WHERE id = :service_id
-        ");
-        $deleteServiceSql->bindParam(':service_id', $serviceId);
-        $deleteServiceSql->execute();
+        try {
+            // Eliminar el servicio
+            $deleteServiceSql = $this->conn->prepare("
+                DELETE FROM services
+                WHERE id = :service_id
+            ");
+            $deleteServiceSql->bindParam(':service_id', $serviceId);
+            $deleteServiceSql->execute();
 
-        $deleteCategoriesSql = $this->conn->prepare("
-            DELETE FROM service_categories
-            WHERE service_id = :service_id
-        ");
-        $deleteCategoriesSql->bindParam(':service_id', $serviceId);
-        $deleteCategoriesSql->execute();
+            // La eliminación de las categorías asociadas debería ser automática debido a ON DELETE CASCADE
+        } catch (PDOException $e) {
+            // Manejo del error
+            error_log("Error al eliminar el servicio: " . $e->getMessage());
+            throw new Exception('No se pudo eliminar el servicio.');
+        }
     }
 
     public function deleteCategory($categoryId)
     {
-        $deleteCategorySql = $this->conn->prepare("DELETE FROM service_categories WHERE id = :category_id");
-        $deleteCategorySql->bindParam(':category_id', $categoryId);
-        $deleteCategorySql->execute();
+        try {
+            $deleteCategorySql = $this->conn->prepare("DELETE FROM service_categories WHERE id = :category_id");
+            $deleteCategorySql->bindParam(':category_id', $categoryId);
+            $deleteCategorySql->execute();
+        } catch (PDOException $e) {
+            // Aquí puedes manejar el error, por ejemplo, registrarlo en un log
+            error_log("Error al eliminar la categoría: " . $e->getMessage());
+
+            // Luego, puedes lanzar una excepción o devolver un mensaje de error
+            throw new Exception('No se pudo eliminar la categoría.');
+        }
     }
 }
