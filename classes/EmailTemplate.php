@@ -6,6 +6,11 @@ require_once 'ConfigUrl.php'; // Asegúrate de tener la ruta correcta
 class EmailTemplate
 {
     private $conn;
+    private $baseUrl;
+    private $companyData = null;
+    private $serviceData = null;
+    private $userData = null;
+
 
     public function __construct()
     {
@@ -62,62 +67,109 @@ class EmailTemplate
         return $errors;
     }
 
+    // Cargar datos de la compañía
+    private function loadCompanyData($company_id, $templateType)
+    {
+        if ($this->companyData === null) {
+            $query = $this->conn->prepare("SELECT name, logo, notas_correo_" . $templateType . " as notas FROM companies WHERE id = :company_id LIMIT 1");
+            $query->bindParam(':company_id', $company_id);
+            $query->execute();
+            $this->companyData = $query->fetch(PDO::FETCH_ASSOC);
+
+            if (!$this->companyData) {
+                throw new Exception("Empresa no encontrada.");
+            }
+
+            $this->companyData['logo'] = 'https://agenda2024.online/' . $this->companyData['logo'];
+            $this->companyData['notas'] = json_decode($this->companyData['notas'], true);
+        }
+    }
+
+    // Cargar datos del servicio
+    private function loadServiceData($service_id)
+    {
+        if ($this->serviceData === null) {
+            $serviceQuery = $this->conn->prepare("SELECT name FROM services WHERE id = :service_id LIMIT 1");
+            $serviceQuery->bindParam(':service_id', $service_id);
+            $serviceQuery->execute();
+            $this->serviceData = $serviceQuery->fetch(PDO::FETCH_ASSOC);
+
+            if (!$this->serviceData) {
+                throw new Exception("Servicio no encontrado.");
+            }
+        }
+    }
+
+    private function loadUserData($company_id)
+    {
+        if ($this->userData === null) {
+            $userQuery = $this->conn->prepare("SELECT name, email FROM users WHERE company_id = :company_id LIMIT 1");
+            $userQuery->bindParam(':company_id', $company_id);
+            $userQuery->execute();
+            $this->userData = $userQuery->fetch(PDO::FETCH_ASSOC);
+
+            if (!$this->userData) {
+                throw new Exception("Usuario no encontrado.");
+            }
+        }
+    }
+
+    // Construir el correo
     public function buildEmail($company_id, $templateType, $service_id, $name, $date, $startTime)
     {
-        // Obtener el asunto de la tabla email_templates
-        $query = $this->conn->prepare("SELECT name, logo, notas_correo_" . $templateType . " as notas FROM companies WHERE id = :company_id LIMIT 1");
-        $query->bindParam(':company_id', $company_id);
-        $query->execute();
-        $company = $query->fetch(PDO::FETCH_ASSOC);
-        if (!$company) {
-            return "Empresa no encontrada.";
-        }
-        $logo = 'https://agenda2024.online/' . $company['logo'];
+        // Cargar datos de la compañía y del servicio
+        $this->loadCompanyData($company_id, $templateType);
+        $this->loadServiceData($service_id);
 
-        // Obtener el nombre del servicio
-        $serviceQuery = $this->conn->prepare("SELECT name FROM services WHERE id = :service_id LIMIT 1");
-        $serviceQuery->bindParam(':service_id', $service_id);
-        $serviceQuery->execute();
-        $service = $serviceQuery->fetch(PDO::FETCH_ASSOC);
-
-        if (!$service) {
-            return "Servicio no encontrado.";
-        }
-
-        // Decodificar el JSON de notas
-        $notes = json_decode($company['notas'], true);
-
-        // Construir el HTML de las notas
         $notesHtml = '';
-        if (!empty($notes)) {
-            foreach ($notes as $note) {
+        if (!empty($this->companyData['notas'])) {
+            foreach ($this->companyData['notas'] as $note) {
                 $notesHtml .= "<li>{$note}</li>";
             }
         } else {
             $notesHtml = '<li>No hay notas adicionales.</li>';
         }
 
-        // Leer la plantilla desde el archivo
         $templatePath = $this->baseUrl . 'correos_template/correo_' . $templateType . '.php';
         $templateContent = file_get_contents($templatePath);
 
-        // Modificar el formato de la fecha a dd/mm/yyyy
         $date = date('d/m/Y', strtotime($date));
-
-        // Modificar el formato de la hora a 12h
         $startTime = date('h:i a', strtotime($startTime));
-        // Reemplazar los placeholders en el asunto
+
         $subject_msg = $templateType == 'reserva' ? 'Solicitud de reserva recibida - {fecha_reserva}' : '¡Tu reserva ha sido confirmada! - {fecha_reserva}';
         $subject_msg = str_replace('{fecha_reserva}', $date, $subject_msg);
         $subject = mb_encode_mimeheader($subject_msg, 'UTF-8', 'B', "\n");
 
-        // Reemplazar los placeholders en el cuerpo del email
         $body = str_replace(
             ['{nombre_cliente}', '{fecha_reserva}', '{hora_reserva}', '{servicio_reservado}', '{notas}', '{ruta_logo}', '{nombre_empresa}'],
-            [$name, $date, $startTime, $service['name'], $notesHtml, $logo, $company['name']],
+            [$name, $date, $startTime, $this->serviceData['name'], $notesHtml, $this->companyData['logo'], $this->companyData['name']],
             $templateContent
         );
 
-        return ['subject' => $subject, 'body' => $body, 'company_name' => $company['name']];
+        return ['subject' => $subject, 'body' => $body, 'company_name' => $this->companyData['name']];
+    }
+
+    // Otro constructor de correos, como alertas, reutilizando los mismos datos
+    public function buildAppointmentAlert($company_id, $name, $date, $startTime)
+    {
+        if ($this->companyData === null || $this->serviceData === null) {
+            throw new Exception("Los datos de la compañía y el servicio deben cargarse primero.");
+        }
+
+        $this->loadUserData($company_id);
+
+        $alertTemplatePath = $this->baseUrl . 'correos_template/correo_aviso_reserva.php';
+        $alertContent = file_get_contents($alertTemplatePath);
+
+        $date = date('d/m/Y', strtotime($date));
+        $startTime = date('h:i a', strtotime($startTime));
+
+        $body = str_replace(
+            ['{ruta_logo}', '{nombre_usuario}', '{nombre_cliente}', '{fecha}', '{hora}', '{nombre_servicio}'],
+            [$this->companyData['logo'], $this->userData['name'], $name, $date, $startTime, $this->serviceData['name']],
+            $alertContent
+        );
+
+        return ['subject' => 'Alerta de cita', 'body' => $body, 'correo_empresa' => $this->userData['email']];
     }
 }

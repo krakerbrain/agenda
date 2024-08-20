@@ -53,8 +53,12 @@ try {
         // Obtener el email template y el logo
         $emailTemplateBuilder = new EmailTemplate();
         $emailContent = $emailTemplateBuilder->buildEmail($company_id, 'reserva', $id_service, $name, $date, $formattedStartTime);
-        // Enviar el correo
+        // CORREO DE RESERVA
         sendEmail($mail, $emailContent, 'Reserva');
+
+        // CORREO ALERTA DE RESERVA
+        $alertEmailContent = $emailTemplateBuilder->buildAppointmentAlert($company_id, $name, $date, $formattedStartTime);
+        sendEmail(null, $alertEmailContent, null);
 
         // Confirmar la transacción
         $conn->commit();
