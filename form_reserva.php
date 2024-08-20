@@ -46,69 +46,69 @@ $services = $sql_services->fetchAll(PDO::FETCH_ASSOC);
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <style>
-:root {
-    --primary-color: <?php echo htmlspecialchars($primary_color);
-    ?>;
-    --secondary-color: <?php echo htmlspecialchars($secondary_color);
-    ?>;
-    --background-color: <?php echo htmlspecialchars($background_color);
-    ?>;
-    --button-color: <?php echo htmlspecialchars($button_color);
-    ?>;
-    --border-color: <?php echo htmlspecialchars($border_color);
-    ?>;
-}
+    :root {
+        --primary-color: <?php echo htmlspecialchars($primary_color);
+                            ?>;
+        --secondary-color: <?php echo htmlspecialchars($secondary_color);
+                            ?>;
+        --background-color: <?php echo htmlspecialchars($background_color);
+                            ?>;
+        --button-color: <?php echo htmlspecialchars($button_color);
+                        ?>;
+        --border-color: <?php echo htmlspecialchars($border_color);
+                        ?>;
+    }
 
-body {
-    background-color: var(--background-color);
-}
+    body {
+        background-color: var(--background-color);
+    }
 
-h2 {
-    color: var(--primary-color);
-}
+    h2 {
+        color: var(--primary-color);
+    }
 
-.btn-primary {
-    background-color: var(--button-color);
-    border-color: var(--button-color);
-    color: var(--primary-color)
-}
+    .btn-primary {
+        background-color: var(--button-color);
+        border-color: var(--button-color);
+        color: var(--primary-color)
+    }
 
-.btn-secondary {
-    background-color: var(--secondary-color);
-    border-color: var(--secondary-color);
-    color: var(--primary-color)
-}
+    .btn-secondary {
+        background-color: var(--secondary-color);
+        border-color: var(--secondary-color);
+        color: var(--primary-color)
+    }
 
-.form-control,
-.form-select {
-    border-color: var(--border-color);
-}
+    .form-control,
+    .form-select {
+        border-color: var(--border-color);
+    }
 
-.form-label {
-    color: var(--primary-color);
-}
+    .form-label {
+        color: var(--primary-color);
+    }
 </style>
 
 <body>
     <div class="container mt-5">
         <form id="appointmentForm" style="max-width: 600px; margin: 0 auto;">
             <?php if ($company && $company['logo']) : ?>
-            <div class="mb-4 d-flex justify-content-between align-items-baseline">
-                <img src="<?php echo $baseUrl . $company['logo']; ?>" alt="Logo de la Empresa" class="img-fluid w-25">
-                <h5 class="text-center mb-4">Reserva de Cita</h5>
-            </div>
+                <div class="mb-4 d-flex justify-content-between align-items-baseline">
+                    <img src="<?php echo $baseUrl . $company['logo']; ?>" alt="Logo de la Empresa" class="img-fluid w-25">
+                    <h5 class="text-center mb-4">Reserva de Cita</h5>
+                </div>
             <?php endif; ?>
 
             <div id="step1" class="step">
                 <h2 class="text-center mb-4">Paso 1: Escoge el Servicio</h2>
                 <div class="mb-3">
                     <label for="service" class="form-label">Servicio:</label>
-                    <select id="service" name="service" class="form-select" onchange="getServiceCategory()" required>
+                    <select id="service" name="service" class="form-select" required>
                         <option value="" selected>Selecciona un servicio</option>
                         <?php foreach ($services as $service) : ?>
-                        <option value="<?php echo $service['id']; ?>"
-                            data-observation="<?php echo htmlspecialchars($service['observations']); ?>">
-                            <?php echo htmlspecialchars($service['name']); ?></option>
+                            <option value="<?php echo $service['id']; ?>"
+                                data-observation="<?php echo htmlspecialchars($service['observations']); ?>">
+                                <?php echo htmlspecialchars($service['name']); ?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>
@@ -190,222 +190,234 @@ h2 {
     </div>
 
     <script>
-    function showStep(step) {
+        function showStep(step) {
 
-        document.querySelectorAll('.step').forEach(function(element) {
-            element.classList.add('d-none');
-        });
-        document.getElementById('step' + step).classList.remove('d-none');
-    }
-    document.getElementById('service').addEventListener('change', function() {
-        getObservation('service');
-        getServiceCategory();
-        getAvailableDays();
-    });
-    document.getElementById('category').addEventListener('change', function() {
-        getObservation('category');
-    });
-    document.getElementById('date').addEventListener('change', function() {
-        fetchAvailableTimes();
-    });
-
-    function getObservation(id) {
-        var serviceSelect = document.getElementById(id);
-        var observation = serviceSelect.options[serviceSelect.selectedIndex].getAttribute('data-observation');
-        var observationField = document.getElementById(id + 'Observation');
-        var observationSpan = document.getElementById(id + 'TextObservation');
-
-        if (observation) {
-            observationField.classList.remove('d-none');
-            observationSpan.textContent = observation;
-        } else {
-            observationField.classList.add('d-none');
-            observationSpan.textContent = '';
+            document.querySelectorAll('.step').forEach(function(element) {
+                element.classList.add('d-none');
+            });
+            document.getElementById('step' + step).classList.remove('d-none');
         }
-    }
 
-    function getServiceCategory() {
-        var service_id = document.getElementById('service').value;
-        var url = "<?php echo $baseUrl; ?>reservas/controller/reservaController.php";
-        var data = {
-            service_id: service_id,
-        };
+        document.getElementById('service').addEventListener('change', function(event) {
+            console.log("change", event.target.value)
+            getObservation('service');
+            getServiceCategory(event.target.value);
+            getAvailableDays();
+        });
 
+        document.getElementById('category').addEventListener('change', function() {
+            getObservation('category');
+        });
 
-        fetch(url, {
-                method: 'POST',
-                body: JSON.stringify(data),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                var select = document.getElementById('category');
-                if (data.success) {
-                    var categories = data.categories;
+        document.getElementById('date').addEventListener('change', function() {
+            fetchAvailableTimes();
+        });
+
+        function getObservation(id) {
+            var serviceSelect = document.getElementById(id);
+            var observation = serviceSelect.options[serviceSelect.selectedIndex].getAttribute('data-observation');
+            var observationField = document.getElementById(id + 'Observation');
+            var observationSpan = document.getElementById(id + 'TextObservation');
+
+            if (observation) {
+                observationField.classList.remove('d-none');
+                observationSpan.textContent = observation;
+            } else {
+                observationField.classList.add('d-none');
+                observationSpan.textContent = '';
+            }
+        }
+
+        async function getServiceCategory(serviceId) {
+            try {
+                let url = "<?php echo $baseUrl; ?>reservas/controller/reservaController.php";
+                let data = {
+                    service_id: serviceId,
+                };
+
+                const response = await fetch(url, {
+                    method: 'POST',
+                    body: JSON.stringify(data),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const {
+                    success,
+                    categories
+                } = await response.json();
+
+                let select = document.getElementById('category');
+                if (success) {
                     document.getElementById('categoryContainer').classList.remove('d-none');
-                    select.innerHTML = '<option value="" selected>Selecciona una categoría</option>';
+                    select.disabled = false;
+                    let categoryOption = '<option value="" selected>Selecciona una categoría</option>';
                     categories.forEach(function(category) {
-                        var option = document.createElement('option');
-                        option.value = category.id;
-                        option.text = category.category_name;
-                        option.setAttribute('data-observation', category.category_description);
-                        select.appendChild(option);
+                        categoryOption +=
+                            `<option value="${category.id}" data-observation="${category.category_description}">${category.category_name}</option>`;
                     });
+                    select.innerHTML = categoryOption;
                 } else {
                     document.getElementById('categoryContainer').classList.add('d-none');
+                    document.getElementById('categoryObservation').classList.add('d-none');
                     select.disabled = true;
                 }
-            })
-            .catch(error => console.error('Error:', error));
-    }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
 
-    function getAvailableDays() {
-        const BASE_URL = "<?php echo $baseUrl; ?>reservas/controller/";
-        const calendarDaysAvailable = <?php echo $company['calendar_days_available']; ?>;
-        const serviceId = document.getElementById('service').value;
-        const companyId = document.getElementById('company_id').value;
-        const url = BASE_URL + 'get_days_availability.php';
+        function getAvailableDays() {
+            const BASE_URL = "<?php echo $baseUrl; ?>reservas/controller/";
+            const calendarDaysAvailable = <?php echo $company['calendar_days_available']; ?>;
+            const serviceId = document.getElementById('service').value;
+            const companyId = document.getElementById('company_id').value;
+            const url = BASE_URL + 'get_days_availability.php';
 
-        const data = {
-            service_id: serviceId,
-            calendar_days_available: calendarDaysAvailable,
-            company_id: companyId
-        };
+            const data = {
+                service_id: serviceId,
+                calendar_days_available: calendarDaysAvailable,
+                company_id: companyId
+            };
 
-        fetch(url, {
-                method: 'POST',
-                body: JSON.stringify(data),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const availableDates = data.available_days;
-                    flatpickr("#date", {
-                        enableTime: false,
-                        dateFormat: "Y-m-d",
-                        minDate: "today",
-                        maxDate: new Date().fp_incr(
-                            calendarDaysAvailable), // Puedes ajustar este valor según necesites
-                        enable: [
-                            function(date) {
-                                return availableDates.includes(date.toISOString().split('T')[0]);
-                            }
-                        ]
-                    });
-                } else {
-                    console.error('Error:', data.message);
-                }
-            })
-            .catch(error => console.error('Error:', error));
-    }
-
-    function fetchAvailableTimes() {
-        const BASE_URL = "<?php echo $baseUrl; ?>reservas/controller/";
-        const timeInput = document.getElementById("time");
-        const companyID = document.getElementById("company_id").value;
-
-        const date = document.getElementById("date").value;
-        const serviceId = document.getElementById("service").value;
-        const scheduleMode = document.getElementById("schedule_mode").value === "blocks" ?
-            "get_available_hours_blocks.php" : "get_available_hours_free.php";
-
-        if (date && serviceId) {
-            fetch(BASE_URL + scheduleMode, {
-                    method: "POST",
+            fetch(url, {
+                    method: 'POST',
+                    body: JSON.stringify(data),
                     headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        date: date,
-                        service_id: serviceId,
-                        company_id: companyID
-                    }),
+                        'Content-Type': 'application/json'
+                    }
                 })
-                .then((response) => response.json())
-                .then((data) => {
-                    timeInput.innerHTML = ""; // Clear previous options
+                .then(response => response.json())
+                .then(data => {
                     if (data.success) {
-                        if (data.available_times.length > 0) {
-                            timeInput.innerHTML = '<option value="">Selecciona una hora</option>';
-                            data.available_times.forEach((time) => {
-                                const option = document.createElement("option");
-                                option.value = `${time.start} - ${time.end}`;
-                                option.textContent = `${time.start} - ${time.end}`;
-                                timeInput.appendChild(option);
+                        const availableDates = data.available_days;
+                        flatpickr("#date", {
+                            enableTime: false,
+                            dateFormat: "Y-m-d",
+                            minDate: "today",
+                            maxDate: new Date().fp_incr(
+                                calendarDaysAvailable), // Puedes ajustar este valor según necesites
+                            enable: [
+                                function(date) {
+                                    return availableDates.includes(date.toISOString().split('T')[0]);
+                                }
+                            ]
+                        });
+                    } else {
+                        console.error('Error:', data.message);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        async function fetchAvailableTimes() {
+            const BASE_URL = "<?php echo $baseUrl; ?>reservas/controller/";
+            const timeInput = document.getElementById("time");
+            const companyID = document.getElementById("company_id").value;
+
+            const date = document.getElementById("date").value;
+            const serviceId = document.getElementById("service").value;
+            const scheduleMode = document.getElementById("schedule_mode").value === "blocks" ?
+                "get_available_hours_blocks.php" : "get_available_hours_free.php";
+
+            if (date && serviceId) {
+                try {
+                    const response = await fetch(BASE_URL + scheduleMode, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            date: date,
+                            service_id: serviceId,
+                            company_id: companyID
+                        }),
+                    });
+
+                    const {
+                        success,
+                        available_times,
+                        message
+                    } = await response.json();
+
+                    timeInput.innerHTML = ""; // Clear previous options
+                    if (success) {
+                        if (available_times.length > 0) {
+                            let availableTimesOption = '<option value="">Selecciona una hora</option>';
+                            available_times.forEach((time) => {
+                                availableTimesOption +=
+                                    `<option value="${time.start} - ${time.end}">${time.start} - ${time.end}</option>`;
                             });
+                            timeInput.innerHTML = availableTimesOption;
                         } else {
                             timeInput.innerHTML = '<option value="">No hay horas disponibles</option>';
                         }
                     } else {
-                        alert(data.message);
+                        alert(message);
                     }
-                })
-                .catch((error) => console.error("Error:", error));
-        }
-    }
-
-    document.getElementById("appointmentForm").addEventListener("submit", function(event) {
-        event.preventDefault();
-        const form = document.querySelector('#appointmentForm'); // Selecciona un formulario del DOM
-        const formData = new FormData(form);
-        const scheduleMode = document.getElementById("schedule_mode").value;
-
-        if (scheduleMode === "blocks") {
-            sendAppointment(formData);
-        }
-    });
-
-    function sendAppointment(formData) {
-        const BASE_URL = "<?php echo $baseUrl; ?>reservas/controller/";
-
-        const reservarBtn = document.getElementById('reservarBtn');
-        const spinner = reservarBtn.querySelector('.spinner-border');
-        const buttonText = reservarBtn.querySelector('.button-text');
-
-        // Mostrar spinner y deshabilitar botón
-        spinner.classList.remove('d-none');
-        buttonText.textContent = 'Procesando...';
-        reservarBtn.disabled = true;
-
-        fetch(BASE_URL + "appointment.php", {
-                method: "POST",
-                body: formData,
-            })
-            .then((response) => response.json())
-            .then((data) => {
-                try {
-                    // Aquí puedes seguir con la lógica anterior si el JSON es válido
-                    var modalBody = document.querySelector('.modal-body');
-                    modalBody.innerText = data.message;
-                    var modal = new bootstrap.Modal(document.getElementById('responseModal'));
-                    modal.show();
-
-                    var acceptButton = document.getElementById('acceptButton');
-                    acceptButton.addEventListener('click', function() {
-
-                        if (data.message === "Cita reservada exitosamente y correo enviado!") {
-                            location.reload();
-                        }
-                    });
                 } catch (error) {
-                    console.error("Error parsing JSON:", error);
-                    console.error("Original response text:", text); // Muestra la respuesta original
+                    console.error("Error:", error);
                 }
-            })
-            .catch((error) => {
-                console.error("Fetch error:", error);
-            }).finally(() => {
+            }
+        }
+
+        document.getElementById("appointmentForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            const form = document.querySelector('#appointmentForm'); // Selecciona un formulario del DOM
+            const formData = new FormData(form);
+            const scheduleMode = document.getElementById("schedule_mode").value;
+
+            if (scheduleMode === "blocks") {
+                sendAppointment(formData);
+            }
+        });
+
+        async function sendAppointment(formData) {
+            const BASE_URL = "<?php echo $baseUrl; ?>reservas/controller/";
+
+            const reservarBtn = document.getElementById('reservarBtn');
+            const spinner = reservarBtn.querySelector('.spinner-border');
+            const buttonText = reservarBtn.querySelector('.button-text');
+
+            // Mostrar spinner y deshabilitar botón
+            spinner.classList.remove('d-none');
+            buttonText.textContent = 'Procesando...';
+            reservarBtn.disabled = true;
+
+            try {
+                const response = await fetch(BASE_URL + "appointment.php", {
+                    method: "POST",
+                    body: formData,
+                });
+
+                const {
+                    message
+                } = await response.json();
+
+                // Aquí puedes seguir con la lógica anterior si el JSON es válido
+                var modalBody = document.querySelector('.modal-body');
+                modalBody.innerText = message;
+                var modal = new bootstrap.Modal(document.getElementById('responseModal'));
+                modal.show();
+
+                var acceptButton = document.getElementById('acceptButton');
+                acceptButton.addEventListener('click', function() {
+
+                    // if (message === "Cita reservada exitosamente y correo enviado!") {
+                    if (response.ok) {
+                        location.reload();
+                    }
+                });
+            } catch (error) {
+                console.error("Error:", error);
+            } finally {
                 // Ocultar spinner y habilitar botón después de que la solicitud se complete
                 spinner.classList.add('d-none');
                 buttonText.textContent = 'Reservar';
                 reservarBtn.disabled = false;
-            });
-    }
+            }
+        }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
