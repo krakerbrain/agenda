@@ -22,7 +22,7 @@ function sendEmail($to, $mailContent, $template)
         $mail->Port = 587;
 
         // Configuración del correo electrónico
-        if ($template !== null) {
+        if ($template !== "") {
             $mail->setFrom('agendaroad@gmail.com', $mailContent['company_name'] . ' - ' . $template);
             $mail->addAddress($to);
         } else {
