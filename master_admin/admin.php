@@ -96,12 +96,11 @@ include dirname(__DIR__) . '/partials/head.php';
             });
             const {
                 success,
-                company_id
+                company_id,
+                error
             } = await response.json();
 
-            if (success,
-                error
-            ) {
+            if (success) {
                 document.getElementById('company_id').value = company_id;
                 //limpiar formulario
                 this.reset();
