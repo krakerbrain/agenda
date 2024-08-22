@@ -9,3 +9,5 @@ composer.lock
 composer.phar 
 tareas.md
 README.MD
+/master_admin/uploads/*.png
+/master_admin/uploads/*.jpg

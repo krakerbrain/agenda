@@ -6,17 +6,32 @@ $conn = $manager->getDB();
 $name = $_POST['name'];
 $logo = null;
 
-// Manejar la subida del logo
-if (!empty($_FILES['logo']['name'])) {
-    $logo = 'master_admin/uploads/' . basename($_FILES['logo']['name']);
-    move_uploaded_file($_FILES['logo']['tmp_name'], $logo);
-}
+
 
 // Generar un token aleatorio
 $token = bin2hex(random_bytes(16));
 
 try {
     $conn->beginTransaction();
+    // Manejar la subida del logo dentro de la transacción solo si hay un archivo para subir
+    if (!empty($_FILES['logo']['name'])) {
+        $upload_dir = dirname(__DIR__) . '/master_admin/uploads/';
+
+        // Obtener la extensión del archivo
+        $extension = pathinfo($_FILES['logo']['name'], PATHINFO_EXTENSION);
+
+        // Formatear el nombre del archivo
+        $formatted_name = 'logo-' . preg_replace('/[^a-zA-Z0-9]/', '_', $name) . '-' . date('dmY') . '-' . uniqid() . '.' . $extension;
+
+        $logo_path = $upload_dir . $formatted_name;
+
+        if (!move_uploaded_file($_FILES['logo']['tmp_name'], $logo_path)) {
+            throw new Exception('Error al subir el archivo.');
+        }
+
+        // Si la subida fue exitosa, guarda la ruta del logo en la variable $logo
+        $logo = 'master_admin/uploads/' . $formatted_name;
+    }
 
     // Insertar la nueva compañía con el token
     $sql = $conn->prepare("INSERT INTO companies (name, logo, is_active, token) VALUES (:name, :logo, 1, :token)");
@@ -47,8 +62,6 @@ try {
         $sql->bindParam(':is_enabled', $is_enabled);
         $sql->execute();
     }
-
-
 
     $conn->commit();
 

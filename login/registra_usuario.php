@@ -6,22 +6,29 @@ $creado = false;
 $error = "";
 
 if (isset($_POST['usuario']) && isset($_POST['correo']) && isset($_POST['password']) && isset($_POST['password2'])) {
-    $usuario_registro = $_POST['usuario'];
-    $correo = $_POST['correo'];
-    $pass = $_POST['password'];
-    $pass2 = $_POST['password2'];
-    $company_id = $_POST['company_id'];
-    // $master_admin = isset($_POST['master_admin']) ? 1 : 0;
+    $data = [
+        'role' => $_POST['role_id'],
+        'usuario' => $_POST['usuario'],
+        'correo' => $_POST['correo'],
+        'password' => $_POST['password'],
+        'password2' => $_POST['password2'],
+        'company_id' => $_POST['company_id']
+    ];
 
-    if (!empty($usuario_registro) && !empty($correo) && !empty($pass) && !empty($pass2) && !empty($company_id)) {
+    if ($data['role'] != 1) {
+        echo json_encode(["success" => false, "error" => "Error en asignación de rol. Rol no válido"]);
+        exit;
+    }
+
+    if (!empty($data['usuario']) && !empty($data['correo']) && !empty($data['password']) && !empty($data['password2']) && !empty($data['company_id'])) {
         // Los campos no están vacíos, proceder con la validación y la inserción en la base de datos
 
         try {
             $query = $conn->prepare("CALL validar_registro(:usuario, :correo, :pass, :pass2, @error)");
-            $query->bindParam(':usuario', $usuario_registro);
-            $query->bindParam(':correo', $correo);
-            $query->bindParam(':pass', $pass);
-            $query->bindParam(':pass2', $pass2);
+            $query->bindParam(':usuario', $data['usuario']);
+            $query->bindParam(':correo', $data['correo']);
+            $query->bindParam(':pass', $data['password']);
+            $query->bindParam(':pass2', $data['password2']);
             $query->execute();
         } catch (PDOException $e) {
             echo json_encode(["success" => false, "error" => "Error en la ejecución de la consulta: " . $e->getMessage()]);
@@ -37,12 +44,13 @@ if (isset($_POST['usuario']) && isset($_POST['correo']) && isset($_POST['passwor
             echo json_encode(["success" => false, "error" => $error]);
         } else {
             // El registro es válido, continuar con la inserción en la base de datos
-            $hash = password_hash($pass, PASSWORD_BCRYPT, ['cost' => 7]);
-            $query = $conn->prepare("INSERT INTO users(name, email, password, company_id) VALUES (:nombre, :correo, :clave, :company_id)");
-            $query->bindParam(':nombre', $usuario_registro);
-            $query->bindParam(':correo', $correo);
+            $hash = password_hash($data['password'], PASSWORD_BCRYPT, ['cost' => 7]);
+            $query = $conn->prepare("INSERT INTO users(name, email, password, company_id, role_id, created_at) VALUES (:nombre, :correo, :clave, :company_id, :role, NOW())");
+            $query->bindParam(':nombre', $data['usuario']);
+            $query->bindParam(':correo', $data['correo']);
             $query->bindParam(':clave', $hash);
-            $query->bindParam(':company_id', $company_id);
+            $query->bindParam(':company_id', $data['company_id']);
+            $query->bindParam(':role', $data['role']);
             $query->execute();
             $count2 = $query->rowCount();
 
