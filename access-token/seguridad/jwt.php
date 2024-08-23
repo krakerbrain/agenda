@@ -63,3 +63,60 @@ function validarToken()
 
     return null;
 }
+
+function generarTokenSuperUser()
+{
+    $key = $_ENV['JWTKEY'];
+
+    $payload = array(
+        "role" => "superadmin",
+        "last_activity" => time() // Tiempo de la última actividad
+    );
+
+    $jwt = JWT::encode($payload, $key, 'HS256');
+
+    // Configurar la cookie sin fecha de expiración específica para que dure solo mientras dure la sesión
+    setcookie("superadmin_jwt", $jwt, [
+        'expires' => 0,
+        'path' => '/',
+        'secure' => false,
+        'httponly' => true,
+        'samesite' => 'Lax'
+    ]);
+}
+
+function validarTokenSuperUser()
+{
+    $baseUrl = ConfigUrl::get();
+    if (isset($_COOKIE['superadmin_jwt'])) {
+        $key = $_ENV['JWTKEY'];
+        $timeout = 1800; // Tiempo de inactividad permitido en segundos (30 minutos)
+
+        try {
+            $decoded = JWT::decode($_COOKIE['superadmin_jwt'], new Key($key, 'HS256'));
+
+            if (is_object($decoded) && $decoded->role === "superadmin") {
+                $last_activity = $decoded->last_activity;
+
+                if ((time() - $last_activity) > $timeout) {
+                    // Si ha pasado demasiado tiempo, invalida la sesión
+                    setcookie("superadmin_jwt", "", time() - 3600, "/", "", false, true); // Borrar la cookie
+                    header("Location: " . $baseUrl . "user_admin/index.php"); // Redirigir al login
+                    exit;
+                } else {
+                    // Actualizar la última actividad y regenerar el token
+                    generarTokenSuperUser();
+                    return true;
+                }
+            } else {
+                header("Location: " . $baseUrl . "user_admin/index.php");
+                return false;
+            }
+        } catch (Exception $e) {
+            echo "Error JWT: " . $e->getMessage();
+            return false;
+        }
+    }
+
+    return false;
+}

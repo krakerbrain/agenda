@@ -16,12 +16,21 @@ if (isset($_POST['usuario']) && isset($_POST['contrasenia'])) {
     $usuario = $_POST['usuario'];
     if ($pass != "" && $usuario != "") {
         try {
-            $query = $conn->prepare("SELECT password, company_id FROM users WHERE email = :usuario LIMIT 1");
+            $query = $conn->prepare("SELECT password, company_id, role_id FROM users WHERE email = :usuario LIMIT 1");
             $query->bindParam(':usuario', $usuario);
             $query->execute();
             $datos = $query->fetch(PDO::FETCH_ASSOC);
 
             if ($datos) {
+                if ($datos['role_id'] === 1) {
+                    if (password_verify($pass, $datos['password'])) {
+                        generarTokenSuperUser();
+                        header("Location: " . $baseUrl . 'master_admin/admin.php');
+                        exit;
+                    } else {
+                        $error = "true";
+                    }
+                }
                 if (password_verify($pass, $datos['password'])) {
                     generarTokenYConfigurarCookie($datos['company_id']);
                     header("Location: " . $baseUrl . $_ENV['URL_LOGIN']);

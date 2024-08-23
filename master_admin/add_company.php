@@ -65,8 +65,8 @@ try {
 
     $conn->commit();
 
-    echo json_encode(['success' => true, 'token' => $token, 'company_id' => $company_id]);
+    echo json_encode(['success' => true, 'company_id' => $company_id]);
 } catch (Exception $e) {
     $conn->rollBack();
-    echo json_encode(['success' => false]);
+    echo json_encode(['success' => false, 'error' => 'Error al agregar la empresa: ' . $e->getMessage()]);
 }

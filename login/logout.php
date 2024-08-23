@@ -21,6 +21,7 @@ if (ini_get("session.use_cookies")) {
 }
 // Remove JWT from cookies
 setcookie('jwt', '', time() - 3600, '/');
+setcookie('superadmin_jwt', '', time() - 3600, '/');
 
 header("Location: $baseUrl"); // Redirect to baseUrl
 exit();
