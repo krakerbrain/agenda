@@ -14,9 +14,9 @@ include dirname(__DIR__) . '/partials/head.php';
             </button>
             <div class="collapse navbar-collapse justify-content-between" id="navbarNavAltMarkup">
                 <div class="navbar-nav">
-                    <a class="nav-link active" aria-current="page"
+                    <a class="nav-link" aria-current="page"
                         href="<?php echo $baseUrl . 'master_admin/admin.php' ?>">Home</a>
-                    <a class="nav-link disabled" href="#" disabled>Empresas</a>
+                    <a class="nav-link" href="<?php echo $baseUrl . 'master_admin/company_list.php' ?>">Empresas</a>
                 </div>
                 <div class="navbar-nav">
                     <a class="nav-link" href="<?php echo $baseUrl . 'login/logout.php' ?>">Cerrar Sesión</a>

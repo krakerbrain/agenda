@@ -1,7 +1,6 @@
 <?php
 require_once dirname(__DIR__, 2) . '/classes/DatabaseSessionManager.php';
 $manager = new DatabaseSessionManager();
-// $manager->startSession();
 session_start();
 $conn = $manager->getDB();
 
