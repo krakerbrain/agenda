@@ -51,7 +51,7 @@ include dirname(__DIR__) . '/master_admin/navbar.php';
                         <h4 class="card-title mb-4 text-center">Agregar Usuario Inicial</h4>
                         <form id="addUserForm">
                             <div class="mb-3">
-                                <input type="hidden" class="form-control" id="role_id" name="role_id" value="1">
+                                <input type="hidden" class="form-control" id="role_id" name="role_id" value="2">
                             </div>
                             <div class="mb-3">
                                 <label for="username" class="form-label">Nombre de Usuario:</label>
