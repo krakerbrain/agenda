@@ -45,12 +45,14 @@ if (isset($_POST['usuario']) && isset($_POST['correo']) && isset($_POST['passwor
         } else {
             // El registro es válido, continuar con la inserción en la base de datos
             $hash = password_hash($data['password'], PASSWORD_BCRYPT, ['cost' => 7]);
-            $query = $conn->prepare("INSERT INTO users(name, email, password, company_id, role_id, created_at) VALUES (:nombre, :correo, :clave, :company_id, :role, NOW())");
+            $token = hash('sha256', $data['usuario'] . $data['correo']);
+            $query = $conn->prepare("INSERT INTO users(name, email, password, company_id, role_id, token_sha256, created_at) VALUES (:nombre, :correo, :clave, :company_id, :role, :token, NOW())");
             $query->bindParam(':nombre', $data['usuario']);
             $query->bindParam(':correo', $data['correo']);
             $query->bindParam(':clave', $hash);
             $query->bindParam(':company_id', $data['company_id']);
             $query->bindParam(':role', $data['role']);
+            $query->bindParam(':token', $token);
             $query->execute();
             $count2 = $query->rowCount();
 
