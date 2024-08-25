@@ -45,15 +45,12 @@ if (isset($_POST['usuario']) && isset($_POST['contrasenia'])) {
                             exit;
                         } else {
                             $error = "Credenciales incorrectas.";
-                            exit;
                         }
                     } else {
                         $error = "Token de verificación incorrecto.";
-                        exit;
                     }
                 } else {
                     $error = "Usuario no existe.";
-                    exit;
                 }
             } catch (PDOException $e) {
                 $error = "Error de conexión: " . $e->getMessage();

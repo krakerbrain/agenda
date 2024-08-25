@@ -52,6 +52,7 @@ include dirname(__DIR__) . '/master_admin/navbar.php';
                         <form id="addUserForm">
                             <div class="mb-3">
                                 <input type="hidden" class="form-control" id="role_id" name="role_id" value="2">
+                                <input type="hidden" name="master_register" id="master_register" value="true">
                             </div>
                             <div class="mb-3">
                                 <label for="username" class="form-label">Nombre de Usuario:</label>
@@ -89,86 +90,86 @@ include dirname(__DIR__) . '/master_admin/navbar.php';
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
     </script>
     <script>
-        const baseUrl = '<?php echo $baseUrl; ?>';
+    const baseUrl = '<?php echo $baseUrl; ?>';
 
-        document.getElementById('addCompanyForm').addEventListener('submit', async function(event) {
-            event.preventDefault();
-            // Mostrar spinner y deshabilitar botón
-            displaySpinner('addCompany', true);
-            const formData = new FormData(this);
-            try {
-                const response = await fetch(`${baseUrl}master_admin/add_company.php`, {
-                    method: 'POST',
-                    body: formData
-                });
-                const {
-                    success,
-                    company_id,
-                    error
-                } = await response.json();
+    document.getElementById('addCompanyForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        // Mostrar spinner y deshabilitar botón
+        displaySpinner('addCompany', true);
+        const formData = new FormData(this);
+        try {
+            const response = await fetch(`${baseUrl}master_admin/add_company.php`, {
+                method: 'POST',
+                body: formData
+            });
+            const {
+                success,
+                company_id,
+                error
+            } = await response.json();
 
-                if (success) {
-                    document.getElementById('company_id').value = company_id;
-                    //limpiar formulario
-                    this.reset();
-                    alert('Empresa agregada exitosamente');
-                } else {
-                    alert(error);
-                }
-            } catch (error) {
-                console.error('Error:', error);
-            } finally {
-                // Ocultar spinner y habilitar botón
-                displaySpinner('addCompany', false);
-            }
-        });
-        document.getElementById('addUserForm').addEventListener('submit', async function(event) {
-            event.preventDefault();
-            // Mostrar spinner y deshabilitar botón
-            displaySpinner('addUser', true);
-
-            const formData = new FormData(this);
-            try {
-                const response = await fetch(`${baseUrl}login/registra_usuario.php`, {
-                    method: 'POST',
-                    body: formData
-                });
-                const {
-                    success,
-                    error
-                } = await response.json();
-
-                if (success) {
-                    //limpiar formulario
-                    this.reset();
-                    alert('Usuario agregado exitosamente');
-                } else {
-                    alert(error);
-                    this.reset();
-                }
-            } catch (error) {
-                console.error('Error:', error);
-            } finally {
-                // Ocultar spinner y habilitar botón
-                displaySpinner('addUser', false);
-            }
-        });
-
-        function displaySpinner(id, show) {
-            const button = document.getElementById(id);
-            const spinner = button.querySelector('.spinner-border');
-            const buttonText = button.querySelector('.button-text');
-            const textBtn = id === 'addCompany' ? 'Agregar Empresa' : 'Agregar Usuario';
-            if (!show) {
-                spinner.classList.add('d-none');
-                buttonText.textContent = textBtn;
-                button.disabled = false;
+            if (success) {
+                document.getElementById('company_id').value = company_id;
+                //limpiar formulario
+                this.reset();
+                alert('Empresa agregada exitosamente');
             } else {
-                spinner.classList.remove('d-none');
-                buttonText.textContent = 'Procesando...';
-                button.disabled = true;
+                alert(error);
             }
+        } catch (error) {
+            console.error('Error:', error);
+        } finally {
+            // Ocultar spinner y habilitar botón
+            displaySpinner('addCompany', false);
         }
+    });
+    document.getElementById('addUserForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        // Mostrar spinner y deshabilitar botón
+        displaySpinner('addUser', true);
+
+        const formData = new FormData(this);
+        try {
+            const response = await fetch(`${baseUrl}login/registra_usuario.php`, {
+                method: 'POST',
+                body: formData
+            });
+            const {
+                success,
+                error
+            } = await response.json();
+
+            if (success) {
+                //limpiar formulario
+                this.reset();
+                alert('Usuario agregado exitosamente');
+            } else {
+                alert(error);
+                this.reset();
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        } finally {
+            // Ocultar spinner y habilitar botón
+            displaySpinner('addUser', false);
+        }
+    });
+
+    function displaySpinner(id, show) {
+        const button = document.getElementById(id);
+        const spinner = button.querySelector('.spinner-border');
+        const buttonText = button.querySelector('.button-text');
+        const textBtn = id === 'addCompany' ? 'Agregar Empresa' : 'Agregar Usuario';
+        if (!show) {
+            spinner.classList.add('d-none');
+            buttonText.textContent = textBtn;
+            button.disabled = false;
+        } else {
+            spinner.classList.remove('d-none');
+            buttonText.textContent = 'Procesando...';
+            button.disabled = true;
+        }
+    }
     </script>
 </body>
 

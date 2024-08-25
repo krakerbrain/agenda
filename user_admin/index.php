@@ -16,25 +16,25 @@ if (!$datosUsuario) {
 include dirname(__DIR__) . '/partials/head.php';
 ?>
 <script>
-    const baseUrl = '<?php echo $baseUrl; ?>';
+const baseUrl = '<?php echo $baseUrl; ?>';
 </script>
 <style>
-    @media(max-width:1000px) {
+@media(max-width:1000px) {
 
-        th {
-            display: none;
-        }
-
-        td {
-            display: block;
-        }
-
-        .data::before {
-            content: attr(data-cell) ": ";
-            font-weight: 700;
-            text-transform: capitalize;
-        }
+    th {
+        display: none;
     }
+
+    td {
+        display: block;
+    }
+
+    .data::before {
+        content: attr(data-cell) ": ";
+        font-weight: 700;
+        text-transform: capitalize;
+    }
+}
 </style>
 
 <body>
@@ -72,6 +72,12 @@ include dirname(__DIR__) . '/partials/head.php';
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#" id="correos">Correos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="mis_datos">Mis Datos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="add_user">Agregar Usuario</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#" id="configuraciones">Otras configuraciones</a>
