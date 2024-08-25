@@ -5,23 +5,25 @@ $conn = $manager->getDB();
 $creado = false;
 $error = "";
 
-if (isset($_POST['usuario']) && isset($_POST['correo']) && isset($_POST['password']) && isset($_POST['password2'])) {
+if (isset($_POST['usuario']) && isset($_POST['correo']) && isset($_POST['password']) && isset($_POST['password2']) && isset($_POST['company_id']) && isset($_POST['master_register'])) {
     $data = [
         'role' => $_POST['role_id'],
         'usuario' => $_POST['usuario'],
         'correo' => $_POST['correo'],
         'password' => $_POST['password'],
         'password2' => $_POST['password2'],
-        'company_id' => $_POST['company_id']
+        'company_id' => $_POST['company_id'],
+        'master_register' => $_POST['master_register']
     ];
 
-    if ($data['role'] != 1) {
-        echo json_encode(["success" => false, "error" => "Error en asignación de rol. Rol no válido"]);
-        exit;
-    }
+
 
     if (!empty($data['usuario']) && !empty($data['correo']) && !empty($data['password']) && !empty($data['password2']) && !empty($data['company_id'])) {
         // Los campos no están vacíos, proceder con la validación y la inserción en la base de datos
+        if ($data['role'] != 1 && $data['master_register'] == "true") {
+            echo json_encode(["success" => false, "error" => "Error en asignación de rol. Rol no válido"]);
+            exit;
+        }
 
         try {
             $query = $conn->prepare("CALL validar_registro(:usuario, :correo, :pass, :pass2, @error)");

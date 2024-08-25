@@ -3,6 +3,8 @@ import { initHorarios } from "./horarios.js";
 import { initServicios } from "./servicios.js";
 import { initConfiguraciones } from "./configuraciones.js";
 import { initCorreos } from "./correos.js";
+import { initMisDatos } from "./misDatos.js";
+import { initAddUser } from "./addUser.js";
 
 document.addEventListener("DOMContentLoaded", function () {
   const links = document.querySelectorAll(".nav-link");
@@ -21,7 +23,7 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // Load the default content when the page loads, after registering all event listeners
-  loadContent("dateList");
+  loadContent("add_user");
 
   function loadContent(page) {
     document.querySelector(".titulo").textContent = document.querySelector("#" + page).innerHTML;
@@ -58,6 +60,12 @@ document.addEventListener("DOMContentLoaded", function () {
             break;
           case "correos":
             initCorreos();
+            break;
+          case "mis_datos":
+            initMisDatos();
+            break;
+          case "add_user":
+            initAddUser();
             break;
           default:
             console.error("No hay un módulo para la página:", page);
