@@ -93,27 +93,8 @@ $baseUrl = ConfigUrl::get();
 
     .container.flip-container {
         perspective: 1000px;
-    }
-
-    .flip-container-background {
-        background-image: url('<?php echo $baseUrl; ?>assets/img/que_es_cut.png');
-        background-size: 70%;
-        background-position: center;
-        background-repeat: no-repeat;
-        max-height: 600px;
-    }
-
-    .flip-container-background::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(26, 23, 40, 0.95);
-        /* Asegúrate de que esté por encima de la imagen */
-        pointer-events: none;
-        /* Evita que el pseudo-elemento interfiera con los clics */
+        /* Profundidad para el efecto 3D */
+        /* Asegura que el contenedor ocupe todo el ancho */
     }
 
     .flip-card {
@@ -234,9 +215,12 @@ $baseUrl = ConfigUrl::get();
                         </div>
                     </div>
                     <!-- Contenido Detrás -->
-                    <div class="flip-card-back d-flex">
-                        <?php include __DIR__ . '/descripcion-agenda-road.php'; ?>
-
+                    <div class="flip-card-back">
+                        <h2>Más Información sobre Agenda Road</h2>
+                        <p class="py-4">
+                            Aquí puedes agregar más detalles sobre la herramienta, sus características, beneficios, etc.
+                        </p>
+                        <button id="show-less-info" class="btn btn-secondary">Volver</button>
                     </div>
                 </div>
             </div>
@@ -283,19 +267,17 @@ $baseUrl = ConfigUrl::get();
     <!-- Scripts de GSAP y Bootstrap -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/plugins/CSSPlugin.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
     // Scroll horizontal con GSAP
     const sections = document.querySelectorAll('.section');
-    gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+    gsap.registerPlugin(ScrollTrigger, CSSPlugin);
 
     let panelsSection = document.querySelector(".sections-container"),
         panels = document.querySelectorAll(".section"),
         tween;
-
-    // Definir el flag para controlar el scroll
-    let scrollAllowed = true;
 
     document.querySelectorAll(".scroll-nav").forEach((anchor) => {
         anchor.addEventListener("click", function(e) {
@@ -339,50 +321,20 @@ $baseUrl = ConfigUrl::get();
             end: () => "+=" + document.querySelector('.section').offsetWidth * sections.length
         }
     });
-
-
-
-
     document.getElementById("show-more-info").addEventListener("click", function() {
-
         // Giro para mostrar la información adicional
         gsap.to(".flip-card", {
             duration: 0.4,
             rotationY: 180
         });
-        // Activar el scroll horizontal
-        scrollAllowed = false;
-        document.querySelector(".flip-container").classList.add("flip-container-background");
     });
 
     document.getElementById("show-less-info").addEventListener("click", function() {
-        document.querySelector(".flip-container").classList.remove("flip-container-background");
         // Giro para volver a la vista original
         gsap.to(".flip-card", {
             duration: 0.4,
             rotationY: 0
         });
-        // Activar el scroll horizontal
-        scrollAllowed = true;
-    });
-
-    // Controlar el scroll horizontal basado en el flag
-    window.addEventListener('wheel', function(e) {
-        console.log(scrollAllowed)
-        if (!scrollAllowed) {
-            e.preventDefault();
-        }
-    }, {
-        passive: false
-    });
-
-    window.addEventListener('touchmove', function(e) {
-        console.log(scrollAllowed)
-        if (!scrollAllowed) {
-            e.preventDefault();
-        }
-    }, {
-        passive: false
     });
     </script>
 </body>
