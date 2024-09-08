@@ -15,6 +15,7 @@ $baseUrl = ConfigUrl::get();
         href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
     body {
         height: 100vh;
@@ -59,7 +60,7 @@ $baseUrl = ConfigUrl::get();
         /* Bordes redondeados */
         padding: 20px;
         /* Espaciado interno */
-        backdrop-filter: blur(10px);
+        backdrop-filter: blur(6px);
         /* Desenfoque de fondo */
         -webkit-backdrop-filter: blur(10px);
         /* Desenfoque de fondo para Safari */
@@ -77,6 +78,10 @@ $baseUrl = ConfigUrl::get();
         #home h1 {
             font-size: 1.5rem;
             /* Ajuste para pantallas medianas */
+        }
+
+        .free-background-container {
+            background-size: 100%;
         }
     }
 
@@ -153,8 +158,13 @@ $baseUrl = ConfigUrl::get();
         transform: rotateY(180deg);
         /* Coloca la parte trasera al revés */
         z-index: 1;
-        padding: 20px;
-        /* Ajuste del espaciado */
+
+    }
+
+    .responsiveMenu a {
+        border: none;
+        font-size: 0.95rem;
+        font-weight: 300;
     }
     </style>
 </head>
@@ -164,10 +174,27 @@ $baseUrl = ConfigUrl::get();
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">Agenda Road</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+            <!-- Botones de navegación -->
+            <div class="responsiveMenu d-flex">
+                <!-- <button class="navbar-toggler togler-prev d-none p-1" type="button" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-label="Toggle navigation">
+                    <a id="navPrev" class="nav-link scroll-nav" href="#home"><i class="fas fa-arrow-left-long"></i>
+                        Home</a>
+                </button> -->
+                <a id="navPrev" class="nav-link scroll-nav togler-prev d-none scroll-nav p-1" href="#about-us"
+                    data-bs-target="#navbarNav" aria-controls="navbarNav" aria-label="Toggle navigation">
+                    Home <i class="fas fa-arrow-left-long"></i>
+                </a>
+                <a id="navNext" class="nav-link scroll-nav togler-next p-1" href="#about-us" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-label="Toggle navigation">
+                    ¿Qué es? <i class="fas fa-arrow-right-long"></i>
+                </a>
+                <!-- <button class="navbar-toggler togler-next p-1" type="button" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-label="Toggle navigation">
+                    <a id="navNext" class="nav-link scroll-nav" href="#about-us">¿Qué es? <i
+                            class="fas fa-arrow-right-long"></i></a>
+                </button> -->
+            </div>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
@@ -234,9 +261,14 @@ $baseUrl = ConfigUrl::get();
                         </div>
                     </div>
                     <!-- Contenido Detrás -->
-                    <div class="flip-card-back d-flex">
+                    <div class="flip-card-back d-block pt-md-3">
                         <?php include __DIR__ . '/descripcion-agenda-road.php'; ?>
-
+                        <!-- Botones abajo -->
+                        <div class="d-flex flex-column flex-md-row justify-content-center align-items-center pt-md-4">
+                            <a href="#" class="btn btn-primary me-md-2 mb-3 mb-md-0">¡Prueba Agenda Road Hoy Mismo!</a>
+                            <button id="show-less-info"
+                                class="btn btn-outline-light ms-md-2 ms-4 align-self-md-center align-self-start">Volver</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -368,7 +400,6 @@ $baseUrl = ConfigUrl::get();
 
     // Controlar el scroll horizontal basado en el flag
     window.addEventListener('wheel', function(e) {
-        console.log(scrollAllowed)
         if (!scrollAllowed) {
             e.preventDefault();
         }
@@ -377,13 +408,87 @@ $baseUrl = ConfigUrl::get();
     });
 
     window.addEventListener('touchmove', function(e) {
-        console.log(scrollAllowed)
         if (!scrollAllowed) {
             e.preventDefault();
         }
     }, {
         passive: false
     });
+
+    // Definir las secciones y los textos
+    const sectionToggler = [{
+            id: 'home',
+            text: 'Home'
+        },
+        {
+            id: 'about-us',
+            text: '¿Qué es?'
+        },
+        {
+            id: 'how-it-works',
+            text: 'Cómo funciona'
+        },
+        {
+            id: 'pricing',
+            text: 'Precios'
+        }
+    ];
+
+    let currentIndex = 0;
+
+    const prevButton = document.querySelector('.togler-prev');
+    const nextButton = document.querySelector('.togler-next');
+    const navPrev = document.getElementById('navPrev');
+    const navNext = document.getElementById('navNext');
+
+    function updateNavButtons() {
+        // Actualizar botón anterior
+        if (currentIndex > 0) {
+            prevButton.classList.remove('d-none');
+            navPrev.href = `#${sectionToggler[currentIndex - 1].id}`;
+            navPrev.innerHTML = `<i class="fas fa-arrow-left-long"></i> ${sectionToggler[currentIndex - 1].text}`;
+        } else {
+            prevButton.classList.add('d-none');
+        }
+
+        // Actualizar botón siguiente
+        if (currentIndex < sectionToggler.length - 1) {
+            nextButton.classList.remove('d-none');
+            navNext.href = `#${sectionToggler[currentIndex + 1].id}`;
+            navNext.innerHTML = `${sectionToggler[currentIndex + 1].text} <i class="fas fa-arrow-right-long"></i>`;
+        } else {
+            nextButton.classList.add('d-none');
+        }
+    }
+
+    // Agregar eventos de clic para los botones
+    navPrev.addEventListener('click', () => {
+        if (currentIndex > 0) {
+            currentIndex--;
+            updateNavButtons();
+            localStorage.setItem('currentIndex', currentIndex);
+        }
+    });
+
+    navNext.addEventListener('click', () => {
+        if (currentIndex < sectionToggler.length - 1) {
+            currentIndex++;
+            updateNavButtons();
+            localStorage.setItem('currentIndex', currentIndex);
+        }
+    });
+
+    // Obtener el valor de currentIndex del localStorage al cargar la página
+    window.addEventListener('load', () => {
+        const storedIndex = localStorage.getItem('currentIndex');
+        if (storedIndex !== null) {
+            currentIndex = parseInt(storedIndex);
+            updateNavButtons();
+        }
+    });
+
+    // Inicializar los botones
+    updateNavButtons();
     </script>
 </body>
 
