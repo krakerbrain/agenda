@@ -1,42 +1,34 @@
 <!-- Sección Descubre Agenda Road -->
 <style>
-.carousel-item h5 {
-    font-size: 2.5rem;
-    font-weight: bold;
-    color: #c5c5c5;
-}
-
-.carousel-item {
-    min-height: 300px;
-    /* Ajusta este valor según lo que necesites */
-}
-
-
-
-@media (max-width: 576px) {
     .carousel-item h5 {
-        font-size: 1.8rem;
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #c5c5c5;
     }
 
-    .carousel-item p {
-        font-size: 0.9rem;
+    .carousel-item {
+        min-height: 300px;
+        /* Ajusta este valor según lo que necesites */
     }
 
-    .carousel-inner {
-        height: 400px;
+
+
+    @media (max-width: 576px) {
+        .carousel-item h5 {
+            font-size: 1.8rem;
+        }
+
+        .carousel-item p {
+            font-size: 0.9rem;
+        }
+
+        .carousel-inner {
+            height: 400px;
+        }
     }
-}
 </style>
 <div class="d-block">
     <div class="text-white">
-        <!-- <div class="row">
-        <div class="col-md-12 text-center mb-4">
-            <h2 class="fw-bold">Descubre Agenda Road: La Solución Perfecta para Gestionar tus Citas</h2>
-            <p class="">¿Eres un profesional que presta servicios y necesitas organizar tu agenda de citas de
-                manera eficiente y sin complicaciones? ¡Agenda Road es la herramienta ideal para ti!</p>
-        </div>
-    </div> -->
-
         <!-- Carrusel -->
         <div id="featuresCarousel" class="carousel slide" data-bs-interval="false">
             <div class="carousel-inner">
