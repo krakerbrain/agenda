@@ -62,9 +62,26 @@ include '../partials/head.php';
 ?>
 
 <!-- Código HTML -->
+<style>
+    .login-container {
+        background: rgba(255, 255, 255, 0.2);
+        /* Color de fondo blanco con opacidad */
+        border-radius: 15px;
+        /* Bordes redondeados */
 
-<body style="background-color: #D4D4D4;" class="d-flex justify-content-center align-items-center vh-100">
-    <div class="bg-light p-5 rounded">
+        backdrop-filter: blur(10px);
+        /* Desenfoque de fondo */
+        -webkit-backdrop-filter: blur(10px);
+        /* Desenfoque de fondo para Safari */
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        /* Sombra sutil */
+        color: #f5f5f5;
+        /* Color del texto */
+    }
+</style>
+
+<body style="background-color: #1a1728;" class="d-flex justify-content-center align-items-center vh-100">
+    <div class="login-container p-5 ">
         <div class="justify-content-center">
             <form action="" method="post" class="form-group">
                 <div class="text-center">
@@ -111,11 +128,6 @@ include '../partials/head.php';
                     <span class="d-flex justify-content-center mt-1 text-danger"><?= $error ?></span>
                 <?php } ?>
             </form>
-
-            <div class="d-flex gap-1 justify-content-center mt-1">
-                <div style="margin-right:5px">¿No tiene una cuenta?</div>
-                <a href="registro.php" class="text-info text-decoration-none fw-semibold">Registrese</a>
-            </div>
         </div>
     </div>
 

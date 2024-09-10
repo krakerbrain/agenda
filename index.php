@@ -6,51 +6,156 @@ $baseUrl = ConfigUrl::get();
 <html lang="es">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agenda Road</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <style>
-    body {
-        background-color: #D4D4D4 !important;
-    }
-
-    .hero {
-        height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-    }
-
-    .hero img {
-        max-width: 100%;
-        height: auto;
-    }
-
-    .login-link {
-        margin-top: 20px;
-    }
-    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="<?php echo $baseUrl; ?>assets/css/index.css">
 </head>
 
 <body>
-    <section class="hero">
-        <h1 class="text-center display-4">Agenda Road</h1>
-        <div class="container text-center">
-            <!-- Espacio para la imagen central -->
-            <img src="<?php echo $baseUrl; ?>assets/img/landing_agenda_road.png" alt="Agenda Road" />
-            <!-- Link para el login -->
-            <div class="login-link">
-                <a href="<?php echo $baseUrl; ?>login/index.php" class="btn btn-info w-50">Iniciar sesión</a>
+    <nav class="navbar fixed-top">
+        <div class="container-fluid">
+            <!-- Marca -->
+            <a class="navbar-brand" href="#">Agenda Road</a>
+            <!-- Botón de inicio de sesión -->
+            <div class="d-flex login">
+                <a href="<?php echo $baseUrl; ?>login/index.php" class="btn text-info d-flex">
+                    Iniciar Sesión
+                    <i class="material-icons ms-1">login</i>
+                </a>
             </div>
         </div>
-    </section>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
-    </script>
+    </nav>
+    <!-- Navbar de Bootstrap -->
+    <nav class="navbar fixed-bottom">
+        <div class="container-fluid justify-content-around">
+            <a href="#home" class="nav-item scroll-nav active">
+                <i class="material-icons">home</i>
+                Inicio
+            </a>
+            <a href="#about-us" class="nav-item scroll-nav">
+                <i class="material-icons">info</i>
+                ¿Qué es?
+            </a>
+            <a href="#how-it-works" class="nav-item scroll-nav">
+                <i class="material-icons">help_outline</i>
+                ¿Cómo funciona?
+            </a>
+            <a href="#pricing" class="nav-item scroll-nav">
+                <i class="material-icons">attach_money</i>
+                Precios
+            </a>
+        </div>
+    </nav>
+    <div class="sections-container d-flex">
+        <div class="section hero d-flex justify-content-center align-items-center" id="home">
+            <div class="container p-4">
+                <div class="row align-items-center">
+                    <div class="col-md-6 order-2 order-md-1 text-center text-md-start">
+                        <h1 class="mb-md-4 mt-4 mt-md-0">AGENDA ROAD</h1>
+                        <p class="text-info py-4">La herramienta de gestión de citas que necesitas para organizar tu
+                            tiempo de manera
+                            eficiente.</p>
+                        <div class="d-grid gap-2 d-md-flex mt-md-4">
+                            <a href="#about-us" class="btn conocenos-btn flex-grow-1 scroll-nav">Conócenos</a>
+                            <a href="#tu-accion" class="btn btn-primary flex-grow-1">Pruebalo Gratis</a>
+                        </div>
+                    </div>
+                    <div class="col-md-6 order-1 order-md-2 text-center">
+                        <img src="<?php echo $baseUrl; ?>assets/img/landing_home.png" alt="Agenda Road"
+                            class="img-fluid" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Sección ¿Qué es? -->
+        <div id="about-us" class="section d-flex justify-content-center align-items-center about-us">
+            <div class="container text-center flip-container">
+                <!-- Contenedor giratorio -->
+                <div class="flip-card">
+                    <!-- Contenido Frente -->
+                    <div class="flip-card-front d-flex justify-content-center align-items-center">
+                        <div class="row align-items-center">
+                            <div class="col-md-6 text-center">
+                                <img src="<?php echo $baseUrl; ?>assets/img/que_es_cut.png" alt="Agenda Road"
+                                    class="img-fluid" />
+                            </div>
+                            <div class="col-md-6 text-center text-md-start">
+                                <h2>¿Qué es Agenda Road?</h2>
+                                <p class="text-info py-4">
+                                    Agenda Road es una herramienta de gestión de citas fácil de usar, diseñada para
+                                    ayudarte a organizar
+                                    tu tiempo de manera eficiente.
+                                </p>
+                                <button id="show-more-info" class="btn btn-primary">Más Información</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Contenido Detrás -->
+                    <div class="flip-card-back d-block pt-md-3">
+                        <?php include __DIR__ . '/includes/descripcion-agenda-road.php'; ?>
+                        <!-- Botones abajo -->
+                        <div class="pt-md-4">
+                            <a id="show-less-info" class="btn btn-outline-light p-1 material-icons">reply</a>
+                            <a href="#" class="btn btn-primary py-1">¡Prueba Agenda Road Hoy Mismo!</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección ¿Cómo funciona? -->
+        <div id="how-it-works" class="section d-flex justify-content-center align-items-center how-it-works">
+            <div class="container text-center">
+
+                <div class="row align-items-center">
+                    <div class="col-md-6 text-center">
+                        <img src="<?php echo $baseUrl; ?>assets/img/como_funciona.png" alt="Agenda Road"
+                            class="img-fluid w-75" />
+                    </div>
+                    <div class="col-md-6 text-center text-md-start">
+                        <h2>¿Cómo Funciona?</h2>
+                        <p class="text-info py-4">
+                            Agenda Road te permite crear, modificar y eliminar citas con facilidad. Recibe
+                            notificaciones y
+                            recordatorios directamente en tu dispositivo.
+                        </p>
+                        <a href="#tu-accion" class="btn btn-primary">Más Información</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Sección Precios -->
+        <div id="pricing" class="section d-flex justify-content-center align-items-center pricing">
+            <div class="container text-center free-background-container align-content-center"
+                style="background-image: url('<?php echo $baseUrl; ?>assets/img/gratis.png');">
+                <div class="free-text-container">
+                    <h2>Nuestros Planes</h2>
+                    <p class="text-info py-4">
+                        Estamos en periodo de pruebas, por lo que NO HAY PLANES. Solicita tu prueba gratuita de 1 mes.
+                    </p>
+                    <a href=" #tu-accion" class="btn btn-primary">Solicita Gratis</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Agrega más secciones aquí -->
+    </div>
+
+    <!-- Scripts de GSAP y Bootstrap -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="<?php echo $baseUrl; ?>assets/js/app.js"></script>
 </body>
 
 </html>

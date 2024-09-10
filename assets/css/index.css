@@ -1,0 +1,170 @@
+body {
+  height: 100vh;
+  margin: 0;
+  font-family: "Roboto", sans-serif;
+  background: #1a1728;
+  color: #f5f5f5;
+}
+
+.container {
+  width: 90%;
+  max-width: 1200px;
+}
+
+.sections-container {
+  width: 100vw;
+}
+
+.section {
+  min-width: 100vw;
+  height: 100vh;
+}
+
+.free-background-container {
+  background-size: 70%;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 100%;
+  max-height: 600px;
+}
+
+.free-text-container {
+  background: rgba(255, 255, 255, 0);
+  /* Color de fondo blanco con opacidad */
+  border-radius: 15px;
+  /* Bordes redondeados */
+  padding: 20px;
+  /* Espaciado interno */
+  backdrop-filter: blur(6px);
+  /* Desenfoque de fondo */
+  -webkit-backdrop-filter: blur(10px);
+  /* Desenfoque de fondo para Safari */
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  /* Sombra sutil */
+}
+
+#home h1 {
+  font-size: 5rem;
+}
+
+@media (max-width: 768px) {
+  #home h1 {
+    font-size: 1.5rem;
+    /* Ajuste para pantallas medianas */
+  }
+
+  .free-background-container {
+    background-size: 100%;
+  }
+}
+
+.conocenos-btn {
+  background-color: #ea98a2;
+  border: none;
+  font-weight: 500;
+}
+
+.conocenos-btn:hover {
+  background-color: #d9a7ad;
+  color: #1a1728;
+}
+
+.container.flip-container {
+  perspective: 1000px;
+}
+
+.flip-container-background {
+  background-image: url("../img/que_es_cut.png");
+  background-size: 70%;
+  background-position: center;
+  background-repeat: no-repeat;
+  max-height: 600px;
+}
+
+.flip-container-background::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(26, 23, 40, 0.95);
+  /* Asegúrate de que esté por encima de la imagen */
+  pointer-events: none;
+  /* Evita que el pseudo-elemento interfiera con los clics */
+}
+
+.flip-card {
+  width: 100%;
+  height: 400px;
+  /* Ajusta según tu diseño; puedes usar 100% para ocupar todo el espacio */
+  position: relative;
+  transform-style: preserve-3d;
+  /* Permite el giro en 3D */
+  transition: transform 0.4s;
+  /* Duración del efecto de giro más rápido */
+}
+
+.flip-card-front,
+.flip-card-back {
+  backface-visibility: hidden;
+  /* Oculta la parte trasera cuando se gira */
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  /* Centrado del texto */
+}
+
+.flip-card-front {
+  z-index: 2;
+}
+
+.flip-card-back {
+  transform: rotateY(180deg);
+  /* Coloca la parte trasera al revés */
+  z-index: 1;
+}
+
+.navbar {
+  height: 60px;
+  box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.1);
+  background-color: #242035;
+}
+
+.nav-item {
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 100;
+  text-decoration: auto;
+}
+
+.nav-item i {
+  display: block;
+  font-size: 22px;
+}
+
+.nav-item.active {
+  color: #0dcaf0;
+  /* Color destacado */
+}
+
+.navbar-brand,
+.nav-item {
+  color: #f5f5f5;
+}
+.navbar-brand:hover,
+.navbar-brand:focus {
+  color: #f5f5f5; /* Asegura que el color se mantenga en hover o focus */
+  text-decoration: none; /* Opcional, para eliminar subrayado en ciertos navegadores */
+}
+
+.login a {
+  font-size: 0.95rem;
+}
+
+.login i {
+  font-size: 1.3rem;
+}
