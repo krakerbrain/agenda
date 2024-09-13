@@ -6,8 +6,6 @@ require_once dirname(__DIR__, 2) . '/access-token/seguridad/jwt.php';
 require_once dirname(__DIR__, 2) . '/classes/Services.php';
 $baseUrl = ConfigUrl::get();
 $manager = new DatabaseSessionManager();
-// $manager->startSession();
-// session_start();
 $datosUsuario = validarToken();
 if (!$datosUsuario) {
     header("Location: " . $baseUrl . "login/index.php");

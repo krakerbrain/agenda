@@ -4,10 +4,7 @@ require_once dirname(__DIR__) . '/classes/ConfigUrl.php';
 require_once dirname(__DIR__) . '/access-token/seguridad/jwt.php';
 $baseUrl = ConfigUrl::get();
 $manager = new DatabaseSessionManager();
-// $manager->startSession();
-// session_start();
 $title = "Configuraciones";
-// $sesion = isset($_SESSION['company_id']);
 $datosUsuario = validarToken();
 if (!$datosUsuario) {
     header("Location: " . $baseUrl . "login/index.php");
@@ -74,7 +71,7 @@ const baseUrl = '<?php echo $baseUrl; ?>';
                     <a class="nav-link" href="#" id="correos">Correos</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#" id="mis_datos">Mis Datos</a>
+                    <a class="nav-link" href="#" id="datos_empresa">Datos Empresa</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#" id="add_user">Agregar Usuario</a>
