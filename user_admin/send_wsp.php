@@ -1,7 +1,7 @@
 <?php
 
 
-function sendWspReserva($template_name, $telefono, $nombre_cliente,  $fecha_cita, $hora_cita)
+function sendWspReserva($template_name, $telefono, $nombre_cliente,  $fecha_cita, $hora_cita, $nombre_empresa, $social_token)
 {
     $token = $_ENV['WSP_TOKEN'];
     //URL A DONDE SE MANDARA EL MENSAJE
@@ -22,12 +22,11 @@ function sendWspReserva($template_name, $telefono, $nombre_cliente,  $fecha_cita
                         "type" => "header",
                         "parameters" => [
                             [
-                                "type" => "image",
-                                "image" => [
-                                    "link" => "https://agenda2024.online/assets/img/15042021LOGO_2.png"
-                                ]
+                                "type" => "text",
+                                "text" => $nombre_empresa
                             ]
                         ]
+                        # end header
                     ],
                     [
                         "type" => "body",
@@ -35,6 +34,18 @@ function sendWspReserva($template_name, $telefono, $nombre_cliente,  $fecha_cita
                             ["type" => "text", "text" => $nombre_cliente],  // {{1}}
                             ["type" => "text", "text" => $fecha_cita],    // {{3}}
                             ["type" => "text", "text" => $hora_cita]      // {{4}}
+                        ]
+                    ],
+                    [
+                        "type" => "button",
+                        "sub_type" => "url",
+                        "index" => "0",
+                        "parameters" => [
+                            [
+                                "type" => "text",
+                                # Business Developer-defined dynamic URL suffix
+                                "text" => $social_token
+                            ]
                         ]
                     ]
                 ]

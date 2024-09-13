@@ -2,6 +2,7 @@
 require_once dirname(__DIR__, 2) . '/classes/DatabaseSessionManager.php';
 require_once dirname(__DIR__, 2) . '/classes/EmailTemplate.php';
 require_once dirname(__DIR__, 2) . '/user_admin/send_email.php';
+require_once dirname(__DIR__, 2) . '/user_admin/send_wsp.php';
 $manager = new DatabaseSessionManager();
 $conn = $manager->getDB();
 
@@ -35,6 +36,8 @@ try {
     $formattedStartTime = $startDateTime->format('H:i');
     $formattedEndTime = $endDateTime->format('H:i');
 
+    $phone = formatPhoneNumber($phone);
+
     // Preparar la consulta SQL
     $stmt = $conn->prepare("INSERT INTO appointments (company_id, name, phone, mail, date, start_time, end_time, id_service) VALUES (:company_id, :name, :phone, :mail, :date, :start_time, :end_time, :id_service)");
 
@@ -60,11 +63,20 @@ try {
         $alertEmailContent = $emailTemplateBuilder->buildAppointmentAlert($company_id, $name, $date, $formattedStartTime);
         sendEmail(null, $alertEmailContent, null);
 
-        // Confirmar la transacción
-        $conn->commit();
+        // Enviar mensaje de WhatsApp
+        $wspStatusCode = sendWspReserva("registro_reserva", $phone, $name, $date, $formattedStartTime, $emailContent['company_name'], $emailContent['social_token']);
 
-        echo json_encode(['message' => 'Cita reservada exitosamente y correo enviado!']);
-        http_response_code(200);
+        // Verificar si el mensaje de WhatsApp fue enviado correctamente
+        if ($wspStatusCode == 200 || $wspStatusCode == 201) {
+            // Confirmar la transacción si todo fue exitoso
+            $conn->commit();
+
+            echo json_encode(['message' => 'Cita reservada exitosamente y aviso enviado!']);
+            http_response_code(200);
+        } else {
+            // Si falla el envío de WhatsApp, revertir la transacción
+            throw new Exception('Error al enviar el mensaje de WhatsApp. Código de estado: ' . $wspStatusCode);
+        }
     } else {
         throw new Exception('Error al reservar la cita.');
     }
@@ -76,4 +88,28 @@ try {
 } finally {
     // Cerrar la conexión
     $conn = null;
+}
+
+function formatPhoneNumber($telefono)
+{
+    // Eliminar espacios en blanco, guiones, paréntesis y el símbolo "+"
+    $telefono = preg_replace('/[\s\-\(\)\+]/', '', $telefono);
+
+    // Si el número empieza con "9" y tiene 8 dígitos (número móvil chileno), agregar "56" al inicio
+    if (preg_match('/^9\d{8}$/', $telefono)) {
+        return '56' . $telefono;
+    }
+
+    // Si el número ya empieza con "56" y tiene 11 dígitos, es correcto
+    if (preg_match('/^56\d{9}$/', $telefono)) {
+        return $telefono;
+    }
+
+    // Si el número ya empieza con "6" y tiene 9 dígitos (número fijo chileno), agregar "56" al inicio
+    if (preg_match('/^\d{8}$/', $telefono)) {
+        return '569' . $telefono;
+    }
+
+    // Si el número no es válido, lanzar una excepción
+    throw new Exception('Número de teléfono inválido.');
 }

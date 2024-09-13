@@ -9,6 +9,8 @@ RewriteCond %{REQUEST_FILENAME} !-d
 
 # Redirigir URLs bajo "agenda" a "index.php" con el token como parámetro
 RewriteRule ^([^/]+)$ form_reserva.php?path=$1 [L]
+# Reescribe la URL /social/{token} a social_redirect.php con el token como parámetro
+RewriteRule ^social/([a-zA-Z0-9_-]+)$ user_admin/controllers/social_redirect.php?token=$1 [L]
 # Negar acceso al archivo client_secret.json
   RewriteRule ^access-token/client_secret\.json$ - [F,NC]
 </IfModule>

@@ -1,42 +1,31 @@
 <?php
 require_once dirname(__DIR__) . '/classes/DatabaseSessionManager.php';
+require_once dirname(__DIR__) . '/classes/FileManages.php';
 $manager = new DatabaseSessionManager();
 $conn = $manager->getDB();
 
 $name = $_POST['name'];
 $logo = null;
 
-
-
 // Generar un token aleatorio
 $token = bin2hex(random_bytes(16));
+// Crear una instancia de FileManages
+$fileManager = new FileManages();
 
 try {
     $conn->beginTransaction();
     // Manejar la subida del logo dentro de la transacción solo si hay un archivo para subir
     if (!empty($_FILES['logo']['name'])) {
-        $upload_dir = dirname(__DIR__) . '/master_admin/uploads/';
-
-        // Obtener la extensión del archivo
-        $extension = pathinfo($_FILES['logo']['name'], PATHINFO_EXTENSION);
-
-        // Formatear el nombre del archivo
-        $formatted_name = 'logo-' . preg_replace('/[^a-zA-Z0-9]/', '_', $name) . '-' . date('dmY') . '-' . uniqid() . '.' . $extension;
-
-        $logo_path = $upload_dir . $formatted_name;
-
-        if (!move_uploaded_file($_FILES['logo']['tmp_name'], $logo_path)) {
-            throw new Exception('Error al subir el archivo.');
-        }
-
-        // Si la subida fue exitosa, guarda la ruta del logo en la variable $logo
-        $logo = 'master_admin/uploads/' . $formatted_name;
+        // Utilizar la clase para manejar la subida del logo
+        $logo = $fileManager->uploadLogo($name);
     }
 
     // Insertar la nueva compañía con el token
-    $sql = $conn->prepare("INSERT INTO companies (name, logo, is_active, token) VALUES (:name, :logo, 1, :token)");
+    $sql = $conn->prepare("INSERT INTO companies (name, logo, phone, address, is_active, token) VALUES (:name, :logo,:phone, :address, 1, :token)");
     $sql->bindParam(':name', $name);
     $sql->bindParam(':logo', $logo);
+    $sql->bindParam(':phone', $_POST['phone']);
+    $sql->bindParam(':address', $_POST['address']);
     $sql->bindParam(':token', $token);
     $sql->execute();
 

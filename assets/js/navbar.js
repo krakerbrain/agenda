@@ -3,7 +3,7 @@ import { initHorarios } from "./horarios.js";
 import { initServicios } from "./servicios.js";
 import { initConfiguraciones } from "./configuraciones.js";
 import { initCorreos } from "./correos.js";
-import { initMisDatos } from "./misDatos.js";
+import { initDatosEmpresa } from "./datosEmpresa.js";
 import { initAddUser } from "./addUser.js";
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // Load the default content when the page loads, after registering all event listeners
-  loadContent("add_user");
+  loadContent("datos_empresa");
 
   function loadContent(page) {
     document.querySelector(".titulo").textContent = document.querySelector("#" + page).innerHTML;
@@ -61,8 +61,8 @@ document.addEventListener("DOMContentLoaded", function () {
           case "correos":
             initCorreos();
             break;
-          case "mis_datos":
-            initMisDatos();
+          case "datos_empresa":
+            initDatosEmpresa();
             break;
           case "add_user":
             initAddUser();

@@ -31,6 +31,25 @@ include dirname(__DIR__) . '/master_admin/navbar.php';
                                 <label for="logo" class="form-label">Logo (opcional):</label>
                                 <input type="file" class="form-control" id="logo" name="logo">
                             </div>
+                            <div>
+                                <label for="phone" class="form-label">Teléfono:</label>
+                                <input type="tel" class="form-control" id="phone" name="phone" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="address" class="form-label">Dirección:</label>
+                                <input type="text" class="form-control" id="address" name="address" required>
+                            </div>
+                            <!-- Descripción de la Empresa -->
+                            <div class="mb-3">
+                                <div class="">
+                                    <label for="description" class="form-label">Descripción</label>
+                                    <textarea class="form-control" id="description" name="description" rows="2"
+                                        maxlength="50"
+                                        placeholder="Descripción breve de la empresa (máximo 50 caracteres)">Empresa dedicada a...</textarea>
+                                    <div class="form-text">Máximo 50 caracteres.</div>
+                                </div>
+                            </div>
+
                             <div class="text-center">
                                 <button type="submit" class="btn btn-primary" id="addCompany">
                                     <span class="spinner-border spinner-border-sm d-none" aria-hidden="true"></span>
@@ -90,86 +109,86 @@ include dirname(__DIR__) . '/master_admin/navbar.php';
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
     </script>
     <script>
-    const baseUrl = '<?php echo $baseUrl; ?>';
+        const baseUrl = '<?php echo $baseUrl; ?>';
 
-    document.getElementById('addCompanyForm').addEventListener('submit', async function(event) {
-        event.preventDefault();
-        // Mostrar spinner y deshabilitar botón
-        displaySpinner('addCompany', true);
-        const formData = new FormData(this);
-        try {
-            const response = await fetch(`${baseUrl}master_admin/add_company.php`, {
-                method: 'POST',
-                body: formData
-            });
-            const {
-                success,
-                company_id,
-                error
-            } = await response.json();
+        document.getElementById('addCompanyForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            // Mostrar spinner y deshabilitar botón
+            displaySpinner('addCompany', true);
+            const formData = new FormData(this);
+            try {
+                const response = await fetch(`${baseUrl}master_admin/add_company.php`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const {
+                    success,
+                    company_id,
+                    error
+                } = await response.json();
 
-            if (success) {
-                document.getElementById('company_id').value = company_id;
-                //limpiar formulario
-                this.reset();
-                alert('Empresa agregada exitosamente');
-            } else {
-                alert(error);
+                if (success) {
+                    document.getElementById('company_id').value = company_id;
+                    //limpiar formulario
+                    this.reset();
+                    alert('Empresa agregada exitosamente');
+                } else {
+                    alert(error);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            } finally {
+                // Ocultar spinner y habilitar botón
+                displaySpinner('addCompany', false);
             }
-        } catch (error) {
-            console.error('Error:', error);
-        } finally {
-            // Ocultar spinner y habilitar botón
-            displaySpinner('addCompany', false);
-        }
-    });
-    document.getElementById('addUserForm').addEventListener('submit', async function(event) {
-        event.preventDefault();
-        // Mostrar spinner y deshabilitar botón
-        displaySpinner('addUser', true);
+        });
+        document.getElementById('addUserForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            // Mostrar spinner y deshabilitar botón
+            displaySpinner('addUser', true);
 
-        const formData = new FormData(this);
-        try {
-            const response = await fetch(`${baseUrl}login/registra_usuario.php`, {
-                method: 'POST',
-                body: formData
-            });
-            const {
-                success,
-                error
-            } = await response.json();
+            const formData = new FormData(this);
+            try {
+                const response = await fetch(`${baseUrl}login/registra_usuario.php`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const {
+                    success,
+                    error
+                } = await response.json();
 
-            if (success) {
-                //limpiar formulario
-                this.reset();
-                alert('Usuario agregado exitosamente');
-            } else {
-                alert(error);
-                this.reset();
+                if (success) {
+                    //limpiar formulario
+                    this.reset();
+                    alert('Usuario agregado exitosamente');
+                } else {
+                    alert(error);
+                    this.reset();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            } finally {
+                // Ocultar spinner y habilitar botón
+                displaySpinner('addUser', false);
             }
-        } catch (error) {
-            console.error('Error:', error);
-        } finally {
-            // Ocultar spinner y habilitar botón
-            displaySpinner('addUser', false);
-        }
-    });
+        });
 
-    function displaySpinner(id, show) {
-        const button = document.getElementById(id);
-        const spinner = button.querySelector('.spinner-border');
-        const buttonText = button.querySelector('.button-text');
-        const textBtn = id === 'addCompany' ? 'Agregar Empresa' : 'Agregar Usuario';
-        if (!show) {
-            spinner.classList.add('d-none');
-            buttonText.textContent = textBtn;
-            button.disabled = false;
-        } else {
-            spinner.classList.remove('d-none');
-            buttonText.textContent = 'Procesando...';
-            button.disabled = true;
+        function displaySpinner(id, show) {
+            const button = document.getElementById(id);
+            const spinner = button.querySelector('.spinner-border');
+            const buttonText = button.querySelector('.button-text');
+            const textBtn = id === 'addCompany' ? 'Agregar Empresa' : 'Agregar Usuario';
+            if (!show) {
+                spinner.classList.add('d-none');
+                buttonText.textContent = textBtn;
+                button.disabled = false;
+            } else {
+                spinner.classList.remove('d-none');
+                buttonText.textContent = 'Procesando...';
+                button.disabled = true;
+            }
         }
-    }
     </script>
 </body>
 

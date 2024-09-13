@@ -71,7 +71,7 @@ class EmailTemplate
     private function loadCompanyData($company_id, $templateType)
     {
         if ($this->companyData === null) {
-            $query = $this->conn->prepare("SELECT name, logo, notas_correo_" . $templateType . " as notas FROM companies WHERE id = :company_id LIMIT 1");
+            $query = $this->conn->prepare("SELECT name, logo, notas_correo_" . $templateType . " as notas, social_token FROM companies WHERE id = :company_id LIMIT 1");
             $query->bindParam(':company_id', $company_id);
             $query->execute();
             $this->companyData = $query->fetch(PDO::FETCH_ASSOC);
@@ -146,7 +146,7 @@ class EmailTemplate
             $templateContent
         );
 
-        return ['subject' => $subject, 'body' => $body, 'company_name' => $this->companyData['name']];
+        return ['subject' => $subject, 'body' => $body, 'company_name' => $this->companyData['name'], 'social_token' => $this->companyData['social_token']];
     }
 
     // Otro constructor de correos, como alertas, reutilizando los mismos datos
