@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // Load the default content when the page loads, after registering all event listeners
-  loadContent("datos_empresa");
+  loadContent("dateList");
 
   function loadContent(page) {
     document.querySelector(".titulo").textContent = document.querySelector("#" + page).innerHTML;

@@ -11,3 +11,9 @@ tareas.md
 README.MD
 /master_admin/uploads/*.png
 /master_admin/uploads/*.jpg
+/__tests__/
+package-lock.json
+package.json
+jest.config.js
+babel.config.js
+/node_modules

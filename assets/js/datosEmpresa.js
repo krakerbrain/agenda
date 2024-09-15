@@ -7,7 +7,6 @@ export function initDatosEmpresa() {
       const response = await fetch(`${baseUrl}user_admin/controllers/redesSociales.php`, {
         method: "GET",
       });
-
       const { success, data } = await response.json();
 
       if (success) {
