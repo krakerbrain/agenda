@@ -33,7 +33,8 @@ try {
 
     // Actualizar nombre del logo con el id de la compañía
     if (!empty($_FILES['logo']['name'])) {
-        $logo = $fileManager->uploadCompanyLogo($company_id, $_FILES['logo']);
+        //los parametros que se envian son el nombre de la compañia ($name) y el id de la compañia ($company_id)
+        $logo = $fileManager->uploadLogo($name, $company_id);
         $sql = $conn->prepare("UPDATE companies SET logo = :logo WHERE id = :company_id");
         $sql->bindParam(':logo', $logo);
         $sql->bindParam(':company_id', $company_id);
