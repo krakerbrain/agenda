@@ -10,7 +10,7 @@ if (!$datosUsuario) {
     header("Location: " . $baseUrl . "login/index.php");
 }
 $company_id = $datosUsuario['company_id'];
-$query = $conn->prepare("SELECT id, type, about_role FROM user_role WHERE id != 1");
+$query = $conn->prepare("SELECT id, type, about_role FROM user_role WHERE id > 2");
 $query->execute();
 $roles = $query->fetchAll(PDO::FETCH_ASSOC);
 
@@ -28,7 +28,6 @@ $roles = $query->fetchAll(PDO::FETCH_ASSOC);
             <form action="" method="post" class="form-group" id="addUserForm">
                 <div class="alert alert-secondary error d-none mb-2" role="alert"></div>
                 <input type="hidden" name="company_id" id="company_id" value="<?= $company_id; ?>">
-                <input type="hidden" name="master_register" id="master_register" value="false">
                 <div class="input-group">
                     <div class="input-group-text bg-secondary text-light">
                         <i class="fa-solid fa-user"></i>
@@ -91,6 +90,21 @@ $roles = $query->fetchAll(PDO::FETCH_ASSOC);
 
             </form>
         </div>
+    </div>
+    <div class="container mt-4">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Usuario</th>
+                    <th>Correo</th>
+                    <th>Rol</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="usersTable">
+
+            </tbody>
+        </table>
     </div>
 
 </div>

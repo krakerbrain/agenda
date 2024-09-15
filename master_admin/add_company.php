@@ -1,6 +1,6 @@
 <?php
 require_once dirname(__DIR__) . '/classes/DatabaseSessionManager.php';
-require_once dirname(__DIR__) . '/classes/FileManages.php';
+require_once dirname(__DIR__) . '/classes/FileManager.php';
 $manager = new DatabaseSessionManager();
 $conn = $manager->getDB();
 
@@ -10,14 +10,14 @@ $logo = null;
 // Generar un token aleatorio
 $token = bin2hex(random_bytes(16));
 // Crear una instancia de FileManages
-$fileManager = new FileManages();
+$fileManager = new FileManager();
 
 try {
     $conn->beginTransaction();
     // Manejar la subida del logo dentro de la transacción solo si hay un archivo para subir
     if (!empty($_FILES['logo']['name'])) {
         // Utilizar la clase para manejar la subida del logo
-        $logo = $fileManager->uploadLogo($name);
+        $logo = $_FILES['logo']['name'];
     }
 
     // Insertar la nueva compañía con el token
@@ -30,6 +30,16 @@ try {
     $sql->execute();
 
     $company_id = $conn->lastInsertId();
+
+    // Actualizar nombre del logo con el id de la compañía
+    if (!empty($_FILES['logo']['name'])) {
+        $logo = $fileManager->uploadCompanyLogo($company_id, $_FILES['logo']);
+        $sql = $conn->prepare("UPDATE companies SET logo = :logo WHERE id = :company_id");
+        $sql->bindParam(':logo', $logo);
+        $sql->bindParam(':company_id', $company_id);
+        $sql->execute();
+    }
+
 
     // Insertar los horarios de trabajo de la nueva compañía
     $days = [1, 2, 3, 4, 5, 6, 7]; // Lunes a Viernes

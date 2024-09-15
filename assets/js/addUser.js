@@ -1,4 +1,65 @@
 export function initAddUser() {
+  async function loadUsers() {
+    try {
+      const response = await fetch(`${baseUrl}user_admin/controllers/users.php`, {
+        method: "GET",
+      });
+
+      const { success, data } = await response.json();
+
+      if (success) {
+        getUsers(data);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  loadUsers();
+
+  function getUsers(users) {
+    const usersTable = document.getElementById("usersTable");
+    usersTable.innerHTML = "";
+    users.forEach((user) => {
+      usersTable.innerHTML += `
+        <tr>
+          <td>${user.name}</td>
+          <td>${user.email}</td>
+          <td>${user.role_type}</td>
+          <td>
+            <button class="btn btn-danger remove-user" data-id="${user.id}">Eliminar</button>
+          </td>
+        </tr>
+      `;
+    });
+    if (users.length > 0) {
+      document.querySelectorAll(".remove-user").forEach((button) => {
+        button.addEventListener("click", (e) => {
+          const userId = e.target.dataset.id;
+          deleteUser(userId);
+        });
+      });
+    }
+  }
+
+  async function deleteUser(id) {
+    try {
+      const response = await fetch(`${baseUrl}user_admin/controllers/users.php`, {
+        method: "DELETE",
+        body: JSON.stringify({ id }),
+      });
+
+      const { success, message } = await response.json();
+
+      if (success) {
+        alert(message);
+        loadUsers();
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   document.getElementById("addUserForm").addEventListener("submit", async function (event) {
     event.preventDefault();
     // Mostrar spinner y deshabilitar botón

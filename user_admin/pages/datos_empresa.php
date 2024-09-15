@@ -15,6 +15,7 @@ $sql = $conn->prepare("SELECT * FROM companies WHERE id = :id AND is_active = 1"
 $sql->bindParam(':id', $company_id, PDO::PARAM_INT);
 $sql->execute();
 $company = $sql->fetch(PDO::FETCH_ASSOC);
+$logo = isset($company['logo']) ? $company['logo'] : 'assets/img/no_logo.png';
 
 $media = $conn->prepare("SELECT id, name FROM social_networks ORDER BY name");
 $media->execute();
@@ -29,7 +30,7 @@ $media->execute();
         <h4 class=""><?php echo $company['name']; ?></h4>
         <div class="mb-3">
             <div class="">
-                <img src="<?php echo $baseUrl . $company['logo']; ?>" alt="Logo de la Empresa" class="img-fluid w-25">
+                <img src="<?php echo $baseUrl . $logo; ?>" alt="Logo de la Empresa" class="img-fluid w-25">
             </div>
             <div class="">
                 <label for="logo" class="form-label">Cambiar Logo</label>
