@@ -1,9 +1,9 @@
 <?php
-require_once dirname(__DIR__) . '/classes/DatabaseSessionManager.php';
+require_once dirname(__DIR__) . '/classes/Database.php';
 require_once dirname(__DIR__) . '/classes/ConfigUrl.php';
 require_once dirname(__DIR__) . '/access-token/seguridad/jwt.php';
 $baseUrl = ConfigUrl::get();
-$manager = new DatabaseSessionManager();
+
 $title = "Configuraciones";
 $datosUsuario = validarToken();
 if (!$datosUsuario) {

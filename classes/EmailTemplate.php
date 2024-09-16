@@ -1,33 +1,37 @@
 <?php
 
-require_once 'DatabaseSessionManager.php'; // Asegúrate de tener la ruta correcta
+require_once 'Database.php'; // Asegúrate de tener la ruta correcta
 require_once 'ConfigUrl.php'; // Asegúrate de tener la ruta correcta
 
 class EmailTemplate
 {
-    private $conn;
+    private $db;
     private $baseUrl;
     private $companyData = null;
     private $serviceData = null;
     private $userData = null;
 
 
-    public function __construct()
+    public function __construct($db = null)
     {
-        $manager = new DatabaseSessionManager();
+        if ($db) {
+            $this->db = $db;
+        } else {
+            $this->db = new Database();
+        }
+        // $manager = new DatabaseSessionManager();
         $baseUrl = new ConfigUrl();
-        $this->conn = $manager->getDB();
+        // $this->conn = $manager->getDB();
         $this->baseUrl = $baseUrl->get();
     }
-
     // Obtener plantillas por company_id
     public function getTemplatesByCompanyId($company_id)
     {
         try {
-            $query = $this->conn->prepare("SELECT notas_correo_reserva as reserva, notas_correo_confirmacion as confirmacion FROM companies WHERE id = :company_id");
-            $query->bindParam(':company_id', $company_id, PDO::PARAM_INT);
-            $query->execute();
-            return $query->fetchAll(PDO::FETCH_ASSOC);
+            // Preparar y ejecutar la consulta usando la instancia de Database
+            $this->db->query("SELECT notas_correo_reserva as reserva, notas_correo_confirmacion as confirmacion FROM companies WHERE id = :company_id");
+            $this->db->bind(':company_id', $company_id);
+            return $this->db->resultSet();
         } catch (PDOException $e) {
             return ['success' => false, 'message' => $e->getMessage()];
         }
@@ -37,44 +41,33 @@ class EmailTemplate
     public function updateTemplate($company_id, $template_name, $notas)
     {
         try {
-            $query = $this->conn->prepare("
-            UPDATE companies
-            SET notas_correo_" . $template_name . " = :notas
-            WHERE id = :company_id");
+            $sql = "
+        UPDATE companies
+        SET notas_correo_" . $template_name . " = :notas
+        WHERE id = :company_id";
 
             // Almacenar el JSON en una variable antes de pasarlo a bindParam
             $notasJson = json_encode($notas);
-            $query->bindParam(':company_id', $company_id, PDO::PARAM_INT);
-            $query->bindParam(':notas', $notasJson, PDO::PARAM_STR);
-            $query->execute();
+
+            // Preparar y ejecutar la consulta
+            $this->db->query($sql);
+            $this->db->bind(':company_id', $company_id);
+            $this->db->bind(':notas', $notasJson);
+            $this->db->execute();
+
             return ['success' => true];
         } catch (PDOException $e) {
             return ['success' => false, 'message' => $e->getMessage()];
         }
     }
 
-
-    // Validar datos de la plantilla
-    public static function validateTemplateData($data)
-    {
-        $errors = [];
-        if (empty($data['company_id']) || !is_numeric($data['company_id'])) {
-            $errors[] = 'ID de compañía inválido.';
-        }
-        if (empty($data['template_name'])) {
-            $errors[] = 'Nombre de plantilla es requerido.';
-        }
-        return $errors;
-    }
-
     // Cargar datos de la compañía
     private function loadCompanyData($company_id, $templateType)
     {
         if ($this->companyData === null) {
-            $query = $this->conn->prepare("SELECT name, logo, notas_correo_" . $templateType . " as notas, social_token FROM companies WHERE id = :company_id LIMIT 1");
-            $query->bindParam(':company_id', $company_id);
-            $query->execute();
-            $this->companyData = $query->fetch(PDO::FETCH_ASSOC);
+            $this->db->query("SELECT name, logo, notas_correo_" . $templateType . " as notas, social_token FROM companies WHERE id = :company_id LIMIT 1");
+            $this->db->bind(':company_id', $company_id);
+            $this->companyData = $this->db->single();
 
             if (!$this->companyData) {
                 throw new Exception("Empresa no encontrada.");
@@ -89,10 +82,9 @@ class EmailTemplate
     private function loadServiceData($service_id)
     {
         if ($this->serviceData === null) {
-            $serviceQuery = $this->conn->prepare("SELECT name FROM services WHERE id = :service_id LIMIT 1");
-            $serviceQuery->bindParam(':service_id', $service_id);
-            $serviceQuery->execute();
-            $this->serviceData = $serviceQuery->fetch(PDO::FETCH_ASSOC);
+            $this->db->query("SELECT name FROM services WHERE id = :service_id LIMIT 1");
+            $this->db->bind(':service_id', $service_id);
+            $this->serviceData = $this->db->single();
 
             if (!$this->serviceData) {
                 throw new Exception("Servicio no encontrado.");
@@ -100,13 +92,13 @@ class EmailTemplate
         }
     }
 
+    // Cargar datos del usuario
     private function loadUserData($company_id)
     {
         if ($this->userData === null) {
-            $userQuery = $this->conn->prepare("SELECT name, email FROM users WHERE company_id = :company_id LIMIT 1");
-            $userQuery->bindParam(':company_id', $company_id);
-            $userQuery->execute();
-            $this->userData = $userQuery->fetch(PDO::FETCH_ASSOC);
+            $this->db->query("SELECT name, email FROM users WHERE company_id = :company_id LIMIT 1");
+            $this->db->bind(':company_id', $company_id);
+            $this->userData = $this->db->single();
 
             if (!$this->userData) {
                 throw new Exception("Usuario no encontrado.");

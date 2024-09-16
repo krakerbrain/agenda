@@ -1,9 +1,5 @@
 <?php
-
-// require_once dirname(__DIR__) . '/classes/DatabaseSessionManager.php';
-// $manager = new DatabaseSessionManager();
 session_start();
-// $manager->startSession();
 
 function getUserTimeZone($client)
 {
@@ -12,7 +8,7 @@ function getUserTimeZone($client)
     return $calendar->getTimeZone();
 }
 
-function createCalendarEvent($client, $name, $service, $startDateTimeFormatted, $endDateTimeFormatted, $appointmentId, $conn)
+function createCalendarEvent($client, $name, $service, $startDateTimeFormatted, $endDateTimeFormatted, $appointmentId)
 {
     // Establecer el token de acceso del usuario autenticado
     if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
@@ -50,16 +46,10 @@ function createCalendarEvent($client, $name, $service, $startDateTimeFormatted, 
     try {
         // Obtén el ID del calendario principal del usuario autenticado
         $calendarId = 'primary';
-
         // Crear el evento en el calendario del usuario
         $event = $calendarService->events->insert($calendarId, $event);
         $eventId = $event->getId();
-
-        // Guardar el ID del evento en la tabla appointments
-        $sql = $conn->prepare("UPDATE appointments SET event_id = :event_id WHERE id = :appointment_id");
-        $sql->bindParam(':event_id', $eventId);
-        $sql->bindParam(':appointment_id', $appointmentId);
-        $sql->execute();
+        return $eventId;
     } catch (Exception $e) {
         throw new Exception('Failed to create event: ' . $e->getMessage());
     }
