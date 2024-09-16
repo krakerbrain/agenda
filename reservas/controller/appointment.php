@@ -1,14 +1,17 @@
 <?php
-require_once dirname(__DIR__, 2) . '/classes/DatabaseSessionManager.php';
+// require_once dirname(__DIR__, 2) . '/classes/DatabaseSessionManager.php';
+require_once dirname(__DIR__, 2) . '/classes/Appointments.php';
 require_once dirname(__DIR__, 2) . '/classes/EmailTemplate.php';
 require_once dirname(__DIR__, 2) . '/user_admin/send_email.php';
 require_once dirname(__DIR__, 2) . '/user_admin/send_wsp.php';
-$manager = new DatabaseSessionManager();
-$conn = $manager->getDB();
+
+// Crear instancia de la clase Appointments
+$appointments = new Appointments();
+
 
 try {
     // Iniciar la transacción
-    $conn->beginTransaction();
+    $appointments->beginTransaction();
 
     // Recibir los datos del cuerpo de la solicitud
     $data = $_POST;
@@ -36,23 +39,25 @@ try {
     $formattedStartTime = $startDateTime->format('H:i');
     $formattedEndTime = $endDateTime->format('H:i');
 
-    $phone = formatPhoneNumber($phone);
+    $phone = formatPhoneNumber($data['phone']);
 
-    // Preparar la consulta SQL
-    $stmt = $conn->prepare("INSERT INTO appointments (company_id, name, phone, mail, date, start_time, end_time, id_service) VALUES (:company_id, :name, :phone, :mail, :date, :start_time, :end_time, :id_service)");
+    // Preparar los datos para insertar la cita
+    $appointmentData = [
+        'company_id' => $data['company_id'],
+        'name' => $data['name'],
+        'phone' => $phone,
+        'mail' => $data['mail'],
+        'date' => $data['date'],
+        'start_time' => $formattedStartTime,
+        'end_time' => $formattedEndTime,
+        'id_service' => $data['service']
+    ];
 
-    // Enlazar los parámetros
-    $stmt->bindParam(':company_id', $company_id);
-    $stmt->bindParam(':name', $name);
-    $stmt->bindParam(':phone', $phone);
-    $stmt->bindParam(':mail', $mail);
-    $stmt->bindParam(':date', $date);
-    $stmt->bindParam(':start_time', $formattedStartTime);
-    $stmt->bindParam(':end_time', $formattedEndTime);
-    $stmt->bindParam(':id_service', $id_service);
+    // Insertar la cita en la base de datos
+    $stmt = $appointments->add_appointment($appointmentData);
 
-    // Ejecutar la consulta
-    if ($stmt->execute()) {
+    // Ejecutar la consulta si rowcount es mayor a 0
+    if ($stmt > 0) {
         // Obtener el email template y el logo
         $emailTemplateBuilder = new EmailTemplate();
         $emailContent = $emailTemplateBuilder->buildEmail($company_id, 'reserva', $id_service, $name, $date, $formattedStartTime);
@@ -65,11 +70,12 @@ try {
 
         // Enviar mensaje de WhatsApp
         $wspStatusCode = sendWspReserva("registro_reserva", $phone, $name, $date, $formattedStartTime, $emailContent['company_name'], $emailContent['social_token']);
-
+        //Para pruebas
+        // $wspStatusCode = 200;
         // Verificar si el mensaje de WhatsApp fue enviado correctamente
         if ($wspStatusCode == 200 || $wspStatusCode == 201) {
             // Confirmar la transacción si todo fue exitoso
-            $conn->commit();
+            $appointments->endTransaction();
 
             echo json_encode(['message' => 'Cita reservada exitosamente y aviso enviado!']);
             http_response_code(200);
@@ -82,12 +88,12 @@ try {
     }
 } catch (Exception $e) {
     // Revertir la transacción en caso de error
-    $conn->rollBack();
+    $appointments->cancelTransaction();
     echo json_encode(['message' => 'Error: ' . $e->getMessage()]);
     http_response_code(500);
 } finally {
     // Cerrar la conexión
-    $conn = null;
+    $appointments = null;
 }
 
 function formatPhoneNumber($telefono)

@@ -1,51 +1,113 @@
 export function initDateList() {
-  const confirmButton = document.querySelector(".confirm");
-  const eliminarReserva = document.querySelectorAll(".eliminarReserva");
-  if (confirmButton) {
-    confirmButton.addEventListener("click", function (event) {
-      event.preventDefault();
-      confirmReservation(event.currentTarget.dataset.id);
-    });
-  }
-  if (eliminarReserva) {
-    eliminarReserva.forEach((button) => {
-      button.addEventListener("click", function (event) {
-        event.preventDefault();
-        deleteAppointment(event.currentTarget.dataset.id, event.currentTarget.dataset.eventid);
+  async function loadAppointments() {
+    try {
+      const response = await fetch(`${baseUrl}user_admin/controllers/appointments.php`, {
+        method: "GET",
       });
-    });
-  }
-}
-export function confirmReservation(id) {
-  addSpinner(id, true, "confirmar");
-  fetch(`${baseUrl}user_admin/confirm.php`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      id: id,
-    }),
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      if (data.success) {
-        if (data.success) {
-          alert(data.message);
-          location.reload();
-        }
-      } else {
-        alert("Error desconocido al confirmar la reserva.");
+
+      const { success, data } = await response.json();
+
+      if (success) {
+        getAppointments(data);
       }
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-      alert("Error al confirmar la reserva.");
-    })
-    .finally(() => {
-      // Ocultar spinner y habilitar botón después de que la solicitud se complete
-      addSpinner(id, false, "confirmar");
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  loadAppointments();
+}
+
+function getAppointments(data) {
+  const appointmentsList = document.getElementById("appointmentsList");
+  let html = "";
+  data.forEach((appointment) => {
+    html += `
+      <tr>
+        <td data-cell="servicio" class="data">${appointment.service}</td>
+        <td data-cell="nombre" class="data">${appointment.name}</td>
+        <td data-cell="telefono" class="data">${appointment.phone}</td>
+        <td data-cell="correo" class="data">${appointment.mail}</td>
+        <td data-cell="fecha" class="data">${appointment.date}</td>
+        <td data-cell="hora" class="data">${appointment.start_time}</td>
+        <td data-cell="estado" class="data">${appointment.status ? "Confirmada" : "Pendiente"}</td>
+        <td class="d-flex justify-content-around">
+          ${
+            !appointment.status
+              ? `
+            <button id="confirmarBtn${appointment.id}" 
+                    class="btn btn-success btn-sm confirm" 
+                    title="Confirmar reserva"
+                    data-id="${appointment.id}">
+              <i class="fas fa-check"></i>
+              <span class="spinner-border spinner-border-sm d-none" aria-hidden="true"></span>
+              <span class="button-text"></span>
+            </button>`
+              : ""
+          }
+          <button id="eliminarBtn${appointment.id}" 
+                  class="btn btn-danger btn-sm eliminarReserva" 
+                  title="Eliminar reserva"
+                  data-id="${appointment.id}" 
+                  data-eventid="${appointment.event_id}">
+            <i class="fas fa-times"></i>
+            <span class="spinner-border spinner-border-sm d-none" aria-hidden="true"></span>
+            <span class="button-text"></span>
+          </button>
+        </td>
+      </tr>
+      `;
+  });
+
+  appointmentsList.innerHTML = html;
+
+  // Agrega los event listeners para los botones después de que el HTML se haya renderizado
+  data.forEach((appointment) => {
+    const confirmarBtn = document.getElementById(`confirmarBtn${appointment.id}`);
+    const eliminarBtn = document.getElementById(`eliminarBtn${appointment.id}`);
+
+    if (confirmarBtn) {
+      confirmarBtn.addEventListener("click", function () {
+        confirmReservation(appointment.id);
+      });
+    }
+
+    eliminarBtn.addEventListener("click", function () {
+      deleteAppointment(appointment.id, appointment.event_id);
     });
+  });
+}
+
+export async function confirmReservation(id) {
+  try {
+    // Mostrar spinner
+    addSpinner(id, true, "confirmar");
+
+    const response = await fetch(`${baseUrl}user_admin/confirm.php`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: id,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      alert(data.message);
+      location.reload(); // Recargar la página si la confirmación fue exitosa
+    } else {
+      alert("Error desconocido al confirmar la reserva.");
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    alert("Error al confirmar la reserva.");
+  } finally {
+    // Ocultar spinner y habilitar botón después de que la solicitud se complete
+    addSpinner(id, false, "confirmar");
+  }
 }
 
 export function deleteAppointment(appointmentID, calendarEventID) {
