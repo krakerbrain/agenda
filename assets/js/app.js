@@ -1,9 +1,14 @@
+let showMoreInfo = false;
+
 document.querySelectorAll(".nav-item").forEach((item) => {
   item.addEventListener("click", function () {
     // Remover la clase 'active' de todos los elementos
     document.querySelectorAll(".nav-item").forEach((el) => el.classList.remove("active"));
     // Agregar la clase 'active' al elemento que se clickeó
     this.classList.add("active");
+    if (showMoreInfo) {
+      hideInfo();
+    }
   });
 });
 // Scroll horizontal con GSAP
@@ -79,6 +84,7 @@ document.getElementById("show-more-info").addEventListener("click", function () 
   });
   // Activar el scroll horizontal
   scrollAllowed = false;
+  showMoreInfo = true;
   document.querySelector(".flip-container").classList.add("flip-container-background");
 });
 
@@ -93,6 +99,7 @@ function hideInfo() {
   });
   // Activar el scroll horizontal
   scrollAllowed = true;
+  showMoreInfo = false;
 }
 
 // Controlar el scroll horizontal basado en el flag
@@ -122,3 +129,44 @@ window.addEventListener(
 
 // Llamar la función inicialmente en caso de que una sección ya esté visible
 updateNavbarActiveState();
+
+document.querySelector("#companyForm").addEventListener("submit", async function (e) {
+  e.preventDefault(); // Evitar que el formulario se envíe de manera tradicional
+
+  const formData = new FormData(this); // Recoger los datos del formulario
+
+  try {
+    const response = await fetch(`${baseUrl}inscripcion/controller/procesar_inscripcion.php`, {
+      method: "POST",
+      body: formData,
+    });
+
+    const { success, message } = await response.json(); // Convertir la respuesta a JSON
+
+    if (success) {
+      // Obtener el modal de inscripción
+      let inscriptionModalEl = document.getElementById("inscriptionModal");
+      let inscriptionModal = bootstrap.Modal.getInstance(inscriptionModalEl); // Obtener la instancia actual del modal
+
+      if (inscriptionModal) {
+        // Si la instancia existe (es decir, el modal está abierto), ocultarlo
+        inscriptionModal.hide();
+      }
+
+      // Mostrar el mensaje en el modal de respuesta
+      const responseMessage = document.getElementById("responseMessage");
+      responseMessage.innerText = message;
+
+      // Mostrar el modal de respuesta
+      const responseModal = new bootstrap.Modal(document.getElementById("responseModal"));
+      responseModal.show();
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    const responseMessage = document.getElementById("responseMessage");
+    responseMessage.innerText = "Hubo un error al procesar la solicitud.";
+
+    const responseModal = new bootstrap.Modal(document.getElementById("responseModal"));
+    responseModal.show();
+  }
+});

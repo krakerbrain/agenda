@@ -1,5 +1,5 @@
 <?php
-require_once 'DatabaseSessionManager.php'; // Asegúrate de tener la ruta correcta
+// require_once 'DatabaseSessionManager.php'; // Asegúrate de tener la ruta correcta
 require_once 'ConfigUrl.php'; // Asegúrate de tener la ruta correcta
 
 class FileManager

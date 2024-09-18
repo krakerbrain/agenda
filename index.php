@@ -19,10 +19,13 @@ $baseUrl = ConfigUrl::get();
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="<?php echo $baseUrl; ?>assets/css/index.css">
 </head>
+<script>
+const baseUrl = '<?php echo $baseUrl; ?>';
+</script>
 
 <body>
     <nav class="navbar fixed-top">
-        <div class="container-fluid">
+        <div class="container">
             <!-- Marca -->
             <a class="navbar-brand" href="#">Agenda Road</a>
             <!-- Botón de inicio de sesión -->
@@ -36,7 +39,7 @@ $baseUrl = ConfigUrl::get();
     </nav>
     <!-- Navbar de Bootstrap -->
     <nav class="navbar fixed-bottom">
-        <div class="container-fluid justify-content-around">
+        <div class="container">
             <a href="#home" class="nav-item scroll-nav active">
                 <i class="material-icons">home</i>
                 Inicio
@@ -66,7 +69,8 @@ $baseUrl = ConfigUrl::get();
                             eficiente.</p>
                         <div class="d-grid gap-2 d-md-flex mt-md-4">
                             <a href="#about-us" class="btn conocenos-btn flex-grow-1 scroll-nav">Conócenos</a>
-                            <a href="#tu-accion" class="btn btn-primary flex-grow-1">Pruebalo Gratis</a>
+                            <a href="#inscriptionModal" class="btn btn-primary flex-grow-1"
+                                data-bs-toggle="modal">Pruebalo Gratis</a>
                         </div>
                     </div>
                     <div class="col-md-6 order-1 order-md-2 text-center">
@@ -105,7 +109,8 @@ $baseUrl = ConfigUrl::get();
                         <!-- Botones abajo -->
                         <div class="pt-md-4">
                             <a id="show-less-info" class="btn btn-outline-light p-1 material-icons">reply</a>
-                            <a href="#" class="btn btn-primary py-1">¡Prueba Agenda Road Hoy Mismo!</a>
+                            <a href="#inscriptionModal" class="btn btn-primary flex-grow-1"
+                                data-bs-toggle="modal">¡Prueba Agenda Road Hoy Mismo!</a>
                         </div>
                     </div>
                 </div>
@@ -140,16 +145,19 @@ $baseUrl = ConfigUrl::get();
                 <div class="free-text-container">
                     <h2>Nuestros Planes</h2>
                     <p class="text-info py-4">
-                        Estamos en periodo de pruebas, por lo que NO HAY PLANES. Solicita tu prueba gratuita de 1 mes.
+                        Prueba todas las funcionalidades gratis por 1 mes. Si te gusta puedes continuar por solo $5.000
+                        al mes
                     </p>
-                    <a href=" #tu-accion" class="btn btn-primary">Solicita Gratis</a>
+                    <a href="#inscriptionModal" data-bs-toggle="modal" class="btn btn-primary">Solicita Gratis</a>
                 </div>
             </div>
         </div>
     </div>
     <!-- Agrega más secciones aquí -->
     </div>
-
+    <!-- Incluir el modal -->
+    <?php include 'includes/modal-inscripcion.php'; ?>
+    <?php include 'includes/modal-inscripcion-exitosa.php'; ?>
     <!-- Scripts de GSAP y Bootstrap -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>

@@ -1,7 +1,8 @@
 <?php
 
-require_once 'Database.php'; // Asegúrate de tener la ruta correcta
-require_once 'ConfigUrl.php'; // Asegúrate de tener la ruta correcta
+require_once 'Database.php';
+require_once 'ConfigUrl.php';
+require_once 'EmailSender.php';
 
 class EmailTemplate
 {
@@ -163,5 +164,21 @@ class EmailTemplate
         );
 
         return ['subject' => 'Alerta de cita', 'body' => $body, 'correo_empresa' => $this->userData['email']];
+    }
+    public function buildInscriptionAlert($mail)
+    {
+
+        $alertTemplatePath = $this->baseUrl . 'correos_template/correo_alerta_inscripcion.php';
+        $mailContent = file_get_contents($alertTemplatePath);
+
+        $body = str_replace(
+            ['{email_cliente}',],
+            [$mail],
+            $mailContent
+        );
+
+        // Instancia de la clase EmailSender para enviar el correo
+        $emailSender = new EmailSender();
+        return $emailSender->sendInscriptionAlert('Alerta de inscripción', 'agendaroad@gmail.com', $body);
     }
 }
