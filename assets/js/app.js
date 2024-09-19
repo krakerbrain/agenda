@@ -102,11 +102,14 @@ function hideInfo() {
   showMoreInfo = false;
 }
 
+const modal = document.querySelector("#inscriptionModal");
+
 // Controlar el scroll horizontal basado en el flag
 window.addEventListener(
   "wheel",
   function (e) {
-    if (!scrollAllowed) {
+    const isModalOpen = modal && modal.classList.contains("show");
+    if (!scrollAllowed && !isModalOpen) {
       e.preventDefault();
     }
   },
@@ -118,7 +121,8 @@ window.addEventListener(
 window.addEventListener(
   "touchmove",
   function (e) {
-    if (!scrollAllowed) {
+    const isModalOpen = modal && modal.classList.contains("show");
+    if (!scrollAllowed && !isModalOpen) {
       e.preventDefault();
     }
   },
