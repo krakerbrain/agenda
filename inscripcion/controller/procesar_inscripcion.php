@@ -16,12 +16,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_POST['email'];                                   // Email del propietario
     $password = '1234';                                         // Contraseña temporal
     $role_id = 2;                                               // Rol predeterminado
+    $status = 0;                                                // Estado predeterminado
 
     // Crear una instancia de CompanyManager
     $companyManager = new CompanyManager();
 
     // Llamar a la función para crear la empresa con los datos proporcionados
-    $result = $companyManager->createCompany($name, $phone, $address, $logo);
+    $result = $companyManager->createCompany($name, $phone, $address, $logo, $status);
 
     // Verificar el resultado y responder según corresponda
     if ($result['success']) {
