@@ -14,7 +14,7 @@ class CompanyManager
     }
 
     // Función para crear una nueva empresa
-    public function createCompany($name, $phone, $address, $logo = null)
+    public function createCompany($name, $phone, $address, $logo = null, $status = 1)
     {
         // Generar un token aleatorio para la empresa
         $token = bin2hex(random_bytes(16));
@@ -30,12 +30,13 @@ class CompanyManager
 
             // Inserta la empresa en la base de datos
             $sql = "INSERT INTO companies (name, logo, phone, address, is_active, token) 
-                    VALUES (:name, :logo, :phone, :address, 1, :token)";
+                    VALUES (:name, :logo, :phone, :address, :status, :token)";
             $this->db->query($sql);
             $this->db->bind(':name', $name);
             $this->db->bind(':logo', $logoName);
             $this->db->bind(':phone', $phone);
             $this->db->bind(':address', $address);
+            $this->db->bind(':status', $status);
             $this->db->bind(':token', $token);
             $this->db->execute();
 
