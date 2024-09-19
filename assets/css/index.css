@@ -5,6 +5,9 @@ body {
   background: #1a1728;
   color: #f5f5f5;
 }
+a {
+  text-decoration: none;
+}
 
 .container {
   width: 90%;
