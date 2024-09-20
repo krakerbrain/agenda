@@ -13,6 +13,12 @@ class CompanyManager
         $this->fileManager = new FileManager();
     }
 
+    public function getAllCompanies()
+    {
+        $sql = "SELECT id, name, logo, is_active, token FROM companies";
+        $this->db->query($sql);
+        return $this->db->resultSet();
+    }
     // Función para crear una nueva empresa
     public function createCompany($name, $phone, $address, $logo = null, $status = 1)
     {
@@ -70,6 +76,39 @@ class CompanyManager
         } catch (Exception $e) {
             $this->db->cancelTransaction(); // Rollback de la transacción en caso de error
             return ['success' => false, 'error' => 'Error al agregar la empresa: ' . $e->getMessage()];
+        }
+    }
+
+    // Función para cambiar estado de empresa
+    public function updateCompanyStatus($data)
+    {
+        try {
+            // Actualizar la empresa
+            $sql = "UPDATE companies SET is_active = :status WHERE id = :company_id";
+            $this->db->query($sql);
+            $this->db->bind(':status', $data['is_active']);
+            $this->db->bind(':company_id', $data['id']);
+            $this->db->execute();
+
+            return ['success' => true];
+        } catch (Exception $e) {
+            return ['success' => false, 'error' => 'Error al actualizar la empresa: ' . $e->getMessage()];
+        }
+    }
+
+    public function deleteCompany($company_id)
+    {
+        try {
+            // Eliminar la empresa
+            $sql = "DELETE FROM companies WHERE id = :company_id";
+            $this->db->query($sql);
+            $this->db->bind(':company_id', $company_id);
+            $this->db->execute();
+
+            return ['success' => true];
+        } catch (Exception $e) {
+
+            return ['success' => false, 'error' => 'Error al eliminar la empresa: ' . $e->getMessage()];
         }
     }
 }

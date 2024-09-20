@@ -125,4 +125,12 @@ class Users
         $db->execute();
         return $db->rowCount();
     }
+    public function delete_user_by_company($company_id)
+    {
+        $db = new Database();
+        $db->query('DELETE FROM users WHERE company_id = :company_id');
+        $db->bind(':company_id', $company_id);
+        $db->execute();
+        return ['success' => true];
+    }
 }

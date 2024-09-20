@@ -102,11 +102,14 @@ function hideInfo() {
   showMoreInfo = false;
 }
 
+const modal = document.querySelector("#inscriptionModal");
+
 // Controlar el scroll horizontal basado en el flag
 window.addEventListener(
   "wheel",
   function (e) {
-    if (!scrollAllowed) {
+    const isModalOpen = modal && modal.classList.contains("show");
+    if (!scrollAllowed && !isModalOpen) {
       e.preventDefault();
     }
   },
@@ -118,7 +121,8 @@ window.addEventListener(
 window.addEventListener(
   "touchmove",
   function (e) {
-    if (!scrollAllowed) {
+    const isModalOpen = modal && modal.classList.contains("show");
+    if (!scrollAllowed && !isModalOpen) {
       e.preventDefault();
     }
   },
@@ -154,6 +158,14 @@ document.querySelector("#companyForm").addEventListener("submit", async function
       }
 
       // Mostrar el mensaje en el modal de respuesta
+      const responseMessage = document.getElementById("responseMessage");
+      responseMessage.innerText = message;
+
+      // Mostrar el modal de respuesta
+      const responseModal = new bootstrap.Modal(document.getElementById("responseModal"));
+      responseModal.show();
+    } else {
+      // Mostrar el mensaje de error en el modal de respuesta
       const responseMessage = document.getElementById("responseMessage");
       responseMessage.innerText = message;
 
