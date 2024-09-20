@@ -164,6 +164,14 @@ document.querySelector("#companyForm").addEventListener("submit", async function
       // Mostrar el modal de respuesta
       const responseModal = new bootstrap.Modal(document.getElementById("responseModal"));
       responseModal.show();
+    } else {
+      // Mostrar el mensaje de error en el modal de respuesta
+      const responseMessage = document.getElementById("responseMessage");
+      responseMessage.innerText = message;
+
+      // Mostrar el modal de respuesta
+      const responseModal = new bootstrap.Modal(document.getElementById("responseModal"));
+      responseModal.show();
     }
   } catch (error) {
     console.error("Error:", error);

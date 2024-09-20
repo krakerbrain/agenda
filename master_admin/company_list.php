@@ -37,4 +37,4 @@ include dirname(__DIR__) . '/master_admin/navbar.php';
     </div>
 </div>
 
-<script src="<?php echo $baseUrl ?>assets/js/master_admin/company_list.js?v=" <?php echo time(); ?>"></script>
+<script src="<?php echo $baseUrl ?>assets/js/master_admin/company_list.js?v=<?php echo time(); ?>"></script>

@@ -1,38 +1,83 @@
 <?php
+require_once dirname(__DIR__, 2) . '/classes/CompanyManager.php';
+require_once dirname(__DIR__, 2) . '/classes/Users.php';
 require_once dirname(__DIR__, 2) . '/classes/ConfigUrl.php';
 require_once dirname(__DIR__, 2) . '/access-token/seguridad/jwt.php';
-require_once dirname(__DIR__, 2) . '/classes/DatabaseSessionManager.php';
 
-class CompanyController
-{
-    private $conn;
-
-    public function __construct()
-    {
-        $manager = new DatabaseSessionManager();
-        $this->conn = $manager->getDB();
-    }
-
-    public function getCompanies()
-    {
-        $sql = $this->conn->prepare("SELECT id, name, logo, is_active, token FROM companies");
-        $sql->execute();
-        return $sql->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    public function handleRequest()
-    {
-        $datosUsuario = validarTokenSuperUser();
-        if (!$datosUsuario) {
-            http_response_code(401);
-            echo json_encode(['error' => 'Unauthorized']);
-            exit;
+$baseUrl = ConfigUrl::get();
+$datosUsuario = validarTokenSuperUser();
+if (!$datosUsuario) {
+    header("Location: " . $baseUrl . "login/index.php");
+    exit();
+}
+header('Content-Type: application/json');
+try {
+    $companyManager = new CompanyManager();
+    if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+        $data = json_decode(file_get_contents('php://input'), true);
+        $result = $companyManager->deleteCompany($data['id']);
+        if ($result['success']) {
+            $user = new Users();
+            $result = $user->delete_user_by_company($data['id']);
+            echo json_encode($result);
         }
-
-        $companies = $this->getCompanies();
-        echo json_encode($companies);
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'PATCH') {
+        $data = json_decode(file_get_contents('php://input'), true);
+        $result = $companyManager->updateCompanyStatus($data);
+        echo json_encode($result);
+    } else {
+        echo json_encode(['success' => true, 'data' => $companyManager->getAllCompanies()]);
     }
+} catch (Exception $e) {
+    echo json_encode(['success' => false, 'error' => 'Error al procesar la solicitud: ' . $e->getMessage()]);
 }
 
-$controller = new CompanyController();
-$controller->handleRequest();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// require_once dirname(__DIR__, 2) . '/classes/DatabaseSessionManager.php';
+
+// class CompanyController
+// {
+//     private $conn;
+
+//     public function __construct()
+//     {
+//         $manager = new DatabaseSessionManager();
+//         $this->conn = $manager->getDB();
+//     }
+
+//     public function getCompanies()
+//     {
+//         $sql = $this->conn->prepare("SELECT id, name, logo, is_active, token FROM companies");
+//         $sql->execute();
+//         return $sql->fetchAll(PDO::FETCH_ASSOC);
+//     }
+
+//     public function handleRequest()
+//     {
+//         $datosUsuario = validarTokenSuperUser();
+//         if (!$datosUsuario) {
+//             http_response_code(401);
+//             echo json_encode(['error' => 'Unauthorized']);
+//             exit;
+//         }
+
+//         $companies = $this->getCompanies();
+//         echo json_encode($companies);
+//     }
+// }
+
+// $controller = new CompanyController();
+// $controller->handleRequest();
