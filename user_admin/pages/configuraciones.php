@@ -32,33 +32,33 @@ $btnSecondaryColor = $company['btn2'];
 
 ?>
 <style>
-#example-card {
-    background-color: <?=$bgColor ?>;
-}
+    #example-card {
+        background-color: <?= $bgColor ?>;
+    }
 
-#card-title {
-    color: <?=$fontColor ?>;
-}
+    #card-title {
+        color: <?= $fontColor ?>;
+    }
 
-#card-text {
-    color: <?=$fontColor ?>;
-}
+    #card-text {
+        color: <?= $fontColor ?>;
+    }
 
-#btn-primary-example {
-    background-color: <?=$btnPrimaryColor ?>;
-    border-color: <?=$btnPrimaryColor ?>;
-    color: <?=$fontColor ?>;
-}
+    #btn-primary-example {
+        background-color: <?= $btnPrimaryColor ?>;
+        border-color: <?= $btnPrimaryColor ?>;
+        color: <?= $fontColor ?>;
+    }
 
-#btn-secondary-example {
-    background-color: <?=$btnSecondaryColor ?>;
-    border-color: <?=$btnSecondaryColor ?>;
-    color: <?=$fontColor ?>;
-}
+    #btn-secondary-example {
+        background-color: <?= $btnSecondaryColor ?>;
+        border-color: <?= $btnSecondaryColor ?>;
+        color: <?= $fontColor ?>;
+    }
 
-.help i {
-    font-size: 1.4rem;
-}
+    .help i {
+        font-size: 1.4rem;
+    }
 </style>
 <div class="container my-4">
     <form id="companyConfigForm">
@@ -122,28 +122,34 @@ $btnSecondaryColor = $company['btn2'];
                         data-bs-content="Puedes personalizar los colores del formulario de reserva para que se ajusten a la identidad de tu empresa. Puedes ver en el cuadro un ejemplo interactivo de la personalización"><i
                             class="fa fa-circle-question text-primary"></i></a>
                 </div>
-                <div class="col-md-6 color-inputs d-flex mb-2">
-                    <div class="form-color-group w-25">
-                        <label for="background-color" class="form-label">Fondo:</label>
-                        <input type="color" class="form-control" style="height: 50px" id="background-color"
-                            name="background-color" value="<?php echo $company['bg_color'] ?>">
+                <div class="col-md-6 mb-2 row">
+                    <div class="color-inputs d-flex">
+                        <div class="form-floating w-25">
+                            <input type="color" class="form-control" id="background-color" name="background-color"
+                                value="<?php echo $company['bg_color'] ?>" style="height: 70px">
+                            <label for="background-color">Fondo</label>
+                        </div>
+                        <div class="form-floating w-25">
+                            <input type="color" class="form-control" style="height: 70px" id="font-color"
+                                name="font-color" value="<?php echo $company['font_color'] ?>">
+                            <label for="font-color">Texto:</label>
+                        </div>
+                        <div class="form-floating w-25">
+                            <input type="color" class="form-control" style="height: 70px" id="btn-primary-color"
+                                name="btn-primary-color" value="<?php echo $company['btn1'] ?>">
+                            <label for="btn-primary-color">Btn Anterior:</label>
+                        </div>
+                        <div class="form-floating w-25">
+                            <input type="color" class="form-control" style="height: 70px" id="btn-secondary-color"
+                                name="btn-secondary-color" value="<?php echo $company['btn2'] ?>">
+                            <label for="btn-secondary-color">Btn Siguiente:</label>
+                        </div>
                     </div>
-                    <div class="form-color-group w-25">
-                        <label for="font-color" class="form-label">Texto:</label>
-                        <input type="color" class="form-control" style="height: 50px" id="font-color" name="font-color"
-                            value="<?php echo $company['font_color'] ?>">
-                    </div>
-                    <div class="form-color-group w-25">
-                        <label for="btn-primary-color" class="form-label">Btn Anterior:</label>
-                        <input type="color" class="form-control" style="height: 50px" id="btn-primary-color"
-                            name="btn-primary-color" value="<?php echo $company['btn1'] ?>">
-                    </div>
-                    <div class="form-color-group w-25">
-                        <label for="btn-secondary-color" class="form-label">Btn Siguiente:</label>
-                        <input type="color" class="form-control" style="height: 50px" id="btn-secondary-color"
-                            name="btn-secondary-color" value="<?php echo $company['btn2'] ?>">
+                    <div class="align-content-end text-md-end">
+                        <button type="button" class="btn btn-primary mt-3" id="resetColors">Restablecer Colores</button>
                     </div>
                 </div>
+                <!-- Ejemplo de vista de card con estilos seleccionados -->
                 <div class="col-md-6 example-card">
                     <div class="card" id="example-card">
                         <div class="card-body">

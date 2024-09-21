@@ -2,9 +2,7 @@
 require_once __DIR__ . '/classes/Database.php';
 require_once __DIR__ . '/classes/ConfigUrl.php';
 $db = new Database();
-// $manager->startSession();
 session_start();
-// $conn = $manager->getDB();
 $baseUrl = ConfigUrl::get();
 
 
@@ -14,11 +12,11 @@ $db->bind(':token', $token);
 $db->execute();
 $company = $db->single();
 
-$primary_color = $company['font_color'] ?? '#007bff';
-$secondary_color = $company['btn2'] ?? '#6c757d';
-$background_color = $company['bg_color'] ?? '#ffffff';
-$button_color = $company['btn1'] ?? '#007bff';
-$border_color = $company['font_color'] ?? '#007bff';
+$primary_color = $company['font_color'] ?? '#525252';
+$secondary_color = $company['btn2'] ?? '#9b80ff';
+$background_color = $company['bg_color'] ?? '#bebdff';
+$button_color = $company['btn1'] ?? '#ffffff';
+$border_color = $company['font_color'] ?? '#525252';
 
 
 if (!$company) {
@@ -30,6 +28,11 @@ $db->query("SELECT * FROM services WHERE company_id = :company_id");
 $db->bind(':company_id', $company['id']);
 $db->execute();
 $services = $db->resultSet();
+
+$db->query("SELECT sn.name, sn.icon_class, csn.url FROM company_social_networks csn JOIN social_networks sn ON csn.social_network_id = sn.id WHERE csn.company_id = :company_id");
+$db->bind(':company_id', $company['id']);
+$db->execute();
+$socialNetworks = $db->resultSet();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -42,6 +45,8 @@ $services = $db->resultSet();
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/dark.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="<?php echo $baseUrl; ?>assets/css/form_reserva.css?v=" <?php echo time(); ?>">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <style>
@@ -57,46 +62,37 @@ $services = $db->resultSet();
         --border-color: <?php echo htmlspecialchars($border_color);
                         ?>;
     }
-
-    body {
-        background-color: var(--background-color);
-    }
-
-    h2 {
-        color: var(--primary-color);
-    }
-
-    .btn-primary {
-        background-color: var(--button-color);
-        border-color: var(--button-color);
-        color: var(--primary-color)
-    }
-
-    .btn-secondary {
-        background-color: var(--secondary-color);
-        border-color: var(--secondary-color);
-        color: var(--primary-color)
-    }
-
-    .form-control,
-    .form-select {
-        border-color: var(--border-color);
-    }
-
-    .form-label {
-        color: var(--primary-color);
-    }
 </style>
 
 <body>
     <div class="container mt-5">
-        <form id="appointmentForm" style="max-width: 600px; margin: 0 auto;">
-            <?php if ($company && $company['logo']) : ?>
-                <div class="mb-4 d-flex justify-content-between align-items-baseline">
-                    <img src="<?php echo $baseUrl . $company['logo']; ?>" alt="Logo de la Empresa" class="img-fluid w-25">
-                    <h5 class="text-center mb-4">Reserva de Cita</h5>
+        <!-- Tarjeta de Información de la Empresa -->
+        <div class="company-card mb-3">
+            <div class="row">
+                <!-- Columna 1: Logo y redes sociales -->
+                <div class="col-md-5 text-center">
+                    <?php if ($company && $company['logo']) : ?>
+                        <img src="<?php echo $baseUrl . $company['logo']; ?>" alt="Logo de la Empresa" class="img-fluid">
+                    <?php endif; ?>
+
                 </div>
-            <?php endif; ?>
+                <!-- Columna 2: Nombre, dirección y teléfono -->
+                <div class="col-md-7 text-center text-md-end align-content-end mt-3 mt-md-0">
+                    <div class="company-name mb-2"><?php echo $company['name'] ?></div>
+                    <div class="company-info"><?php echo $company['address'] ?></div>
+                    <div class="company-info">Teléfono: <?php echo $company['phone'] ?></div>
+                    <div class="mt-3 social-icons">
+                        <?php foreach ($socialNetworks as $socials) : ?>
+                            <a href="<?php echo $socials['url'] ?>" target="_blank"
+                                title="<?php echo $socials['name'] ?>"><i
+                                    class="<?php echo $socials['icon_class'] ?>"></i></a>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <form id="appointmentForm" style="max-width: 600px; margin: 0 auto;">
+
 
             <div id="step1" class="step">
                 <h2 class="text-center mb-4">Paso 1: Escoge el Servicio</h2>
@@ -172,7 +168,7 @@ $services = $db->resultSet();
         </form>
         <div class="modal fade" id="responseModal" tabindex="-1" aria-labelledby="responseModalLabel"
             aria-hidden="true">
-            <div class="modal-dialog">
+            <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="responseModalLabel">Reserva exitosa</h5>
@@ -187,240 +183,16 @@ $services = $db->resultSet();
             </div>
         </div>
     </div>
-
     <script>
-        function showStep(step) {
-
-            document.querySelectorAll('.step').forEach(function(element) {
-                element.classList.add('d-none');
-            });
-            document.getElementById('step' + step).classList.remove('d-none');
-        }
-
-        document.getElementById('service').addEventListener('change', function(event) {
-            getObservation('service');
-            getServiceCategory(event.target.value);
-            getAvailableDays();
-        });
-
-        document.getElementById('category').addEventListener('change', function() {
-            getObservation('category');
-        });
-
-        document.getElementById('date').addEventListener('change', function() {
-            fetchAvailableTimes();
-        });
-
-        function getObservation(id) {
-            var serviceSelect = document.getElementById(id);
-            var observation = serviceSelect.options[serviceSelect.selectedIndex].getAttribute('data-observation');
-            var observationField = document.getElementById(id + 'Observation');
-            var observationSpan = document.getElementById(id + 'TextObservation');
-
-            if (observation) {
-                observationField.classList.remove('d-none');
-                observationSpan.textContent = observation;
-            } else {
-                observationField.classList.add('d-none');
-                observationSpan.textContent = '';
-            }
-        }
-
-        async function getServiceCategory(serviceId) {
-            try {
-                let url = "<?php echo $baseUrl; ?>reservas/controller/reservaController.php";
-                let data = {
-                    service_id: serviceId,
-                };
-
-                const response = await fetch(url, {
-                    method: 'POST',
-                    body: JSON.stringify(data),
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                const {
-                    success,
-                    categories
-                } = await response.json();
-
-                let select = document.getElementById('category');
-                if (success) {
-                    document.getElementById('categoryContainer').classList.remove('d-none');
-                    select.disabled = false;
-                    let categoryOption = '<option value="" selected>Selecciona una categoría</option>';
-                    categories.forEach(function(category) {
-                        categoryOption +=
-                            `<option value="${category.id}" data-observation="${category.category_description}">${category.category_name}</option>`;
-                    });
-                    select.innerHTML = categoryOption;
-                } else {
-                    document.getElementById('categoryContainer').classList.add('d-none');
-                    document.getElementById('categoryObservation').classList.add('d-none');
-                    select.disabled = true;
-                }
-            } catch (error) {
-                console.error('Error:', error);
-            }
-        }
-
-        function getAvailableDays() {
-            const BASE_URL = "<?php echo $baseUrl; ?>reservas/controller/";
-            const calendarDaysAvailable = <?php echo $company['calendar_days_available']; ?>;
-            const serviceId = document.getElementById('service').value;
-            const companyId = document.getElementById('company_id').value;
-            const url = BASE_URL + 'get_days_availability.php';
-
-            const data = {
-                service_id: serviceId,
-                calendar_days_available: calendarDaysAvailable,
-                company_id: companyId
-            };
-
-            fetch(url, {
-                    method: 'POST',
-                    body: JSON.stringify(data),
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        const availableDates = data.available_days;
-                        flatpickr("#date", {
-                            enableTime: false,
-                            dateFormat: "Y-m-d",
-                            minDate: "today",
-                            maxDate: new Date().fp_incr(
-                                calendarDaysAvailable), // Puedes ajustar este valor según necesites
-                            enable: [
-                                function(date) {
-                                    return availableDates.includes(date.toISOString().split('T')[0]);
-                                }
-                            ]
-                        });
-                    } else {
-                        console.error('Error:', data.message);
-                    }
-                })
-                .catch(error => console.error('Error:', error));
-        }
-
-        async function fetchAvailableTimes() {
-            const BASE_URL = "<?php echo $baseUrl; ?>reservas/controller/";
-            const timeInput = document.getElementById("time");
-            const companyID = document.getElementById("company_id").value;
-
-            const date = document.getElementById("date").value;
-            const serviceId = document.getElementById("service").value;
-            const scheduleMode = document.getElementById("schedule_mode").value === "blocks" ?
-                "get_available_hours_blocks.php" : "get_available_hours_free.php";
-
-            if (date && serviceId) {
-                try {
-                    const response = await fetch(BASE_URL + scheduleMode, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({
-                            date: date,
-                            service_id: serviceId,
-                            company_id: companyID
-                        }),
-                    });
-
-                    const {
-                        success,
-                        available_times,
-                        message
-                    } = await response.json();
-
-                    timeInput.innerHTML = ""; // Clear previous options
-                    if (success) {
-                        if (available_times.length > 0) {
-                            let availableTimesOption = '<option value="">Selecciona una hora</option>';
-                            available_times.forEach((time) => {
-                                availableTimesOption +=
-                                    `<option value="${time.start} - ${time.end}">${time.start} - ${time.end}</option>`;
-                            });
-                            timeInput.innerHTML = availableTimesOption;
-                        } else {
-                            timeInput.innerHTML = '<option value="">No hay horas disponibles</option>';
-                        }
-                    } else {
-                        alert(message);
-                    }
-                } catch (error) {
-                    console.error("Error:", error);
-                }
-            }
-        }
-
-        document.getElementById("appointmentForm").addEventListener("submit", function(event) {
-            event.preventDefault();
-            const form = document.querySelector('#appointmentForm'); // Selecciona un formulario del DOM
-            const formData = new FormData(form);
-            const scheduleMode = document.getElementById("schedule_mode").value;
-
-            if (scheduleMode === "blocks") {
-                sendAppointment(formData);
-            }
-        });
-
-        async function sendAppointment(formData) {
-            const BASE_URL = "<?php echo $baseUrl; ?>reservas/controller/";
-
-            const reservarBtn = document.getElementById('reservarBtn');
-            const spinner = reservarBtn.querySelector('.spinner-border');
-            const buttonText = reservarBtn.querySelector('.button-text');
-
-            // Mostrar spinner y deshabilitar botón
-            spinner.classList.remove('d-none');
-            buttonText.textContent = 'Procesando...';
-            reservarBtn.disabled = true;
-
-            try {
-                const response = await fetch(BASE_URL + "appointment.php", {
-                    method: "POST",
-                    body: formData,
-                });
-
-                const {
-                    message
-                } = await response.json();
-
-                // Aquí puedes seguir con la lógica anterior si el JSON es válido
-                var modalBody = document.querySelector('.modal-body');
-                modalBody.innerText = message;
-                var modal = new bootstrap.Modal(document.getElementById('responseModal'));
-                modal.show();
-
-                var acceptButton = document.getElementById('acceptButton');
-                acceptButton.addEventListener('click', function() {
-
-                    // if (message === "Cita reservada exitosamente y correo enviado!") {
-                    if (response.ok) {
-                        location.reload();
-                    }
-                });
-            } catch (error) {
-                console.error("Error:", error);
-            } finally {
-                // Ocultar spinner y habilitar botón después de que la solicitud se complete
-                spinner.classList.add('d-none');
-                buttonText.textContent = 'Reservar';
-                reservarBtn.disabled = false;
-            }
-        }
+        const baseUrl = "<?php echo $baseUrl; ?>";
+        const company_days_available = <?php echo json_encode($company['calendar_days_available']); ?>;
     </script>
+
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
     </script>
+    <script src="<?php echo $baseUrl; ?>assets/js/form_reserva/index.js?v=" <?php echo time(); ?>"></script>
 </body>
 
 </html>
