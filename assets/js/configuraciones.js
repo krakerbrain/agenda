@@ -89,4 +89,19 @@ export function initConfiguraciones() {
 
   const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
   const popoverList = [...popoverTriggerList].map((popoverTriggerEl) => new bootstrap.Popover(popoverTriggerEl));
+
+  document.getElementById("resetColors").addEventListener("click", function () {
+    document.getElementById("background-color").value = "#bebdff";
+    document.getElementById("font-color").value = "#525252";
+    document.getElementById("btn-primary-color").value = "#ffffff";
+    document.getElementById("btn-secondary-color").value = "#9b80ff";
+
+    document.getElementById("example-card").style.backgroundColor = "#bebdff";
+    document.getElementById("card-title").style.color = "#525252";
+    document.getElementById("card-text").style.color = "#525252";
+    document.getElementById("btn-primary-example").style.backgroundColor = "#ffffff";
+    document.getElementById("btn-primary-example").style.color = "#525252";
+    document.getElementById("btn-secondary-example").style.backgroundColor = "#9b80ff";
+    document.getElementById("btn-secondary-example").style.color = "#525252";
+  });
 }

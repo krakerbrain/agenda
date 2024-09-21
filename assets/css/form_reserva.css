@@ -1,0 +1,90 @@
+body {
+  background-color: var(--background-color);
+}
+
+h2 {
+  color: var(--primary-color);
+}
+
+.btn-primary {
+  background-color: var(--secondary-color);
+  border-color: var(--secondary-color);
+  color: var(--primary-color);
+}
+
+.btn-secondary {
+  background-color: var(--button-color);
+  border-color: var(--button-color);
+  color: var(--primary-color);
+}
+
+.form-control,
+.form-select {
+  border-color: var(--border-color);
+}
+
+.form-label {
+  color: var(--primary-color);
+}
+
+.company-card,
+#appointmentForm {
+  padding: 20px;
+  max-width: 600px;
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.2);
+  /* Fondo semi-transparente */
+  backdrop-filter: blur(10px);
+  /* Desenfoque para el efecto de vidrio */
+  -webkit-backdrop-filter: blur(10px);
+  /* Soporte para navegadores basados en WebKit */
+
+  /* Borde suave */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  /* Sombra ligera */
+  color: #fff;
+}
+
+.company-card {
+  border-radius: 10px 10px 0 0;
+}
+
+.company-card img {
+  min-width: 150px;
+}
+
+@media (max-width: 768px) {
+  .company-card img {
+    width: 70%;
+  }
+}
+
+#appointmentForm {
+  border-radius: 0 0 10px 10px;
+}
+
+.company-name {
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-transform: capitalize;
+  color: var(--primary-color);
+}
+
+.company-info {
+  font-size: 1rem;
+  color: var(--secondary-color);
+}
+
+.social-icons a {
+  font-size: 1.5rem;
+  margin: 0 10px;
+  color: var(--primary-color);
+}
+
+.social-icons a:hover {
+  color: var(--secondary-color);
+}
+
+.container {
+  margin-top: 50px;
+}
