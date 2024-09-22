@@ -13,10 +13,18 @@ class CompanyManager
         $this->fileManager = new FileManager();
     }
 
-    public function getAllCompanies()
+    public function getCompanyDataForCompanyList()
     {
         $sql = "SELECT id, name, logo, is_active, token FROM companies";
         $this->db->query($sql);
+        return $this->db->resultSet();
+    }
+
+    public function getCompanyDataForDatosEmpresa($company_id)
+    {
+        $sql = "SELECT name, logo, phone, address, description FROM companies WHERE id = :id AND is_active = 1";
+        $this->db->query($sql);
+        $this->db->bind(':id', $company_id);
         return $this->db->resultSet();
     }
     // Función para crear una nueva empresa
@@ -78,6 +86,39 @@ class CompanyManager
             return ['success' => false, 'error' => 'Error al agregar la empresa: ' . $e->getMessage()];
         }
     }
+
+    // Función para actualizar los datos de una empresa
+    // $sql = $conn->prepare("UPDATE companies SET logo = :logo, phone = :phone, address = :address, description = :description WHERE id = :id");
+    public function updateCompanyData($company_id, $data)
+    {
+        try {
+            $this->db->beginTransaction(); // Iniciar transacción
+
+            // Asignar valores de $data
+            $phone = $data['phone'] ?? null;
+            $address = $data['address'] ?? null;
+            $description = $data['description'] ?? null;
+            $logo = $data['logo'] ?? null;
+
+            // Actualizar los datos de la empresa
+            $sql = "UPDATE companies SET logo = :logo, phone = :phone, address = :address, description = :description WHERE id = :id";
+            $this->db->query($sql);
+            $this->db->bind(':phone', $phone);
+            $this->db->bind(':address', $address);
+            $this->db->bind(':description', $description);
+            $this->db->bind(':logo', $logo);
+            $this->db->bind(':id', $company_id);
+            $this->db->execute();
+
+            $this->db->endTransaction(); // Commit de la transacción
+
+            return ['success' => true, 'message' => 'Datos de la empresa actualizados correctamente'];
+        } catch (Exception $e) {
+            $this->db->cancelTransaction(); // Rollback de la transacción en caso de error
+            return ['success' => false, 'error' => 'Error al actualizar la empresa: ' . $e->getMessage()];
+        }
+    }
+
 
     // Función para cambiar estado de empresa
     public function updateCompanyStatus($data)

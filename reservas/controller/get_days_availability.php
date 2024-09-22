@@ -103,6 +103,11 @@ foreach ($daterange as $date) {
     $day_of_week = $date->format('w'); // Obtiene el día de la semana en formato numérico
     $date_str = $date->format('Y-m-d');
 
+    // Evitar el día actual
+    if ($date_str === (new DateTime())->format('Y-m-d')) {
+        continue; // Saltar la fecha si es el mismo día
+    }
+
     if (isset($work_days[$day_of_week]) && !in_array($date_str, $blocked_dates)) {
         // Obtener horarios disponibles para el día
         $work_start = $work_days[$day_of_week]['work_start'];

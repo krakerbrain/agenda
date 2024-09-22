@@ -26,7 +26,7 @@ try {
         $result = $companyManager->updateCompanyStatus($data);
         echo json_encode($result);
     } else {
-        echo json_encode(['success' => true, 'data' => $companyManager->getAllCompanies()]);
+        echo json_encode(['success' => true, 'data' => $companyManager->getCompanyDataForCompanyList()]);
     }
 } catch (Exception $e) {
     echo json_encode(['success' => false, 'error' => 'Error al procesar la solicitud: ' . $e->getMessage()]);

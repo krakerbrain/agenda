@@ -2,6 +2,30 @@ export function initDatosEmpresa() {
   const form = document.getElementById("datosEmpresaForm");
   const formRedes = document.getElementById("social-form");
 
+  async function getDatosEmpresa() {
+    try {
+      const response = await fetch(`${baseUrl}user_admin/controllers/datosEmpresa.php`, {
+        method: "GET",
+      });
+      const { success, data } = await response.json();
+
+      if (success) {
+        const { name, phone, address, description, logo } = data[0];
+        const logoUrl = logo != "" ? logo : "assets/images/logo.png";
+
+        document.querySelector(".companyName").textContent = name;
+        document.querySelector(".logoEmpresa").src = `${baseUrl}${logoUrl}`;
+        document.querySelector("#phone").value = phone;
+        document.querySelector("#address").value = address;
+        document.querySelector("#description").textContent = description;
+        document.querySelector("#companyName").value = name;
+        document.querySelector("#logoUrl").value = logoUrl;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   async function loadSocials() {
     try {
       const response = await fetch(`${baseUrl}user_admin/controllers/redesSociales.php`, {
@@ -17,18 +41,19 @@ export function initDatosEmpresa() {
     }
   }
 
+  getDatosEmpresa();
   loadSocials();
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const formData = new FormData(form);
-    formData.append("action", "add_social"); // Indicamos que es una nueva red social
+    // formData.append("action", "add_social"); // Indicamos que es una nueva red social
     try {
       const response = await fetch(`${baseUrl}user_admin/controllers/datosEmpresa.php`, {
         method: "POST",
         body: formData,
       });
-
+      debugger;
       const { success, message } = await response.json();
 
       if (success) {
