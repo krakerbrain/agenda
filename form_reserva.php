@@ -46,22 +46,22 @@ $socialNetworks = $db->resultSet();
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/dark.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <link rel="stylesheet" href="<?php echo $baseUrl; ?>assets/css/form_reserva.css?v=" <?php echo time(); ?>">
+    <link rel="stylesheet" href="<?php echo $baseUrl; ?>assets/css/form_reserva.css?v=<?php echo time(); ?>">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <style>
-:root {
-    --primary-color: <?php echo htmlspecialchars($primary_color);
-    ?>;
-    --secondary-color: <?php echo htmlspecialchars($secondary_color);
-    ?>;
-    --background-color: <?php echo htmlspecialchars($background_color);
-    ?>;
-    --button-color: <?php echo htmlspecialchars($button_color);
-    ?>;
-    --border-color: <?php echo htmlspecialchars($border_color);
-    ?>;
-}
+    :root {
+        --primary-color: <?php echo htmlspecialchars($primary_color);
+                            ?>;
+        --secondary-color: <?php echo htmlspecialchars($secondary_color);
+                            ?>;
+        --background-color: <?php echo htmlspecialchars($background_color);
+                            ?>;
+        --button-color: <?php echo htmlspecialchars($button_color);
+                        ?>;
+        --border-color: <?php echo htmlspecialchars($border_color);
+                        ?>;
+    }
 </style>
 
 <body>
@@ -72,7 +72,7 @@ $socialNetworks = $db->resultSet();
                 <!-- Columna 1: Logo y redes sociales -->
                 <div class="col-md-5 text-center">
                     <?php if ($company && $company['logo']) : ?>
-                    <img src="<?php echo $baseUrl . $company['logo']; ?>" alt="Logo de la Empresa" class="img-fluid">
+                        <img src="<?php echo $baseUrl . $company['logo']; ?>" alt="Logo de la Empresa" class="img-fluid">
                     <?php endif; ?>
 
                 </div>
@@ -83,9 +83,9 @@ $socialNetworks = $db->resultSet();
                     <div class="company-info">Teléfono: <?php echo $company['phone'] ?></div>
                     <div class="mt-3 social-icons">
                         <?php foreach ($socialNetworks as $socials) : ?>
-                        <a href="<?php echo $socials['url'] ?>" target="_blank"
-                            title="<?php echo $socials['name'] ?>"><i
-                                class="<?php echo $socials['icon_class'] ?>"></i></a>
+                            <a href="<?php echo $socials['url'] ?>" target="_blank"
+                                title="<?php echo $socials['name'] ?>"><i
+                                    class="<?php echo $socials['icon_class'] ?>"></i></a>
                         <?php endforeach; ?>
                     </div>
                 </div>
@@ -101,9 +101,9 @@ $socialNetworks = $db->resultSet();
                     <select id="service" name="service" class="form-select" required>
                         <option value="" selected>Selecciona un servicio</option>
                         <?php foreach ($services as $service) : ?>
-                        <option value="<?php echo $service['id']; ?>"
-                            data-observation="<?php echo htmlspecialchars($service['observations']); ?>">
-                            <?php echo htmlspecialchars($service['name']); ?></option>
+                            <option value="<?php echo $service['id']; ?>"
+                                data-observation="<?php echo htmlspecialchars($service['observations']); ?>">
+                                <?php echo htmlspecialchars($service['name']); ?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>
@@ -184,15 +184,15 @@ $socialNetworks = $db->resultSet();
         </div>
     </div>
     <script>
-    const baseUrl = "<?php echo $baseUrl; ?>";
-    const company_days_available = <?php echo json_encode($company['calendar_days_available']); ?>;
+        const baseUrl = "<?php echo $baseUrl; ?>";
+        const company_days_available = <?php echo json_encode($company['calendar_days_available']); ?>;
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
     </script>
-    <script src="<?php echo $baseUrl; ?>assets/js/form_reserva/index.js?v=" <?php echo time(); ?>"></script>
+    <script src="<?php echo $baseUrl; ?>assets/js/form_reserva/index.js?v=<?php echo time(); ?>"></script>
 </body>
 
 </html>
