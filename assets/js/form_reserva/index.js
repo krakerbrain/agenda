@@ -13,6 +13,11 @@ function validarPaso(step) {
   // Validación del paso actual antes de avanzar
   if (step === 2) {
     const service = document.getElementById("service").value;
+    const categoryContainer = document.getElementById("categoryContainer");
+    if (!categoryContainer.classList.contains("d-none")) {
+      const category = document.getElementById("category").value;
+      return category !== "";
+    }
     return service !== "";
   } else if (step === 3) {
     const date = document.getElementById("date").value;
