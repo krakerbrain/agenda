@@ -11,26 +11,18 @@ if (!$datosUsuario) {
 }
 $company_id = $datosUsuario['company_id'];
 
-$sql = $conn->prepare("SELECT * FROM companies WHERE id = :id AND is_active = 1");
-$sql->bindParam(':id', $company_id, PDO::PARAM_INT);
-$sql->execute();
-$company = $sql->fetch(PDO::FETCH_ASSOC);
-$logo = isset($company['logo']) ? $company['logo'] : 'assets/img/no_logo.png';
-
 $media = $conn->prepare("SELECT id, name FROM social_networks ORDER BY name");
 $media->execute();
-
 
 ?>
 <div class="container mt-5">
     <form id="datosEmpresaForm" action="" method="POST">
-        <input type="hidden" name="company_id" value="<?php echo $company_id ?>">
-        <input type="hidden" name="company_name" value="<?php echo $company['name'] ?>">
-        <input type="hidden" name="logo_url" value="<?php echo $company['logo'] ?>">
-        <h4 class=""><?php echo $company['name']; ?></h4>
+        <input type="hidden" name="logo_url" id="logoUrl" value="">
+        <input type="hidden" name="company_name" id="companyName" value="">
+        <h4 class="companyName"></h4>
         <div class="mb-3">
             <div class="">
-                <img src="<?php echo $baseUrl . $logo; ?>" alt="Logo de la Empresa" class="img-fluid w-25">
+                <img src="" alt="Logo de la Empresa" class="img-fluid w-25 logoEmpresa">
             </div>
             <div class="">
                 <label for="logo" class="form-label">Cambiar Logo</label>
@@ -42,12 +34,12 @@ $media->execute();
             <div class="col-md-6">
                 <label for="phone" class="form-label">Teléfono</label>
                 <input type="tel" class="form-control" id="phone" name="phone" placeholder="Número de teléfono"
-                    value="<?php echo $company['phone'] ?>">
+                    value="+56 9 1234 5678">
             </div>
             <div class="col-md-6">
                 <label for="address" class="form-label">Dirección</label>
                 <input type="text" class="form-control" id="address" name="address"
-                    placeholder="Dirección de la empresa" value="<?php echo $company['address'] ?>">
+                    placeholder="Dirección de la empresa" value="">
             </div>
         </div>
 
@@ -56,7 +48,7 @@ $media->execute();
             <div class="col-md-12">
                 <label for="description" class="form-label">Descripción</label>
                 <textarea class="form-control" id="description" name="description" rows="2" maxlength="120"
-                    placeholder="Descripción breve de la empresa (máximo 120 caracteres)"><?php echo $company['description'] ?></textarea>
+                    placeholder="Descripción breve de la empresa (máximo 120 caracteres)"></textarea>
                 <div class="form-text">Máximo 120 caracteres.</div>
             </div>
         </div>
@@ -112,3 +104,6 @@ $media->execute();
 
 
 </div>
+<script>
+    const baseUrl = '<?php echo $baseUrl ?>';
+</script>
