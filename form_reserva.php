@@ -50,18 +50,18 @@ $socialNetworks = $db->resultSet();
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <style>
-    :root {
-        --primary-color: <?php echo htmlspecialchars($primary_color);
-                            ?>;
-        --secondary-color: <?php echo htmlspecialchars($secondary_color);
-                            ?>;
-        --background-color: <?php echo htmlspecialchars($background_color);
-                            ?>;
-        --button-color: <?php echo htmlspecialchars($button_color);
-                        ?>;
-        --border-color: <?php echo htmlspecialchars($border_color);
-                        ?>;
-    }
+:root {
+    --primary-color: <?php echo htmlspecialchars($primary_color);
+    ?>;
+    --secondary-color: <?php echo htmlspecialchars($secondary_color);
+    ?>;
+    --background-color: <?php echo htmlspecialchars($background_color);
+    ?>;
+    --button-color: <?php echo htmlspecialchars($button_color);
+    ?>;
+    --border-color: <?php echo htmlspecialchars($border_color);
+    ?>;
+}
 </style>
 
 <body>
@@ -72,7 +72,7 @@ $socialNetworks = $db->resultSet();
                 <!-- Columna 1: Logo y redes sociales -->
                 <div class="col-md-5 text-center">
                     <?php if ($company && $company['logo']) : ?>
-                        <img src="<?php echo $baseUrl . $company['logo']; ?>" alt="Logo de la Empresa" class="img-fluid">
+                    <img src="<?php echo $baseUrl . $company['logo']; ?>" alt="Logo de la Empresa" class="img-fluid">
                     <?php endif; ?>
 
                 </div>
@@ -83,9 +83,9 @@ $socialNetworks = $db->resultSet();
                     <div class="company-info">Teléfono: <?php echo $company['phone'] ?></div>
                     <div class="mt-3 social-icons">
                         <?php foreach ($socialNetworks as $socials) : ?>
-                            <a href="<?php echo $socials['url'] ?>" target="_blank"
-                                title="<?php echo $socials['name'] ?>"><i
-                                    class="<?php echo $socials['icon_class'] ?>"></i></a>
+                        <a href="<?php echo $socials['url'] ?>" target="_blank"
+                            title="<?php echo $socials['name'] ?>"><i
+                                class="<?php echo $socials['icon_class'] ?>"></i></a>
                         <?php endforeach; ?>
                     </div>
                 </div>
@@ -93,7 +93,7 @@ $socialNetworks = $db->resultSet();
         </div>
         <form id="appointmentForm" style="max-width: 600px; margin: 0 auto;">
 
-
+            <!-- PASO 1 -->
             <div id="step1" class="step">
                 <h2 class="text-center mb-4">Paso 1: Escoge el Servicio</h2>
                 <div class="mb-3">
@@ -101,9 +101,9 @@ $socialNetworks = $db->resultSet();
                     <select id="service" name="service" class="form-select" required>
                         <option value="" selected>Selecciona un servicio</option>
                         <?php foreach ($services as $service) : ?>
-                            <option value="<?php echo $service['id']; ?>"
-                                data-observation="<?php echo htmlspecialchars($service['observations']); ?>">
-                                <?php echo htmlspecialchars($service['name']); ?></option>
+                        <option value="<?php echo $service['id']; ?>"
+                            data-observation="<?php echo htmlspecialchars($service['observations']); ?>">
+                            <?php echo htmlspecialchars($service['name']); ?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>
@@ -122,9 +122,9 @@ $socialNetworks = $db->resultSet();
                         class="form-control-plaintext bg-danger-subtle text-danger-emphasis p-2"></span>
                 </div>
 
-                <button type="button" class="btn btn-primary" onclick="showStep(2)">Siguiente</button>
+                <button type="button" class="btn btn-secondary btn-siguiente" onclick="showStep(2)">Siguiente</button>
             </div>
-
+            <!-- PASO 2 -->
             <div id="step2" class="step d-none">
                 <h2 class="text-center mb-4">Paso 2: Escoge Fecha y Hora</h2>
                 <div class="mb-3">
@@ -139,10 +139,10 @@ $socialNetworks = $db->resultSet();
                         <option value="" selected>Selecciona una hora</option>
                     </select>
                 </div>
-                <button type="button" class="btn btn-secondary" onclick="showStep(1)">Anterior</button>
-                <button type="button" class="btn btn-primary" onclick="showStep(3)">Siguiente</button>
+                <button type="button" class="btn btn-secondary btn-anterior" onclick="showStep(1)">Anterior</button>
+                <button type="button" class="btn btn-secondary btn-siguiente" onclick="showStep(3)">Siguiente</button>
             </div>
-
+            <!-- PASO 3 -->
             <div id="step3" class="step d-none">
                 <h2 class="text-center mb-4">Paso 3: Llena tus Datos</h2>
                 <input type="hidden" name="company_id" id="company_id"
@@ -159,8 +159,8 @@ $socialNetworks = $db->resultSet();
                     <label for="mail" class="form-label">Correo:</label>
                     <input type="email" id="mail" name="mail" class="form-control" required>
                 </div>
-                <button type="button" class="btn btn-secondary" onclick="showStep(2)">Anterior</button>
-                <button id="reservarBtn" class="btn btn-primary" type="submit">
+                <button type="button" class="btn btn-secondary btn-anterior" onclick="showStep(2)">Anterior</button>
+                <button id="reservarBtn" class="btn btn-secondary btn-siguiente" type="submit">
                     <span class="spinner-border spinner-border-sm d-none" aria-hidden="true"></span>
                     <span class="button-text">Reservar</span>
                 </button>
@@ -176,7 +176,7 @@ $socialNetworks = $db->resultSet();
                     </div>
                     <div class="modal-body"></div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" id="acceptButton"
+                        <button type="button" class="btn btn-secondary btn-siguiente" id="acceptButton"
                             data-bs-dismiss="modal">Aceptar</button>
                     </div>
                 </div>
@@ -184,8 +184,8 @@ $socialNetworks = $db->resultSet();
         </div>
     </div>
     <script>
-        const baseUrl = "<?php echo $baseUrl; ?>";
-        const company_days_available = <?php echo json_encode($company['calendar_days_available']); ?>;
+    const baseUrl = "<?php echo $baseUrl; ?>";
+    const company_days_available = <?php echo json_encode($company['calendar_days_available']); ?>;
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
