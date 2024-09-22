@@ -55,9 +55,9 @@ $media->execute();
         <div class="row mb-3">
             <div class="col-md-12">
                 <label for="description" class="form-label">Descripción</label>
-                <textarea class="form-control" id="description" name="description" rows="2" maxlength="50"
-                    placeholder="Descripción breve de la empresa (máximo 50 caracteres)"><?php echo $company['description'] ?></textarea>
-                <div class="form-text">Máximo 50 caracteres.</div>
+                <textarea class="form-control" id="description" name="description" rows="2" maxlength="120"
+                    placeholder="Descripción breve de la empresa (máximo 120 caracteres)"><?php echo $company['description'] ?></textarea>
+                <div class="form-text">Máximo 120 caracteres.</div>
             </div>
         </div>
 
