@@ -20,9 +20,8 @@ class EmailTemplate
         } else {
             $this->db = new Database();
         }
-        // $manager = new DatabaseSessionManager();
+
         $baseUrl = new ConfigUrl();
-        // $this->conn = $manager->getDB();
         $this->baseUrl = $baseUrl->get();
     }
     // Obtener plantillas por company_id

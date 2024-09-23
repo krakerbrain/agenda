@@ -106,6 +106,15 @@ class Users
         $db->bind(':id', $id);
         return $db->single();
     }
+
+    public function get_user_for_login($correo)
+    {
+        // SELECT name, password, company_id, role_id, token_sha256 FROM users WHERE email = :usuario LIMIT 1
+        $db = new Database();
+        $db->query('SELECT name, password, company_id, role_id, token_sha256 FROM users WHERE email = :usuario LIMIT 1');
+        $db->bind(':usuario', $correo);
+        return $db->single();
+    }
     public function update_user($data)
     {
         $db = new Database();
