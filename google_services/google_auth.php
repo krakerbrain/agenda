@@ -1,9 +1,9 @@
 <?php
 session_start();
-require_once dirname(__DIR__) . '/vendor/autoload.php'; // Cargar dependencias
+require_once dirname(__DIR__) . '/configs/init.php'; // Cargar dependencias
 require_once dirname(__DIR__) . '/classes/ConfigUrl.php';
 
-use Dotenv\Dotenv;
+// use Dotenv\Dotenv;
 use Google_Client;
 use Google_Service_Calendar;
 
@@ -13,9 +13,9 @@ use Google_Service_Calendar;
 // error_reporting(E_ALL);
 
 try {
-    // Cargar variables de entorno desde el archivo .env
-    $dotenv = Dotenv::createImmutable(dirname(__DIR__));
-    $dotenv->load();
+    // // Cargar variables de entorno desde el archivo .env
+    // $dotenv = Dotenv::createImmutable(dirname(__DIR__));
+    // $dotenv->load();
 
     $baseUrl = ConfigUrl::get();
 

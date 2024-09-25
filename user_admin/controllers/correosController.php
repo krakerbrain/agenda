@@ -1,15 +1,12 @@
 <?php
+require_once dirname(__DIR__, 2) . '/configs/init.php';
+require_once dirname(__DIR__, 2) . '/access-token/seguridad/JWTAuth.php';
 require_once dirname(__DIR__, 2) . '/classes/ConfigUrl.php';
-require_once dirname(__DIR__, 2) . '/access-token/seguridad/jwt.php';
 require_once dirname(__DIR__, 2) . '/classes/EmailTemplate.php';
 
 $baseUrl = ConfigUrl::get();
-$datosUsuario = validarToken();
-
-if (!$datosUsuario) {
-    header("Location: " . $baseUrl . "login/index.php");
-    exit;
-}
+$auth = new JWTAuth();
+$datosUsuario = $auth->validarTokenUsuario();
 
 $company_id = $datosUsuario['company_id'] ?? null;
 

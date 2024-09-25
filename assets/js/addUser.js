@@ -9,6 +9,7 @@ export function initAddUser() {
 
       if (success) {
         getUsers(data);
+        get_role_select();
       }
     } catch (error) {
       console.error(error);
@@ -39,6 +40,27 @@ export function initAddUser() {
           deleteUser(userId);
         });
       });
+    }
+  }
+
+  async function get_role_select() {
+    try {
+      const response = await fetch(`${baseUrl}user_admin/controllers/users.php?action=getRoles`, {
+        method: "GET",
+      });
+
+      const { success, data } = await response.json();
+
+      if (success) {
+        const roleSelect = document.querySelector("#role_id");
+        let select = "<option selected>Seleccione rol del usuario</option>";
+        data.forEach((role) => {
+          select += `<option value="${role.id}" data-about="${role.about_role}">${role.type}</option>`;
+        });
+        roleSelect.innerHTML = select;
+      }
+    } catch (error) {
+      console.error(error);
     }
   }
 
@@ -77,6 +99,7 @@ export function initAddUser() {
         //limpiar formulario
         this.reset();
         alert("Usuario agregado exitosamente");
+        loadUsers();
       } else {
         document.querySelector("#addUserForm .error").innerHTML = `<span>${error}</span>`;
         document.querySelector("#addUserForm .error").classList.remove("d-none");

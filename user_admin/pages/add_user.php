@@ -1,18 +1,10 @@
 <?php
-require_once dirname(__DIR__, 2) . '/classes/DatabaseSessionManager.php';
+require_once dirname(__DIR__, 2) . '/configs/init.php';
+require_once dirname(__DIR__, 2) . '/access-token/seguridad/JWTAuth.php';
 require_once dirname(__DIR__, 2) . '/classes/ConfigUrl.php';
-require_once dirname(__DIR__, 2) . '/access-token/seguridad/jwt.php';
 $baseUrl = ConfigUrl::get();
-$manager = new DatabaseSessionManager();
-$conn = $manager->getDB();
-$datosUsuario = validarToken();
-if (!$datosUsuario) {
-    header("Location: " . $baseUrl . "login/index.php");
-}
-$company_id = $datosUsuario['company_id'];
-$query = $conn->prepare("SELECT id, type, about_role FROM user_role WHERE id > 2");
-$query->execute();
-$roles = $query->fetchAll(PDO::FETCH_ASSOC);
+$auth = new JWTAuth();
+$auth->validarTokenUsuario();
 
 ?>
 <div class="col-lg-6 mx-auto vh-100">
@@ -27,7 +19,6 @@ $roles = $query->fetchAll(PDO::FETCH_ASSOC);
         <div class="justify-content-center">
             <form action="" method="post" class="form-group" id="addUserForm">
                 <div class="alert alert-secondary error d-none mb-2" role="alert"></div>
-                <input type="hidden" name="company_id" id="company_id" value="<?= $company_id; ?>">
                 <div class="input-group">
                     <div class="input-group-text bg-secondary text-light">
                         <i class="fa-solid fa-user"></i>
@@ -70,12 +61,7 @@ $roles = $query->fetchAll(PDO::FETCH_ASSOC);
                         <i class="fa-solid fa-user"></i>
                     </div>
                     <select id="role_id" name="role_id" class="form-select">
-                        <option selected>Seleccione rol del usuario</option>
-                        <?php foreach ($roles as $role) { ?>
-                            <option value="<?php echo $role['id']; ?>"
-                                data-about="<?php echo htmlspecialchars($role['about_role']); ?>">
-                                <?php echo $role['type']; ?></option>
-                        <?php } ?>
+
                     </select>
                 </div>
                 <div id="roleAbout" class="mb-3 d-none">

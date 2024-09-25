@@ -5,6 +5,8 @@ import { initConfiguraciones } from "./configuraciones.js";
 import { initCorreos } from "./correos.js";
 import { initDatosEmpresa } from "./datosEmpresa.js";
 import { initAddUser } from "./addUser.js";
+import { initAddCompany } from "./master_admin/master_add_company.js";
+import { initCompanyList } from "./master_admin/master_company_list.js";
 
 document.addEventListener("DOMContentLoaded", function () {
   const links = document.querySelectorAll(".nav-link");
@@ -21,9 +23,12 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
   });
-
+  if (role_id == 1) {
+    loadContent("master_add_company");
+  } else {
+    loadContent("dateList");
+  }
   // Load the default content when the page loads, after registering all event listeners
-  loadContent("dateList");
 
   function loadContent(page) {
     document.querySelector(".titulo").textContent = document.querySelector("#" + page).innerHTML;
@@ -66,6 +71,12 @@ document.addEventListener("DOMContentLoaded", function () {
             break;
           case "add_user":
             initAddUser();
+            break;
+          case "master_add_company":
+            initAddCompany();
+            break;
+          case "master_company_list":
+            initCompanyList();
             break;
           default:
             console.error("No hay un módulo para la página:", page);

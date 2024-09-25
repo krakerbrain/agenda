@@ -1,17 +1,13 @@
 <?php
+require_once dirname(__DIR__, 2) . '/access-token/seguridad/JWTAuth.php';
 require_once dirname(__DIR__, 2) . '/classes/DatabaseSessionManager.php';
 require_once dirname(__DIR__, 2) . '/classes/ConfigUrl.php';
-require_once dirname(__DIR__, 2) . '/access-token/seguridad/jwt.php';
+
 $baseUrl = ConfigUrl::get();
 $manager = new DatabaseSessionManager();
-// $manager->startSession();
-// session_start();
-// $sesion = isset($_SESSION['companyID']);
-$datosUsuario = validarToken();
-if (!$datosUsuario) {
-    header("Location: " . $baseUrl . "login/index.php");
-}
-// Usar $datosUsuario['company_id'] donde sea necesario
+$auth = new JWTAuth();
+$datosUsuario = $auth->validarTokenUsuario();
+
 $company_id = $datosUsuario['company_id'];
 $conn = $manager->getDB();
 

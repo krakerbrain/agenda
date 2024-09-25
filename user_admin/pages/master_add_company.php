@@ -1,20 +1,3 @@
-<?php
-require_once dirname(__DIR__) . '/classes/ConfigUrl.php';
-require_once dirname(__DIR__) . '/access-token/seguridad/jwt.php';
-require_once dirname(__DIR__) . '/classes/DatabaseSessionManager.php';
-$baseUrl = ConfigUrl::get();
-
-$datosUsuario = validarTokenSuperUser();
-if (!$datosUsuario) {
-    header("Location: " . $baseUrl . "login/index.php");
-}
-$title = "Agregar Empresa";
-
-include dirname(__DIR__) . '/partials/head.php';
-include dirname(__DIR__) . '/master_admin/navbar.php';
-?>
-
-<body>
     <div class="container mt-5">
         <!-- Formulario Agregar Empresa -->
         <div class="row mb-4">
@@ -44,9 +27,9 @@ include dirname(__DIR__) . '/master_admin/navbar.php';
                                 <div class="">
                                     <label for="description" class="form-label">Descripción</label>
                                     <textarea class="form-control" id="description" name="description" rows="2"
-                                        maxlength="50"
-                                        placeholder="Descripción breve de la empresa (máximo 50 caracteres)">Empresa dedicada a...</textarea>
-                                    <div class="form-text">Máximo 50 caracteres.</div>
+                                        maxlength="120"
+                                        placeholder="Descripción breve de la empresa (máximo 120 caracteres)">Empresa dedicada a...</textarea>
+                                    <div class="form-text">Máximo 120 caracteres.</div>
                                 </div>
                             </div>
 
@@ -107,88 +90,6 @@ include dirname(__DIR__) . '/master_admin/navbar.php';
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
     </script>
-    <script>
-        const baseUrl = '<?php echo $baseUrl; ?>';
+    </body>
 
-        document.getElementById('addCompanyForm').addEventListener('submit', async function(event) {
-            event.preventDefault();
-            // Mostrar spinner y deshabilitar botón
-            displaySpinner('addCompany', true);
-            const formData = new FormData(this);
-            try {
-                const response = await fetch(`${baseUrl}master_admin/add_company.php`, {
-                    method: 'POST',
-                    body: formData
-                });
-                const {
-                    success,
-                    company_id,
-                    error
-                } = await response.json();
-
-                if (success) {
-                    document.getElementById('company_id').value = company_id;
-                    //limpiar formulario
-                    this.reset();
-                    alert('Empresa agregada exitosamente');
-                } else {
-                    alert(error);
-                }
-            } catch (error) {
-                console.error('Error:', error);
-            } finally {
-                // Ocultar spinner y habilitar botón
-                displaySpinner('addCompany', false);
-            }
-        });
-        document.getElementById('addUserForm').addEventListener('submit', async function(event) {
-            event.preventDefault();
-            // Mostrar spinner y deshabilitar botón
-            displaySpinner('addUser', true);
-
-            const formData = new FormData(this);
-            try {
-                const response = await fetch(`${baseUrl}login/registra_usuario.php`, {
-                    method: 'POST',
-                    body: formData
-                });
-                const {
-                    success,
-                    error
-                } = await response.json();
-
-                if (success) {
-                    //limpiar formulario
-                    this.reset();
-                    alert('Usuario agregado exitosamente');
-                } else {
-                    alert(error);
-                    this.reset();
-                }
-            } catch (error) {
-                console.error('Error:', error);
-            } finally {
-                // Ocultar spinner y habilitar botón
-                displaySpinner('addUser', false);
-            }
-        });
-
-        function displaySpinner(id, show) {
-            const button = document.getElementById(id);
-            const spinner = button.querySelector('.spinner-border');
-            const buttonText = button.querySelector('.button-text');
-            const textBtn = id === 'addCompany' ? 'Agregar Empresa' : 'Agregar Usuario';
-            if (!show) {
-                spinner.classList.add('d-none');
-                buttonText.textContent = textBtn;
-                button.disabled = false;
-            } else {
-                spinner.classList.remove('d-none');
-                buttonText.textContent = 'Procesando...';
-                button.disabled = true;
-            }
-        }
-    </script>
-</body>
-
-</html>
+    </html>

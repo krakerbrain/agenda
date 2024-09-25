@@ -1,24 +1,27 @@
 <?php
+require_once dirname(__DIR__) . '/configs/init.php';
+require_once dirname(__DIR__) . '/classes/ConfigUrl.php';
+$baseUrl = ConfigUrl::get();
 $title = "Login";
 include '../partials/head.php';
 ?>
 <!-- Código HTML -->
 <style>
-.login-container {
-    background: rgba(255, 255, 255, 0.2);
-    /* Color de fondo blanco con opacidad */
-    border-radius: 15px;
-    /* Bordes redondeados */
+    .login-container {
+        background: rgba(255, 255, 255, 0.2);
+        /* Color de fondo blanco con opacidad */
+        border-radius: 15px;
+        /* Bordes redondeados */
 
-    backdrop-filter: blur(10px);
-    /* Desenfoque de fondo */
-    -webkit-backdrop-filter: blur(10px);
-    /* Desenfoque de fondo para Safari */
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-    /* Sombra sutil */
-    color: #f5f5f5;
-    /* Color del texto */
-}
+        backdrop-filter: blur(10px);
+        /* Desenfoque de fondo */
+        -webkit-backdrop-filter: blur(10px);
+        /* Desenfoque de fondo para Safari */
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        /* Sombra sutil */
+        color: #f5f5f5;
+        /* Color del texto */
+    }
 </style>
 
 <body style="background-color: #1a1728;" class="d-flex justify-content-center align-items-center vh-100">
@@ -59,36 +62,36 @@ include '../partials/head.php';
     </div>
 
     <script>
-    const baseUrl = '<?= $baseUrl ?>';
-    document.getElementById('loginForm').addEventListener('submit', async function(event) {
-        event.preventDefault(); // Evitar el envío tradicional del formulario
+        const baseUrl = '<?= $baseUrl ?>';
+        document.getElementById('loginForm').addEventListener('submit', async function(event) {
+            event.preventDefault(); // Evitar el envío tradicional del formulario
 
-        // Capturar los datos del formulario
-        const formData = new FormData(this);
 
-        try {
-            const response = await fetch('controllers/login_controller.php', {
-                method: 'POST',
-                body: formData
-            });
+            // Capturar los datos del formulario
+            const formData = new FormData(this);
 
-            const result = await response.json();
+            try {
+                const response = await fetch('controllers/login_controller.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
 
-            if (result.success) {
-                // Redirigir si la respuesta es exitosa
-                window.location.href = `${baseUrl}${result.redirect}`;
-            } else {
-                // Mostrar el mensaje de error
-                document.getElementById('error-message').innerText = result.message;
+                if (result.success) {
+                    // Redirigir si la respuesta es exitosa
+                    window.location.href = `${baseUrl}${result.redirect}`;
+                } else {
+                    // Mostrar el mensaje de error
+                    document.getElementById('error-message').innerText = result.message;
+                }
+            } catch (error) {
+                document.getElementById('error-message').innerText = "Error en la conexión.";
             }
-        } catch (error) {
-            document.getElementById('error-message').innerText = "Error en la conexión.";
-        }
-    });
+        });
 
-    function verpass() {
-        var pass = document.getElementById('contrasenia');
-        pass.type = pass.type === "password" ? "text" : "password";
-    }
+        function verpass() {
+            var pass = document.getElementById('contrasenia');
+            pass.type = pass.type === "password" ? "text" : "password";
+        }
     </script>
 </body>
