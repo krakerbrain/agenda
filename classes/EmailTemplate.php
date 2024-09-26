@@ -37,10 +37,20 @@ class EmailTemplate
         }
     }
 
+    public function sanitize($data)
+    {
+        // Usar htmlspecialchars para evitar que se inyecte HTML o JavaScript
+        return is_array($data) ? array_map('htmlspecialchars', $data) : htmlspecialchars($data);
+    }
+
     // Actualizar una plantilla existente
     public function updateTemplate($company_id, $template_name, $notas)
     {
         try {
+            // Sanitizar las notas
+            $notas = $this->sanitize($notas);
+
+            // Preparar la consulta
             $sql = "
         UPDATE companies
         SET notas_correo_" . $template_name . " = :notas

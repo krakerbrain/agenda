@@ -30,22 +30,13 @@ switch ($action) {
         $template_name = $input['template_name'] ?? '';
         $notas = $input['notas'] ?? [];
 
-        // Validación de las notas y otros datos
-        $errors = EmailTemplate::validateTemplateData([
-            'company_id' => $company_id,
-            'template_name' => $template_name,
-            'notas' => $notas
-        ]);
 
-        if (empty($errors)) {
-            $emailTemplate = new EmailTemplate();
-            if ($template_name) { // Asume que si template_name existe, es una actualización
-                $result = $emailTemplate->updateTemplate($company_id, $template_name, $notas);
-            }
-            $response = $result;
-        } else {
-            $response['message'] = implode(', ', $errors);
+        $emailTemplate = new EmailTemplate();
+        if ($template_name) { // Asume que si template_name existe, es una actualización
+            $result = $emailTemplate->updateTemplate($company_id, $template_name, $notas);
         }
+        $response = $result;
+
         break;
 
     default:

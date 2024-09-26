@@ -4,7 +4,6 @@ require_once dirname(__DIR__) . '/classes/EmailTemplate.php';
 require_once dirname(__DIR__) . '/classes/Appointments.php';
 require_once dirname(__DIR__) . '/google_services/google_client.php';
 require_once dirname(__DIR__) . '/google_services/calendar_service.php';
-include 'send_email.php';
 include 'send_wsp.php';
 
 $appointments = new Appointments();

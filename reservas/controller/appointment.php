@@ -3,7 +3,6 @@
 require_once dirname(__DIR__, 2) . '/configs/init.php';
 require_once dirname(__DIR__, 2) . '/classes/Appointments.php';
 require_once dirname(__DIR__, 2) . '/classes/EmailTemplate.php';
-require_once dirname(__DIR__, 2) . '/user_admin/send_email.php';
 require_once dirname(__DIR__, 2) . '/user_admin/send_wsp.php';
 
 // Crear instancia de la clase Appointments
