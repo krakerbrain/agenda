@@ -1,14 +1,12 @@
 <?php
+require_once dirname(__DIR__, 2) . '/access-token/seguridad/JWTAuth.php';
 require_once dirname(__DIR__, 2) . '/classes/DatabaseSessionManager.php';
 require_once dirname(__DIR__, 2) . '/classes/ConfigUrl.php';
-require_once dirname(__DIR__, 2) . '/access-token/seguridad/jwt.php';
 require_once dirname(__DIR__, 2) . '/classes/RedesSociales.php';
 $baseUrl = ConfigUrl::get();
 $manager = new DatabaseSessionManager();
-$datosUsuario = validarToken();
-if (!$datosUsuario) {
-    header("Location: " . $baseUrl . "login/index.php");
-}
+$auth = new JWTAuth();
+$datosUsuario = $auth->validarTokenUsuario();
 $conn = $manager->getDB();
 
 try {

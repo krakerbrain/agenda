@@ -38,6 +38,11 @@
                                     <td style="padding: 10px;">{nombre_cliente}</td>
                                 </tr>
                                 <tr>
+                                    <th align="left" style="padding: 10px; background-color: #f2f2f2;">Teléfono</th>
+                                    <td style="padding: 10px;"><a
+                                            href="https://wa.me/{telefono_cliente}">{telefono_cliente}</a></td>
+                                </tr>
+                                <tr>
                                     <th align="left" style="padding: 10px; background-color: #f2f2f2;">Fecha</th>
                                     <td style="padding: 10px;">{fecha}</td>
                                 </tr>

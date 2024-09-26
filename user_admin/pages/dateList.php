@@ -1,19 +1,13 @@
 <?php
+require_once dirname(__DIR__, 2) . '/configs/init.php';
+require_once dirname(__DIR__, 2) . '/access-token/seguridad/JWTAuth.php';
 require_once dirname(__DIR__, 2) . '/classes/Database.php';
 require_once dirname(__DIR__, 2) . '/classes/ConfigUrl.php';
-require_once dirname(__DIR__, 2) . '/access-token/seguridad/jwt.php';
+
 $baseUrl = ConfigUrl::get();
-
-$datosUsuario = validarToken();
-
-if (!$datosUsuario) {
-    header("Location: " . $baseUrl . "login/index.php");
-}
-
-// $company_id = $datosUsuario['company_id'];
+$auth = new JWTAuth();
+$auth->validarTokenUsuario();
 ?>
-
-
 <div class="container mt-4">
     <div class="table-responsive">
         <table class="table table-striped table-hover">

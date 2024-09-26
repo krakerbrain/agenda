@@ -81,10 +81,10 @@ class Users
 
         return ["error" => null];
     }
-    public function get_roles()
+    public function getAboutRoles()
     {
         $db = new Database();
-        $db->query('SELECT * FROM roles');
+        $db->query('SELECT id, type, about_role FROM user_role WHERE id > 2');
         return $db->resultSet();
     }
     public function get_users($company_id)
@@ -95,7 +95,7 @@ class Users
                             ON u.role_id = ur.id
                             WHERE u.company_id = :company
                             AND ur.id > 2 
-                            ORDER BY u.id DESC');
+                            ORDER BY u.role_id ASC');
         $db->bind(':company', $company_id);
         return $db->resultSet();
     }
@@ -104,6 +104,15 @@ class Users
         $db = new Database();
         $db->query('SELECT * FROM users WHERE id = :id');
         $db->bind(':id', $id);
+        return $db->single();
+    }
+
+    public function get_user_for_login($correo)
+    {
+        // SELECT name, password, company_id, role_id, token_sha256 FROM users WHERE email = :usuario LIMIT 1
+        $db = new Database();
+        $db->query('SELECT name, password, company_id, role_id, token_sha256 FROM users WHERE email = :usuario LIMIT 1');
+        $db->bind(':usuario', $correo);
         return $db->single();
     }
     public function update_user($data)

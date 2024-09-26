@@ -1,8 +1,8 @@
 <?php
-// require_once dirname(__DIR__, 2) . '/classes/DatabaseSessionManager.php';
+
+require_once dirname(__DIR__, 2) . '/configs/init.php';
 require_once dirname(__DIR__, 2) . '/classes/Appointments.php';
 require_once dirname(__DIR__, 2) . '/classes/EmailTemplate.php';
-require_once dirname(__DIR__, 2) . '/user_admin/send_email.php';
 require_once dirname(__DIR__, 2) . '/user_admin/send_wsp.php';
 
 // Crear instancia de la clase Appointments
@@ -19,15 +19,6 @@ try {
     if (!$data) {
         throw new Exception('Datos inválidos recibidos');
     }
-
-    $company_id = $data['company_id'];
-    $name = $data['name'];
-    $phone = $data['phone'];
-    $mail = $data['mail'];
-    $date = $data['date'];
-    $time = $data['time'];
-    $id_service = $data['service'];
-
     // Separar el tiempo en inicio y fin
     list($start_time, $end_time) = explode(' - ', $time);
 
@@ -60,13 +51,7 @@ try {
     if ($stmt > 0) {
         // Obtener el email template y el logo
         $emailTemplateBuilder = new EmailTemplate();
-        $emailContent = $emailTemplateBuilder->buildEmail($company_id, 'reserva', $id_service, $name, $date, $formattedStartTime);
-        // CORREO DE RESERVA
-        sendEmail($mail, $emailContent, 'Reserva');
-
-        // CORREO ALERTA DE RESERVA
-        $alertEmailContent = $emailTemplateBuilder->buildAppointmentAlert($company_id, $name, $date, $formattedStartTime);
-        sendEmail(null, $alertEmailContent, null);
+        $emailContent = $emailTemplateBuilder->buildEmail($appointmentData, 'reserva');
 
         // Enviar mensaje de WhatsApp
         $wspStatusCode = sendWspReserva("registro_reserva", $phone, $name, $date, $formattedStartTime, $emailContent['company_name'], $emailContent['social_token']);

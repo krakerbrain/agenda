@@ -18,3 +18,4 @@ jest.config.js
 babel.config.js
 /node_modules
 /assets/img/uploads
+/trash

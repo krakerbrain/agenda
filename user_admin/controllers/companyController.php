@@ -1,15 +1,13 @@
 <?php
+require_once dirname(__DIR__, 2) . '/configs/init.php';
+require_once dirname(__DIR__, 2) . '/access-token/seguridad/JWTAuth.php';
 require_once dirname(__DIR__, 2) . '/classes/CompanyManager.php';
 require_once dirname(__DIR__, 2) . '/classes/Users.php';
 require_once dirname(__DIR__, 2) . '/classes/ConfigUrl.php';
-require_once dirname(__DIR__, 2) . '/access-token/seguridad/jwt.php';
 
 $baseUrl = ConfigUrl::get();
-$datosUsuario = validarTokenSuperUser();
-if (!$datosUsuario) {
-    header("Location: " . $baseUrl . "login/index.php");
-    exit();
-}
+$auth = new JWTAuth();
+$datosUsuario = $auth->validarTokenUsuario();
 header('Content-Type: application/json');
 try {
     $companyManager = new CompanyManager();
