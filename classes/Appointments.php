@@ -17,17 +17,6 @@ class Appointments extends Database
         $db->bind(':id_service', $data['id_service']);
         $db->execute();
         return $db->rowCount();
-
-
-        // No necesitas instanciar $db porque la clase hereda de Database
-        // $this->query('INSERT INTO appointments (company_id, user_id, date, time, description) VALUES (:company_id, :user_id, :date, :time, :description)');
-        // $this->bind(':company_id', $data['company_id']);
-        // $this->bind(':user_id', $data['user_id']);
-        // $this->bind(':date', $data['date']);
-        // $this->bind(':time', $data['time']);
-        // $this->bind(':description', $data['description']);
-        // $this->execute();
-        // return $this->rowCount();
     }
 
     public function get_appointments($company_id)

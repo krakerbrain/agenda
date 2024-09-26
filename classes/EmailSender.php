@@ -28,6 +28,7 @@ class EmailSender
     // Método común para enviar el correo
     public function sendEmail($to, $mailContent, $template = '')
     {
+        $template = mb_encode_mimeheader($template, 'UTF-8', 'B', "\n");
         try {
             // Si se pasa un template personalizado
             if ($template !== '') {
@@ -42,8 +43,11 @@ class EmailSender
             $this->mail->Body = $mailContent['body'];
 
             $this->mail->send();
+            // Devolver true si el correo fue enviado exitosamente
+            return true;
         } catch (Exception $e) {
             echo "Error al enviar el correo: {$this->mail->ErrorInfo}";
+            return false;
         }
     }
 

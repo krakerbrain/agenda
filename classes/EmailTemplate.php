@@ -107,11 +107,11 @@ class EmailTemplate
     }
 
     // Construir el correo
-    public function buildEmail($company_id, $templateType, $service_id, $name, $date, $startTime)
+    public function buildEmail($data, $templateType)
     {
         // Cargar datos de la compañía y del servicio
-        $this->loadCompanyData($company_id, $templateType);
-        $this->loadServiceData($service_id);
+        $this->loadCompanyData($data['company_id'], $templateType);
+        $this->loadServiceData($data['id_service']);
 
         $notesHtml = '';
         if (!empty($this->companyData['notas'])) {
@@ -125,40 +125,46 @@ class EmailTemplate
         $templatePath = $this->baseUrl . 'correos_template/correo_' . $templateType . '.php';
         $templateContent = file_get_contents($templatePath);
 
-        $date = date('d/m/Y', strtotime($date));
-        $startTime = date('h:i a', strtotime($startTime));
+        $date = date('d/m/Y', strtotime($data['date']));
+        $startTime = date('h:i a', strtotime($data['start_time']));
 
         $subject_msg = $templateType == 'reserva' ? 'Solicitud de reserva recibida - {fecha_reserva}' : '¡Tu reserva ha sido confirmada! - {fecha_reserva}';
-        $subject_msg = str_replace('{fecha_reserva}', $date, $subject_msg);
+        $subject_msg = str_replace('{fecha_reserva}', $data['date'], $subject_msg);
         $subject = mb_encode_mimeheader($subject_msg, 'UTF-8', 'B', "\n");
 
         $body = str_replace(
             ['{nombre_cliente}', '{fecha_reserva}', '{hora_reserva}', '{servicio_reservado}', '{notas}', '{ruta_logo}', '{nombre_empresa}'],
-            [$name, $date, $startTime, $this->serviceData['name'], $notesHtml, $this->companyData['logo'], $this->companyData['name']],
+            [$data['name'], $data['date'], $startTime, $this->serviceData['name'], $notesHtml, $this->companyData['logo'], $this->companyData['name']],
             $templateContent
         );
-
-        return ['subject' => $subject, 'body' => $body, 'company_name' => $this->companyData['name'], 'social_token' => $this->companyData['social_token']];
+        $mailData = ['subject' => $subject, 'body' => $body, 'company_name' => $this->companyData['name']];
+        $emailSender = new EmailSender();
+        $sender =  $emailSender->sendEmail($data['mail'],  $mailData, ucfirst($templateType));
+        if ($templateType == 'reserva') {
+            $alertEmailContent = $this->buildAppointmentAlert($data);
+            $emailSender->sendEmail($this->userData['email'], $alertEmailContent, null);
+        }
+        return ['success' => $sender, 'company_name' => $this->companyData['name'], 'social_token' => $this->companyData['social_token']];
     }
 
     // Otro constructor de correos, como alertas, reutilizando los mismos datos
-    public function buildAppointmentAlert($company_id, $name, $phone, $date, $startTime)
+    public function buildAppointmentAlert($data)
     {
         if ($this->companyData === null || $this->serviceData === null) {
             throw new Exception("Los datos de la compañía y el servicio deben cargarse primero.");
         }
 
-        $this->loadUserData($company_id);
+        $this->loadUserData($data['company_id']);
 
         $alertTemplatePath = $this->baseUrl . 'correos_template/correo_aviso_reserva.php';
         $alertContent = file_get_contents($alertTemplatePath);
 
-        $date = date('d/m/Y', strtotime($date));
-        $startTime = date('h:i a', strtotime($startTime));
+        $date = date('d/m/Y', strtotime($data['date']));
+        $startTime = date('h:i a', strtotime($data['start_time']));
 
         $body = str_replace(
             ['{ruta_logo}', '{nombre_usuario}', '{nombre_cliente}', '{telefono_cliente}', '{fecha}', '{hora}', '{nombre_servicio}'],
-            [$this->companyData['logo'], $this->userData['name'], $name, $phone, $date, $startTime, $this->serviceData['name']],
+            [$this->companyData['logo'], $this->userData['name'], $data['name'], $data['phone'], $date, $startTime, $this->serviceData['name']],
             $alertContent
         );
 

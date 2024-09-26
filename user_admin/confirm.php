@@ -30,10 +30,18 @@ try {
 
     $appointments->update_event($eventId, $appointment['id']);
 
-    $emailTemplateBuilder = new EmailTemplate($appointments);
-    $emailContent = $emailTemplateBuilder->buildEmail($appointment['company_id'], 'confirmacion', $appointment['id_service'], $appointment['name'], $appointment['date'], $appointment['start_time']);
-    // Enviar confirmación por correo electrónico
-    sendEmail($appointment['mail'], $emailContent, 'Confirmación');
+    // Construir el contenido del correo
+    $confirmData = [
+        'company_id'    => $appointment['company_id'],
+        'name'          => $appointment['name'],
+        'id_service'    => $appointment['id_service'],
+        'date'          => $appointment['date'],
+        'start_time'    => $appointment['start_time'],
+        'mail'          => $appointment['mail']
+    ];
+
+    $emailTemplateBuilder = new EmailTemplate();
+    $emailContent = $emailTemplateBuilder->buildEmail($confirmData, 'confirmacion');
 
     // Enviar mensaje de WhatsApp
     $wspStatusCode = sendWspReserva("confirmar_reserva", $appointment['phone'], $appointment['name'], $appointment['date'], $appointment['start_time'], $emailContent['company_name'], $emailContent['social_token']);

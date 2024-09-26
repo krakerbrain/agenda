@@ -20,15 +20,6 @@ try {
     if (!$data) {
         throw new Exception('Datos inválidos recibidos');
     }
-
-    $company_id = $data['company_id'];
-    $name = $data['name'];
-    $phone = $data['phone'];
-    $mail = $data['mail'];
-    $date = $data['date'];
-    $time = $data['time'];
-    $id_service = $data['service'];
-
     // Separar el tiempo en inicio y fin
     list($start_time, $end_time) = explode(' - ', $time);
 
@@ -61,18 +52,12 @@ try {
     if ($stmt > 0) {
         // Obtener el email template y el logo
         $emailTemplateBuilder = new EmailTemplate();
-        $emailContent = $emailTemplateBuilder->buildEmail($company_id, 'reserva', $id_service, $name, $date, $formattedStartTime);
-        // CORREO DE RESERVA
-        sendEmail($mail, $emailContent, 'Reserva');
-
-        // CORREO ALERTA DE RESERVA
-        $alertEmailContent = $emailTemplateBuilder->buildAppointmentAlert($company_id, $name, $phone, $date, $formattedStartTime);
-        sendEmail(null, $alertEmailContent, null);
+        $emailContent = $emailTemplateBuilder->buildEmail($appointmentData, 'reserva');
 
         // Enviar mensaje de WhatsApp
-        // $wspStatusCode = sendWspReserva("registro_reserva", $phone, $name, $date, $formattedStartTime, $emailContent['company_name'], $emailContent['social_token']);
+        $wspStatusCode = sendWspReserva("registro_reserva", $phone, $name, $date, $formattedStartTime, $emailContent['company_name'], $emailContent['social_token']);
         //Para pruebas
-        $wspStatusCode = 200;
+        // $wspStatusCode = 200;
         // Verificar si el mensaje de WhatsApp fue enviado correctamente
         if ($wspStatusCode == 200 || $wspStatusCode == 201) {
             // Confirmar la transacción si todo fue exitoso
