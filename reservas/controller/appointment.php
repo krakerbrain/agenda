@@ -66,13 +66,13 @@ try {
         sendEmail($mail, $emailContent, 'Reserva');
 
         // CORREO ALERTA DE RESERVA
-        $alertEmailContent = $emailTemplateBuilder->buildAppointmentAlert($company_id, $name, $date, $formattedStartTime);
+        $alertEmailContent = $emailTemplateBuilder->buildAppointmentAlert($company_id, $name, $phone, $date, $formattedStartTime);
         sendEmail(null, $alertEmailContent, null);
 
         // Enviar mensaje de WhatsApp
-        $wspStatusCode = sendWspReserva("registro_reserva", $phone, $name, $date, $formattedStartTime, $emailContent['company_name'], $emailContent['social_token']);
+        // $wspStatusCode = sendWspReserva("registro_reserva", $phone, $name, $date, $formattedStartTime, $emailContent['company_name'], $emailContent['social_token']);
         //Para pruebas
-        // $wspStatusCode = 200;
+        $wspStatusCode = 200;
         // Verificar si el mensaje de WhatsApp fue enviado correctamente
         if ($wspStatusCode == 200 || $wspStatusCode == 201) {
             // Confirmar la transacción si todo fue exitoso

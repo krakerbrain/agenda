@@ -142,7 +142,7 @@ class EmailTemplate
     }
 
     // Otro constructor de correos, como alertas, reutilizando los mismos datos
-    public function buildAppointmentAlert($company_id, $name, $date, $startTime)
+    public function buildAppointmentAlert($company_id, $name, $phone, $date, $startTime)
     {
         if ($this->companyData === null || $this->serviceData === null) {
             throw new Exception("Los datos de la compañía y el servicio deben cargarse primero.");
@@ -157,8 +157,8 @@ class EmailTemplate
         $startTime = date('h:i a', strtotime($startTime));
 
         $body = str_replace(
-            ['{ruta_logo}', '{nombre_usuario}', '{nombre_cliente}', '{fecha}', '{hora}', '{nombre_servicio}'],
-            [$this->companyData['logo'], $this->userData['name'], $name, $date, $startTime, $this->serviceData['name']],
+            ['{ruta_logo}', '{nombre_usuario}', '{nombre_cliente}', '{telefono_cliente}', '{fecha}', '{hora}', '{nombre_servicio}'],
+            [$this->companyData['logo'], $this->userData['name'], $name, $phone, $date, $startTime, $this->serviceData['name']],
             $alertContent
         );
 
