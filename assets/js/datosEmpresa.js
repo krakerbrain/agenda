@@ -53,7 +53,6 @@ export function initDatosEmpresa() {
         method: "POST",
         body: formData,
       });
-      debugger;
       const { success, message } = await response.json();
 
       if (success) {
