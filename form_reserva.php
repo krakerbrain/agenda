@@ -1,39 +1,22 @@
 <?php
-require_once __DIR__ . '/configs/init.php';
-require_once __DIR__ . '/classes/Database.php';
 require_once __DIR__ . '/classes/ConfigUrl.php';
-$db = new Database();
-session_start();
-$baseUrl = ConfigUrl::get();
+require_once __DIR__ . '/reservas/controller/CompanyController.php';
+$baseUrl =          ConfigUrl::get();
 
+$token =            isset($_GET['path']) ? $_GET['path'] : null;
+$controller =       new CompanyController();
 
-$token = isset($_GET['path']) ? $_GET['path'] : null;
-$db->query("SELECT * FROM companies WHERE token = :token AND is_active = 1");
-$db->bind(':token', $token);
-$db->execute();
-$company = $db->single();
+$data =             $controller->getCompanyData($token);
+$company =          $data['company'];
+$socialNetworks  =  $data['socialNetworks'];
+$services  =        $data['services'];
+$style  =           $data['style'];
 
-$primary_color = $company['font_color'] ?? '#525252';
-$secondary_color = $company['btn2'] ?? '#9b80ff';
-$background_color = $company['bg_color'] ?? '#bebdff';
-$button_color = $company['btn1'] ?? '#ffffff';
-$border_color = $company['font_color'] ?? '#525252';
-
-
-if (!$company) {
-    header("Location: " . $baseUrl . "error.html");
-    exit();
-}
-
-$db->query("SELECT * FROM services WHERE company_id = :company_id");
-$db->bind(':company_id', $company['id']);
-$db->execute();
-$services = $db->resultSet();
-
-$db->query("SELECT sn.name, sn.icon_class, csn.url FROM company_social_networks csn JOIN social_networks sn ON csn.social_network_id = sn.id WHERE csn.company_id = :company_id");
-$db->bind(':company_id', $company['id']);
-$db->execute();
-$socialNetworks = $db->resultSet();
+$primary_color =    $style['primary_color'];
+$secondary_color =  $style['secondary_color'];
+$background_color = $style['background_color'];
+$button_color =     $style['button_color'];
+$border_color =     $style['border_color'];
 ?>
 <!DOCTYPE html>
 <html lang="en">

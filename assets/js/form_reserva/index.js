@@ -1,14 +1,3 @@
-// document.addEventListener("DOMContentLoaded", async function () {
-//   try {
-//     const response = await fetch(`${baseUrl}reservas/controller/initialData.php`);
-//     const data = await response.json();
-//     // Process the data as needed
-//     console.log(data);
-//   } catch (error) {
-//     console.error("Error fetching initial data:", error);
-//   }
-// });
-
 function validarPaso(step) {
   // Validación del paso actual antes de avanzar
   if (step === 2) {
@@ -72,7 +61,7 @@ function getObservation(id) {
 
 async function getServiceCategory(serviceId) {
   try {
-    let url = `${baseUrl}reservas/controller/reservaController.php`;
+    let url = `${baseUrl}reservas/controller/getCategories.php`;
     let data = {
       service_id: serviceId,
     };
