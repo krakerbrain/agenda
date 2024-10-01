@@ -34,7 +34,7 @@ class EmailSender
             if ($template !== '') {
                 $this->mail->setFrom('agendaroad@gmail.com', $mailContent['company_name'] . ' - ' . $template);
             } else {
-                $this->mail->setFrom('agendaroad@gmail.com', 'ALERTA - Agenda Road');
+                $this->mail->setFrom('agendaroad@gmail.com', 'ALERTA - Agendarium');
             }
 
             $this->mail->addAddress($to);
@@ -55,7 +55,7 @@ class EmailSender
     public function sendInscriptionAlert($subject, $to, $mailContent)
     {
         try {
-            $this->mail->setFrom('agendaroad@gmail.com', 'INSCRIPCION - Agenda Road');
+            $this->mail->setFrom('agendaroad@gmail.com', 'INSCRIPCION - Agendarium');
             $this->mail->addAddress($to);
             $this->mail->isHTML(true);
             $this->mail->Subject = $subject;

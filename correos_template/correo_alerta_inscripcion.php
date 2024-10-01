@@ -27,7 +27,7 @@
                     <tr>
                         <td colspan="2"
                             style="background-color: #f8f9fa; text-align: center; padding: 20px; font-size: 12px; color: #777777;">
-                            &copy; 2024 Agenda Road. Todos los derechos reservados.
+                            &copy; 2024 Agendarium. Todos los derechos reservados.
                         </td>
                     </tr>
                 </table>

@@ -7,7 +7,7 @@ class ConfigUrl
         if ($_SERVER['HTTP_HOST'] == 'localhost') {
             return 'http://localhost/agenda/';
         } else {
-            return 'https://agenda2024.online/';
+            return 'https://agendarium.com/';
         }
     }
 }
