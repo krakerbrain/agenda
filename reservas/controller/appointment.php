@@ -20,11 +20,11 @@ try {
         throw new Exception('Datos inválidos recibidos');
     }
     // Separar el tiempo en inicio y fin
-    list($start_time, $end_time) = explode(' - ', $time);
+    list($start_time, $end_time) = explode(' - ', $data['time']);
 
     // Crear objetos DateTime a partir de las cadenas de tiempo
-    $startDateTime = new DateTime($date . ' ' . $start_time);
-    $endDateTime = new DateTime($date . ' ' . $end_time);
+    $startDateTime = new DateTime($data['date'] . ' ' . $start_time);
+    $endDateTime = new DateTime($data['date'] . ' ' . $end_time);
 
     // Formatear el tiempo en "H:i" (horas:minutos)
     $formattedStartTime = $startDateTime->format('H:i');
@@ -54,7 +54,7 @@ try {
         $emailContent = $emailTemplateBuilder->buildEmail($appointmentData, 'reserva');
 
         // Enviar mensaje de WhatsApp
-        $wspStatusCode = sendWspReserva("registro_reserva", $phone, $name, $date, $formattedStartTime, $emailContent['company_name'], $emailContent['social_token']);
+        $wspStatusCode = sendWspReserva("registro_reserva", $appointmentData['phone'], $appointmentData['name'], $appointmentData['date'], $formattedStartTime, $emailContent['company_name'], $emailContent['social_token']);
         //Para pruebas
         // $wspStatusCode = 200;
         // Verificar si el mensaje de WhatsApp fue enviado correctamente
