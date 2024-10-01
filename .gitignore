@@ -19,3 +19,4 @@ babel.config.js
 /node_modules
 /assets/img/uploads
 /trash
+__documentacion__

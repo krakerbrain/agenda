@@ -62,7 +62,7 @@ $media->execute();
                     <label for="social-network" class="form-label">Red Social</label>
                     <select id="social-network" name="social_network" class="form-select">
                         <?php foreach ($media as $red) { ?>
-                            <option value="<?php echo $red['id'] ?>"><?php echo $red['name'] ?></option>
+                        <option value="<?php echo $red['id'] ?>"><?php echo $red['name'] ?></option>
                         <?php } ?>
                     </select>
 
@@ -101,9 +101,23 @@ $media->execute();
             </tbody>
         </table>
     </div>
-
+    <div class="modal fade" id="preferedSocial" tabindex="-1" aria-labelledby="preferedSocialLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="preferedSocialLabel">Red Social Favorita</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-siguiente" id="acceptButton"
+                        data-bs-dismiss="modal">Aceptar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </div>
 <script>
-    const baseUrl = '<?php echo $baseUrl ?>';
+const baseUrl = '<?php echo $baseUrl ?>';
 </script>

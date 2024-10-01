@@ -3,20 +3,20 @@ require_once __DIR__ . '/classes/ConfigUrl.php';
 require_once __DIR__ . '/reservas/controller/CompanyController.php';
 $baseUrl =          ConfigUrl::get();
 
-$token =            isset($_GET['path']) ? $_GET['path'] : null;
-$controller =       new CompanyController();
+$token             = isset($_GET['path']) ? $_GET['path'] : null;
+$controller        = new CompanyController();
 
-$data =             $controller->getCompanyData($token);
-$company =          $data['company'];
-$socialNetworks  =  $data['socialNetworks'];
-$services  =        $data['services'];
-$style  =           $data['style'];
+$data              = $controller->getCompanyData($token);
+$company           = $data['company'];
+$socialNetworks    = $data['socialNetworks'];
+$services          = $data['services'];
+$style             = $data['style'];
 
-$primary_color =    $style['primary_color'];
-$secondary_color =  $style['secondary_color'];
-$background_color = $style['background_color'];
-$button_color =     $style['button_color'];
-$border_color =     $style['border_color'];
+$primary_color     = $style['primary_color'];
+$secondary_color   = $style['secondary_color'];
+$background_color  = $style['background_color'];
+$button_color      = $style['button_color'];
+$border_color      = $style['border_color'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -34,18 +34,18 @@ $border_color =     $style['border_color'];
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <style>
-    :root {
-        --primary-color: <?php echo htmlspecialchars($primary_color);
-                            ?>;
-        --secondary-color: <?php echo htmlspecialchars($secondary_color);
-                            ?>;
-        --background-color: <?php echo htmlspecialchars($background_color);
-                            ?>;
-        --button-color: <?php echo htmlspecialchars($button_color);
-                        ?>;
-        --border-color: <?php echo htmlspecialchars($border_color);
-                        ?>;
-    }
+:root {
+    --primary-color: <?php echo htmlspecialchars($primary_color);
+    ?>;
+    --secondary-color: <?php echo htmlspecialchars($secondary_color);
+    ?>;
+    --background-color: <?php echo htmlspecialchars($background_color);
+    ?>;
+    --button-color: <?php echo htmlspecialchars($button_color);
+    ?>;
+    --border-color: <?php echo htmlspecialchars($border_color);
+    ?>;
+}
 </style>
 
 <body>
@@ -56,7 +56,7 @@ $border_color =     $style['border_color'];
                 <!-- Columna 1: Logo y redes sociales -->
                 <div class="col-md-5 text-center">
                     <?php if ($company && $company['logo']) : ?>
-                        <img src="<?php echo $baseUrl . $company['logo']; ?>" alt="Logo de la Empresa" class="img-fluid">
+                    <img src="<?php echo $baseUrl . $company['logo']; ?>" alt="Logo de la Empresa" class="img-fluid">
                     <?php endif; ?>
 
                 </div>
@@ -67,9 +67,9 @@ $border_color =     $style['border_color'];
                     <div class="company-info">Teléfono: <?php echo $company['phone'] ?></div>
                     <div class="mt-3 social-icons">
                         <?php foreach ($socialNetworks as $socials) : ?>
-                            <a href="<?php echo $socials['url'] ?>" target="_blank"
-                                title="<?php echo $socials['name'] ?>"><i
-                                    class="<?php echo $socials['icon_class'] ?>"></i></a>
+                        <a href="<?php echo $socials['url'] ?>" target="_blank"
+                            title="<?php echo $socials['name'] ?>"><i
+                                class="<?php echo $socials['icon_class'] ?>"></i></a>
                         <?php endforeach; ?>
                     </div>
                 </div>
@@ -85,9 +85,9 @@ $border_color =     $style['border_color'];
                     <select id="service" name="service" class="form-select" required>
                         <option value="" selected>Selecciona un servicio</option>
                         <?php foreach ($services as $service) : ?>
-                            <option value="<?php echo $service['id']; ?>"
-                                data-observation="<?php echo htmlspecialchars($service['observations']); ?>">
-                                <?php echo htmlspecialchars($service['name']); ?></option>
+                        <option value="<?php echo $service['id']; ?>"
+                            data-observation="<?php echo htmlspecialchars($service['observations']); ?>">
+                            <?php echo htmlspecialchars($service['name']); ?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>
@@ -168,8 +168,8 @@ $border_color =     $style['border_color'];
         </div>
     </div>
     <script>
-        const baseUrl = "<?php echo $baseUrl; ?>";
-        const company_days_available = <?php echo json_encode($company['calendar_days_available']); ?>;
+    const baseUrl = "<?php echo $baseUrl; ?>";
+    const company_days_available = <?php echo json_encode($company['calendar_days_available']); ?>;
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
