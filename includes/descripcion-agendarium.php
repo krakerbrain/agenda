@@ -1,4 +1,4 @@
-<!-- Sección Descubre Agenda Road -->
+<!-- Sección Descubre Agendarium -->
 <style>
     .carousel-item h5 {
         font-size: 2.5rem;
@@ -50,8 +50,7 @@
                         <h5 class="pb-4">Independencia y Control Total</h5>
                         <div class="mx-auto pt-md-5" style="max-width: 75%;">
                             <p class="text-info">A diferencia de otras herramientas que guardan tus citas solo en sus
-                                plataformas, con Agenda
-                                Road,
+                                plataformas, con Agendarium,
                                 tus citas están siempre disponibles en tu calendario personal. Esto significa que
                                 mantienes
                                 el
@@ -79,7 +78,7 @@
                             <p class="text-info">Ya seas un médico, un entrenador personal, un terapeuta, un asesor, o
                                 cualquier
                                 otro tipo de
-                                profesional, Agenda Road se adapta a tus necesidades, simplificando el proceso de
+                                profesional, Agendarium se adapta a tus necesidades, simplificando el proceso de
                                 gestión de
                                 citas.</p>
                         </div>

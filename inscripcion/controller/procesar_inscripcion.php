@@ -53,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($emailSent) {
                 echo json_encode([
                     'success' => true,
-                    'message' => "Empresa creada exitosamente. Usuario registrado con éxito. Te enviaremos un correo para que actives tu cuenta. Bienvenido a Agenda Road."
+                    'message' => "Empresa creada exitosamente. Usuario registrado con éxito. Te enviaremos un correo para que actives tu cuenta. Bienvenido a Agendarium."
                 ]);
             } else {
                 echo json_encode([

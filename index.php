@@ -8,7 +8,7 @@ $baseUrl = ConfigUrl::get();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agenda Road</title>
+    <title>Agendarium</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -27,7 +27,7 @@ const baseUrl = '<?php echo $baseUrl; ?>';
     <nav class="navbar fixed-top">
         <div class="container">
             <!-- Marca -->
-            <a class="navbar-brand" href="#">Agenda Road</a>
+            <a class="navbar-brand" href="#">Agendarium</a>
             <!-- Botón de inicio de sesión -->
             <div class="d-flex login">
                 <a href="<?php echo $baseUrl; ?>login/index.php" class="btn text-info d-flex">
@@ -63,7 +63,7 @@ const baseUrl = '<?php echo $baseUrl; ?>';
             <div class="container p-4">
                 <div class="row align-items-center">
                     <div class="col-md-6 order-2 order-md-1 text-center text-md-start">
-                        <h1 class="mb-md-4 mt-4 mt-md-0">AGENDA ROAD</h1>
+                        <h1 class="mb-md-4 mt-4 mt-md-0">AGENDARIUM</h1>
                         <p class="text-info py-4">La herramienta de gestión de citas que necesitas para organizar tu
                             tiempo de manera
                             eficiente.</p>
@@ -74,7 +74,7 @@ const baseUrl = '<?php echo $baseUrl; ?>';
                         </div>
                     </div>
                     <div class="col-md-6 order-1 order-md-2 text-center">
-                        <img src="<?php echo $baseUrl; ?>assets/img/landing_home.png" alt="Agenda Road"
+                        <img src="<?php echo $baseUrl; ?>assets/img/landing_home.png" alt="Agendarium"
                             class="img-fluid" />
                     </div>
                 </div>
@@ -89,13 +89,13 @@ const baseUrl = '<?php echo $baseUrl; ?>';
                     <div class="flip-card-front d-flex justify-content-center align-items-center">
                         <div class="row align-items-center">
                             <div class="col-md-6 text-center">
-                                <img src="<?php echo $baseUrl; ?>assets/img/que_es_cut.png" alt="Agenda Road"
+                                <img src="<?php echo $baseUrl; ?>assets/img/que_es_cut.png" alt="Agendarium"
                                     class="img-fluid" />
                             </div>
                             <div class="col-md-6 text-center text-md-start">
-                                <h2>¿Qué es Agenda Road?</h2>
+                                <h2>¿Qué es Agendarium?</h2>
                                 <p class="text-info py-4">
-                                    Agenda Road es una herramienta de gestión de citas fácil de usar, diseñada para
+                                    Agendarium es una herramienta de gestión de citas fácil de usar, diseñada para
                                     ayudarte a organizar
                                     tu tiempo de manera eficiente.
                                 </p>
@@ -105,12 +105,12 @@ const baseUrl = '<?php echo $baseUrl; ?>';
                     </div>
                     <!-- Contenido Detrás -->
                     <div class="flip-card-back d-block pt-md-3">
-                        <?php include __DIR__ . '/includes/descripcion-agenda-road.php'; ?>
+                        <?php include __DIR__ . '/includes/descripcion-agendarium.php'; ?>
                         <!-- Botones abajo -->
                         <div class="pt-md-4">
                             <a id="show-less-info" class="btn btn-outline-light p-1 material-icons">reply</a>
                             <a href="#inscriptionModal" class="btn btn-primary flex-grow-1"
-                                data-bs-toggle="modal">¡Prueba Agenda Road Hoy Mismo!</a>
+                                data-bs-toggle="modal">¡Prueba Agendarium Hoy Mismo!</a>
                         </div>
                     </div>
                 </div>
@@ -123,13 +123,13 @@ const baseUrl = '<?php echo $baseUrl; ?>';
 
                 <div class="row align-items-center">
                     <div class="col-md-6 text-center">
-                        <img src="<?php echo $baseUrl; ?>assets/img/como_funciona.png" alt="Agenda Road"
+                        <img src="<?php echo $baseUrl; ?>assets/img/como_funciona.png" alt="Agendarium"
                             class="img-fluid w-75" />
                     </div>
                     <div class="col-md-6 text-center text-md-start">
                         <h2>¿Cómo Funciona?</h2>
                         <p class="text-info py-4">
-                            Agenda Road te permite crear, modificar y eliminar citas con facilidad. Recibe
+                            Agendarium te permite crear, modificar y eliminar citas con facilidad. Recibe
                             notificaciones y
                             recordatorios directamente en tu dispositivo.
                         </p>

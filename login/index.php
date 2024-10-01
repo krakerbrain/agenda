@@ -29,7 +29,7 @@ include '../partials/head.php';
         <div class="justify-content-center">
             <form id="loginForm" class="form-group">
                 <div class="text-center">
-                    <h4 class="display-6">LOGIN AGENDA ROAD</h4>
+                    <h4 class="display-6">LOGIN AGENDARIUM</h4>
                 </div>
                 <!-- Inputs del formulario -->
                 <div class="input-group">

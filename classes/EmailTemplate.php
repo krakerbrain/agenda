@@ -83,7 +83,7 @@ class EmailTemplate
                 throw new Exception("Empresa no encontrada.");
             }
 
-            $this->companyData['logo'] = 'https://agenda2024.online/' . $this->companyData['logo'];
+            $this->companyData['logo'] = 'https://agendarium.com/' . $this->companyData['logo'];
             $this->companyData['notas'] = json_decode($this->companyData['notas'], true);
         }
     }
