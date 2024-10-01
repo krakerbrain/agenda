@@ -53,7 +53,6 @@ export function initDatosEmpresa() {
         method: "POST",
         body: formData,
       });
-      debugger;
       const { success, message } = await response.json();
 
       if (success) {
@@ -101,7 +100,7 @@ export function initDatosEmpresa() {
           id="redPreferida-${social.id}" value="${social.id}" ${redPreferida} disabled>
       </td>
         <td>
-          <button class="btn btn-danger remove-social" data-id="${social.id}">Eliminar</button>
+          <button class="btn btn-danger remove-social" data-id="${social.id}" data-preferred="${social.red_preferida}">Eliminar</button>
         </td>
       `;
       socialsTable.appendChild(tr);
@@ -110,7 +109,8 @@ export function initDatosEmpresa() {
       document.querySelectorAll(".remove-social").forEach((button) => {
         button.addEventListener("click", (e) => {
           const socialId = e.target.dataset.id;
-          deleteSocial(socialId);
+          const preferred = e.target.dataset.preferred;
+          deleteSocial(socialId, preferred);
         });
       });
     }
@@ -154,6 +154,8 @@ export function initDatosEmpresa() {
 
           if (success) {
             alert(message);
+            // Actualizar el DOM con la nueva red preferida
+            updatePreferredSocialInDOM(selectedId);
             disableRadioInputs(true); // Deshabilitar los radios de nuevo
           }
         } catch (error) {
@@ -163,7 +165,7 @@ export function initDatosEmpresa() {
     });
   });
 
-  async function deleteSocial(socialId) {
+  async function deleteSocial(socialId, isPreferred) {
     try {
       const response = await fetch(`${baseUrl}user_admin/controllers/redesSociales.php`, {
         method: "DELETE",
@@ -175,13 +177,114 @@ export function initDatosEmpresa() {
       const { success, message } = await response.json();
 
       if (success) {
-        alert(message);
-        loadSocials();
+        // Contar las redes sociales restantes en la tabla
+        const remainingSocials = document.querySelectorAll("#social-networks tr").length;
+        if (isPreferred == 1 && remainingSocials > 1) {
+          modalSeleccionRedFavorita();
+        } else {
+          alert(message);
+          loadSocials();
+        }
       }
     } catch (error) {
       console.error(error);
     }
   }
+
+  // Función que llena el modal con las redes sociales
+  async function modalSeleccionRedFavorita() {
+    try {
+      // Obtener las redes sociales mediante fetch
+      const response = await fetch(`${baseUrl}user_admin/controllers/redesSociales.php`, {
+        method: "GET",
+      });
+
+      const { success, data } = await response.json();
+
+      if (success) {
+        getSocialsModal(data);
+
+        // Mostrar el modal
+        const modal = new bootstrap.Modal(document.getElementById("preferedSocial"));
+        modal.show();
+      }
+    } catch (error) {
+      console.error("Error al obtener las redes sociales:", error);
+    }
+  }
+
+  // Función para crear el select de redes sociales en el modal
+  function getSocialsModal(data) {
+    const modalBody = document.querySelector("#preferedSocial .modal-body");
+
+    // Limpiar contenido anterior
+    modalBody.innerHTML = "";
+
+    // Crear un select dinámico
+    const select = document.createElement("select");
+    select.classList.add("form-select");
+
+    data.forEach((redSocial) => {
+      const option = document.createElement("option");
+      option.value = redSocial.id;
+      option.textContent = redSocial.nombre;
+      select.appendChild(option);
+    });
+    modalBody.appendChild(select);
+
+    // Añadir listener al botón de aceptar
+    document.getElementById("acceptButton").addEventListener("click", () => {
+      const selectedId = select.value; // Obtener el valor seleccionado del select
+      actualizarRedPreferida(selectedId); // Actualizar la red preferida
+    });
+  }
+
+  // Función para enviar la selección de red preferida al backend
+  async function actualizarRedPreferida(selectedId) {
+    try {
+      const data = {
+        id: selectedId,
+        preferida: true,
+        action: "set_preferred",
+      };
+
+      // Enviar solicitud POST para actualizar la red preferida
+      const response = await fetch(`${baseUrl}user_admin/controllers/redesSociales.php`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      const { success, message } = await response.json();
+
+      if (success) {
+        // alert(message);
+        loadSocials();
+      } else {
+        alert("Error al actualizar la red social preferida");
+      }
+    } catch (error) {
+      console.error("Error en la solicitud:", error);
+    }
+  }
+
+  // Función para actualizar el DOM y reflejar la red preferida
+  function updatePreferredSocialInDOM(preferredId) {
+    document.querySelectorAll(".remove-social").forEach((button) => {
+      const socialId = button.dataset.id;
+
+      // Si el id coincide con el preferido, actualizar el dataset a "1"
+      if (socialId === preferredId) {
+        button.dataset.preferred = "1";
+      } else {
+        // El resto de redes no son preferidas, poner dataset a "0"
+        button.dataset.preferred = "0";
+      }
+    });
+  }
+
   const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
   const popoverList = [...popoverTriggerList].map((popoverTriggerEl) => new bootstrap.Popover(popoverTriggerEl));
 }

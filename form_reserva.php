@@ -1,39 +1,22 @@
 <?php
-require_once __DIR__ . '/configs/init.php';
-require_once __DIR__ . '/classes/Database.php';
 require_once __DIR__ . '/classes/ConfigUrl.php';
-$db = new Database();
-session_start();
-$baseUrl = ConfigUrl::get();
+require_once __DIR__ . '/reservas/controller/CompanyController.php';
+$baseUrl =          ConfigUrl::get();
 
+$token             = isset($_GET['path']) ? $_GET['path'] : null;
+$controller        = new CompanyController();
 
-$token = isset($_GET['path']) ? $_GET['path'] : null;
-$db->query("SELECT * FROM companies WHERE token = :token AND is_active = 1");
-$db->bind(':token', $token);
-$db->execute();
-$company = $db->single();
+$data              = $controller->getCompanyData($token);
+$company           = $data['company'];
+$socialNetworks    = $data['socialNetworks'];
+$services          = $data['services'];
+$style             = $data['style'];
 
-$primary_color = $company['font_color'] ?? '#525252';
-$secondary_color = $company['btn2'] ?? '#9b80ff';
-$background_color = $company['bg_color'] ?? '#bebdff';
-$button_color = $company['btn1'] ?? '#ffffff';
-$border_color = $company['font_color'] ?? '#525252';
-
-
-if (!$company) {
-    header("Location: " . $baseUrl . "error.html");
-    exit();
-}
-
-$db->query("SELECT * FROM services WHERE company_id = :company_id");
-$db->bind(':company_id', $company['id']);
-$db->execute();
-$services = $db->resultSet();
-
-$db->query("SELECT sn.name, sn.icon_class, csn.url FROM company_social_networks csn JOIN social_networks sn ON csn.social_network_id = sn.id WHERE csn.company_id = :company_id");
-$db->bind(':company_id', $company['id']);
-$db->execute();
-$socialNetworks = $db->resultSet();
+$primary_color     = $style['primary_color'];
+$secondary_color   = $style['secondary_color'];
+$background_color  = $style['background_color'];
+$button_color      = $style['button_color'];
+$border_color      = $style['border_color'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -51,18 +34,18 @@ $socialNetworks = $db->resultSet();
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <style>
-    :root {
-        --primary-color: <?php echo htmlspecialchars($primary_color);
-                            ?>;
-        --secondary-color: <?php echo htmlspecialchars($secondary_color);
-                            ?>;
-        --background-color: <?php echo htmlspecialchars($background_color);
-                            ?>;
-        --button-color: <?php echo htmlspecialchars($button_color);
-                        ?>;
-        --border-color: <?php echo htmlspecialchars($border_color);
-                        ?>;
-    }
+:root {
+    --primary-color: <?php echo htmlspecialchars($primary_color);
+    ?>;
+    --secondary-color: <?php echo htmlspecialchars($secondary_color);
+    ?>;
+    --background-color: <?php echo htmlspecialchars($background_color);
+    ?>;
+    --button-color: <?php echo htmlspecialchars($button_color);
+    ?>;
+    --border-color: <?php echo htmlspecialchars($border_color);
+    ?>;
+}
 </style>
 
 <body>
@@ -73,7 +56,7 @@ $socialNetworks = $db->resultSet();
                 <!-- Columna 1: Logo y redes sociales -->
                 <div class="col-md-5 text-center">
                     <?php if ($company && $company['logo']) : ?>
-                        <img src="<?php echo $baseUrl . $company['logo']; ?>" alt="Logo de la Empresa" class="img-fluid">
+                    <img src="<?php echo $baseUrl . $company['logo']; ?>" alt="Logo de la Empresa" class="img-fluid">
                     <?php endif; ?>
 
                 </div>
@@ -84,9 +67,9 @@ $socialNetworks = $db->resultSet();
                     <div class="company-info">Teléfono: <?php echo $company['phone'] ?></div>
                     <div class="mt-3 social-icons">
                         <?php foreach ($socialNetworks as $socials) : ?>
-                            <a href="<?php echo $socials['url'] ?>" target="_blank"
-                                title="<?php echo $socials['name'] ?>"><i
-                                    class="<?php echo $socials['icon_class'] ?>"></i></a>
+                        <a href="<?php echo $socials['url'] ?>" target="_blank"
+                            title="<?php echo $socials['name'] ?>"><i
+                                class="<?php echo $socials['icon_class'] ?>"></i></a>
                         <?php endforeach; ?>
                     </div>
                 </div>
@@ -102,9 +85,9 @@ $socialNetworks = $db->resultSet();
                     <select id="service" name="service" class="form-select" required>
                         <option value="" selected>Selecciona un servicio</option>
                         <?php foreach ($services as $service) : ?>
-                            <option value="<?php echo $service['id']; ?>"
-                                data-observation="<?php echo htmlspecialchars($service['observations']); ?>">
-                                <?php echo htmlspecialchars($service['name']); ?></option>
+                        <option value="<?php echo $service['id']; ?>"
+                            data-observation="<?php echo htmlspecialchars($service['observations']); ?>">
+                            <?php echo htmlspecialchars($service['name']); ?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>
@@ -185,8 +168,8 @@ $socialNetworks = $db->resultSet();
         </div>
     </div>
     <script>
-        const baseUrl = "<?php echo $baseUrl; ?>";
-        const company_days_available = <?php echo json_encode($company['calendar_days_available']); ?>;
+    const baseUrl = "<?php echo $baseUrl; ?>";
+    const company_days_available = <?php echo json_encode($company['calendar_days_available']); ?>;
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
