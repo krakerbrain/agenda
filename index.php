@@ -70,7 +70,7 @@ const baseUrl = '<?php echo $baseUrl; ?>';
                         <div class="d-grid gap-2 d-md-flex mt-md-4">
                             <a href="#about-us" class="btn conocenos-btn flex-grow-1 scroll-nav">Conócenos</a>
                             <a href="#inscriptionModal" class="btn btn-primary flex-grow-1"
-                                data-bs-toggle="modal">Pruebalo Gratis</a>
+                                data-bs-toggle="modal">Pruebalo gratis por 1 mes</a>
                         </div>
                     </div>
                     <div class="col-md-6 order-1 order-md-2 text-center">

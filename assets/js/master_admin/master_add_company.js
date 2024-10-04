@@ -4,13 +4,13 @@ export function initAddCompany() {
     // Mostrar spinner y deshabilitar botón
     displaySpinner("addCompany", true);
     const formData = new FormData(this);
+
     try {
       const response = await fetch(`${baseUrl}user_admin/controllers/add_company.php`, {
         method: "POST",
         body: formData,
       });
       const { success, company_id, error } = await response.json();
-
       if (success) {
         document.getElementById("company_id").value = company_id;
         //limpiar formulario
