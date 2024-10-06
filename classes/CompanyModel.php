@@ -11,10 +11,10 @@ class CompanyModel
         $this->db = new Database(); // Usa la clase Database
     }
 
-    public function getCompanyByToken($token)
+    public function getCompanyByUrl($url)
     {
-        $this->db->query("SELECT id, logo, name, address, phone, schedule_mode, calendar_days_available, font_color, btn2, bg_color, btn1 FROM companies WHERE token = :token AND is_active = 1");
-        $this->db->bind(':token', $token);
+        $this->db->query("SELECT id, logo, name, address, phone, schedule_mode, calendar_days_available, font_color, btn2, bg_color, btn1 FROM companies WHERE custom_url = :url AND is_active = 1");
+        $this->db->bind(':url', $url);
         return $this->db->single();
     }
 

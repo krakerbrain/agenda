@@ -145,7 +145,7 @@ document.querySelector("#companyForm").addEventListener("submit", async function
       body: formData,
     });
 
-    const { success, message } = await response.json(); // Convertir la respuesta a JSON
+    const { success, message, error, debug } = await response.json(); // Convertir la respuesta a JSON
 
     if (success) {
       // Obtener el modal de inscripción
@@ -167,11 +167,12 @@ document.querySelector("#companyForm").addEventListener("submit", async function
     } else {
       // Mostrar el mensaje de error en el modal de respuesta
       const responseMessage = document.getElementById("responseMessage");
-      responseMessage.innerText = message;
+      responseMessage.innerText = message == null ? error : message;
 
       // Mostrar el modal de respuesta
       const responseModal = new bootstrap.Modal(document.getElementById("responseModal"));
       responseModal.show();
+      console.error(debug);
     }
   } catch (error) {
     console.error("Error:", error);

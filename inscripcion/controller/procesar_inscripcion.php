@@ -70,10 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     } else {
         // Error al crear la empresa
-        echo json_encode([
-            'success' => false,
-            'message' => "Error al crear la empresa: " . $result['error']
-        ]);
+        echo json_encode($result);
     }
 } else {
     echo json_encode([

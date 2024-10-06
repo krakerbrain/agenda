@@ -33,7 +33,7 @@ export function initCompanyList() {
             </td>
             <td data-cell="logo" class="data"><img src="${baseUrl}${company.logo}" alt="Logo" style="width:70px"></td>
             <td data-cell="nombre" class="data">${company.name}</td>
-            <td data-cell="url" class="data"><a href="${baseUrl}${company.token}" target="_blank">URL FORM</a></td>
+            <td data-cell="url" class="data"><a href="${baseUrl}reservas/${company.custom_url}" target="_blank">URL FORM</a></td>
             <td data-cell="accion">
                 <button class="btn btn-danger btn-sm eliminarReserva" title="Eliminar reserva" data-id="${company.id}">
                     <i class="fas fa-times"></i>

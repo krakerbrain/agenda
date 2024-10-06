@@ -28,33 +28,33 @@ $btnSecondaryColor = $company['btn2'];
 
 ?>
 <style>
-    #example-card {
-        background-color: <?= $bgColor ?>;
-    }
+#example-card {
+    background-color: <?=$bgColor ?>;
+}
 
-    #card-title {
-        color: <?= $fontColor ?>;
-    }
+#card-title {
+    color: <?=$fontColor ?>;
+}
 
-    #card-text {
-        color: <?= $fontColor ?>;
-    }
+#card-text {
+    color: <?=$fontColor ?>;
+}
 
-    #btn-primary-example {
-        background-color: <?= $btnPrimaryColor ?>;
-        border-color: <?= $btnPrimaryColor ?>;
-        color: <?= $fontColor ?>;
-    }
+#btn-primary-example {
+    background-color: <?=$btnPrimaryColor ?>;
+    border-color: <?=$btnPrimaryColor ?>;
+    color: <?=$fontColor ?>;
+}
 
-    #btn-secondary-example {
-        background-color: <?= $btnSecondaryColor ?>;
-        border-color: <?= $btnSecondaryColor ?>;
-        color: <?= $fontColor ?>;
-    }
+#btn-secondary-example {
+    background-color: <?=$btnSecondaryColor ?>;
+    border-color: <?=$btnSecondaryColor ?>;
+    color: <?=$fontColor ?>;
+}
 
-    .help i {
-        font-size: 1.4rem;
-    }
+.help i {
+    font-size: 1.4rem;
+}
 </style>
 <div class="container my-4">
     <form id="companyConfigForm">
@@ -174,8 +174,8 @@ $btnSecondaryColor = $company['btn2'];
                     class="fa fa-circle-question text-primary"></i></a>
         </div>
         <div class="input-group mb-3">
-            <input type="text" class="form-control" id="urlToCopy" value="<?php echo $baseUrl . $company['token']; ?>"
-                readonly>
+            <input type="text" class="form-control" id="urlToCopy"
+                value="<?php echo $baseUrl .'reservas/'. $company['custom_url']; ?>" readonly>
             <button class="btn btn-outline-secondary copyToClipboard" type="button">Copiar URL</button>
         </div>
         <button type="submit" class="btn btn-success">Guardar Configuración</button>

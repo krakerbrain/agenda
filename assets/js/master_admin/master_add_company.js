@@ -10,7 +10,7 @@ export function initAddCompany() {
         method: "POST",
         body: formData,
       });
-      const { success, company_id, error } = await response.json();
+      const { success, company_id, error, debug } = await response.json();
       if (success) {
         document.getElementById("company_id").value = company_id;
         //limpiar formulario
@@ -18,9 +18,10 @@ export function initAddCompany() {
         alert("Empresa agregada exitosamente");
       } else {
         alert(error);
+        console.error("Error:", debug);
       }
-    } catch (error) {
-      console.error("Error:", error);
+    } catch (debug) {
+      console.error("Error:", debug);
     } finally {
       // Ocultar spinner y habilitar botón
       displaySpinner("addCompany", false);

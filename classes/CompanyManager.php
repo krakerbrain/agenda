@@ -1,4 +1,6 @@
 <?php
+
+require_once dirname(__DIR__) . '/configs/init.php';
 require_once dirname(__DIR__) . '/classes/Database.php';
 require_once dirname(__DIR__) . '/classes/FileManager.php';
 
@@ -7,15 +9,16 @@ class CompanyManager
     private $db;
     private $fileManager;
 
-    public function __construct()
+    // Modificar el constructor para aceptar dependencias
+    public function __construct(Database $db = null, FileManager $fileManager = null)
     {
-        $this->db = new Database(); // Usa la clase Database
-        $this->fileManager = new FileManager();
+        $this->db = $db ?? new Database(); // Usa la clase Database o la inyectada
+        $this->fileManager = $fileManager ?? new FileManager(); // Usa FileManager o la inyectada
     }
 
     public function getCompanyDataForCompanyList()
     {
-        $sql = "SELECT id, name, logo, is_active, token FROM companies";
+        $sql = "SELECT id, name, logo, is_active, custom_url FROM companies";
         $this->db->query($sql);
         return $this->db->resultSet();
     }
@@ -66,6 +69,8 @@ class CompanyManager
                 $this->db->execute();
             }
 
+            $this->urlConverter($company_id, $name);
+
             // Insertar los horarios de trabajo de la nueva compañía
             $days = [1, 2, 3, 4, 5, 6, 7]; // Lunes a Domingo
             foreach ($days as $day) {
@@ -82,13 +87,88 @@ class CompanyManager
 
             return ['success' => true, 'company_id' => $company_id];
         } catch (Exception $e) {
-            $this->db->cancelTransaction(); // Rollback de la transacción en caso de error
-            return ['success' => false, 'error' => 'Error al agregar la empresa: ' . $e->getMessage()];
+            $this->db->cancelTransaction(); // Rollback de la transacción
+
+            // Verificar si el error es de tipo "clave duplicada"
+            if ($e->getCode() == 23000 && strpos($e->getMessage(), '1062 Duplicate entry') !== false) {
+                return [
+                    'success' => false,
+                    'error' => 'Esta empresa ya ha sido creada.',
+                    'debug' => $e->getMessage() // Añadimos el mensaje técnico para el log
+                ];
+            }
+
+            // Otro tipo de error
+            return [
+                'success' => false,
+                'error' => 'Error al agregar la empresa.',
+                'debug' => $e->getMessage() // Añadimos el mensaje técnico para el log
+            ];
         }
     }
 
+    public function urlConverter($company_id, $company_name)
+    {
+        // Limpiar el nombre de la empresa
+        $cleanedCompanyName = $this->cleanCompanyName($company_name);
+        $max_length = 20;
+
+        // Generar el slug base
+        $baseSlug = URLify::slug($cleanedCompanyName, $max_length, '-');
+        $count = 0;
+
+        // Buscar una URL única
+        do {
+            $urlSlug = $baseSlug . ($count > 0 ? '-' . $count : '');
+            $sql = "SELECT COUNT(*) AS count FROM companies WHERE custom_url = :url";
+            $this->db->query($sql);
+            $this->db->bind(':url', $urlSlug);
+            $result = $this->db->single();
+
+            if (isset($result['count']) && $result['count'] == 0) {
+                // URL no existe, romper el bucle
+                break;
+            }
+
+            $count++;
+        } while (true);  // Terminará cuando encuentre un slug único
+
+        // Guardar la URL en la base de datos
+        $query = "UPDATE companies SET custom_url = :url WHERE id = :id";
+        $this->db->query($query);
+        $this->db->bind(':url', $urlSlug);
+        $this->db->bind(':id', $company_id);
+        $this->db->execute();
+
+        return true;
+    }
+
+    private function cleanCompanyName($companyName)
+    {
+        // Definir palabras a eliminar
+        $removeWords = ['la', 'los', 'el', 'y', 'de'];
+
+        // Convertir el nombre a minúsculas
+        $companyName = mb_strtolower($companyName);
+
+        // Eliminar palabras no deseadas
+        $companyName = preg_replace('/\b(' . implode('|', $removeWords) . ')\b/', '', $companyName);
+
+        // Eliminar caracteres especiales y reemplazar múltiples espacios con uno solo
+        $companyName = preg_replace('/[^a-z0-9\s-]/', '', $companyName);
+        $companyName = preg_replace('/\s+/', ' ', $companyName);
+
+        // Trim spaces
+        $companyName = trim($companyName);
+
+        // Reemplazar espacios con guiones
+        $companyName = str_replace(' ', '-', $companyName);
+
+        return $companyName;
+    }
+
+
     // Función para actualizar los datos de una empresa
-    // $sql = $conn->prepare("UPDATE companies SET logo = :logo, phone = :phone, address = :address, description = :description WHERE id = :id");
     public function updateCompanyData($company_id, $data)
     {
         try {
