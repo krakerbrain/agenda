@@ -12,9 +12,9 @@ class CompanyController
         $this->companyModel = new CompanyModel();
     }
 
-    public function getCompanyData($token)
+    public function getCompanyData($url)
     {
-        $company = $this->companyModel->getCompanyByToken($token);
+        $company = $this->companyModel->getCompanyByUrl($url);
 
         if (!$company) {
             http_response_code(404);

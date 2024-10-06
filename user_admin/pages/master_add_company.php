@@ -7,8 +7,9 @@
                         <h4 class="card-title mb-4 text-center">Agregar Empresa</h4>
                         <form id="addCompanyForm">
                             <div class="mb-3">
-                                <label for="name" class="form-label">Nombre de la Empresa:</label>
-                                <input type="text" class="form-control" id="name" name="name" required>
+                                <label for="business_name" class="form-label">Nombre de la Empresa:</label>
+                                <input type="text" class="form-control" id="business_name" name="business_name"
+                                    required>
                             </div>
                             <div class="mb-3">
                                 <label for="logo" class="form-label">Logo (opcional):</label>
