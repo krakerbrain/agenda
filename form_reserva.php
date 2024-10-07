@@ -34,29 +34,29 @@ $border_color      = $style['border_color'];
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <style>
-    :root {
-        --primary-color: <?php echo htmlspecialchars($primary_color);
-                            ?>;
-        --secondary-color: <?php echo htmlspecialchars($secondary_color);
-                            ?>;
-        --background-color: <?php echo htmlspecialchars($background_color);
-                            ?>;
-        --button-color: <?php echo htmlspecialchars($button_color);
-                        ?>;
-        --border-color: <?php echo htmlspecialchars($border_color);
-                        ?>;
-    }
+:root {
+    --primary-color: <?php echo htmlspecialchars($primary_color);
+    ?>;
+    --secondary-color: <?php echo htmlspecialchars($secondary_color);
+    ?>;
+    --background-color: <?php echo htmlspecialchars($background_color);
+    ?>;
+    --button-color: <?php echo htmlspecialchars($button_color);
+    ?>;
+    --border-color: <?php echo htmlspecialchars($border_color);
+    ?>;
+}
 </style>
 
 <body>
-    <div class="container mt-5">
+    <div class="container mt-3">
         <!-- Tarjeta de Información de la Empresa -->
         <div class="company-card mb-3">
             <div class="row">
                 <!-- Columna 1: Logo y redes sociales -->
                 <div class="col-md-5 text-center">
                     <?php if ($company && $company['logo']) : ?>
-                        <img src="<?php echo $baseUrl . $company['logo']; ?>" alt="Logo de la Empresa" class="img-fluid">
+                    <img src="<?php echo $baseUrl . $company['logo']; ?>" alt="Logo de la Empresa" class="img-fluid">
                     <?php endif; ?>
 
                 </div>
@@ -67,9 +67,9 @@ $border_color      = $style['border_color'];
                     <div class="company-info">Teléfono: <?php echo $company['phone'] ?></div>
                     <div class="mt-3 social-icons">
                         <?php foreach ($socialNetworks as $socials) : ?>
-                            <a href="<?php echo $socials['url'] ?>" target="_blank"
-                                title="<?php echo $socials['name'] ?>"><i
-                                    class="<?php echo $socials['icon_class'] ?>"></i></a>
+                        <a href="<?php echo $socials['url'] ?>" target="_blank"
+                            title="<?php echo $socials['name'] ?>"><i
+                                class="<?php echo $socials['icon_class'] ?>"></i></a>
                         <?php endforeach; ?>
                     </div>
                 </div>
@@ -79,15 +79,15 @@ $border_color      = $style['border_color'];
 
             <!-- PASO 1 -->
             <div id="step1" class="step">
-                <h2 class="text-center mb-4">Paso 1: Escoge el Servicio</h2>
+                <h4 class="text-center mb-4 pass-title">Paso 1: Escoge el Servicio</h4>
                 <div class="mb-3">
                     <label for="service" class="form-label">Servicio:</label>
                     <select id="service" name="service" class="form-select" required>
                         <option value="" selected>Selecciona un servicio</option>
                         <?php foreach ($services as $service) : ?>
-                            <option value="<?php echo $service['id']; ?>"
-                                data-observation="<?php echo htmlspecialchars($service['observations']); ?>">
-                                <?php echo htmlspecialchars($service['name']); ?></option>
+                        <option value="<?php echo $service['id']; ?>"
+                            data-observation="<?php echo htmlspecialchars($service['observations']); ?>">
+                            <?php echo htmlspecialchars($service['name']); ?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>
@@ -110,7 +110,7 @@ $border_color      = $style['border_color'];
             </div>
             <!-- PASO 2 -->
             <div id="step2" class="step d-none">
-                <h2 class="text-center mb-4">Paso 2: Escoge Fecha y Hora</h2>
+                <h4 class="text-center mb-4 pass-title">Paso 2: Escoge Fecha y Hora</h4>
                 <div class="mb-3">
                     <label for="date" class="form-label">Fecha:</label>
                     <input type="date" id="date" name="date" class="form-control" required>
@@ -128,7 +128,7 @@ $border_color      = $style['border_color'];
             </div>
             <!-- PASO 3 -->
             <div id="step3" class="step d-none">
-                <h2 class="text-center mb-4">Paso 3: Llena tus Datos</h2>
+                <h4 class="text-center mb-4 pass-title">Paso 3: Llena tus Datos</h4>
                 <input type="hidden" name="company_id" id="company_id"
                     value="<?php echo htmlspecialchars($company['id']); ?>">
                 <div class="mb-3">
@@ -168,8 +168,8 @@ $border_color      = $style['border_color'];
         </div>
     </div>
     <script>
-        const baseUrl = "<?php echo $baseUrl; ?>";
-        const company_days_available = <?php echo json_encode($company['calendar_days_available']); ?>;
+    const baseUrl = "<?php echo $baseUrl; ?>";
+    const company_days_available = <?php echo json_encode($company['calendar_days_available']); ?>;
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>

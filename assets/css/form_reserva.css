@@ -2,7 +2,7 @@ body {
   background-color: var(--background-color);
 }
 
-h2 {
+.pass-title {
   color: var(--primary-color);
 }
 
@@ -53,12 +53,6 @@ h2 {
   min-width: 150px;
 }
 
-@media (max-width: 768px) {
-  .company-card img {
-    width: 70%;
-  }
-}
-
 #appointmentForm {
   border-radius: 0 0 10px 10px;
 }
@@ -76,7 +70,7 @@ h2 {
 }
 
 .social-icons a {
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   margin: 0 10px;
   color: var(--primary-color);
 }
@@ -87,4 +81,13 @@ h2 {
 
 .container {
   margin-top: 50px;
+}
+
+@media (max-width: 768px) {
+  .company-card img {
+    width: 55%;
+  }
+  .company-info {
+    font-size: 0.9rem;
+  }
 }
