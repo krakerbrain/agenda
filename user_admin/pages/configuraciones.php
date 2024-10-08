@@ -1,20 +1,15 @@
 <?php
 require_once dirname(__DIR__, 2) . '/access-token/seguridad/JWTAuth.php';
-require_once dirname(__DIR__, 2) . '/classes/DatabaseSessionManager.php';
+require_once dirname(__DIR__, 2) . '/classes/CompanyManager.php';
 require_once dirname(__DIR__, 2) . '/classes/ConfigUrl.php';
 
 $baseUrl = ConfigUrl::get();
-$manager = new DatabaseSessionManager();
+$company = new CompanyManager();
 $auth = new JWTAuth();
 $datosUsuario = $auth->validarTokenUsuario();
 
 $company_id = $datosUsuario['company_id'];
-$conn = $manager->getDB();
-
-$sql = $conn->prepare("SELECT * FROM companies WHERE id = :company_id  AND is_active = 1");
-$sql->bindParam(':company_id', $company_id);
-$sql->execute();
-$company = $sql->fetch(PDO::FETCH_ASSOC);
+$company = $company->getAllCompanyData($company_id);
 
 if (!$company) {
     echo "Empresa no encontrada o inactiva.";
@@ -28,33 +23,33 @@ $btnSecondaryColor = $company['btn2'];
 
 ?>
 <style>
-#example-card {
-    background-color: <?=$bgColor ?>;
-}
+    #example-card {
+        background-color: <?= $bgColor ?>;
+    }
 
-#card-title {
-    color: <?=$fontColor ?>;
-}
+    #card-title {
+        color: <?= $fontColor ?>;
+    }
 
-#card-text {
-    color: <?=$fontColor ?>;
-}
+    #card-text {
+        color: <?= $fontColor ?>;
+    }
 
-#btn-primary-example {
-    background-color: <?=$btnPrimaryColor ?>;
-    border-color: <?=$btnPrimaryColor ?>;
-    color: <?=$fontColor ?>;
-}
+    #btn-primary-example {
+        background-color: <?= $btnPrimaryColor ?>;
+        border-color: <?= $btnPrimaryColor ?>;
+        color: <?= $fontColor ?>;
+    }
 
-#btn-secondary-example {
-    background-color: <?=$btnSecondaryColor ?>;
-    border-color: <?=$btnSecondaryColor ?>;
-    color: <?=$fontColor ?>;
-}
+    #btn-secondary-example {
+        background-color: <?= $btnSecondaryColor ?>;
+        border-color: <?= $btnSecondaryColor ?>;
+        color: <?= $fontColor ?>;
+    }
 
-.help i {
-    font-size: 1.4rem;
-}
+    .help i {
+        font-size: 1.4rem;
+    }
 </style>
 <div class="container my-4">
     <form id="companyConfigForm">
@@ -175,7 +170,7 @@ $btnSecondaryColor = $company['btn2'];
         </div>
         <div class="input-group mb-3">
             <input type="text" class="form-control" id="urlToCopy"
-                value="<?php echo $baseUrl .'reservas/'. $company['custom_url']; ?>" readonly>
+                value="<?php echo $baseUrl . 'reservas/' . $company['custom_url']; ?>" readonly>
             <button class="btn btn-outline-secondary copyToClipboard" type="button">Copiar URL</button>
         </div>
         <button type="submit" class="btn btn-success">Guardar Configuración</button>
