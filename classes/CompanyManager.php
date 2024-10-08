@@ -16,6 +16,14 @@ class CompanyManager
         $this->fileManager = $fileManager ?? new FileManager(); // Usa FileManager o la inyectada
     }
 
+    public function getAllActiveCompanies()
+    {
+        $sql = "SELECT id FROM companies WHERE is_active = 1";
+        $this->db->query($sql);
+        return $this->db->resultSet();
+    }
+
+
     public function getCompanyDataForCompanyList()
     {
         $sql = "SELECT id, name, logo, is_active, custom_url FROM companies";
@@ -29,6 +37,13 @@ class CompanyManager
         $this->db->query($sql);
         $this->db->bind(':id', $company_id);
         return $this->db->resultSet();
+    }
+    public function getAllCompanyData($company_id)
+    {
+        $sql = "SELECT * FROM companies WHERE id = :id AND is_active = 1";
+        $this->db->query($sql);
+        $this->db->bind(':id', $company_id);
+        return $this->db->single();
     }
     // Función para crear una nueva empresa
     public function createCompany($name, $phone, $address, $logo = null, $status = 1)
@@ -231,5 +246,33 @@ class CompanyManager
 
             return ['success' => false, 'error' => 'Error al eliminar la empresa: ' . $e->getMessage()];
         }
+    }
+
+    public function removePastBlockedDates($company_id)
+    {
+        // Obtener las fechas bloqueadas
+        $sql = "SELECT blocked_dates FROM companies WHERE id = :id";
+        $this->db->query($sql);
+        $this->db->bind(':id', $company_id);
+        $blockedDates = $this->db->single()['blocked_dates'];
+
+        // Convertir las fechas bloqueadas a un array
+        $datesArray = explode(',', $blockedDates);
+        $currentDate = date('Y-m-d');
+
+        // Filtrar las fechas que ya han pasado
+        $futureDates = array_filter($datesArray, function ($date) use ($currentDate) {
+            return $date >= $currentDate;
+        });
+
+        // Volver a convertir el array en una cadena de texto
+        $updatedBlockedDates = implode(',', $futureDates);
+
+        // Actualizar la base de datos
+        $sqlUpdate = "UPDATE companies SET blocked_dates = :blocked_dates WHERE id = :id";
+        $this->db->query($sqlUpdate);
+        $this->db->bind(':blocked_dates', $updatedBlockedDates);
+        $this->db->bind(':id', $company_id);
+        return $this->db->execute();
     }
 }
