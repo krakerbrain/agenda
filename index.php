@@ -70,7 +70,7 @@ const baseUrl = '<?php echo $baseUrl; ?>';
                         <div class="d-grid gap-2 d-md-flex mt-md-4">
                             <a href="#about-us" class="btn conocenos-btn flex-grow-1 scroll-nav">Conócenos</a>
                             <a href="#inscriptionModal" class="btn btn-primary flex-grow-1"
-                                data-bs-toggle="modal">Pruebalo gratis por 1 mes</a>
+                                data-bs-toggle="modal">Pruebalo gratis por 15 dias</a>
                         </div>
                     </div>
                     <div class="col-md-6 order-1 order-md-2 text-center">
@@ -145,7 +145,8 @@ const baseUrl = '<?php echo $baseUrl; ?>';
                 <div class="free-text-container">
                     <h2>Nuestros Planes</h2>
                     <p class="text-info py-4">
-                        Prueba todas las funcionalidades gratis por 1 mes. Si te gusta puedes continuar por solo $5.000
+                        Prueba todas las funcionalidades gratis por 15 dias. Si te gusta puedes continuar por solo
+                        $9.000
                         al mes
                     </p>
                     <a href="#inscriptionModal" data-bs-toggle="modal" class="btn btn-primary">Solicita Gratis</a>

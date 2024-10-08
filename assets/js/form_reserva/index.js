@@ -108,6 +108,42 @@ function getAvailableDays() {
     company_id: companyId,
   };
 
+  // Función anidada para registrar eventos en fechas deshabilitadas
+  function registerDisabledDateClickEvents(instance) {
+    const calendarDaysAvailable = company_days_available; // Número de días que el calendario permite seleccionar
+    const today = new Date(); // Fecha actual
+    const maxDate = new Date().fp_incr(calendarDaysAvailable); // Fecha máxima permitida sumando los días disponibles
+
+    // Selecciona solo los elementos con la clase .flatpickr-disabled dentro de .dayContainer
+    document.querySelectorAll(".dayContainer .flatpickr-disabled").forEach((element) => {
+      element.addEventListener("click", function () {
+        // Obtenemos la fecha del aria-label (ejemplo: "October 9, 2024")
+        const dateString = element.getAttribute("aria-label");
+        const clickedDate = new Date(dateString); // Convertimos el string a objeto Date
+
+        let message; // Variable para el mensaje
+        let modalTitle = document.querySelector(".modal-title");
+        if (clickedDate > maxDate) {
+          // Si la fecha es mayor a la fecha máxima permitida
+          modalTitle.textContent = "Fecha deshabilitada";
+          message = `Lo sentimos, esta fecha aún no ha sido habilitada para reservas.`;
+        } else {
+          // Si es una fecha anterior pero está deshabilitada
+          modalTitle.textContent = "Fecha ocupada";
+          message = `Lo sentimos, esta fecha ya ha sido reservada.`;
+        }
+
+        // Cerrar el calendario antes de mostrar el modal
+        instance.close();
+        // Mostrar el mensaje en el modal
+        const modalBody = document.querySelector(".modal-body");
+        modalBody.innerText = message;
+        const modal = new bootstrap.Modal(document.getElementById("responseModal"));
+        modal.show();
+      });
+    });
+  }
+
   fetch(url, {
     method: "POST",
     body: JSON.stringify(data),
@@ -127,6 +163,22 @@ function getAvailableDays() {
           enable: [
             function (date) {
               return availableDates.includes(date.toISOString().split("T")[0]);
+            },
+          ],
+          onReady: [
+            function (selectedDates, dateStr, instance) {
+              registerDisabledDateClickEvents(instance);
+            },
+          ],
+          onValueUpdate: [
+            function (selectedDates, dateStr, instance) {
+              console.log(availableDates);
+              registerDisabledDateClickEvents(instance);
+            },
+          ],
+          onMonthChange: [
+            function (selectedDates, dateStr, instance) {
+              registerDisabledDateClickEvents(instance);
             },
           ],
         });

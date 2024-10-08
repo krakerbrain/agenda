@@ -5,7 +5,7 @@
             <div class="modal-header">
                 <div>
                     <h5 class="modal-title" id="inscriptionModalLabel">Formulario de Inscripción</h5>
-                    <small>Prueba Gratis por 1 mes. Después $5.000 al mes</small>
+                    <small>Prueba Gratis por 15 dias. Después $9.000 al mes</small>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
