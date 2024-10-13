@@ -19,8 +19,8 @@ if (!$company) {
     exit;
 }
 
-// Obtener la duración del servicio
-$sql_service = $conn->prepare("SELECT duration FROM services WHERE id = :service_id");
+// Obtener la duración del servicio y los días disponibles
+$sql_service = $conn->prepare("SELECT duration, available_days FROM services WHERE id = :service_id");
 $sql_service->bindParam(':service_id', $service_id);
 $sql_service->execute();
 $service = $sql_service->fetch(PDO::FETCH_ASSOC);
@@ -34,8 +34,12 @@ if (!$service) {
 $service_duration = floatval($service['duration']);
 $service_duration_minutes = (int)($service_duration * 60);
 
+// Convertir available_days a un array de enteros
+$service_available_days = array_map('intval', explode(',', $service['available_days']));
+
 // Obtener días laborales y fechas bloqueadas
 $blocked_dates = explode(',', $company['blocked_dates']);
+
 // Obtener días laborables y horarios de trabajo desde company_schedules
 $sql_schedules = $conn->prepare("
     SELECT day_id, work_start, work_end, break_start, break_end 
@@ -68,9 +72,7 @@ foreach ($schedules as $schedule) {
     ];
 }
 
-
 // Rango de fechas (hoy + 30 días)
-
 $start_date = new DateTime();
 $end_date = new DateTime();
 $end_date->modify('+' . $calendar_days_available . ' days');
@@ -100,7 +102,7 @@ $daterange = new DatePeriod($start_date, $interval, $end_date);
 $available_days = [];
 
 foreach ($daterange as $date) {
-    $day_of_week = $date->format('w'); // Obtiene el día de la semana en formato numérico
+    $day_of_week = (int)$date->format('N'); // 1 (lunes) a 7 (domingo)
     $date_str = $date->format('Y-m-d');
 
     // Evitar el día actual
@@ -108,6 +110,12 @@ foreach ($daterange as $date) {
         continue; // Saltar la fecha si es el mismo día
     }
 
+    // Verificar si el día está en los available_days del servicio
+    if (!in_array($day_of_week, $service_available_days)) {
+        continue; // Saltar esta fecha si el servicio no está disponible ese día
+    }
+
+    // Verificar si es un día laborable y no está bloqueado
     if (isset($work_days[$day_of_week]) && !in_array($date_str, $blocked_dates)) {
         // Obtener horarios disponibles para el día
         $work_start = $work_days[$day_of_week]['work_start'];
@@ -142,9 +150,9 @@ foreach ($daterange as $date) {
                 $end_time = clone $current_time;
                 $end_time->add(new DateInterval('PT' . $service_duration_minutes . 'M'));
 
-                // Validar que el bloque de tiempo sea suficientemente largo y no caiga en el período de descanso
+                // Validar que el bloque de tiempo no caiga en el período de descanso
                 if ($current_time < $break_start && $end_time > $break_start) {
-                    if (($break_start->getTimestamp() - $current_time->getTimestamp()) >= $service_duration_minutes * 60) {
+                    if (($break_start->getTimestamp() - $current_time->getTimestamp()) >= ($service_duration_minutes * 60)) {
                         $available_times[] = [
                             'start' => $current_time->format('H:i'),
                             'end' => $break_start->format('H:i')

@@ -130,7 +130,7 @@ function getAvailableDays() {
         } else {
           // Si es una fecha anterior pero está deshabilitada
           modalTitle.textContent = "Fecha ocupada";
-          message = `Lo sentimos, esta fecha ya ha sido reservada.`;
+          message = `Lo sentimos, este día no está disponible para reservas.`;
         }
 
         // Cerrar el calendario antes de mostrar el modal
@@ -172,7 +172,6 @@ function getAvailableDays() {
           ],
           onValueUpdate: [
             function (selectedDates, dateStr, instance) {
-              console.log(availableDates);
               registerDisabledDateClickEvents(instance);
             },
           ],

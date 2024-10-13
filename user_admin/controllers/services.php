@@ -3,6 +3,7 @@ require_once dirname(__DIR__, 2) . '/access-token/seguridad/JWTAuth.php';
 require_once dirname(__DIR__, 2) . '/classes/DatabaseSessionManager.php';
 require_once dirname(__DIR__, 2) . '/classes/ConfigUrl.php';
 require_once dirname(__DIR__, 2) . '/classes/Services.php';
+require_once dirname(__DIR__, 2) . '/classes/Schedules.php'; // Incluir la clase Schedules
 
 $baseUrl = ConfigUrl::get();
 $manager = new DatabaseSessionManager();
@@ -10,10 +11,10 @@ $auth = new JWTAuth();
 $datosUsuario = $auth->validarTokenUsuario();
 $conn = $manager->getDB();
 
-
 try {
     $company_id = $datosUsuario['company_id'];
     $services = new Services($conn, $company_id);
+    $schedules = new Schedules($conn, $company_id); // Instanciar la clase Schedules
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Procesar la data del formulario
@@ -40,10 +41,20 @@ try {
             echo json_encode(['success' => true, 'message' => 'Categoría eliminada exitosamente.']);
         }
     } else {
-        // Obtener los servicios y devolver el JSON
+        // Obtener los servicios y los horarios
+        $servicesData = $services->getServices();
+        $schedulesData = $schedules->getSchedules(); // Obtener los horarios
+
+        // Enviar ambos conjuntos de datos al frontend
         header('Content-Type: application/json');
-        echo json_encode(['success' => true, 'data' => $services->getServices()]);
+        echo json_encode([
+            'success' => true,
+            'data' => [
+                'services' => $servicesData,
+                'schedules' => $schedulesData // Incluir horarios en la respuesta
+            ]
+        ]);
     }
-} catch (PDOException $e) {
-    echo json_encode(['success' => false, 'message' => 'Connection failed: ' . $e->getMessage()]);
+} catch (Exception $e) {
+    echo json_encode(['success' => false, 'message' => $e->getMessage()]);
 }

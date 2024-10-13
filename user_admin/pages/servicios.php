@@ -16,6 +16,7 @@
                     <th>Duración (horas)</th>
                     <th>Observaciones</th>
                     <th>Categorías</th>
+                    <th>Días Disponible</th>
                     <th>Acción</th>
                 </tr>
             </thead>
