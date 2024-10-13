@@ -15,12 +15,14 @@ export function initServicios() {
         // Limpiar el cuerpo de la tabla
         tableBody.innerHTML = "";
 
-        const servicesData = data.data;
+        const { services, schedules } = data.data; // Extraer services y schedules
 
-        if (servicesData.length > 0) {
+        // Procesar los días habilitados/deshabilitados a partir de schedules
+        const daysStatus = processSchedules(schedules);
+        if (services.length > 0) {
           // Llenar la página con los datos obtenidos
-          servicesData.forEach((service) => {
-            addService(service);
+          services.forEach((service) => {
+            addService(service, schedules, daysStatus); // Pasar schedules a addService
           });
         }
         // Añadir una fila en blanco para un nuevo servicio
@@ -106,6 +108,11 @@ export function initServicios() {
       <td data-cell="agrega categorías" class="data">
         <button type="button" class="btn btn-outline-primary btn-sm add-category" data-service-id="${tempServiceId}">+Categoría</button>
       </td>
+      <td data-cell="días disponibles" class="data">
+        <div class="days-container d-flex gap-1">
+          ${generateDaysCheckboxes([], tempServiceId)}
+        </div>
+      </td>
       <td>
         <button type="button" class="btn btn-danger btn-sm delete-service" disabled>Eliminar</button>
       </td>
@@ -135,35 +142,80 @@ export function initServicios() {
       removeCategory(this);
     });
   });
+
   const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
   const popoverList = [...popoverTriggerList].map((popoverTriggerEl) => new bootstrap.Popover(popoverTriggerEl));
 }
 
-function addService(service = null) {
+function processSchedules(schedules) {
+  let daysStatus = {}; // Objeto para almacenar el estado de los días
+
+  schedules.forEach((schedule) => {
+    daysStatus[schedule.day_id] = schedule.is_enabled === 1;
+  });
+
+  return daysStatus; // Retorna un objeto donde el key es el día (1-7) y el valor es true o false
+}
+
+function addService(service = null, schedules = {}, daysStatus = {}) {
   const tableBody = document.getElementById("servicesTableBody");
 
-  let serviceId;
-  let serviceName = "";
-  let serviceDuration = "";
-  let serviceObservations = "";
+  // Valores por defecto
+  let serviceId,
+    serviceName = "",
+    serviceDuration = "",
+    serviceObservations = "",
+    serviceDays = [];
 
   if (service && typeof service === "object" && !service.isTrusted) {
     serviceId = service.service_id;
     serviceName = service.service_name;
     serviceDuration = service.duration;
     serviceObservations = service.observations;
+    serviceDays = service.available_days || []; // Array de días disponibles
   } else {
     serviceId = `new-service-${tempServiceCounter}`;
     tempServiceCounter++;
   }
 
+  // Crear una fila para el servicio
+  const serviceRow = createServiceRow(serviceId, serviceName, serviceDuration, serviceObservations, serviceDays, schedules, daysStatus, service?.is_enabled);
+
+  // Añadir la fila a la tabla
+  tableBody.appendChild(serviceRow);
+
+  // Añadir eventos para eliminar servicio y agregar categoría
+  serviceRow.querySelector(".delete-service").addEventListener("click", function () {
+    deleteService(this);
+  });
+
+  serviceRow.querySelector(".add-category").addEventListener("click", function () {
+    addCategory(this);
+  });
+
+  // Añadir las categorías si el servicio tiene alguna
+  if (service && service.categories) {
+    service.categories.forEach((category) => {
+      addCategoryToService(serviceId, category);
+    });
+  }
+
+  // Inicializar tooltips para los días deshabilitados
+  const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+  [...tooltipTriggerList].map((tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl));
+}
+
+// Crear la fila del servicio
+function createServiceRow(serviceId, serviceName, serviceDuration, serviceObservations, serviceDays, schedules, dayStatus, isEnabled) {
+  const daysStatus = Object.keys(schedules).length === 0 ? "" : getAvailableDays(serviceDays, schedules);
   const serviceRow = document.createElement("tr");
   serviceRow.classList.add("service-row");
-  const isChecked = service.is_enabled ? "checked" : "";
+
+  const isChecked = isEnabled ? "checked" : "";
   serviceRow.innerHTML = `
-     <td data-cell="Habilitado" class="data">
+    <td data-cell="Habilitado" class="data">
       <div class="form-check form-switch">
-          <input type="checkbox" class="form-check-input" name="service_enabled[${serviceId}]" ${isChecked}>
+        <input type="checkbox" class="form-check-input" name="service_enabled[${serviceId}]" ${isChecked}>
       </div>
     </td>
     <td data-cell="nombre servicio" class="data"><input type="text" class="form-control" name="service_name[${serviceId}]" value="${serviceName}"></td>
@@ -172,28 +224,56 @@ function addService(service = null) {
     <td data-cell="agrega categorías" class="data">
       <button type="button" class="btn btn-outline-primary btn-sm add-category" data-service-id="${serviceId}">+Categoría</button>
     </td>
+    <td data-cell="días disponibles" class="data">
+      <div class="days-container d-flex gap-1">
+      ${generateDaysCheckboxes(daysStatus, serviceId)}
+      </div>
+    </td>
     <td>
       <button type="button" class="btn btn-danger btn-sm delete-service">Eliminar</button>
     </td>
   `;
-  tableBody.appendChild(serviceRow);
 
-  // Registrar el evento de eliminación del servicio
-  serviceRow.querySelector(".delete-service").addEventListener("click", function () {
-    deleteService(this);
-  });
+  return serviceRow;
+}
 
-  // Registrar el evento de adición de categoría al servicio
-  serviceRow.querySelector(".add-category").addEventListener("click", function () {
-    addCategory(this);
-  });
+// Generar los checkboxes para los días (1 al 7 siempre)
+function generateDaysCheckboxes(daysStatus, serviceId) {
+  const daysOfWeek = ["L", "M", "M", "J", "V", "S", "D"];
 
-  // Agregar categorías si es un servicio existente
-  if (service && service.categories) {
-    service.categories.forEach((category) => {
-      addCategoryToService(serviceId, category);
-    });
+  return daysOfWeek
+    .map((day, index) => {
+      const dayId = index + 1; // Los días empiezan desde 1
+      const { enabled = true, checked = false } = daysStatus[dayId] || {}; // Si no hay datos en daysStatus, habilitado por defecto
+      const disabledClass = !enabled ? "disabled-day" : ""; // Clase para días deshabilitados
+      const tooltipAttributes = !enabled ? `tabindex="0" data-bs-toggle="tooltip" title="Día no disponible. Habilitarlo en Servicios"` : "";
+
+      return `
+      <div class="day align-items-center d-flex flex-column text-center ${disabledClass}" ${tooltipAttributes}>
+       <input type="checkbox" class="form-check-input" name="available_service_day[${serviceId}][]" value="${dayId}" ${checked ? "checked" : ""} ${!enabled ? "disabled" : ""}>
+        <label class="mt-1">${day}</label>
+      </div>`;
+    })
+    .join("");
+}
+
+function getAvailableDays(serviceDays, schedules) {
+  // Crea un objeto para almacenar el estado de los días (habilitado y marcado)
+  const daysStatus = {};
+
+  // Recorre los días de la semana (1-7) y aplica la lógica
+  for (let i = 1; i <= 7; i++) {
+    const isDayEnabled = schedules.some((schedule) => schedule.day_id === i && schedule.is_enabled);
+    const isChecked = serviceDays.includes(i) && isDayEnabled; // Solo checked si está habilitado y marcado
+
+    daysStatus[i] = {
+      day: i,
+      enabled: isDayEnabled,
+      checked: isChecked,
+    };
   }
+
+  return daysStatus;
 }
 
 function addCategoryToService(serviceId, category) {

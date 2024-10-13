@@ -13,7 +13,7 @@ class Services
     public function getServices()
     {
         $servicesSql = $this->conn->prepare("
-            SELECT s.id AS service_id, s.name AS service_name, s.duration, s.observations, s.is_enabled, 
+            SELECT s.id AS service_id, s.name AS service_name, s.duration, s.observations, s.is_enabled, s.available_days,
                    sc.id AS category_id, sc.category_name, sc.category_description
             FROM services s
             LEFT JOIN service_categories sc ON s.id = sc.service_id
@@ -35,6 +35,7 @@ class Services
                     'duration' => $row['duration'],
                     'observations' => $row['observations'],
                     'is_enabled' => $row['is_enabled'],
+                    'available_days' => $row['available_days'],
                     'categories' => []
                 ];
             }
@@ -60,49 +61,84 @@ class Services
         try {
             foreach ($servicesData['service_name'] as $serviceId => $serviceName) {
                 $isEnabled = isset($servicesData['service_enabled'][$serviceId]) ? 1 : 0;
+
+                // Convertimos el array de días a una cadena "1,2,3"
+                $availableDays = isset($servicesData['available_service_day'][$serviceId])
+                    ? implode(',', $servicesData['available_service_day'][$serviceId])
+                    : '';
+
                 if (strpos($serviceId, 'new-service') !== false) {
                     // Nuevo servicio
-                    $newServiceId = $this->addService($serviceName, $servicesData['service_duration'][$serviceId], $servicesData['service_observations'][$serviceId], $isEnabled);
+                    $newServiceId = $this->addService(
+                        $serviceName,
+                        $servicesData['service_duration'][$serviceId],
+                        $servicesData['service_observations'][$serviceId],
+                        $isEnabled,
+                        $availableDays
+                    );
 
+                    // Agregar categorías si están presentes
                     if (isset($servicesData['category_name'][$serviceId])) {
-                        foreach ($servicesData['category_name'][$serviceId] as $categoryIndex => $categoryName) {
-                            $this->addCategory($newServiceId, $categoryName, $servicesData['category_description'][$serviceId][$categoryIndex]);
+                        foreach ($servicesData['category_name'][$serviceId] as $index => $categoryName) {
+                            $this->addCategory(
+                                $newServiceId,
+                                $categoryName,
+                                $servicesData['category_description'][$serviceId][$index]
+                            );
                         }
                     }
                 } else {
-                    // Servicio existente
-                    $this->updateService($serviceId, $serviceName, $servicesData['service_duration'][$serviceId], $servicesData['service_observations'][$serviceId], $isEnabled);
+                    // Actualizar servicio existente
+                    $this->updateService(
+                        $serviceId,
+                        $serviceName,
+                        $servicesData['service_duration'][$serviceId],
+                        $servicesData['service_observations'][$serviceId],
+                        $isEnabled,
+                        $availableDays
+                    );
 
+                    // Actualizar categorías si están presentes
                     if (isset($servicesData['category_name'][$serviceId])) {
-                        foreach ($servicesData['category_name'][$serviceId] as $categoryIndex => $categoryName) {
-                            if (strpos($categoryIndex, 'new-category') !== false) {
-                                $this->addCategory($serviceId, $categoryName, $servicesData['category_description'][$serviceId][$categoryIndex]);
+                        foreach ($servicesData['category_name'][$serviceId] as $index => $categoryName) {
+                            if (strpos($index, 'new-category') !== false) {
+                                $this->addCategory(
+                                    $serviceId,
+                                    $categoryName,
+                                    $servicesData['category_description'][$serviceId][$index]
+                                );
                             } else {
-                                // Aquí se podría lanzar una excepción si falla
-                                $this->updateCategory($categoryIndex, $categoryName, $servicesData['category_description'][$serviceId][$categoryIndex]);
+                                $this->updateCategory(
+                                    $index,
+                                    $categoryName,
+                                    $servicesData['category_description'][$serviceId][$index]
+                                );
                             }
                         }
                     }
                 }
             }
-            // Si todo fue bien
+
             return json_encode(['success' => true, 'message' => 'Servicios guardados exitosamente.']);
         } catch (Exception $e) {
-            // Devuelve un mensaje de error si ocurre alguna excepción
             return json_encode(['success' => false, 'message' => 'Error al guardar los servicios: ' . $e->getMessage()]);
         }
     }
 
-    private function addService($name, $duration, $observations, $isEnabled)
+
+
+
+    private function addService($name, $duration, $observations, $isEnabled, $availableDays)
     {
         try {
 
-            $stmt = $this->conn->prepare("INSERT INTO services (company_id, name, duration, observations, is_enabled) VALUES (:company_id, :name, :duration, :observations, :is_enabled)");
+            $stmt = $this->conn->prepare("INSERT INTO services (company_id, name, duration, observations, is_enabled, available_days) VALUES (:company_id, :name, :duration, :observations, :is_enabled, :available_days)");
             $stmt->bindParam(':company_id', $this->company_id);
             $stmt->bindParam(':name', $name);
             $stmt->bindParam(':duration', $duration);
             $stmt->bindParam(':observations', $observations);
             $stmt->bindParam(':is_enabled', $isEnabled);
+            $stmt->bindParam(':available_days', $availableDays);
             $stmt->execute();
             return $this->conn->lastInsertId();
         } catch (PDOException $e) {
@@ -114,17 +150,18 @@ class Services
         }
     }
 
-    private function updateService($serviceId, $name, $duration, $observations, $isEnabled)
+    private function updateService($serviceId, $name, $duration, $observations, $isEnabled, $availableDays)
     {
         try {
 
-            $stmt = $this->conn->prepare("UPDATE services SET name = :name, duration = :duration, observations = :observations, is_enabled = :is_enabled WHERE id = :service_id AND company_id = :company_id");
+            $stmt = $this->conn->prepare("UPDATE services SET name = :name, duration = :duration, observations = :observations, is_enabled = :is_enabled, available_days = :available_days WHERE id = :service_id AND company_id = :company_id");
             $stmt->bindParam(':service_id', $serviceId);
             $stmt->bindParam(':company_id', $this->company_id);
             $stmt->bindParam(':name', $name);
             $stmt->bindParam(':duration', $duration);
             $stmt->bindParam(':observations', $observations);
             $stmt->bindParam(':is_enabled', $isEnabled);
+            $stmt->bindParam(':available_days', $availableDays);
             $stmt->execute();
         } catch (PDOException $e) {
             // Aquí puedes manejar el error, por ejemplo, registrarlo en un log
