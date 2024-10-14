@@ -43,7 +43,7 @@ try {
     $emailContent = $emailTemplateBuilder->buildEmail($confirmData, 'confirmacion');
 
     // Enviar mensaje de WhatsApp
-    $wspStatusCode = sendWspReserva("confirmar_reserva", $appointment['phone'], $appointment['name'], $appointment['date'], $appointment['start_time'], $emailContent['company_name'], $emailContent['social_token']);
+    $wspStatusCode = sendWspReserva("confirmar_reserva", $appointment['phone'], $appointment['name'], $appointment['date'], $appointment['start_time'], $emailContent['company_name'], $appointment['appointment_token']);
     // Para pruebas locales
     // $wspStatusCode = 200;
     // Verificar si el mensaje de WhatsApp fue enviado correctamente

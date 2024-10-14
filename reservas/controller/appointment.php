@@ -45,16 +45,16 @@ try {
     ];
 
     // Insertar la cita en la base de datos
-    $stmt = $appointments->add_appointment($appointmentData);
+    $result = $appointments->add_appointment($appointmentData);
 
     // Ejecutar la consulta si rowcount es mayor a 0
-    if ($stmt > 0) {
+    if ($result && is_array($result)) {
         // Obtener el email template y el logo
         $emailTemplateBuilder = new EmailTemplate();
         $emailContent = $emailTemplateBuilder->buildEmail($appointmentData, 'reserva');
 
         // Enviar mensaje de WhatsApp
-        $wspStatusCode = sendWspReserva("registro_reserva", $appointmentData['phone'], $appointmentData['name'], $appointmentData['date'], $formattedStartTime, $emailContent['company_name'], $emailContent['social_token']);
+        $wspStatusCode = sendWspReserva("registro_reserva", $appointmentData['phone'], $appointmentData['name'], $appointmentData['date'], $formattedStartTime, $emailContent['company_name'], $result['appointment_token']);
         //Para pruebas
         // $wspStatusCode = 200;
         // Verificar si el mensaje de WhatsApp fue enviado correctamente

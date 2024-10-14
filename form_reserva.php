@@ -4,6 +4,11 @@ require_once __DIR__ . '/reservas/controller/CompanyController.php';
 $baseUrl =          ConfigUrl::get();
 
 $url            = isset($_GET['path']) ? $_GET['path'] : null;
+$view = isset($_GET['view']) ? $_GET['view'] : 'form';
+$reservation_id = isset($_GET['reservation_id']) ? $_GET['reservation_id'] : 0;
+
+echo "reservation_id: " . htmlspecialchars($reservation_id);
+
 $controller        = new CompanyController();
 
 $data              = $controller->getCompanyData($url);
@@ -76,7 +81,6 @@ $border_color      = $style['border_color'];
             </div>
         </div>
         <form id="appointmentForm" style="max-width: 600px; margin: 0 auto;">
-
             <!-- PASO 1 -->
             <div id="step1" class="step">
                 <h4 class="text-center mb-4 pass-title">Paso 1: Escoge el Servicio</h4>

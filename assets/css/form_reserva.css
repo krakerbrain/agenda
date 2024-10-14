@@ -28,6 +28,7 @@ body {
 }
 
 .company-card,
+.details-page,
 #appointmentForm {
   padding: 20px;
   max-width: 600px;

@@ -66,6 +66,13 @@ class Database
         return $this->stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    public function singleValue()
+    {
+        $this->execute();
+        $result = $this->stmt->fetch(PDO::FETCH_ASSOC);
+        return $result ? array_values($result)[0] : null; // Retorna el primer valor o null si no hay resultados
+    }
+
     public function rowCount()
     {
         return $this->stmt->rowCount();

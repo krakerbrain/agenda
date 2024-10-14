@@ -13,7 +13,7 @@ class CompanyModel
 
     public function getCompanyByUrl($url)
     {
-        $this->db->query("SELECT id, logo, name, address, phone, schedule_mode, calendar_days_available, font_color, btn2, bg_color, btn1 FROM companies WHERE custom_url = :url AND is_active = 1");
+        $this->db->query("SELECT id, logo, name, address, phone, schedule_mode, calendar_days_available, font_color, btn2, bg_color, btn1, notas_correo_reserva, notas_correo_confirmacion FROM companies WHERE custom_url = :url AND is_active = 1");
         $this->db->bind(':url', $url);
         return $this->db->single();
     }
