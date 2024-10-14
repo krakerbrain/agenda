@@ -67,6 +67,42 @@ class JWTAuth
         exit();
     }
 
+    // Función para generar un token de cita
+    public function generarTokenCita($company_id, $appointment_id)
+    {
+        $payload = [
+            "company_id" => $company_id,
+            "appointment_id" => $appointment_id,
+            "created_at" => time()
+        ];
+
+        return JWT::encode($payload, $this->key, 'HS256');
+    }
+
+    // Validar token de cita
+    public function validarTokenCita($token)
+    {
+        try {
+            $decoded = JWT::decode($token, new Key($this->key, 'HS256'));
+
+            if (is_object($decoded) && isset($decoded->appointment_id)) {
+                return [
+                    'valid' => true,
+                    'company_id' => $decoded->company_id,
+                    'appointment_id' => $decoded->appointment_id,
+                    'created_at' => $decoded->created_at
+                ];
+            }
+        } catch (Exception $e) {
+            return [
+                'valid' => false,
+                'error' => $e->getMessage()
+            ];
+        }
+
+        return ['valid' => false, 'error' => 'Token inválido'];
+    }
+
     // Función para invalidar sesión
     private function invalidarSesion()
     {

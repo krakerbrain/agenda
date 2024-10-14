@@ -1,7 +1,7 @@
 <?php
 
 
-function sendWspReserva($template_name, $telefono, $nombre_cliente,  $fecha_cita, $hora_cita, $nombre_empresa, $social_token)
+function sendWspReserva($template_name, $telefono, $nombre_cliente,  $fecha_cita, $hora_cita, $nombre_empresa, $appointment_token)
 {
     $token = $_ENV['WSP_TOKEN'];
     //URL A DONDE SE MANDARA EL MENSAJE
@@ -44,7 +44,7 @@ function sendWspReserva($template_name, $telefono, $nombre_cliente,  $fecha_cita
                             [
                                 "type" => "text",
                                 # Business Developer-defined dynamic URL suffix
-                                "text" => $social_token
+                                "text" => $appointment_token
                             ]
                         ]
                     ]

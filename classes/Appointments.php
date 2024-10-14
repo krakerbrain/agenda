@@ -1,22 +1,49 @@
 <?php
 require_once 'Database.php';
+require_once dirname(__DIR__) . '/access-token/seguridad/JWTAuth.php';
 
 class Appointments extends Database
 {
     public function add_appointment($data)
     {
-        $db = new Database();
-        $db->query('INSERT INTO appointments (company_id, name, phone, mail, date, start_time, end_time, id_service) VALUES (:company_id, :name, :phone, :mail, :date, :start_time, :end_time, :id_service)');
-        $db->bind(':company_id', $data['company_id']);
-        $db->bind(':name', $data['name']);
-        $db->bind(':phone', $data['phone']);
-        $db->bind(':mail', $data['mail']);
-        $db->bind(':date', $data['date']);
-        $db->bind(':start_time', $data['start_time']);
-        $db->bind(':end_time', $data['end_time']);
-        $db->bind(':id_service', $data['id_service']);
-        $db->execute();
-        return $db->rowCount();
+        try {
+            $db = new Database();
+
+            // Insertar la cita sin el token
+            $db->query('INSERT INTO appointments (company_id, name, phone, mail, date, start_time, end_time, id_service) 
+                        VALUES (:company_id, :name, :phone, :mail, :date, :start_time, :end_time, :id_service)');
+            $db->bind(':company_id', $data['company_id']);
+            $db->bind(':name', $data['name']);
+            $db->bind(':phone', $data['phone']);
+            $db->bind(':mail', $data['mail']);
+            $db->bind(':date', $data['date']);
+            $db->bind(':start_time', $data['start_time']);
+            $db->bind(':end_time', $data['end_time']);
+            $db->bind(':id_service', $data['id_service']);
+            $db->execute();
+
+            // Obtener el ID de la cita recién creada
+            $appointmentId = $db->lastInsertId();
+
+            // Generar el token para la cita usando el ID
+            $jwtAuth = new JWTAuth();
+            $appointmentToken = $jwtAuth->generarTokenCita($data['company_id'], $appointmentId);
+
+            // Actualizar la cita con el token generado
+            $db->query('UPDATE appointments SET appointment_token = :token WHERE id = :id');
+            $db->bind(':token', $appointmentToken);
+            $db->bind(':id', $appointmentId);
+            $db->execute();
+
+            // Retornar el ID de la cita y el token generado
+            return [
+                'appointment_id' => $appointmentId,
+                'appointment_token' => $appointmentToken
+            ];
+        } catch (PDOException $e) {
+            // Manejo de errores, puedes loguear el error si es necesario
+            return 0; // Retornar 0 en caso de error
+        }
     }
 
     public function get_appointments($company_id)
@@ -35,13 +62,32 @@ class Appointments extends Database
 
     public function get_appointment($id)
     {
-        $db = new Database();
-        $db->query('SELECT s.name as service, a.* FROM appointments a
+        try {
+            //code...
+
+            $db = new Database();
+            $db->query('SELECT s.name as service, a.* FROM appointments a
                             JOIN services s
                             ON a.id_service = s.id
                             WHERE a.id = :id');
-        $db->bind(':id', $id);
-        return $db->single();
+            $db->bind(':id', $id);
+            return $db->single();
+        } catch (Exception $e) {
+            return $e->getMessage();
+        }
+    }
+    public function get_appointment_token($token)
+    {
+        try {
+            //code...
+
+            $db = new Database();
+            $db->query('SELECT id FROM appointments WHERE  appointment_token = :token');
+            $db->bind(':token', $token);
+            return $db->single();
+        } catch (Exception $e) {
+            return $e->getMessage();
+        }
     }
 
     public function update_appointment($id)

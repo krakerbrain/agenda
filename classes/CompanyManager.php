@@ -45,10 +45,19 @@ class CompanyManager
         $this->db->bind(':id', $company_id);
         return $this->db->single();
     }
+    public function getCompanyCustomUrl($company_id)
+    {
+        $sql = "SELECT custom_url FROM companies WHERE id = :id AND is_active = 1";
+        $this->db->query($sql);
+        $this->db->bind(':id', $company_id);
+        return $this->db->singleValue();
+    }
     // Función para crear una nueva empresa
     public function createCompany($name, $phone, $address, $logo = null, $status = 1)
     {
-        // Generar un token aleatorio para la empresa
+        /**
+         * // este token cumplia la funcion de usarlo al final de la url para dirigir a la pagina de reservas. Sin embargo se cambio por una url amigable por lo cual ya no es necesario a menos que se le de otro uso, por ahora no cumple ninguna funcion
+         */
         $token = bin2hex(random_bytes(16));
 
         try {
