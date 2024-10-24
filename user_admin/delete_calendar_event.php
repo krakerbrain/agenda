@@ -1,34 +1,34 @@
 <?php
 require_once dirname(__DIR__) . '/google_services/google_client.php';
-require_once dirname(__DIR__) . '/classes/DatabaseSessionManager.php';
-$manager = new DatabaseSessionManager();
-// $manager->startSession();
+require_once dirname(__DIR__) . '/classes/Appointments.php';
+
 session_start();
-$conn = $manager->getDB();
 
 $client = getClient();
 $data = json_decode(file_get_contents('php://input'), true);
 $appointmentId = $data['appointmentID'];
 $eventId = isset($data['calendarEventID']) ? $data['calendarEventID'] : "";
 
-deleteCalendarEvent($conn, $client, $eventId, $appointmentId);
-function deleteCalendarEvent($conn, $client, $eventId, $appointmentId)
+deleteCalendarEvent($client, $eventId, $appointmentId);
+function deleteCalendarEvent($client, $eventId, $appointmentId)
 {
     $calendarService = new Google_Service_Calendar($client);
     $calendarId = 'primary'; // ID de tu calendario
 
+    $appointment = new Appointments();
     try {
         if ($eventId != "") {
             $calendarService = new Google_Service_Calendar($client);
             $calendarId = 'primary'; // ID de tu calendario
             $calendarService->events->delete($calendarId, $eventId);
         }
-        // Actualizar el estado de la cita en la base de datos
-        $sql = $conn->prepare("DELETE FROM appointments WHERE id = :appointment_id");
-        $sql->bindParam(':appointment_id', $appointmentId, PDO::PARAM_INT);
-        $sql->execute();
 
-        echo json_encode(['success' => true, 'message' => 'Evento eliminado exitosamente']);
+        $deletedRows = $appointment->delete_appointment($appointmentId);
+        if ($deletedRows > 0) {
+            echo json_encode(['success' => true, 'message' => 'Evento eliminado exitosamente']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'No se encontró la cita para eliminar']);
+        }
     } catch (Exception $e) {
         throw new Exception('Failed to delete event: ' . $e->getMessage());
     }
