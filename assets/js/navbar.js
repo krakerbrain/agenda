@@ -1,12 +1,12 @@
-import { initDateList } from "./datesList.js";
-import { initHorarios } from "./horarios.js";
-import { initServicios } from "./servicios.js";
-import { initConfiguraciones } from "./configuraciones.js";
-import { initCorreos } from "./correos.js";
-import { initDatosEmpresa } from "./datosEmpresa.js";
-import { initAddUser } from "./addUser.js";
-import { initAddCompany } from "./master_admin/master_add_company.js";
-import { initCompanyList } from "./master_admin/master_company_list.js";
+import { initDateList } from "./datesList.js?v=<?php echo time(); ?>";
+import { initHorarios } from "./horarios.js?v=<?php echo time(); ?>";
+import { initServicios } from "./servicios.js?v=<?php echo time(); ?>";
+import { initConfiguraciones } from "./configuraciones.js?v=<?php echo time(); ?>";
+import { initCorreos } from "./correos.js?v=<?php echo time(); ?>";
+import { initDatosEmpresa } from "./datosEmpresa.js?v=<?php echo time(); ?>";
+import { initAddUser } from "./addUser.js?v=<?php echo time(); ?>";
+import { initAddCompany } from "./master_admin/master_add_company.js?v=<?php echo time(); ?>";
+import { initCompanyList } from "./master_admin/master_company_list.js?v=<?php echo time(); ?>";
 
 document.addEventListener("DOMContentLoaded", function () {
   const links = document.querySelectorAll(".nav-link");
