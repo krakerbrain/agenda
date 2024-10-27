@@ -19,6 +19,7 @@ try {
     if (!$data) {
         throw new Exception('Datos inválidos recibidos');
     }
+
     // Separar el tiempo en inicio y fin
     list($start_time, $end_time) = explode(' - ', $data['time']);
 
@@ -47,16 +48,20 @@ try {
     // Insertar la cita en la base de datos
     $result = $appointments->add_appointment($appointmentData);
 
+    // Comprobar si hubo un error
+    if (isset($result['error'])) {
+        throw new Exception('Error al reservar la cita: ' . $result['error']);
+    }
+
     // Ejecutar la consulta si rowcount es mayor a 0
-    if ($result && is_array($result)) {
+    if (is_array($result)) {
         // Obtener el email template y el logo
         $emailTemplateBuilder = new EmailTemplate();
         $emailContent = $emailTemplateBuilder->buildEmail($appointmentData, 'reserva');
 
         // Enviar mensaje de WhatsApp
         $wspStatusCode = sendWspReserva("registro_reserva", $appointmentData['phone'], $appointmentData['name'], $appointmentData['date'], $formattedStartTime, $emailContent['company_name'], $result['appointment_token']);
-        //Para pruebas
-        // $wspStatusCode = 200;
+
         // Verificar si el mensaje de WhatsApp fue enviado correctamente
         if ($wspStatusCode == 200 || $wspStatusCode == 201) {
             // Confirmar la transacción si todo fue exitoso
@@ -80,6 +85,7 @@ try {
     // Cerrar la conexión
     $appointments = null;
 }
+
 
 function formatPhoneNumber($telefono)
 {

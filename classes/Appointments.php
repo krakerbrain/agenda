@@ -11,7 +11,7 @@ class Appointments extends Database
 
             // Insertar la cita sin el token
             $db->query('INSERT INTO appointments (company_id, name, phone, mail, date, start_time, end_time, id_service, created_at) 
-                        VALUES (:company_id, :name, :phone, :mail, :date, :start_time, :end_time, :id_service, now())');
+                    VALUES (:company_id, :name, :phone, :mail, :date, :start_time, :end_time, :id_service, now())');
             $db->bind(':company_id', $data['company_id']);
             $db->bind(':name', $data['name']);
             $db->bind(':phone', $data['phone']);
@@ -42,9 +42,10 @@ class Appointments extends Database
             ];
         } catch (PDOException $e) {
             // Manejo de errores, puedes loguear el error si es necesario
-            return 0; // Retornar 0 en caso de error
+            return ['error' => $e->getMessage()]; // Retornar el mensaje de error
         }
     }
+
 
     public function get_appointments($company_id)
     {
