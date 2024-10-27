@@ -43,6 +43,9 @@ class EmailSender
             $this->mail->Body = $mailContent['body'];
 
             $this->mail->send();
+            // Limpiar direcciones después del envío
+            $this->mail->clearAddresses();
+
             // Devolver true si el correo fue enviado exitosamente
             return true;
         } catch (Exception $e) {

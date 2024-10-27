@@ -160,6 +160,7 @@ class EmailTemplate
     // Otro constructor de correos, como alertas, reutilizando los mismos datos
     public function buildAppointmentAlert($data)
     {
+
         if ($this->companyData === null || $this->serviceData === null) {
             throw new Exception("Los datos de la compañía y el servicio deben cargarse primero.");
         }

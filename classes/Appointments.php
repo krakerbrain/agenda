@@ -10,8 +10,8 @@ class Appointments extends Database
             $db = new Database();
 
             // Insertar la cita sin el token
-            $db->query('INSERT INTO appointments (company_id, name, phone, mail, date, start_time, end_time, id_service) 
-                        VALUES (:company_id, :name, :phone, :mail, :date, :start_time, :end_time, :id_service)');
+            $db->query('INSERT INTO appointments (company_id, name, phone, mail, date, start_time, end_time, id_service, created_at) 
+                        VALUES (:company_id, :name, :phone, :mail, :date, :start_time, :end_time, :id_service, now())');
             $db->bind(':company_id', $data['company_id']);
             $db->bind(':name', $data['name']);
             $db->bind(':phone', $data['phone']);
@@ -59,6 +59,66 @@ class Appointments extends Database
         return $db->resultSet();
     }
 
+    public function get_all_appointments($company_id)
+    {
+        $db = new Database();
+        $db->query('SELECT a.*, s.name AS service, 
+                 DATE_FORMAT(a.date, "%d-%m-%Y") as date 
+                 FROM appointments a 
+                 INNER JOIN services s ON a.id_service = s.id
+                 WHERE a.company_id = :company
+                 AND status != 2
+                 ORDER BY a.date DESC');
+        $db->bind(':company', $company_id);
+        return $db->resultSet();
+    }
+
+    public function get_unconfirmed_appointments($company_id)
+    {
+        $db = new Database();
+        $db->query('SELECT a.*, s.name AS service,
+                 DATE_FORMAT(a.date, "%d-%m-%Y") as date 
+                 FROM appointments a 
+                 INNER JOIN services s ON a.id_service = s.id
+                 WHERE a.company_id = :company
+                 AND status = 0
+                 AND a.date >= CURDATE()
+                 ORDER BY a.date DESC');
+        $db->bind(':company', $company_id);
+        return $db->resultSet();
+    }
+
+    public function get_confirmed_appointments($company_id)
+    {
+        $db = new Database();
+        $db->query('SELECT a.*, s.name AS service,
+                 DATE_FORMAT(a.date, "%d-%m-%Y") as date 
+                 FROM appointments a 
+                 INNER JOIN services s ON a.id_service = s.id
+                 WHERE a.company_id = :company
+                 AND status = 1
+                 AND a.date >= CURDATE()
+                 ORDER BY a.date DESC');
+        $db->bind(':company', $company_id);
+        return $db->resultSet();
+    }
+
+    public function get_past_appointments($company_id)
+    {
+        $db = new Database();
+        $db->query('SELECT a.*, s.name AS service,
+                 DATE_FORMAT(a.date, "%d-%m-%Y") as date 
+                 FROM appointments a 
+                 INNER JOIN services s ON a.id_service = s.id
+                 WHERE a.company_id = :company
+                 AND date < CURDATE()
+                 AND status != 2
+                 ORDER BY a.date DESC');
+        $db->bind(':company', $company_id);
+        return $db->resultSet();
+    }
+
+
 
     public function get_appointment($id)
     {
@@ -93,7 +153,7 @@ class Appointments extends Database
     public function update_appointment($id)
     {
         $db = new Database();
-        $db->query('UPDATE appointments SET status = 1 WHERE id = :id');
+        $db->query('UPDATE appointments SET status = 1, updated_at = now() WHERE id = :id');
         $db->bind(':id', $id);
         $db->execute();
         return $db->rowCount();
@@ -101,7 +161,7 @@ class Appointments extends Database
     public function update_event($eventId, $appointmentId)
     {
         $db = new Database();
-        $db->query("UPDATE appointments SET event_id = :event_id WHERE id = :appointment_id");
+        $db->query("UPDATE appointments SET event_id = :event_id, updated_at = now() WHERE id = :appointment_id");
         $db->bind(':event_id', $eventId);
         $db->bind(':appointment_id', $appointmentId);
         $db->execute();

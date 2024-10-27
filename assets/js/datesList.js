@@ -1,25 +1,47 @@
 export function initDateList() {
-  async function loadAppointments() {
+  async function loadAppointments(status = "unconfirmed") {
     try {
-      const response = await fetch(`${baseUrl}user_admin/controllers/appointments.php`, {
+      const response = await fetch(`${baseUrl}user_admin/controllers/appointments.php?status=${status}`, {
         method: "GET",
       });
 
       const { success, data } = await response.json();
 
       if (success) {
-        getAppointments(data);
+        // Llenar la tabla correspondiente según el estado
+        if (status === "unconfirmed") {
+          fillTable(data, "unconfirmedAppointmentsList");
+        } else if (status === "confirmed") {
+          fillTable(data, "confirmedAppointmentsList");
+        } else if (status === "past") {
+          fillTable(data, "pastAppointmentsList");
+        } else {
+          fillTable(data, "appointmentsList"); // Para 'all'
+        }
       }
     } catch (error) {
       console.error(error);
     }
   }
 
-  loadAppointments();
+  // Cargar citas inicialmente para la pestaña "Todas"
+  loadAppointments("unconfirmed");
+
+  const triggerTabList = document.querySelectorAll("#myTab button");
+  triggerTabList.forEach((triggerEl) => {
+    const tabTrigger = new bootstrap.Tab(triggerEl);
+
+    triggerEl.addEventListener("click", (event) => {
+      event.preventDefault();
+      const status = event.target.dataset.bsTarget.substring(1);
+      loadAppointments(status);
+      tabTrigger.show();
+    });
+  });
 }
 
-function getAppointments(data) {
-  const appointmentsList = document.getElementById("appointmentsList");
+function fillTable(data, tableId) {
+  const appointmentsList = document.getElementById(tableId);
   let html = "";
   data.forEach((appointment) => {
     html += `
@@ -48,17 +70,15 @@ function getAppointments(data) {
           <button id="eliminarBtn${appointment.id}" 
                   class="btn btn-danger btn-sm eliminarReserva" 
                   title="Eliminar reserva"
-                  data-id="${appointment.id}" 
-                  data-eventid="${appointment.event_id}">
-            <i class="fas fa-times"></i>
+                  data-id="${appointment.id}">
+            <i class="fas fa-trash"></i>
             <span class="spinner-border spinner-border-sm d-none" aria-hidden="true"></span>
             <span class="button-text"></span>
           </button>
         </td>
       </tr>
-      `;
+    `;
   });
-
   appointmentsList.innerHTML = html;
 
   // Agrega los event listeners para los botones después de que el HTML se haya renderizado
