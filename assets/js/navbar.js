@@ -1,12 +1,12 @@
-import { initDateList } from "./datesList.js?v=<?php echo time(); ?>";
-import { initHorarios } from "./horarios.js?v=<?php echo time(); ?>";
-import { initServicios } from "./servicios.js?v=<?php echo time(); ?>";
-import { initConfiguraciones } from "./configuraciones.js?v=<?php echo time(); ?>";
-import { initCorreos } from "./correos.js?v=<?php echo time(); ?>";
-import { initDatosEmpresa } from "./datosEmpresa.js?v=<?php echo time(); ?>";
-import { initAddUser } from "./addUser.js?v=<?php echo time(); ?>";
-import { initAddCompany } from "./master_admin/master_add_company.js?v=<?php echo time(); ?>";
-import { initCompanyList } from "./master_admin/master_company_list.js?v=<?php echo time(); ?>";
+import { initDateList } from "./datesList.js?v=1.0.0";
+import { initHorarios } from "./horarios.js?v=1.0.0";
+import { initServicios } from "./servicios.js?v=1.0.0";
+import { initConfiguraciones } from "./configuraciones.js?v=1.0.0";
+import { initCorreos } from "./correos.js?v=1.0.0";
+import { initDatosEmpresa } from "./datosEmpresa.js?v=1.0.1";
+import { initAddUser } from "./addUser.js?v=1.0.0";
+import { initAddCompany } from "./master_admin/master_add_company.js?v=1.0.0";
+import { initCompanyList } from "./master_admin/master_company_list.js?v=1.0.0";
 
 document.addEventListener("DOMContentLoaded", function () {
   const links = document.querySelectorAll(".nav-link");

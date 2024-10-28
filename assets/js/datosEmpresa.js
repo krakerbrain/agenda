@@ -67,10 +67,13 @@ export function initDatosEmpresa() {
   document.getElementById("social-network").addEventListener("change", function () {
     const selectedNetwork = this.value;
     const socialUrlInput = document.getElementById("social-url");
+    const phoneNumber = document.getElementById("phone").value;
+    const formattedPhone = phoneNumber.startsWith("+") ? phoneNumber.substring(1) : phoneNumber;
+
     if (selectedNetwork === "8") {
       // Suponiendo que el valor para WhatsApp es 'whatsapp'
-      const phoneNumber = "5211234567890"; // Aquí usas el número actual del cliente
-      socialUrlInput.value = `https://wa.me/${phoneNumber}`;
+      const phone = formattedPhone != "" ? formattedPhone : "56912345678"; // Aquí usas el número actual del cliente
+      socialUrlInput.value = `https://wa.me/${phone}`;
     } else {
       socialUrlInput.value = ""; // Limpia el campo si no es WhatsApp
     }

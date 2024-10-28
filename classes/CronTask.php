@@ -1,6 +1,6 @@
 <?php
 
-require_once 'CompanyManager.php';
+require_once 'CompanyManager.php'; // Ajustar la ruta de inclusión
 
 class CronTasks
 {
@@ -10,9 +10,12 @@ class CronTasks
         $companies = $companyManager->getAllActiveCompanies();
 
         // Registrar el inicio del proceso
-        error_log("Inicio de la tarea cron para eliminar fechas bloqueadas: " . PHP_EOL . date('Y-m-d H:i:s'), 3, '../cron/cron-error/error.log');
+        error_log("Inicio de la tarea cron para eliminar fechas bloqueadas: " . date('Y-m-d H:i:s') . PHP_EOL, 3, dirname(__DIR__) . '/cron/cronerror/error.log');
+
+        echo dirname(__DIR__) . '/cron/cronerror/error.log';
+
         if (empty($companies)) {
-            error_log("No se encontraron compañías activas." . PHP_EOL, 3, '../cron/cron-error/error.log');
+            error_log("No se encontraron compañías activas." . PHP_EOL, 3, dirname(__DIR__) . '/cron/cronerror/error.log');
             return; // Salir si no hay compañías
         }
 
@@ -20,11 +23,11 @@ class CronTasks
             $success = $companyManager->removePastBlockedDates($company['id']);
             if (!$success) {
                 // Registrar error si la eliminación falla
-                error_log("Error al eliminar fechas pasadas para la compañía ID: " . PHP_EOL . $company['id'], 3, '../cron/cron-error/error.log');
+                error_log("Error al eliminar fechas pasadas para la compañía ID: " . $company['id'] . PHP_EOL, 3, dirname(__DIR__) . '/cron/cronerror/error.log');
             }
         }
 
         // Registrar el final del proceso
-        error_log("Finalizada la tarea cron para eliminar fechas bloqueadas: " . PHP_EOL . date('Y-m-d H:i:s'), 3, '../cron/cron-error/error.log');
+        error_log("Finalizada la tarea cron para eliminar fechas bloqueadas: " . date('Y-m-d H:i:s') . PHP_EOL, 3, dirname(__DIR__) . '/cron/cronerror/error.log');
     }
 }

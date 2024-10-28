@@ -7,9 +7,9 @@
             <select id="service" name="service" class="form-select" required>
                 <option value="" selected>Selecciona un servicio</option>
                 <?php foreach ($services as $service) : ?>
-                <option value="<?php echo htmlspecialchars($service['id']); ?>"
-                    data-observation="<?php echo htmlspecialchars($service['observations']); ?>">
-                    <?php echo htmlspecialchars($service['name']); ?></option>
+                    <option value="<?php echo htmlspecialchars($service['id']); ?>"
+                        data-observation="<?php echo htmlspecialchars($service['observations']); ?>">
+                        <?php echo htmlspecialchars($service['name']); ?></option>
                 <?php endforeach; ?>
             </select>
         </div>
