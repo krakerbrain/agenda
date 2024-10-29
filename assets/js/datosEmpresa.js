@@ -53,11 +53,15 @@ export function initDatosEmpresa() {
         method: "POST",
         body: formData,
       });
-      const { success, message } = await response.json();
+
+      const { success, message, error } = await response.json();
 
       if (success) {
         alert(message);
-        location.reload();
+        getDatosEmpresa();
+        loadSocials();
+      } else {
+        alert(error);
       }
     } catch (error) {
       console.error(error);

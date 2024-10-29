@@ -61,8 +61,10 @@ class CompanyManager
         $token = bin2hex(random_bytes(16));
 
         try {
+            // Formatear el número de teléfono
             $this->db->beginTransaction(); // Iniciar transacción
 
+            $phone = $this->formatPhoneNumber($phone);
             // Subir el logo si existe
             $logoName = null;
             if ($logo && $logo['error'] === UPLOAD_ERR_OK) {
@@ -113,6 +115,15 @@ class CompanyManager
         } catch (Exception $e) {
             $this->db->cancelTransaction(); // Rollback de la transacción
 
+            // Manejo de excepciones para el número de teléfono inválido
+            if ($e->getCode() === 1001) {
+                return [
+                    'success' => false,
+                    'error' => 'Número de teléfono inválido.', // Mensaje específico
+                    'debug' => $e->getMessage()
+                ];
+            }
+
             // Verificar si el error es de tipo "clave duplicada"
             if ($e->getCode() == 23000 && strpos($e->getMessage(), '1062 Duplicate entry') !== false) {
                 return [
@@ -129,6 +140,35 @@ class CompanyManager
                 'debug' => $e->getMessage() // Añadimos el mensaje técnico para el log
             ];
         }
+    }
+
+    private function formatPhoneNumber($telefono)
+    {
+        // Eliminar espacios en blanco, guiones y paréntesis, pero mantener el símbolo "+"
+        $telefono = preg_replace('/[\s\-\(\)]/', '', $telefono);
+
+        // Si el número empieza con "+56" y tiene 11 dígitos, es correcto
+        if (preg_match('/^\+56\d{9}$/', $telefono)) {
+            return $telefono;
+        }
+
+        // Si el número ya empieza con "56" y tiene 11 dígitos, añadir "+"
+        if (preg_match('/^56\d{9}$/', $telefono)) {
+            return '+' . $telefono;
+        }
+
+        // Si el número tiene 8 dígitos y empieza con "9" (móvil chileno), agregar "+56"
+        if (preg_match('/^9\d{8}$/', $telefono)) {
+            return '+56' . $telefono;
+        }
+
+        // Si el número tiene 8 dígitos (número fijo chileno), agregar "+569"
+        if (preg_match('/^\d{8}$/', $telefono)) {
+            return '+569' . $telefono;
+        }
+
+        // Si el número no es válido, lanzar una excepción
+        throw new Exception('Número de teléfono inválido.', 1001);
     }
 
     public function urlConverter($company_id, $company_name)

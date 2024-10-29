@@ -22,7 +22,7 @@ try {
 
         // Manejo del archivo de imagen (logo) en $_FILES
         $logoName = $logoUrl;  // Mantener el logo anterior si no hay nuevo
-
+        $fomattedPhone = formatPhoneNumber($phone);
         if (isset($_FILES['logo']) && $_FILES['logo']['error'] === UPLOAD_ERR_OK) {
             $fileManager = new FileManager();
             $logoName = $fileManager->uploadLogo($_POST['company_name'], $company_id);
@@ -30,7 +30,7 @@ try {
 
         // Actualizar los datos de la empresa
         $data = [
-            'phone' => $phone,
+            'phone' => $fomattedPhone,
             'address' => $address,
             'description' => $description,
             'logo' => $logoName
@@ -45,33 +45,31 @@ try {
 }
 
 
+function formatPhoneNumber($telefono)
+{
+    // Eliminar espacios en blanco, guiones y paréntesis, pero mantener el símbolo "+"
+    $telefono = preg_replace('/[\s\-\(\)]/', '', $telefono);
 
-// Acceder a los datos de texto enviados por formData
-// $company_id = $_POST['company_id'] ?? null;
-// $name = $_POST['company_name'] ?? null;
-// $phone = $_POST['phone'] ?? null;
-// $address = $_POST['address'] ?? null;
-// $description = $_POST['description'] ?? null;
-// // Crear una instancia de FileManages
-// $fileManager = new FileManager();
-// try {
-//     $conn->beginTransaction();
+    // Si el número empieza con "+56" y tiene 11 dígitos, es correcto
+    if (preg_match('/^\+56\d{9}$/', $telefono)) {
+        return $telefono;
+    }
 
-//     // Aquí manejarías la subida del archivo como en el ejemplo anterior
-//     $logo = !empty($_FILES['logo']['name']) ? $fileManager->uploadLogo($name, $company_id) : $_POST['logo_url'];
+    // Si el número ya empieza con "56" y tiene 11 dígitos, añadir "+"
+    if (preg_match('/^56\d{9}$/', $telefono)) {
+        return '+' . $telefono;
+    }
 
-//     // Actualizar los datos de la empresa
-//     $sql = $conn->prepare("UPDATE companies SET logo = :logo, phone = :phone, address = :address, description = :description WHERE id = :id");
-//     $sql->bindParam(':phone', $phone);
-//     $sql->bindParam(':address', $address);
-//     $sql->bindParam(':description', $description);
-//     $sql->bindParam(':logo', $logo);
-//     $sql->bindParam(':id', $company_id);
-//     $sql->execute();
+    // Si el número tiene 8 dígitos y empieza con "9" (móvil chileno), agregar "+56"
+    if (preg_match('/^9\d{8}$/', $telefono)) {
+        return '+56' . $telefono;
+    }
 
-//     $conn->commit();
-//     echo json_encode(['success' => true, 'message' => 'Datos de la empresa actualizados correctamente']);
-// } catch (Exception $e) {
-//     $conn->rollBack();
-//     echo json_encode(['success' => false, 'error' => 'Error al agregar la empresa: ' . $e->getMessage()]);
-// }
+    // Si el número tiene 8 dígitos (número fijo chileno), agregar "+569"
+    if (preg_match('/^\d{8}$/', $telefono)) {
+        return '+569' . $telefono;
+    }
+
+    // Si el número no es válido, lanzar una excepción
+    throw new Exception('Número de teléfono inválido.');
+}
