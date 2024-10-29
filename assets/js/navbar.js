@@ -1,17 +1,18 @@
-import { initDateList } from "./datesList.js?v=<?php echo time(); ?>";
-import { initHorarios } from "./horarios.js?v=<?php echo time(); ?>";
-import { initServicios } from "./servicios.js?v=<?php echo time(); ?>";
-import { initConfiguraciones } from "./configuraciones.js?v=<?php echo time(); ?>";
-import { initCorreos } from "./correos.js?v=<?php echo time(); ?>";
-import { initDatosEmpresa } from "./datosEmpresa.js?v=<?php echo time(); ?>";
-import { initAddUser } from "./addUser.js?v=<?php echo time(); ?>";
-import { initAddCompany } from "./master_admin/master_add_company.js?v=<?php echo time(); ?>";
-import { initCompanyList } from "./master_admin/master_company_list.js?v=<?php echo time(); ?>";
-
 document.addEventListener("DOMContentLoaded", function () {
   const links = document.querySelectorAll(".nav-link");
   const mainContent = document.getElementById("main-content");
 
+  // Cargar la última pestaña seleccionada, o usar la predeterminada
+  const lastPage = localStorage.getItem("lastPage");
+  if (lastPage) {
+    loadContent(lastPage);
+  } else if (role_id == 1) {
+    loadContent("master_add_company");
+  } else {
+    loadContent("dateList");
+  }
+
+  // Configurar los listeners para cada pestaña
   links.forEach((link) => {
     link.addEventListener("click", function (event) {
       event.preventDefault();
@@ -20,71 +21,67 @@ document.addEventListener("DOMContentLoaded", function () {
         logout();
       } else {
         loadContent(page);
+        localStorage.setItem("lastPage", page); // Guardar la pestaña actual en localStorage
       }
     });
   });
-  if (role_id == 1) {
-    loadContent("master_add_company");
-  } else {
-    loadContent("dateList");
-  }
-  // Load the default content when the page loads, after registering all event listeners
 
-  function loadContent(page) {
-    document.querySelector(".titulo").textContent = document.querySelector("#" + page).innerHTML;
-    fetch(`pages/${page}.php`)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Error al cargar el contenido.");
-        }
-        return response.text();
-      })
-      .then((data) => {
-        hideCanvas();
-        mainContent.innerHTML = data;
-        document.getElementById(page).classList.add("active");
-        links.forEach((link) => {
-          if (link.id !== page) {
-            link.classList.remove("active");
-          }
-        });
+  async function loadContent(page) {
+    document.querySelector(".titulo").textContent = document.querySelector(`#${page}`).innerHTML;
+    try {
+      const response = await fetch(`pages/${page}.php`);
+      if (!response.ok) throw new Error("Error al cargar el contenido.");
 
-        // Ejecutar el código específico de la página cargada
-        switch (page) {
-          case "dateList":
-            initDateList();
-            break;
-          case "horarios":
-            initHorarios();
-            break;
-          case "servicios":
-            initServicios();
-            break;
-          case "configuraciones":
-            initConfiguraciones();
-            break;
-          case "correos":
-            initCorreos();
-            break;
-          case "datos_empresa":
-            initDatosEmpresa();
-            break;
-          case "add_user":
-            initAddUser();
-            break;
-          case "master_add_company":
-            initAddCompany();
-            break;
-          case "master_company_list":
-            initCompanyList();
-            break;
-          default:
-            console.error("No hay un módulo para la página:", page);
-        }
-      })
-      .catch((error) => {
-        mainContent.innerHTML = error.message;
-      });
+      const data = await response.text();
+      mainContent.innerHTML = data;
+      document.getElementById(page).classList.add("active");
+
+      links.forEach((link) => link.classList.toggle("active", link.id === page));
+
+      hideCanvas();
+      switch (page) {
+        case "dateList":
+          const { initDateList } = await import("./datesList.js?v=1.0.0");
+          initDateList();
+          break;
+        case "horarios":
+          const { initHorarios } = await import("./horarios.js?v=1.0.0");
+          initHorarios();
+          break;
+        case "servicios":
+          const { initServicios } = await import("./servicios.js?v=1.0.0");
+          initServicios();
+          break;
+        case "configuraciones":
+          const { initConfiguraciones } = await import("./configuraciones.js?v=1.0.0");
+          initConfiguraciones();
+          break;
+        case "correos":
+          const { initCorreos } = await import("./correos.js?v=1.0.0");
+          initCorreos();
+          break;
+        case "datos_empresa":
+          const { initDatosEmpresa } = await import("./datosEmpresa.js?v=1.0.2");
+          initDatosEmpresa();
+          break;
+        case "add_user":
+          const { initAddUser } = await import("./addUser.js?v=1.0.0");
+          initAddUser();
+          break;
+        case "master_add_company":
+          const { initAddCompany } = await import("./master_admin/master_add_company.js?v=1.0.1");
+          initAddCompany();
+          break;
+        case "master_company_list":
+          const { initCompanyList } = await import("./master_admin/master_company_list.js?v=1.0.1");
+          initCompanyList();
+          break;
+        default:
+          console.error("No hay un módulo para la página:", page);
+      }
+    } catch (error) {
+      mainContent.innerHTML = error.message;
+    }
   }
 
   function logout() {

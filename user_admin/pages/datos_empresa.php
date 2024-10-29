@@ -34,7 +34,7 @@ $media->execute();
             <div class="col-md-6">
                 <label for="phone" class="form-label">Teléfono</label>
                 <input type="tel" class="form-control" id="phone" name="phone" placeholder="Número de teléfono"
-                    value="+56 9 1234 5678">
+                    value="+56912345678" title="El formato usado es +56912345678">
             </div>
             <div class="col-md-6">
                 <label for="address" class="form-label">Dirección</label>
@@ -47,9 +47,9 @@ $media->execute();
         <div class="row mb-3">
             <div class="col-md-12">
                 <label for="description" class="form-label">Descripción</label>
-                <textarea class="form-control" id="description" name="description" rows="2" maxlength="120"
-                    placeholder="Descripción breve de la empresa (máximo 120 caracteres)"></textarea>
-                <div class="form-text">Máximo 120 caracteres.</div>
+                <textarea class="form-control" id="description" name="description" rows="2" maxlength="150"
+                    placeholder="Descripción breve de la empresa (máximo 150 caracteres)"></textarea>
+                <div class="form-text">Máximo 150 caracteres.</div>
             </div>
         </div>
 
@@ -88,10 +88,10 @@ $media->execute();
                         <button id="edit-preferred" class="btn btn-link p-0" title="Editar Red Preferida">
                             <i class="fas fa-pencil-alt"></i>
                         </button>
-                        <a tabindex="0" role="button" data-bs-trigger="focus" class="btn help" data-bs-toggle="popover"
+                        <!-- <a tabindex="0" role="button" data-bs-trigger="focus" class="btn help" data-bs-toggle="popover"
                             data-bs-title="Red preferida"
                             data-bs-content="Presiona en el ícono del lápiz para que puedas seleccionar tu red social preferida o página web. La función de ésto es que en el mensaje de Whatsapp de confirmación hay un botón que lleva al usuario a ver tu red social o página web"><i
-                                class="fa fa-circle-question text-primary"></i></a>
+                                class="fa fa-circle-question text-primary"></i></a> -->
                     </th>
                     <th>Acciones</th>
                 </tr>

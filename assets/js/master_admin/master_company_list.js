@@ -35,7 +35,7 @@ export function initCompanyList() {
             <td data-cell="nombre" class="data">${company.name}</td>
             <td data-cell="url" class="data"><a href="${baseUrl}reservas/${company.custom_url}" target="_blank">URL FORM</a></td>
             <td data-cell="accion">
-                <button class="btn btn-danger btn-sm eliminarReserva" title="Eliminar reserva" data-id="${company.id}">
+                <button class="btn btn-danger btn-sm eliminarCompania" title="Eliminar compañía" data-id="${company.id}">
                     <i class="fas fa-times"></i>
                     <span class="spinner-border spinner-border-sm d-none" aria-hidden="true"></span>
                     <span class="button-text"></span>
@@ -78,10 +78,10 @@ export function initCompanyList() {
   }
 
   document.addEventListener("click", function (event) {
-    if (event.target.closest(".eliminarReserva")) {
-      const button = event.target.closest(".eliminarReserva");
+    event.preventDefault();
+    if (event.target.closest(".eliminarCompania")) {
+      const button = event.target.closest(".eliminarCompania");
       const companyId = button.getAttribute("data-id");
-
       if (confirm("Está seguro de querer borrar esta compañía?")) {
         deleteCompany(companyId, button);
       }
@@ -103,7 +103,7 @@ export function initCompanyList() {
       const { success } = await response.json();
 
       if (success) {
-        button.closest("tr").remove();
+        fetchCompanies();
       } else {
         alert("Failed to delete company.");
       }
