@@ -8,6 +8,33 @@ $datosUsuario = $auth->validarTokenUsuario();
 $companyManager = new CompanyManager();
 $company_id = $datosUsuario['company_id'];
 
+function validateInputs($data)
+{
+    $errors = [];
+
+    // Verificar si los campos necesarios están presentes y no vacíos
+    if (empty($data['schedule_mode'])) {
+        $errors[] = 'El modo de horario es requerido.';
+    }
+
+    if (empty($data['calendar_mode'])) {
+        $errors[] = 'El modo de calendario es requerido.';
+    }
+
+    if ($data['calendar_mode'] === 'corrido' && empty($data['calendar_days_available'])) {
+        $errors[] = 'Los días disponibles del calendario son requeridos.';
+    } elseif ($data['calendar_mode'] !== 'corrido') {
+        if (empty($data['fixed_start_date'])) {
+            $errors[] = 'La fecha de inicio fija es requerida.';
+        }
+        if (empty($data['fixed_duration'])) {
+            $errors[] = 'La duración del periodo es requerida.';
+        }
+    }
+
+    // Retornar los errores encontrados, si hay
+    return $errors;
+}
 
 // Verificar si la solicitud es POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -45,6 +72,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $data['auto_open'] = isset($_POST['auto_open']) ? 1 : 0;
     }
 
+    // Validar los inputs
+    $validationErrors = validateInputs($data);
+    // Verificar si hay errores de validación
+    if (!empty($validationErrors)) {
+        echo json_encode(['success' => false, 'errors' => $validationErrors]);
+        exit; // Termina el script si hay errores
+    }
     try {
         $result = $companyManager->updateCompanyConfig($data);
 
