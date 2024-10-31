@@ -133,23 +133,24 @@ $current_date->setTime(0, 0, 0);
                         class="fa fa-circle-question text-primary"></i></a>
             </div>
             <!-- Mostrar el periodo actual -->
-            <p><strong>Periodo Actual:</strong> del <?php echo $fixed_start_day->format('d-m-Y'); ?> al
-                <?php echo $period_end->format('d-m-Y'); ?></p>
+            <?php if ($company['calendar_mode'] == 'fijo'): ?>
+                <p><strong>Periodo Actual:</strong> del <?php echo $fixed_start_day->format('d-m-Y'); ?> al
+                    <?php echo $period_end->format('d-m-Y'); ?></p>
+            <?php endif; ?>
             <div class="mb-3">
                 <label for="fixed_start_date" class="form-label">Fecha de Inicio:</label>
                 <input type="date" class="form-control" id="fixed_start_date" name="fixed_start_date"
-                    value="<?php echo $company['fixed_start_date']; ?>"
-                    <?php echo $company['calendar_mode'] == 'fijo' ? 'required' : ''; ?>>
+                    value="<?php echo $company['fixed_start_date']; ?>">
             </div>
             <div class="mb-3">
                 <label for="fixed_duration" class="form-label">Duración (días):</label>
                 <input type="number" class="form-control" id="fixed_duration" name="fixed_duration" min="1"
-                    value="<?php echo $company['fixed_duration']; ?>"
-                    <?php echo $company['calendar_mode'] == 'fijo' ? 'required' : ''; ?>>
+                    value="<?php echo $company['fixed_duration']; ?>">
             </div>
             <div class="form-check mb-3">
                 <input class="form-check-input" type="checkbox" id="auto_open" name="auto_open"
-                    <?php echo $company['auto_open']  ? 'checked' : ''; ?>>
+                    <?php echo $company['auto_open']  ? 'checked' : ''; ?>
+                    <?php echo ($company['calendar_mode'] == 'corrido') ? 'disabled' : ''; ?>>
                 <label class="form-check-label" for="auto_open">Abrir automáticamente nuevo periodo al
                     finalizar</label>
                 <a tabindex="0" role="button" data-bs-trigger="focus" class="btn help ms-2" data-bs-toggle="popover"
@@ -162,8 +163,8 @@ $current_date->setTime(0, 0, 0);
             <!-- Botón "Abrir Nuevo Periodo" con ícono de información -->
             <div class="d-flex align-items-center mt-3">
                 <button type="button" id="openNewPeriod" class="btn btn-warning" data-bs-toggle="modal"
-                    data-bs-target="#newPeriodModal">
-                    Abrir Nuevo Periodo
+                    data-bs-target="#newPeriodModal"
+                    <?php echo ($company['calendar_mode'] == 'corrido') ? 'disabled' : ''; ?>> Abrir Nuevo Periodo
                 </button>
                 <a tabindex="0" role="button" data-bs-trigger="focus" class="btn help ms-2" data-bs-toggle="popover"
                     data-bs-title="Abrir Nuevo Periodo"

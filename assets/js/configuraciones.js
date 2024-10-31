@@ -10,12 +10,19 @@ export function initConfiguraciones() {
         body: formData,
       });
 
-      const { success } = await response.json();
+      const { success, errors } = await response.json();
       if (success) {
         alert("Configuración guardada correctamente.");
         location.reload();
       } else {
-        alert("Hubo un error al guardar la configuración.");
+        // Aquí manejamos los errores
+        if (errors) {
+          // Unimos los errores en un string separado por saltos de línea
+          const errorMessage = errors.join("\n");
+          alert(`Hubo un error al guardar la configuración:\n${errorMessage}`);
+        } else {
+          alert("Hubo un error al guardar la configuración.");
+        }
       }
     });
   }
@@ -116,7 +123,7 @@ export function initConfiguraciones() {
 
   // modal de agregar nuevo period
   document.getElementById("diasSeleccionados").textContent = document.getElementById("fixed_duration").value;
-
+  const newPeriodModal = new bootstrap.Modal(document.getElementById("newPeriodModal"));
   document.getElementById("confirmNewPeriod").addEventListener("click", async function () {
     const diasPEriodo = document.getElementById("fixed_duration").value;
 
@@ -130,6 +137,7 @@ export function initConfiguraciones() {
 
     const { success, message } = await response.json();
     if (success) {
+      newPeriodModal.hide();
       alert(message);
       location.reload();
     }

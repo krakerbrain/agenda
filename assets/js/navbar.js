@@ -2,7 +2,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const links = document.querySelectorAll(".nav-link");
   const mainContent = document.getElementById("main-content");
   // Cargar la última pestaña seleccionada, o usar la predeterminada
-  const lastPage = localStorage.getItem("lastPage");
+  const lastPage = sessionStorage.getItem("lastPage");
+
   if (lastPage) {
     loadContent(lastPage);
   } else if (role_id == 1) {
@@ -20,7 +21,7 @@ document.addEventListener("DOMContentLoaded", function () {
         logout();
       } else {
         loadContent(page);
-        localStorage.setItem("lastPage", page); // Guardar la pestaña actual en localStorage
+        sessionStorage.setItem("lastPage", page); // Guardar la pestaña actual en sessionStorage
       }
     });
   });
