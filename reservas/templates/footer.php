@@ -1,7 +1,7 @@
 </div> <!-- Cierre de .container -->
 <script>
-    const baseUrl = "<?php echo $baseUrl; ?>";
-    const company_days_available = <?php echo json_encode($company['calendar_days_available']); ?>;
+const baseUrl = "<?php echo $baseUrl; ?>";
+const company_days_available = <?php echo $calendar_days_available ?>;
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>

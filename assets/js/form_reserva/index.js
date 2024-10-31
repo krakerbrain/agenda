@@ -111,7 +111,6 @@ function getAvailableDays() {
   // Función anidada para registrar eventos en fechas deshabilitadas
   function registerDisabledDateClickEvents(instance) {
     const calendarDaysAvailable = company_days_available; // Número de días que el calendario permite seleccionar
-    const today = new Date(); // Fecha actual
     const maxDate = new Date().fp_incr(calendarDaysAvailable); // Fecha máxima permitida sumando los días disponibles
 
     // Selecciona solo los elementos con la clase .flatpickr-disabled dentro de .dayContainer
@@ -155,11 +154,12 @@ function getAvailableDays() {
     .then((data) => {
       if (data.success) {
         const availableDates = data.available_days;
+
         flatpickr("#date", {
           enableTime: false,
           dateFormat: "Y-m-d",
           minDate: "today",
-          maxDate: new Date().fp_incr(calendarDaysAvailable), // Puedes ajustar este valor según necesites
+          maxDate: data.calendar_mode == "fijo" ? availableDates[availableDates.length - 1] : new Date().fp_incr(calendarDaysAvailable),
           enable: [
             function (date) {
               return availableDates.includes(date.toISOString().split("T")[0]);
