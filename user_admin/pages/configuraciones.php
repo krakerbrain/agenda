@@ -21,6 +21,17 @@ $fontColor = $company['font_color'];
 $btnPrimaryColor = $company['btn1'];
 $btnSecondaryColor = $company['btn2'];
 
+// Se calcula la fecha de inicio y termino del periodo para mostrarla al usuario
+$fixed_start_day = new DateTime($company['fixed_start_date']);
+$fixed_duration = $company['fixed_duration'];
+
+// Calculamos el periodo actual (fecha de inicio y fecha de término)
+$period_end = clone $fixed_start_day;
+$period_end->modify('+' . ($fixed_duration - 1) . ' days');
+
+// Obtenemos la fecha actual en medianoche para comparación
+$current_date = new DateTime();
+$current_date->setTime(0, 0, 0);
 ?>
 <style>
     #example-card {
@@ -71,20 +82,99 @@ $btnSecondaryColor = $company['btn2'];
                 <?php echo $company['schedule_mode'] == 'blocks' ? 'checked' : ''; ?>>
             <label class="form-check-label" for="blocks">Bloques de Horarios</label>
         </div>
-        <div class="d-flex align-items-baseline">
-            <h3 class="mt-4 mb-3">Disponibilidad del calendario</h3>
-            <a tabindex="0" role="button" data-bs-trigger="focus" class=" btn help" data-bs-toggle="popover"
-                data-bs-title="Disponibilidad"
-                data-bs-content="La cantidad de días que elijas es la que el cliente tendrá permitido reservar. Si por ejemplo seleccionas 20 días el cliente no podrá hacer una cita con más de 20 días de antelación"><i
-                    class="fa fa-circle-question text-primary"></i></a>
-        </div>
-        <div class="mb-3">
-            <label for="calendar_days_available" class="form-label">Días disponibles para reservar:</label>
-            <input type="number" class="form-control" id="calendar_days_available" name="calendar_days_available"
-                value="<?php echo $company['calendar_days_available']; ?>">
-        </div>
+
+        <!-- confguración de disponibilidad del calenadario -->
 
         <div class="d-flex align-items-baseline">
+            <h3 class="mt-4 mb-3">Disponibilidad del calendario</h3>
+            <a tabindex="0" role="button" data-bs-trigger="focus" class="btn help" data-bs-toggle="popover"
+                data-bs-title="Disponibilidad"
+                data-bs-content="Define un rango de fechas en el que tu empresa estará disponible para reservas. El cliente podrá elegir entre una disponibilidad fija o continua."><i
+                    class="fa fa-circle-question text-primary"></i></a>
+        </div>
+        <div class="d-flex align-items-center mb-3">
+            <div class="form-check me-3">
+                <input class="form-check-input" type="radio" name="calendar_mode" id="corrido" value="corrido"
+                    <?php echo $company['calendar_mode'] == 'corrido' ? 'checked' : ''; ?>>
+                <label class="form-check-label" for="corrido">Contínuo</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="calendar_mode" id="fijo" value="fijo"
+                    <?php echo $company['calendar_mode'] == 'fijo' ? 'checked' : ''; ?>>
+                <label class="form-check-label" for="fijo">Fijo</label>
+            </div>
+        </div>
+
+        <!-- Input para Días Disponibles (Corrido) -->
+        <div id="corridoInput" class="mb-3"
+            style="display: <?php echo ($company['calendar_mode'] == 'corrido') ? 'block' : 'none'; ?>;">
+            <div class="d-flex align-items-baseline">
+                <h5 class="mt-4 mb-3">Configuración de Disponibilidad Continua</h5>
+                <a tabindex="0" role="button" data-bs-trigger="focus" class="btn help" data-bs-toggle="popover"
+                    data-bs-title="Disponibilidad Continua"
+                    data-bs-content="La cantidad de días que elijas determinará el máximo de días con los que los clientes pueden reservar. Por ejemplo, si seleccionas 20 días, el cliente no podrá hacer una cita con más de 20 días de antelación. Recuerda que cada día se abrirá una nueva fecha disponible."><i
+                        class="fa fa-circle-question text-primary"></i></a>
+            </div>
+            <div class="mb-3">
+                <label for="calendar_days_available" class="form-label">Días disponibles para reservar:</label>
+                <input type="number" class="form-control" id="calendar_days_available" name="calendar_days_available"
+                    value="<?php echo $company['calendar_days_available']; ?>">
+            </div>
+        </div>
+
+        <!-- Configuración de Disponibilidad Fija (Fijo) -->
+        <div id="fijoInput" class="container mb-4"
+            style="display: <?php echo ($company['calendar_mode'] == 'fijo') ? 'block' : 'none'; ?>;">
+            <div class="d-flex align-items-baseline">
+                <h5 class="mt-4 mb-3">Configuración de Disponibilidad Fija</h5>
+                <a tabindex="0" role="button" data-bs-trigger="focus" class="btn help" data-bs-toggle="popover"
+                    data-bs-title="Disponibilidad Fija"
+                    data-bs-content="La cantidad de días que elijas limitará el periodo durante el cual los clientes pueden hacer reservas. Al seleccionar una fecha de inicio y la cantidad de días, no se podrán realizar reservas fuera del periodo establecido hasta que se abra uno nuevo, ya sea automáticamente o manualmente. El calendario no avanzará hasta que se inicie un nuevo periodo."><i
+                        class="fa fa-circle-question text-primary"></i></a>
+            </div>
+            <!-- Mostrar el periodo actual -->
+            <p><strong>Periodo Actual:</strong> del <?php echo $fixed_start_day->format('d-m-Y'); ?> al
+                <?php echo $period_end->format('d-m-Y'); ?></p>
+            <div class="mb-3">
+                <label for="fixed_start_date" class="form-label">Fecha de Inicio:</label>
+                <input type="date" class="form-control" id="fixed_start_date" name="fixed_start_date"
+                    value="<?php echo $company['fixed_start_date']; ?>"
+                    <?php echo $company['calendar_mode'] == 'fijo' ? 'required' : ''; ?>>
+            </div>
+            <div class="mb-3">
+                <label for="fixed_duration" class="form-label">Duración (días):</label>
+                <input type="number" class="form-control" id="fixed_duration" name="fixed_duration" min="1"
+                    value="<?php echo $company['fixed_duration']; ?>"
+                    <?php echo $company['calendar_mode'] == 'fijo' ? 'required' : ''; ?>>
+            </div>
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" id="auto_open" name="auto_open"
+                    <?php echo $company['auto_open']  ? 'checked' : ''; ?>>
+                <label class="form-check-label" for="auto_open">Abrir automáticamente nuevo periodo al
+                    finalizar</label>
+                <a tabindex="0" role="button" data-bs-trigger="focus" class="btn help ms-2" data-bs-toggle="popover"
+                    data-bs-title="Nuevo periodo automático"
+                    data-bs-content="Al terminar el periodo actual se iniciará automáticamente un nuevo periodo considerando la cantidad de días preestablecidos. ">
+                    <i class="fa fa-circle-question text-primary"></i>
+                </a>
+            </div>
+
+            <!-- Botón "Abrir Nuevo Periodo" con ícono de información -->
+            <div class="d-flex align-items-center mt-3">
+                <button type="button" id="openNewPeriod" class="btn btn-warning" data-bs-toggle="modal"
+                    data-bs-target="#newPeriodModal">
+                    Abrir Nuevo Periodo
+                </button>
+                <a tabindex="0" role="button" data-bs-trigger="focus" class="btn help ms-2" data-bs-toggle="popover"
+                    data-bs-title="Abrir Nuevo Periodo"
+                    data-bs-content="Si deseas comenzar un nuevo periodo antes de que finalice el actual, haz clic en este botón. El periodo actual se extenderá hasta completar el nuevo.">
+                    <i class="fa fa-circle-question text-primary"></i>
+                </a>
+            </div>
+
+        </div>
+
+        <div class=" d-flex align-items-baseline">
             <h3 class="mb-3">Fechas Bloqueadas</h3>
             <a tabindex="0" role="button" data-bs-trigger="focus" class="btn help" data-bs-toggle="popover"
                 data-bs-title="Fechas Bloqueadas"
@@ -137,7 +227,8 @@ $btnSecondaryColor = $company['btn2'];
                         </div>
                     </div>
                     <div class="align-content-end text-md-end">
-                        <button type="button" class="btn btn-primary mt-3" id="resetColors">Restablecer Colores</button>
+                        <button type="button" class="btn btn-primary mt-3" id="resetColors">Restablecer
+                            Colores</button>
                     </div>
                 </div>
                 <!-- Ejemplo de vista de card con estilos seleccionados -->
@@ -175,4 +266,6 @@ $btnSecondaryColor = $company['btn2'];
         </div>
         <button type="submit" class="btn btn-success">Guardar Configuración</button>
     </form>
+    <?php include dirname(__DIR__, 2) . '/includes/modal-nuevo-periodo.php';
+    ?>
 </div>

@@ -1,7 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
   const links = document.querySelectorAll(".nav-link");
   const mainContent = document.getElementById("main-content");
-  console.log("mainContent");
   // Cargar la última pestaña seleccionada, o usar la predeterminada
   const lastPage = localStorage.getItem("lastPage");
   if (lastPage) {
@@ -53,7 +52,7 @@ document.addEventListener("DOMContentLoaded", function () {
           initServicios();
           break;
         case "configuraciones":
-          const { initConfiguraciones } = await import("./configuraciones.js?v=1.0.0");
+          const { initConfiguraciones } = await import("./configuraciones.js?v=1.0.1");
           initConfiguraciones();
           break;
         case "correos":

@@ -7,6 +7,7 @@ $data = json_decode(file_get_contents('php://input'), true);
 $service_id = $data['service_id'];
 $calendar_days_available = $data['calendar_days_available'];
 $company_id = $data['company_id'];
+$today = new DateTime();
 
 // Obtener datos de la empresa
 $sql = $conn->prepare("SELECT * FROM companies WHERE id = :company_id AND is_active = 1");
@@ -72,10 +73,14 @@ foreach ($schedules as $schedule) {
     ];
 }
 
-// Rango de fechas (hoy + 30 días)
-$start_date = new DateTime();
-$end_date = new DateTime();
+// Suponiendo que fixed_start_date está en formato 'Y-m-d' en la base de datos
+$fixed_start_day = new DateTime($company['fixed_start_date']);
+
+// Establecer las fechas de inicio y fin
+$start_date = $today; // Establece la fecha de inicio como fixed_start_day
+$end_date = $company['calendar_mode'] === 'corrido' ? clone $start_date : $fixed_start_day;
 $end_date->modify('+' . $calendar_days_available . ' days');
+// }
 
 // Obtener todas las citas en el rango de fechas
 $sql_appointments = $conn->prepare("
@@ -106,7 +111,7 @@ foreach ($daterange as $date) {
     $date_str = $date->format('Y-m-d');
 
     // Evitar el día actual
-    if ($date_str === (new DateTime())->format('Y-m-d')) {
+    if ($date_str === ($today)->format('Y-m-d')) {
         continue; // Saltar la fecha si es el mismo día
     }
 
@@ -208,4 +213,4 @@ foreach ($daterange as $date) {
     }
 }
 
-echo json_encode(['success' => true, 'available_days' => $available_days]);
+echo json_encode(['success' => true, 'available_days' => $available_days, 'calendar_mode' =>  $company['calendar_mode']]);

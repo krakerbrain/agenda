@@ -18,7 +18,7 @@ class CompanyManager
 
     public function getAllActiveCompanies()
     {
-        $sql = "SELECT id FROM companies WHERE is_active = 1";
+        $sql = "SELECT id, fixed_start_date, auto_open, fixed_duration FROM companies WHERE is_active = 1";
         $this->db->query($sql);
         return $this->db->resultSet();
     }
@@ -51,6 +51,18 @@ class CompanyManager
         $this->db->query($sql);
         $this->db->bind(':id', $company_id);
         return $this->db->singleValue();
+    }
+
+    public function getFixedStartDate($companyId)
+    {
+
+        $query = "SELECT fixed_start_date FROM companies WHERE id = :company_id";
+        $this->db->query($query);
+        $this->db->bind(':company_id', $companyId);
+        $result = $this->db->single();
+
+        // Devolver la fecha si existe, de lo contrario, falso
+        return $result ? $result['fixed_start_date'] : false;
     }
     // Función para crear una nueva empresa
     public function createCompany($name, $phone, $address, $logo = null, $status = 1)
@@ -262,6 +274,88 @@ class CompanyManager
             return ['success' => false, 'error' => 'Error al actualizar la empresa: ' . $e->getMessage()];
         }
     }
+
+    public function updateCompanyConfig($data)
+    {
+        try {
+            $this->db->beginTransaction(); // Iniciar transacción
+
+            // Preparar la consulta SQL
+            $sql = "UPDATE companies SET 
+                        schedule_mode = :schedule_mode,
+                        calendar_mode = :calendar_mode,
+                        blocked_dates = :blocked_dates,
+                        bg_color = :bg_color,
+                        font_color = :font_color,
+                        btn1 = :btn1_color,
+                        btn2 = :btn2_color,
+                        calendar_days_available = :calendar_days_available,
+                        fixed_start_date = :fixed_start_date,
+                        fixed_duration = :fixed_duration,
+                        auto_open = :auto_open
+                    WHERE id = :company_id AND is_active = 1";
+
+            $this->db->query($sql);
+            $this->db->bind(':schedule_mode', $data['schedule_mode']);
+            $this->db->bind(':calendar_mode', $data['calendar_mode']);
+            $this->db->bind(':blocked_dates', $data['blocked_dates']);
+            $this->db->bind(':bg_color', $data['bg_color']);
+            $this->db->bind(':font_color', $data['font_color']);
+            $this->db->bind(':btn1_color', $data['btn1_color']);
+            $this->db->bind(':btn2_color', $data['btn2_color']);
+            $this->db->bind(':calendar_days_available', $data['calendar_days_available']);
+            $this->db->bind(':fixed_start_date', $data['fixed_start_date']);
+            $this->db->bind(':fixed_duration', $data['fixed_duration']);
+            $this->db->bind(':auto_open', $data['auto_open']);
+            $this->db->bind(':company_id', $data['company_id']);
+            $this->db->execute();
+
+            $this->db->endTransaction(); // Commit de la transacción
+
+            return ['success' => true];
+        } catch (Exception $e) {
+            $this->db->cancelTransaction(); // Rollback en caso de error
+            return ['success' => false, 'error' => 'Error al actualizar los datos: ' . $e->getMessage()];
+        }
+    }
+
+    public function updateFixedStartDay($companyId, $newStartDay)
+    {
+        try {
+            // Asegurarse de que la nueva fecha sea un objeto DateTime
+            if (!$newStartDay instanceof DateTime) {
+                $newStartDay = new DateTime($newStartDay);
+            }
+
+            // Formatear la fecha a 'Y-m-d' para la consulta SQL
+            $formattedDate = $newStartDay->format('Y-m-d');
+
+            $this->db->beginTransaction(); // Iniciar transacción
+
+            // Crear la consulta para actualizar el fixed_start_date
+            $query = "UPDATE companies SET fixed_start_date = :fixed_start_date WHERE id = :company_id";
+
+            // Preparar la consulta
+            $this->db->query($query);
+            $this->db->bind(':fixed_start_date', $formattedDate);
+            $this->db->bind(':company_id', $companyId);
+            $this->db->execute();
+
+            $this->db->endTransaction(); // Commit de la transacción
+
+            // Registrar el éxito en el log
+            error_log("Se actualizó fixed_start_date para la compañía ID: $companyId a $formattedDate" . PHP_EOL, 3, dirname(__DIR__) . '/cron/cronerror/error.log');
+            return true; // Retornar verdadero si la actualización fue exitosa
+        } catch (Exception $e) {
+            $this->db->cancelTransaction(); // Rollback en caso de error
+            // Registrar el error si la actualización falla
+            error_log("Error al actualizar fixed_start_date para la compañía ID: $companyId - " . $e->getMessage() . PHP_EOL, 3, dirname(__DIR__) . '/cron/cronerror/error.log');
+            return false; // Retornar falso si la actualización falló
+        }
+    }
+
+
+
 
 
     // Función para cambiar estado de empresa

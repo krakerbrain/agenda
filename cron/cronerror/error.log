@@ -1,0 +1,6 @@
+Error al actualizar fixed_start_day para la compañía ID: 1 - SQLSTATE[42S22]: Column not found: 1054 Unknown column 'fixed_start_day' in 'field list'
+Error al actualizar fixed_start_day para la compañía ID: 1 - SQLSTATE[42S22]: Column not found: 1054 Unknown column 'fixed_start_day' in 'field list'
+Se actualizó fixed_start_date para la compañía ID: 1 a 2024-10-31
+Se actualizó fixed_start_date para la compañía ID:  a 2024-11-11
+Se actualizó fixed_start_date para la compañía ID: 1 a 2024-11-11
+Se actualizó fixed_start_date para la compañía ID: 1 a 2024-11-18
