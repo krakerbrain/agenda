@@ -119,43 +119,55 @@ class EmailTemplate
     // Construir el correo
     public function buildEmail($data, $templateType)
     {
-        // Cargar datos de la compañía y del servicio
-        $this->loadCompanyData($data['company_id'], $templateType);
-        $this->loadServiceData($data['id_service']);
+        try {
+            // Cargar datos de la compañía y del servicio
+            $this->loadCompanyData($data['company_id'], $templateType);
+            $this->loadServiceData($data['id_service']);
 
-        $notesHtml = '';
-        if (!empty($this->companyData['notas'])) {
-            foreach ($this->companyData['notas'] as $note) {
-                $notesHtml .= "<li>{$note}</li>";
+            $notesHtml = '';
+            if (!empty($this->companyData['notas'])) {
+                foreach ($this->companyData['notas'] as $note) {
+                    $notesHtml .= "<li>{$note}</li>";
+                }
+            } else {
+                $notesHtml = '<li>No hay notas adicionales.</li>';
             }
-        } else {
-            $notesHtml = '<li>No hay notas adicionales.</li>';
+
+            $templatePath = $this->baseUrl . 'correos_template/correo_' . $templateType . '.php';
+            $templateContent = file_get_contents($templatePath);
+
+            $date = date('d/m/Y', strtotime($data['date']));
+            $startTime = date('h:i a', strtotime($data['start_time']));
+
+            $subject_msg = $templateType == 'reserva' ? 'Solicitud de reserva recibida - {fecha_reserva}' : '¡Tu reserva ha sido confirmada! - {fecha_reserva}';
+            $subject_msg = str_replace('{fecha_reserva}', $data['date'], $subject_msg);
+            $subject = mb_encode_mimeheader($subject_msg, 'UTF-8', 'B', "\n");
+
+            $body = str_replace(
+                ['{nombre_cliente}', '{fecha_reserva}', '{hora_reserva}', '{servicio_reservado}', '{notas}', '{ruta_logo}', '{nombre_empresa}'],
+                [$data['name'], $data['date'], $startTime, $this->serviceData['name'], $notesHtml, $this->companyData['logo'], $this->companyData['name']],
+                $templateContent
+            );
+
+            $mailData = ['subject' => $subject, 'body' => $body, 'company_name' => $this->companyData['name']];
+            $emailSender = new EmailSender();
+            $sender =  $emailSender->sendEmail($data['mail'],  $mailData, ucfirst($templateType));
+
+            if ($templateType == 'reserva') {
+                $alertEmailContent = $this->buildAppointmentAlert($data);
+                $emailSender->sendEmail($this->userData['email'], $alertEmailContent, null);
+            }
+
+            return ['success' => $sender, 'company_name' => $this->companyData['name'], 'social_token' => $this->companyData['social_token']];
+        } catch (Exception $e) {
+            // Aquí podrías loguear el error o enviarlo como respuesta al cron job
+            error_log("Error en el envío de correo: " . $e->getMessage());
+
+            // Retornar un mensaje de error para manejarlo en el cron job
+            return ['error' => $e->getMessage()];
         }
-
-        $templatePath = $this->baseUrl . 'correos_template/correo_' . $templateType . '.php';
-        $templateContent = file_get_contents($templatePath);
-
-        $date = date('d/m/Y', strtotime($data['date']));
-        $startTime = date('h:i a', strtotime($data['start_time']));
-
-        $subject_msg = $templateType == 'reserva' ? 'Solicitud de reserva recibida - {fecha_reserva}' : '¡Tu reserva ha sido confirmada! - {fecha_reserva}';
-        $subject_msg = str_replace('{fecha_reserva}', $data['date'], $subject_msg);
-        $subject = mb_encode_mimeheader($subject_msg, 'UTF-8', 'B', "\n");
-
-        $body = str_replace(
-            ['{nombre_cliente}', '{fecha_reserva}', '{hora_reserva}', '{servicio_reservado}', '{notas}', '{ruta_logo}', '{nombre_empresa}'],
-            [$data['name'], $data['date'], $startTime, $this->serviceData['name'], $notesHtml, $this->companyData['logo'], $this->companyData['name']],
-            $templateContent
-        );
-        $mailData = ['subject' => $subject, 'body' => $body, 'company_name' => $this->companyData['name']];
-        $emailSender = new EmailSender();
-        $sender =  $emailSender->sendEmail($data['mail'],  $mailData, ucfirst($templateType));
-        if ($templateType == 'reserva') {
-            $alertEmailContent = $this->buildAppointmentAlert($data);
-            $emailSender->sendEmail($this->userData['email'], $alertEmailContent, null);
-        }
-        return ['success' => $sender, 'company_name' => $this->companyData['name'], 'social_token' => $this->companyData['social_token']];
     }
+
 
     // Otro constructor de correos, como alertas, reutilizando los mismos datos
     public function buildAppointmentAlert($data)
