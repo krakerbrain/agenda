@@ -169,7 +169,7 @@ class Appointments extends Database
     public function getUnconfirmedAppointment()
     {
         $db = new Database();
-        $db->query("SELECT * FROM appointments WHERE aviso_reserva = 1 and aviso_confirmada = 0");
+        $db->query("SELECT * FROM appointments WHERE aviso_confirmada = 0 AND aviso_reserva = 1 AND status = 1");
         return $db->resultSet();
     }
 
@@ -185,24 +185,6 @@ class Appointments extends Database
         $db->bind(':id', $id);
         return $db->execute();
     }
-
-    // public function update_appointment($id)
-    // {
-    //     $db = new Database();
-    //     $db->query('UPDATE appointments SET status = 1, updated_at = now() WHERE id = :id');
-    //     $db->bind(':id', $id);
-    //     $db->execute();
-    //     return $db->rowCount();
-    // }
-    // public function update_event($eventId, $appointmentId)
-    // {
-    //     $db = new Database();
-    //     $db->query("UPDATE appointments SET event_id = :event_id, updated_at = now() WHERE id = :appointment_id");
-    //     $db->bind(':event_id', $eventId);
-    //     $db->bind(':appointment_id', $appointmentId);
-    //     $db->execute();
-    //     return $db->rowCount();
-    // }
 
     public function updateAppointment($id, $status, $eventId)
     {
