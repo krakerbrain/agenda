@@ -119,6 +119,8 @@ class EmailTemplate
     // Construir el correo
     public function buildEmail($data, $templateType)
     {
+        // Reiniciar datos para cada iteración
+        $this->resetData();
         try {
             // Cargar datos de la compañía y del servicio
             $this->loadCompanyData($data['company_id'], $templateType);
@@ -166,6 +168,13 @@ class EmailTemplate
             // Retornar un mensaje de error para manejarlo en el cron job
             return ['error' => $e->getMessage()];
         }
+    }
+
+    private function resetData()
+    {
+        $this->companyData = null;
+        $this->serviceData = null;
+        $this->userData = null;
     }
 
 
