@@ -9,9 +9,20 @@ class Appointments extends Database
         try {
             $db = new Database();
 
-            // Insertar la cita sin el token
-            $db->query('INSERT INTO appointments (company_id, name, phone, mail, date, start_time, end_time, id_service, created_at) 
-                    VALUES (:company_id, :name, :phone, :mail, :date, :start_time, :end_time, :id_service, now())');
+            /**
+                company_id = id de la compañia
+                name = nombre del cliente
+                phone  = telefono del cliente
+                mail  = correo del cliente
+                date  = fecha de la cita
+                start_time = hora  de inicio de la cita
+                end_time  = hora de fin de la cita
+                id_service  = id del servicio
+                aviso_reserva  = "0" indica que el cliente no ha sido notificado
+                created_at = inidca la fecha de creacion de la cita
+             *  */
+            $db->query('INSERT INTO appointments (company_id, name, phone, mail, date, start_time, end_time, id_service, aviso_reserva, created_at) 
+                    VALUES (:company_id, :name, :phone, :mail, :date, :start_time, :end_time, :id_service, 0, now())');
             $db->bind(':company_id', $data['company_id']);
             $db->bind(':name', $data['name']);
             $db->bind(':phone', $data['phone']);
@@ -119,8 +130,6 @@ class Appointments extends Database
         return $db->resultSet();
     }
 
-
-
     public function get_appointment($id)
     {
         try {
@@ -151,20 +160,57 @@ class Appointments extends Database
         }
     }
 
-    public function update_appointment($id)
+    public function getUnconfirmedReserva()
     {
         $db = new Database();
-        $db->query('UPDATE appointments SET status = 1, updated_at = now() WHERE id = :id');
-        $db->bind(':id', $id);
-        $db->execute();
-        return $db->rowCount();
+        $db->query("SELECT * FROM appointments WHERE aviso_reserva = 0");
+        return $db->resultSet();
     }
-    public function update_event($eventId, $appointmentId)
+    public function getUnconfirmedAppointment()
     {
         $db = new Database();
-        $db->query("UPDATE appointments SET event_id = :event_id, updated_at = now() WHERE id = :appointment_id");
+        $db->query("SELECT * FROM appointments WHERE aviso_reserva = 1 and aviso_confirmada = 0");
+        return $db->resultSet();
+    }
+
+    public function markAsConfirmed($id, $type = 'reserva')
+    {
+        $db = new Database();
+
+        if ($type  === 'reserva') {
+            $db->query("UPDATE appointments SET aviso_reserva = 1, aviso_confirmada  = 0 WHERE id = :id");
+        } else {
+            $db->query("UPDATE appointments SET aviso_confirmada = 1 WHERE id = :id");
+        }
+        $db->bind(':id', $id);
+        return $db->execute();
+    }
+
+    // public function update_appointment($id)
+    // {
+    //     $db = new Database();
+    //     $db->query('UPDATE appointments SET status = 1, updated_at = now() WHERE id = :id');
+    //     $db->bind(':id', $id);
+    //     $db->execute();
+    //     return $db->rowCount();
+    // }
+    // public function update_event($eventId, $appointmentId)
+    // {
+    //     $db = new Database();
+    //     $db->query("UPDATE appointments SET event_id = :event_id, updated_at = now() WHERE id = :appointment_id");
+    //     $db->bind(':event_id', $eventId);
+    //     $db->bind(':appointment_id', $appointmentId);
+    //     $db->execute();
+    //     return $db->rowCount();
+    // }
+
+    public function updateAppointment($id, $status, $eventId)
+    {
+        $db = new Database();
+        $db->query("UPDATE appointments SET status = :status, event_id = :event_id, updated_at = now() WHERE id = :id");
+        $db->bind(':status', $status);
         $db->bind(':event_id', $eventId);
-        $db->bind(':appointment_id', $appointmentId);
+        $db->bind(':id', $id);
         $db->execute();
         return $db->rowCount();
     }

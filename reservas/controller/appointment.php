@@ -1,13 +1,11 @@
 <?php
 
 require_once dirname(__DIR__, 2) . '/configs/init.php';
+require_once dirname(__DIR__, 2) . '/classes/ConfigUrl.php';
 require_once dirname(__DIR__, 2) . '/classes/Appointments.php';
-require_once dirname(__DIR__, 2) . '/classes/EmailTemplate.php';
-require_once dirname(__DIR__, 2) . '/user_admin/send_wsp.php';
 
 // Crear instancia de la clase Appointments
 $appointments = new Appointments();
-
 
 try {
     // Iniciar la transacción
@@ -53,29 +51,12 @@ try {
         throw new Exception('Error al reservar la cita: ' . $result['error']);
     }
 
-    // Ejecutar la consulta si rowcount es mayor a 0
-    if (is_array($result)) {
-        // Obtener el email template y el logo
-        $emailTemplateBuilder = new EmailTemplate();
-        $emailContent = $emailTemplateBuilder->buildEmail($appointmentData, 'reserva');
+    // Confirmar la transacción si todo fue exitoso
+    $appointments->endTransaction();
 
-        // Enviar mensaje de WhatsApp
-        $wspStatusCode = sendWspReserva("registro_reserva", $appointmentData['phone'], $appointmentData['name'], $appointmentData['date'], $formattedStartTime, $emailContent['company_name'], $result['appointment_token']);
-
-        // Verificar si el mensaje de WhatsApp fue enviado correctamente
-        if ($wspStatusCode == 200 || $wspStatusCode == 201) {
-            // Confirmar la transacción si todo fue exitoso
-            $appointments->endTransaction();
-
-            echo json_encode(['message' => 'Cita reservada exitosamente y aviso enviado!']);
-            http_response_code(200);
-        } else {
-            // Si falla el envío de WhatsApp, revertir la transacción
-            throw new Exception('Error al enviar el mensaje de WhatsApp. Código de estado: ' . $wspStatusCode);
-        }
-    } else {
-        throw new Exception('Error al reservar la cita.');
-    }
+    // Responder con un mensaje de confirmación simple al usuario
+    echo json_encode(['message' => 'Cita reservada exitosamente. Recibirás una confirmación en breve.']);
+    http_response_code(200);
 } catch (Exception $e) {
     // Revertir la transacción en caso de error
     $appointments->cancelTransaction();
