@@ -7,9 +7,9 @@
             <select id="service" name="service" class="form-select" required>
                 <option value="" selected>Selecciona un servicio</option>
                 <?php foreach ($services as $service) : ?>
-                    <option value="<?php echo htmlspecialchars($service['id']); ?>"
-                        data-observation="<?php echo htmlspecialchars($service['observations']); ?>">
-                        <?php echo htmlspecialchars($service['name']); ?></option>
+                <option value="<?php echo htmlspecialchars($service['id']); ?>"
+                    data-observation="<?php echo htmlspecialchars($service['observations']); ?>">
+                    <?php echo htmlspecialchars($service['name']); ?></option>
                 <?php endforeach; ?>
             </select>
         </div>
@@ -72,12 +72,12 @@
     </div>
 </form>
 <!-- Modal de Respuesta -->
-<div class="modal fade" id="responseModal" tabindex="-1" aria-labelledby="responseModalLabel" aria-hidden="true">
+<div class="modal fade" id="responseModal" tabindex="-1" aria-labelledby="responseModalLabel" data-bs-backdrop="static"
+    data-bs-keyboard="false" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="responseModalLabel">Reserva exitosa</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body"></div>
             <div class="modal-footer">

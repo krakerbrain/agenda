@@ -48,15 +48,19 @@ try {
 
     // Comprobar si hubo un error
     if (isset($result['error'])) {
-        throw new Exception('Error al reservar la cita: ' . $result['error']);
+        // Retornar el mensaje de error si la cita ya fue enviada
+        if ($result['error'] === 'Cita ya ha sido enviada.') {
+            echo json_encode(['message' => $result['error']]);
+            http_response_code(400); // Bad Request
+        } else {
+            throw new Exception('Error al reservar la cita: ' . $result['error']);
+        }
+    } else {
+        // Confirmar la transacción si todo fue exitoso
+        $appointments->endTransaction();
+        echo json_encode(['message' => 'Cita reservada exitosamente. Recibirás una confirmación en breve.']);
+        http_response_code(200);
     }
-
-    // Confirmar la transacción si todo fue exitoso
-    $appointments->endTransaction();
-
-    // Responder con un mensaje de confirmación simple al usuario
-    echo json_encode(['message' => 'Cita reservada exitosamente. Recibirás una confirmación en breve.']);
-    http_response_code(200);
 } catch (Exception $e) {
     // Revertir la transacción en caso de error
     $appointments->cancelTransaction();
