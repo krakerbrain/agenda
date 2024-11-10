@@ -145,7 +145,7 @@ document.querySelector("#companyForm").addEventListener("submit", async function
       body: formData,
     });
 
-    const { success, message, error, debug } = await response.json(); // Convertir la respuesta a JSON
+    const { success, message, error } = await response.json(); // Convertir la respuesta a JSON
 
     if (success) {
       // Obtener el modal de inscripción
