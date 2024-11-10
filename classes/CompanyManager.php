@@ -65,7 +65,7 @@ class CompanyManager
         return $result ? $result['fixed_start_date'] : false;
     }
     // Función para crear una nueva empresa
-    public function createCompany($name, $phone, $address, $logo = null, $status = 1)
+    public function createCompany($name, $phone, $address, $logo = null, $status = 0)
     {
         /**
          * // este token cumplia la funcion de usarlo al final de la url para dirigir a la pagina de reservas. Sin embargo se cambio por una url amigable por lo cual ya no es necesario a menos que se le de otro uso, por ahora no cumple ninguna funcion

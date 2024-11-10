@@ -218,4 +218,22 @@ class EmailTemplate
         $emailSender = new EmailSender();
         return $emailSender->sendInscriptionAlert('Alerta de inscripción', 'agendaroad@gmail.com', $body);
     }
+    public function buildInscriptionMail($company_id)
+    {
+
+        $alertTemplatePath = $this->baseUrl . 'correos_template/correo_inscripcion.php';
+        $mailContent = file_get_contents($alertTemplatePath);
+        $loginLink = $this->baseUrl . 'login';
+        $this->loadUserData($company_id);
+
+        $body = str_replace(
+            ['{nombre_cliente}', '{login_link}', '{email_cliente}'],
+            [$this->userData['name'], $loginLink, $this->userData['email']],
+            $mailContent
+        );
+
+        // Instancia de la clase EmailSender para enviar el correo
+        $emailSender = new EmailSender();
+        return $emailSender->sendInscriptionAlert('Bienvenido a Agendarium', $this->userData['email'], $body);
+    }
 }

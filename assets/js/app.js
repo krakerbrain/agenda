@@ -136,7 +136,7 @@ updateNavbarActiveState();
 
 document.querySelector("#companyForm").addEventListener("submit", async function (e) {
   e.preventDefault(); // Evitar que el formulario se envíe de manera tradicional
-
+  debugger;
   const formData = new FormData(this); // Recoger los datos del formulario
 
   try {
@@ -172,7 +172,6 @@ document.querySelector("#companyForm").addEventListener("submit", async function
       // Mostrar el modal de respuesta
       const responseModal = new bootstrap.Modal(document.getElementById("responseModal"));
       responseModal.show();
-      console.error(debug);
     }
   } catch (error) {
     console.error("Error:", error);

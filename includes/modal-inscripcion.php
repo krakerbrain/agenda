@@ -7,7 +7,8 @@
                     <h5 class="modal-title" id="inscriptionModalLabel">Formulario de Inscripción</h5>
                     <small>Prueba Gratis por 15 dias. Después $9.000 al mes</small>
                 </div>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                <button type="button" class="btn-close text-bg-light" data-bs-dismiss="modal"
+                    aria-label="Cerrar"></button>
             </div>
             <div class="modal-body">
                 <form id="companyForm" enctype="multipart/form-data">

@@ -72,4 +72,22 @@ class EmailSender
             return false;
         }
     }
+    // Método para enviar correos de alerta de inscripcion
+    public function sendInscriptionMail($subject, $to, $mailContent)
+    {
+        try {
+            $this->mail->setFrom('agendaroad@gmail.com', 'INSCRIPCION - Agendarium');
+            $this->mail->addAddress($to);
+            $this->mail->isHTML(true);
+            $this->mail->Subject = $subject;
+            $this->mail->Body = $mailContent;
+
+            $this->mail->send();
+            // Devolver true si el correo fue enviado exitosamente
+            return true;
+        } catch (Exception $e) {
+            echo "Error al enviar el correo: {$this->mail->ErrorInfo}";
+            return false;
+        }
+    }
 }
