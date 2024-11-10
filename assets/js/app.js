@@ -136,7 +136,7 @@ updateNavbarActiveState();
 
 document.querySelector("#companyForm").addEventListener("submit", async function (e) {
   e.preventDefault(); // Evitar que el formulario se envíe de manera tradicional
-  debugger;
+
   const formData = new FormData(this); // Recoger los datos del formulario
 
   try {
