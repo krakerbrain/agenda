@@ -176,11 +176,5 @@ a {
 }
 
 .modal-content {
-  background: rgba(255, 255, 255, 0.1); /* Fondo semi-transparente */
-  backdrop-filter: blur(10px); /* Desenfoque para el efecto de vidrio */
-  -webkit-backdrop-filter: blur(10px); /* Soporte para navegadores basados en WebKit */
-  border-radius: 10px; /* Bordes redondeados */
-  border: 1px solid rgba(255, 255, 255, 0.2); /* Borde suave */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra ligera */
-  color: #fff; /* Texto en blanco para mejor contraste */
+  background-color: #1a1728;
 }

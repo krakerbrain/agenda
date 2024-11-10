@@ -9,6 +9,11 @@ class Appointments extends Database
         try {
             $db = new Database();
 
+            // Verificar si ya existe una cita con los mismos datos
+            if ($this->checkExistingAppointment($data)) {
+                return ['error' => 'Cita ya ha sido enviada.'];
+            }
+
             /**
                 company_id = id de la compañia
                 name = nombre del cliente
@@ -56,6 +61,22 @@ class Appointments extends Database
             return ['error' => $e->getMessage()]; // Retornar el mensaje de error
         }
     }
+
+    public function checkExistingAppointment($data)
+    {
+        $db = new Database();
+        $db->query('SELECT COUNT(*) as total FROM appointments WHERE company_id = :company_id AND date = :date AND start_time = :start_time AND end_time = :end_time');
+        $db->bind(':company_id', $data['company_id']);
+        $db->bind(':date', $data['date']);
+        $db->bind(':start_time', $data['start_time']);
+        $db->bind(':end_time', $data['end_time']);
+        // Obtener el resultado y acceder a la propiedad 'total'
+        $countResult = $db->single();
+
+        // Asegurarnos de acceder al conteo correctamente
+        return (int)$countResult['total'] > 0; // Retorna verdadero si hay al menos una cita existente
+    }
+
 
 
     public function get_appointments($company_id)

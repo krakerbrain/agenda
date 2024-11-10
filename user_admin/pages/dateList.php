@@ -10,111 +10,39 @@ $auth->validarTokenUsuario();
 ?>
 
 <div class="container mt-4">
-
     <ul class="nav nav-tabs" id="myTab" role="tablist">
         <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="unconfirmed-tab" data-bs-toggle="tab" data-bs-target="#unconfirmed"
-                type="button" role="tab" aria-controls="unconfirmed" aria-selected="true">Por Confirmar</button>
+            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#unconfirmed" role="tab">Por
+                Confirmar</button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="confirmed-tab" data-bs-toggle="tab" data-bs-target="#confirmed" type="button"
-                role="tab" aria-controls="confirmed" aria-selected="false">Confirmadas</button>
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#confirmed" role="tab">Confirmadas</button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="past-tab" data-bs-toggle="tab" data-bs-target="#past" type="button" role="tab"
-                aria-controls="past" aria-selected="false">Pasadas</button>
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#past" role="tab">Pasadas</button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button" role="tab"
-                aria-controls="all" aria-selected="false">Todas</button>
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#all" role="tab">Todas</button>
         </li>
     </ul>
-    <!-- Contenido de las pestañas -->
-    <div class="tab-content" id="appointmentsTabContent">
-        <!-- Agregar aquí las otras pestañas según sea necesario -->
-        <div class="tab-pane fade show active" id="unconfirmed" role="tabpanel" aria-labelledby="unconfirmed-tab">
-            <div class="table-responsive">
-                <table class="table table-striped table-hover">
-                    <thead>
-                        <tr>
-                            <th scope="col">Servicio</th>
-                            <th scope="col">Nombre</th>
-                            <th scope="col">Teléfono</th>
-                            <th scope="col">Correo</th>
-                            <th scope="col">Fecha</th>
-                            <th scope="col">Hora</th>
-                            <th scope="col">Estado</th>
-                            <th scope="col">Acción</th>
-                        </tr>
-                    </thead>
-                    <tbody id="unconfirmedAppointmentsList">
-                        <!-- Las citas no confirmadas se llenarán aquí mediante JavaScript -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="tab-pane fade" id="confirmed" role="tabpanel" aria-labelledby="confirmed-tab">
-            <div class="table-responsive">
-                <table class="table table-striped table-hover">
-                    <thead>
-                        <tr>
-                            <th scope="col">Servicio</th>
-                            <th scope="col">Nombre</th>
-                            <th scope="col">Teléfono</th>
-                            <th scope="col">Correo</th>
-                            <th scope="col">Fecha</th>
-                            <th scope="col">Hora</th>
-                            <th scope="col">Estado</th>
-                            <th scope="col">Acción</th>
-                        </tr>
-                    </thead>
-                    <tbody id="confirmedAppointmentsList">
-                        <!-- Las citas confirmadas se llenarán aquí mediante JavaScript -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="tab-pane fade" id="past" role="tabpanel" aria-labelledby="past-tab">
-            <div class="table-responsive">
-                <table class="table table-striped table-hover">
-                    <thead>
-                        <tr>
-                            <th scope="col">Servicio</th>
-                            <th scope="col">Nombre</th>
-                            <th scope="col">Teléfono</th>
-                            <th scope="col">Correo</th>
-                            <th scope="col">Fecha</th>
-                            <th scope="col">Hora</th>
-                            <th scope="col">Estado</th>
-                            <th scope="col">Acción</th>
-                        </tr>
-                    </thead>
-                    <tbody id="pastAppointmentsList">
-                        <!-- Las citas pasadas se llenarán aquí mediante JavaScript -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="tab-pane fade" id="all" role="tabpanel" aria-labelledby="all-tab">
-            <div class="table-responsive">
-                <table class="table table-striped table-hover">
-                    <thead>
-                        <tr>
-                            <th scope="col">Servicio</th>
-                            <th scope="col">Nombre</th>
-                            <th scope="col">Teléfono</th>
-                            <th scope="col">Correo</th>
-                            <th scope="col">Fecha</th>
-                            <th scope="col">Hora</th>
-                            <th scope="col">Estado</th>
-                            <th scope="col">Acción</th>
-                        </tr>
-                    </thead>
-                    <tbody id="appointmentsList">
-                        <!-- Las citas se llenarán aquí mediante JavaScript -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>Servicio</th>
+                    <th>Nombre</th>
+                    <th>Teléfono</th>
+                    <th>Correo</th>
+                    <th>Fecha</th>
+                    <th>Hora</th>
+                    <th>Estado</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody id="tableContent">
+                <!-- Se llenará con JavaScript -->
+            </tbody>
+        </table>
     </div>
 </div>
