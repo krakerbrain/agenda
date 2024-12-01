@@ -18,4 +18,6 @@
         </table>
         <button type="submit" class="btn btn-primary mt-3">Guardar Configuración</button>
     </form>
+    <?php include dirname(__DIR__, 2) . '/includes/modal-horarios-guardados.php';
+    ?>
 </div>

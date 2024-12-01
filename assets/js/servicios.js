@@ -82,7 +82,8 @@ export function initServicios() {
       const data = await response.json();
 
       if (data.success) {
-        alert("Configuración guardada exitosamente.");
+        const modal = new bootstrap.Modal(document.getElementById("saveServices"));
+        modal.show();
         loadServices(); // Recargar los datos después de guardar
       }
     } catch (error) {
@@ -130,12 +131,6 @@ export function initServicios() {
   // addEmptyServiceRow();
 
   document.getElementById("addServiceButton").addEventListener("click", addService);
-
-  document.querySelectorAll(".delete-service").forEach((button) => {
-    button.addEventListener("click", function () {
-      deleteService(this);
-    });
-  });
 
   document.querySelectorAll(".remove-category").forEach((button) => {
     button.addEventListener("click", function () {
@@ -186,11 +181,34 @@ function addService(service = null, schedules = {}, daysStatus = {}) {
 
   // Añadir eventos para eliminar servicio y agregar categoría
   serviceRow.querySelector(".delete-service").addEventListener("click", function () {
-    deleteService(this);
+    const modal = new bootstrap.Modal(document.getElementById("deleteServiceModal"));
+
+    // Agrega la clase 'ondelete-service' al serviceRow que se va a eliminar
+    const serviceRow = this.closest(".service-row");
+    serviceRow.classList.add("ondelete-service");
+
+    modal.show();
   });
 
   serviceRow.querySelector(".add-category").addEventListener("click", function () {
     addCategory(this);
+  });
+
+  // Manejar el clic en el botón de confirmar
+  document.getElementById("confirmServiceDelete").addEventListener("click", function () {
+    // Obtén el elemento con la clase 'ondelete-service'
+    const serviceRow = document.querySelector(".ondelete-service");
+
+    if (serviceRow) {
+      // Llama a deleteService pasando el serviceRow con la clase 'ondelete-service'
+      deleteService(serviceRow);
+
+      // Quita la clase 'ondelete-service' del elemento
+      serviceRow.classList.remove("ondelete-service");
+    }
+
+    // Cierra el modal
+    bootstrap.Modal.getInstance(document.getElementById("deleteServiceModal")).hide();
   });
 
   // Añadir las categorías si el servicio tiene alguna
@@ -230,7 +248,7 @@ function createServiceRow(serviceId, serviceName, serviceDuration, serviceObserv
       </div>
     </td>
     <td>
-      <button type="button" class="btn btn-danger btn-sm delete-service">Eliminar</button>
+      <button type="button" class="btn btn-danger btn-sm delete-service" ${serviceName == "" ? "disabled" : ""}>Eliminar</button>
     </td>
   `;
 
@@ -321,11 +339,11 @@ function addCategory(button) {
 
 async function deleteService(button) {
   // Encuentra la fila del servicio a eliminar
-  const serviceRow = button.closest(".service-row");
+  // const serviceRow = button.closest(".service-row");
 
   // Encuentra el id del servicio
   const serviceId = button
-    .closest(".service-row")
+    // .closest(".service-row")
     .querySelector("input[name^='service_name']")
     .name.match(/\[(.*?)\]/)[1];
 
@@ -351,8 +369,10 @@ async function deleteService(button) {
       });
 
       // Elimina la fila del servicio
-      serviceRow.remove();
-      alert(result.message);
+      // serviceRow.remove();
+      const modal = new bootstrap.Modal(document.getElementById("deletedServiceModal"));
+      modal.show();
+      button.remove();
     } else {
       alert(result.message);
     }

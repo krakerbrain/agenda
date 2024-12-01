@@ -1,68 +1,106 @@
 <?php
-session_start();
+header('Content-Type: application/json');
 require_once dirname(__DIR__) . '/configs/init.php'; // Cargar dependencias
 require_once dirname(__DIR__) . '/classes/ConfigUrl.php';
+require_once dirname(__DIR__) . '/classes/IntegrationManager.php';
+require_once dirname(__DIR__) . '/classes/Integrations/GoogleIntegrationManager.php';
+require_once dirname(__DIR__) . '/access-token/seguridad/JWTAuth.php';
 
-// use Dotenv\Dotenv;
-use Google_Client;
-use Google_Service_Calendar;
+// Crear instancia para manejar la autenticación JWT
+$auth = new JWTAuth();
+$datosUsuario = $auth->validarTokenUsuario();
 
-// Habilitar el modo de depuración
-// ini_set('display_errors', 1);
-// ini_set('display_startup_errors', 1);
-// error_reporting(E_ALL);
+// Obtener el ID de la compañía
+$company_id = $datosUsuario['company_id'];
 
 try {
-    // // Cargar variables de entorno desde el archivo .env
-    // $dotenv = Dotenv::createImmutable(dirname(__DIR__));
-    // $dotenv->load();
-
+    // Obtener la URL base
     $baseUrl = ConfigUrl::get();
 
-    $client = new Google_Client();
-    $client->setAuthConfig($_ENV['GOOGLE_APPLICATION_CREDENTIALS_PATH']); // Ruta al archivo de configuración de credenciales de Google
-    $redirect_uri = $_ENV['HTTP'] . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'];
-    $client->setRedirectUri($redirect_uri);
-    $client->addScope(Google_Service_Calendar::CALENDAR);
+    // Instancia de IntegrationManager
+    $integrationManager = new IntegrationManager();
+    $googleIntegrationManager = new GoogleIntegrationManager($company_id);
 
-    // Verificar si el código de autorización está presente en la URL
-    if (!isset($_SESSION['access_token']) && !isset($_GET['code'])) {
-        // Redirigir al usuario para iniciar sesión
-        $auth_url = $client->createAuthUrl();
+    // Obtener un cliente de Google configurado
+    $client = $googleIntegrationManager->getConfiguredGoogleClient();
 
-        header('Location: ' . filter_var($auth_url, FILTER_SANITIZE_URL));
-        exit();
-    }
-    if (isset($_GET['code'])) {
+    // Obtener datos de integración de Google Calendar para la compañía
+    $googleCalendarData = $integrationManager->getGoogleCalendarIntegration($company_id);
 
-        // Intercambiar el código de autorización por un token de acceso
-        $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
-        if (isset($token['error'])) {
-            throw new Exception('Error al obtener el token: ' . $token['error']);
+    // Verificar si hay datos de integración y si la integración está habilitada
+    if ($googleCalendarData !== null && $googleCalendarData['enabled']) {
+        $googleCalendarIntegrationData = $googleCalendarData['integration_data'];
+
+        if (!empty($googleCalendarIntegrationData['access_token'])) {
+            $client->setAccessToken($googleCalendarIntegrationData['access_token']);
+
+            // Verificar si el token ha expirado
+            if ($client->isAccessTokenExpired()) {
+                if (!empty($googleCalendarIntegrationData['refresh_token'])) {
+                    // Renueva el token utilizando el refresh_token
+                    $newToken = $client->fetchAccessTokenWithRefreshToken($googleCalendarIntegrationData['refresh_token']);
+
+                    if (!isset($newToken['error'])) {
+                        // Actualizar el token y guardar en la base de datos
+                        $googleCalendarIntegrationData['access_token'] = $newToken['access_token'];
+                        $googleCalendarIntegrationData['expires_at'] = time() + $newToken['expires_in'];
+
+                        $integrationManager->saveGoogleCalendarIntegration($company_id, $googleCalendarIntegrationData);
+                    } else {
+                        // Error al renovar el token, redirigir a la autenticación
+                        redirectToAuth($client);
+                    }
+                } else {
+                    // No hay refresh_token, redirigir a la autenticación
+                    redirectToAuth($client);
+                }
+            }
         }
-        $_SESSION['access_token'] = $token;
-
-
-        // Guardar el token de actualización si es proporcionado por Google
-        if (isset($token['refresh_token'])) {
-            $_SESSION['refresh_token'] = $token['refresh_token'];
+    } else {
+        // No hay token o la integración no es válida, redirigir a la autenticación
+        if (!isset($_GET['code'])) {
+            redirectToAuth($client);
         }
 
-        // Redirigir al dashboard o página principal después de la autenticación
-        header('Location: ' . filter_var($redirect_uri, FILTER_SANITIZE_URL));
-        exit();
+        if (isset($_GET['code'])) {
+            // Intercambiar el código de autorización por un token de acceso
+            $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
+            if (isset($token['error'])) {
+                throw new Exception('Error al obtener el token: ' . $token['error']);
+            }
+
+            // Guardar los tokens en la base de datos
+            $googleCalendarData = [
+                'access_token' => $token['access_token'],
+                'refresh_token' => $token['refresh_token'] ?? null,
+                'expires_at' => time() + $token['expires_in']
+            ];
+
+            $integrationManager->saveGoogleCalendarIntegration($company_id, $googleCalendarData);
+
+            // Redirigir al dashboard después de la autenticación
+            $redirect_uri = $_ENV['HTTP'] . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'];
+            header('Location: ' . filter_var($redirect_uri, FILTER_SANITIZE_URL));
+            exit();
+        }
     }
 
-    $client->setAccessToken($_SESSION['access_token']);
-    if ($client->isAccessTokenExpired() && isset($_SESSION['refresh_token'])) {
-        $client->fetchAccessTokenWithRefreshToken($_SESSION['refresh_token']);
-        $_SESSION['access_token'] = $client->getAccessToken();
-    }
-
+    // Redirigir al dashboard después de la autenticación exitosa
     header("Location: " . $baseUrl . "user_admin/index.php");
     exit();
 } catch (Exception $e) {
     // Manejo de errores
     echo 'Error: ' . $e->getMessage();
-    // Podrías loguear el error, redirigir a una página de error, etc.
+}
+
+/**
+ * Redirige a la URL de autenticación de Google
+ * 
+ * @param Google_Client $client
+ */
+function redirectToAuth($client)
+{
+    $auth_url = $client->createAuthUrl();
+    header('Location: ' . filter_var($auth_url, FILTER_SANITIZE_URL));
+    exit();
 }

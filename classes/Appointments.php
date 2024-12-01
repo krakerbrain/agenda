@@ -207,7 +207,7 @@ class Appointments extends Database
         return $db->execute();
     }
 
-    public function updateAppointment($id, $status, $eventId)
+    public function updateAppointment($id, $status, $eventId = null)
     {
         $db = new Database();
         $db->query("UPDATE appointments SET status = :status, event_id = :event_id, updated_at = now() WHERE id = :id");

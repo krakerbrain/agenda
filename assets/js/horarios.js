@@ -193,7 +193,8 @@ export function initHorarios() {
       const { success, message } = await response.json();
 
       if (success) {
-        alert(message);
+        const modal = new bootstrap.Modal(document.getElementById("saveSchedules"));
+        modal.show();
         getHorarios();
       }
     } catch (error) {

@@ -3,7 +3,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const mainContent = document.getElementById("main-content");
   // Cargar la última pestaña seleccionada, o usar la predeterminada
   const lastPage = sessionStorage.getItem("lastPage");
-
   if (lastPage) {
     loadContent(lastPage);
   } else if (role_id == 1) {
@@ -41,40 +40,44 @@ document.addEventListener("DOMContentLoaded", function () {
       hideCanvas();
       switch (page) {
         case "dateList":
-          const { initDateList } = await import("./datesList.js?v=1.0.0");
+          const { initDateList } = await import("./datesList.js?v=2.0.4");
           initDateList();
           break;
         case "horarios":
-          const { initHorarios } = await import("./horarios.js?v=1.0.0");
+          const { initHorarios } = await import("./horarios.js?v=1.0.4");
           initHorarios();
           break;
         case "servicios":
-          const { initServicios } = await import("./servicios.js?v=1.0.0");
+          const { initServicios } = await import("./servicios.js?v=1.0.4");
           initServicios();
           break;
         case "configuraciones":
-          const { initConfiguraciones } = await import("./configuraciones.js?v=1.0.1");
+          const { initConfiguraciones } = await import("./configuraciones.js?v=1.0.4");
           initConfiguraciones();
           break;
         case "correos":
-          const { initCorreos } = await import("./correos.js?v=1.0.0");
+          const { initCorreos } = await import("./correos.js?v=1.0.4");
           initCorreos();
           break;
         case "datos_empresa":
-          const { initDatosEmpresa } = await import("./datosEmpresa.js?v=1.0.2");
+          const { initDatosEmpresa } = await import("./datosEmpresa.js?v=1.0.4");
           initDatosEmpresa();
           break;
         case "add_user":
-          const { initAddUser } = await import("./addUser.js?v=1.0.0");
+          const { initAddUser } = await import("./addUser.js?v=1.0.4");
           initAddUser();
           break;
         case "master_add_company":
-          const { initAddCompany } = await import("./master_admin/master_add_company.js?v=1.0.1");
+          const { initAddCompany } = await import("./master_admin/master_add_company.js?v=1.0.4");
           initAddCompany();
           break;
         case "master_company_list":
-          const { initCompanyList } = await import("./master_admin/master_company_list.js?v=1.0.1");
+          const { initCompanyList } = await import("./master_admin/master_company_list.js?v=1.0.4");
           initCompanyList();
+          break;
+        case "integrations":
+          const { initIntegrations } = await import("./integrations.js?v=1.0.4");
+          initIntegrations();
           break;
         default:
           console.error("No hay un módulo para la página:", page);
