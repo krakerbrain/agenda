@@ -25,9 +25,17 @@
 
             </tbody>
         </table>
-        <div class="d-flex flex-column row-cols-md-4">
-            <button type="button" class="btn btn-primary mb-4" id="addServiceButton">Agregar Servicio</button>
-            <button type="submit" class="btn btn-success">Guardar Configuración</button>
+        <!-- Botón para agregar servicio más cerca de la tabla -->
+        <button type="button" class="btn btn-outline-primary mb-4" id="addServiceButton">
+            <i class="fa fa-plus"></i> Agregar Nuevo Servicio
+        </button>
+        <!-- Botón para guardar en una sección separada de acción final -->
+        <div class="d-flex justify-content-end mt-3">
+            <button type="submit" class="btn btn-success">
+                <i class="fa fa-save"></i> Guardar Configuración
+            </button>
         </div>
     </form>
+    <?php include dirname(__DIR__, 2) . '/includes/modal-servicios.php';
+    ?>
 </div>

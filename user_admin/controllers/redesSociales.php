@@ -2,14 +2,13 @@
 
 require_once dirname(__DIR__, 2) . '/configs/init.php';
 require_once dirname(__DIR__, 2) . '/access-token/seguridad/JWTAuth.php';
-// require_once dirname(__DIR__, 2) . '/classes/DatabaseSessionManager.php';
 require_once dirname(__DIR__, 2) . '/classes/ConfigUrl.php';
 require_once dirname(__DIR__, 2) . '/classes/RedesSociales.php';
 $baseUrl = ConfigUrl::get();
-// $manager = new DatabaseSessionManager();
+
 $auth = new JWTAuth();
 $datosUsuario = $auth->validarTokenUsuario();
-// $conn = $manager->getDB();
+
 
 try {
     $company_id = $datosUsuario['company_id'];

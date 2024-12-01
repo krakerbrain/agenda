@@ -105,6 +105,9 @@ function fillTable(data) {
 
 export async function confirmReservation(id) {
   try {
+    // Log de inicio de la función
+    logAction(`Iniciando confirmación de reserva con ID: ${id}`);
+
     // Mostrar spinner
     addSpinner(id, true, "confirmar");
 
@@ -113,38 +116,92 @@ export async function confirmReservation(id) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        id: id,
-      }),
+      body: JSON.stringify({ id }),
     });
 
+    logAction(`Respuesta recibida con estado HTTP: ${response.status}`);
+
+    // Verificar si la respuesta fue exitosa (código de estado 2xx)
+    if (response.status === 401) {
+      logAction("Estado 401 detectado: autenticación requerida");
+      handleAuthenticationModal();
+      return; // Salir de la función para evitar continuar con la confirmación
+    }
+
     const data = await response.json();
+    logAction(`Respuesta JSON recibida: ${JSON.stringify(data)}`);
 
     if (data.success) {
-      alert(data.message);
-
-      // Cambiar el tab a "confirmed" y actualizar la sesión
-      sessionStorage.setItem("status", "confirmed");
-
-      // Mostrar el tab "confirmed"
-      const confirmedTabTrigger = document.querySelector('button[data-bs-target="#confirmed"]');
-      if (confirmedTabTrigger) {
-        const confirmedTab = new bootstrap.Tab(confirmedTabTrigger);
-        confirmedTab.show();
-      }
-
-      loadAppointments("confirmed");
-      // location.reload(); // Recargar la página si la confirmación fue exitosa
+      logAction("Reserva confirmada exitosamente");
+      handleSuccess(data);
     } else {
-      alert("Error desconocido al confirmar la reserva.");
+      logAction(`Error en la confirmación: ${data.message || "Sin mensaje"}`);
+      handleError(data);
     }
   } catch (error) {
+    logAction(`Error capturado: ${error.message}`);
     console.error("Error:", error);
-    alert("Error al confirmar la reserva.");
   } finally {
     // Ocultar spinner y habilitar botón después de que la solicitud se complete
     addSpinner(id, false, "confirmar");
+    logAction("Finalizando confirmación de reserva");
   }
+}
+
+// Función para manejar el modal de autenticación
+function handleAuthenticationModal() {
+  logAction("Mostrando modal de autenticación");
+  const modal = new bootstrap.Modal(document.getElementById("googleAuthenticateModal"));
+  modal.show();
+
+  const confirmButton = document.getElementById("confirmAuthenticate");
+  confirmButton.addEventListener("click", function (event) {
+    event.preventDefault();
+    logAction("Redirigiendo para autenticación en Google");
+    window.location.href = `${baseUrl}google_services/google_auth.php`;
+  });
+}
+
+// Función para manejar la respuesta exitosa
+function handleSuccess(data) {
+  logAction(`Reserva exitosa: ${data.message}`);
+  handleInfoModal("infoAppointment", "Evento creado", data.message);
+
+  // Cambiar el tab a "confirmed" y actualizar la sesión
+  sessionStorage.setItem("status", "confirmed");
+
+  // Mostrar el tab "confirmed"
+  const confirmedTabTrigger = document.querySelector('button[data-bs-target="#confirmed"]');
+  if (confirmedTabTrigger) {
+    const confirmedTab = new bootstrap.Tab(confirmedTabTrigger);
+    confirmedTab.show();
+  }
+
+  loadAppointments("confirmed");
+}
+
+// Función para manejar los errores según el código de respuesta
+function handleError(data) {
+  logAction(`Manejando error con código: ${data.code}`);
+  const errorHandlers = {
+    401: () => handleAuthenticationModal(),
+    403: () => alert("No tienes permiso para realizar esta acción."),
+    503: () => alert("Error de conexión. Intenta nuevamente más tarde."),
+    500: () => alert("Hubo un error interno en el servidor. Por favor, intenta más tarde."),
+    default: () => alert(data.message || "Hubo un error inesperado."),
+  };
+
+  const handleError = errorHandlers[data.code] || errorHandlers.default;
+  handleError();
+}
+
+// Función para registrar eventos en localStorage
+function logAction(message) {
+  const logs = JSON.parse(localStorage.getItem("reservationLogs")) || [];
+  const timestamp = new Date().toISOString();
+  logs.push(`[${timestamp}] ${message}`);
+  localStorage.setItem("reservationLogs", JSON.stringify(logs));
+  console.log(`[LOG]: ${message}`); // También muestra el log en la consola para depuración en tiempo real
 }
 
 export async function deleteAppointment(appointmentID, calendarEventID) {
@@ -162,10 +219,19 @@ export async function deleteAppointment(appointmentID, calendarEventID) {
       }),
     });
 
-    const data = await response.json();
+    logAction(`Respuesta recibida con estado HTTP: ${response.status}`);
 
+    // Verificar si la respuesta fue exitosa (código de estado 2xx)
+    if (response.status === 401) {
+      logAction("Estado 401 detectado: autenticación requerida");
+      handleAuthenticationModal();
+      return; // Salir de la función para evitar continuar con la confirmación
+    }
+
+    const data = await response.json();
+    logAction(`Respuesta JSON recibida: ${JSON.stringify(data)}`);
     if (data.success) {
-      alert(data.message);
+      handleInfoModal("infoAppointment", "Evento eliminado", data.message);
       //obtener status de session storage
       let status = sessionStorage.getItem("status");
       loadAppointments(status);
@@ -179,6 +245,15 @@ export async function deleteAppointment(appointmentID, calendarEventID) {
     // Ocultar spinner y habilitar botón después de que la solicitud se complete
     addSpinner(appointmentID, false, "eliminar");
   }
+}
+
+export function handleInfoModal(id, title = null, message = null) {
+  let titulo = document.getElementById(id + "Label");
+  let mensaje = document.getElementById(id + "Message");
+  titulo.textContent = title;
+  mensaje.textContent = message;
+  const modal = new bootstrap.Modal(document.getElementById(id));
+  modal.show();
 }
 
 export function addSpinner(appointmentID, activar, btn) {

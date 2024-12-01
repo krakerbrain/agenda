@@ -21,7 +21,6 @@ if (isset($_POST['usuario']) && isset($_POST['contrasenia'])) {
                 $user = new Users();
                 $datos = $user->get_user_for_login($usuario);
 
-
                 if ($datos) {
                     $tokenVerificacion = hash('sha256', $datos['name'] . $usuario);
                     if (hash_equals($datos['token_sha256'], $tokenVerificacion)) {
@@ -29,8 +28,7 @@ if (isset($_POST['usuario']) && isset($_POST['contrasenia'])) {
                             $auth = new JWTAuth();
                             $auth->generarToken($datos['company_id'], $datos['role_id']);
                             $response['success'] = true;
-                            $response['redirect'] = $datos['role_id'] == 1 ? $_ENV['MASTER_URL_LOGIN'] : $_ENV['URL_LOGIN'];
-                            // }
+                            $response['redirect'] = $_ENV['URL_LOGIN'];
                         } else {
                             $response['message'] = "Credenciales incorrectas.";
                         }

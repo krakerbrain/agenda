@@ -3,17 +3,24 @@
 require_once dirname(__DIR__) . '/configs/init.php';
 require_once dirname(__DIR__) . '/classes/Database.php';
 require_once dirname(__DIR__) . '/classes/FileManager.php';
+require_once dirname(__DIR__) . '/classes/IntegrationManager.php';
+require_once dirname(__DIR__) . '/classes/Logger.php';
 
 class CompanyManager
 {
     private $db;
     private $fileManager;
+    private $integrationManager;
+    private $logger;
+
 
     // Modificar el constructor para aceptar dependencias
-    public function __construct(Database $db = null, FileManager $fileManager = null)
+    public function __construct(Database $db = null, FileManager $fileManager = null, IntegrationManager $integrationManager = null)
     {
         $this->db = $db ?? new Database(); // Usa la clase Database o la inyectada
         $this->fileManager = $fileManager ?? new FileManager(); // Usa FileManager o la inyectada
+        $this->integrationManager = $integrationManager ?? new IntegrationManager(); // Usa FileManager o la inyectada
+        $this->logger = new Logger(); // Usa Logger
     }
 
     public function getAllActiveCompanies()
@@ -119,6 +126,14 @@ class CompanyManager
                 $this->db->bind(':company_id', $company_id);
                 $this->db->bind(':day_id', $day);
                 $this->db->execute();
+            }
+
+            // Aquí no detenemos la transacción, solo registramos los errores si ocurren
+            $integrationResult = $this->integrationManager->createDefaultIntegrationsForCompany($company_id);
+
+            // Verificar si hubo un error al crear las integraciones
+            if (!$integrationResult['success']) {
+                $this->logger->logError('Error al crear integraciones para la empresa con ID ' . $company_id . ': ' . $integrationResult['error']);
             }
 
             $this->db->endTransaction(); // Commit de la transacción
@@ -353,10 +368,6 @@ class CompanyManager
             return false; // Retornar falso si la actualización falló
         }
     }
-
-
-
-
 
     // Función para cambiar estado de empresa
     public function updateCompanyStatus($data)

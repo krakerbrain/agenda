@@ -76,7 +76,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Capturar cualquier excepción y devolver un error en JSON
         echo json_encode([
             'success' => false,
-            'message' => "Ocurrió un error inesperado: " . $e->getMessage()
+            'message' => "Error inesperado: " . $e->getMessage(),
+            'trace' => $e->getTraceAsString()
         ]);
     }
 } else {

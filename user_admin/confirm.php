@@ -1,8 +1,14 @@
 <?php
+date_default_timezone_set('UTC');
 require_once dirname(__DIR__) . '/classes/EmailTemplate.php';
 require_once dirname(__DIR__) . '/classes/Appointments.php';
-require_once dirname(__DIR__) . '/google_services/google_client.php';
-require_once dirname(__DIR__) . '/google_services/calendar_service.php';
+require_once dirname(__DIR__) . '/classes/Integrations/GoogleIntegrationManager.php';
+require_once dirname(__DIR__) . '/classes/IntegrationManager.php';
+require_once dirname(__DIR__) . '/access-token/seguridad/JWTAuth.php';
+
+$auth = new JWTAuth();
+$datosUsuario = $auth->validarTokenUsuario();
+$company_id = $datosUsuario['company_id'];
 
 $appointments = new Appointments();
 $data = json_decode(file_get_contents('php://input'), true);
@@ -19,41 +25,96 @@ try {
         throw new Exception('Cita no encontrada.');
     }
 
-    // Configurar cliente de Google
-    $client = getClient();
-    $timeZone = getUserTimeZone($client);
+    $integrationManager = new IntegrationManager();
+    $integrationData = $integrationManager->getGoogleCalendarIntegration($company_id);
+    $eventId = null;
 
-    list($startDateTimeFormatted, $endDateTimeFormatted) = formatDateTime(
-        $appointment['date'],
-        $appointment['start_time'],
-        $appointment['end_time'],
-        $timeZone
-    );
+    if ($integrationData['enabled']) {
+        // Crear evento en Google Calendar
+        $googleIntegration = new GoogleIntegrationManager($company_id);
+        $userTimeZone = $googleIntegration->getUserTimeZone();
 
-    // Crear evento en Google Calendar
-    $eventId = createCalendarEvent(
-        $client,
-        $appointment['name'],
-        $appointment['service'],
-        $startDateTimeFormatted,
-        $endDateTimeFormatted,
-        $appointment['id']
-    );
+        // Formatear la fecha y hora
+        list($startDateTimeFormatted, $endDateTimeFormatted) = formatDateTime(
+            $appointment['date'],
+            $appointment['start_time'],
+            $appointment['end_time'],
+            $userTimeZone
+        );
+
+        // Crear el evento en Google Calendar
+        $eventSummary = $appointment['service'] . " con " . $appointment['name'];
+        $eventId = $googleIntegration->createEvent($eventSummary, $startDateTimeFormatted, $endDateTimeFormatted, $userTimeZone);
+    }
 
     // Actualizar el ID del evento en la base de datos
-    // $appointments->update_event($eventId, $appointment['id']);
     $appointments->updateAppointment($id, 1, $eventId);
 
     // Confirmar la transacción
+    header('Content-Type: application/json');
     $appointments->endTransaction();
-    echo json_encode(['message' => 'Cita confirmada exitosamente y evento creado en Google Calendar.', 'success' => true]);
+    echo json_encode(['message' => 'Cita confirmada exitosamente', 'success' => true]);
     http_response_code(200);
 } catch (Exception $e) {
-    // Revertir la transacción en caso de error
-    $appointments->cancelTransaction();
-    echo json_encode(['message' => 'Error al confirmar la cita: ' . $e->getMessage()]);
-    http_response_code(500);
+    // Intentar obtener el mensaje de error
+    $errorResponse = $e->getMessage();
+    preg_match('/\{(?:[^{}]|(?R))*\}/', $errorResponse, $matches);
+
+    if ($matches) {
+        $errorData = json_decode($matches[0], true);
+
+        if (json_last_error() === JSON_ERROR_NONE) {
+            if (isset($errorData['error']['code']) && $errorData['error']['code'] == 401) {
+                echo json_encode([
+                    'error' => true,
+                    'code' => 401,
+                    'message' => 'Error de autenticación: ' . $errorData['error']['message'],
+                ]);
+                http_response_code(401);
+            } else {
+                echo json_encode([
+                    'error' => true,
+                    'code' => $errorData['error']['code'] ?? 500,
+                    'message' => $errorData['error']['message'] ?? 'Error desconocido.',
+                ]);
+                http_response_code($errorData['error']['code'] ?? 500);
+            }
+        } else {
+            echo json_encode([
+                'error' => true,
+                'code' => 500,
+                'message' => 'Error interno al procesar la respuesta de la API: ' . $e->getMessage(),
+            ]);
+            http_response_code(500);
+        }
+    } else {
+        echo json_encode([
+            'error' => true,
+            'code' => 500,
+            'message' => 'Error interno: ' . $e->getMessage(),
+        ]);
+        http_response_code(500);
+    }
 } finally {
-    // Cerrar la conexión
     $appointments = null;
+}
+
+/**
+ * Formatea la fecha y hora en RFC3339
+ *
+ * @param string $date Fecha de la cita
+ * @param string $startTime Hora de inicio
+ * @param string $endTime Hora de fin
+ * @param string $timeZone Zona horaria del usuario
+ * @return array Formato de fecha y hora [inicio, fin]
+ */
+function formatDateTime($date, $startTime, $endTime, $timeZone = 'America/Santiago')
+{
+    $startDateTime = new DateTime("$date $startTime", new DateTimeZone($timeZone));
+    $endDateTime = new DateTime("$date $endTime", new DateTimeZone($timeZone));
+
+    $startDateTimeFormatted = $startDateTime->format(DateTime::RFC3339);
+    $endDateTimeFormatted = $endDateTime->format(DateTime::RFC3339);
+
+    return [$startDateTimeFormatted, $endDateTimeFormatted];
 }
