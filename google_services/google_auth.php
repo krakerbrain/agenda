@@ -28,7 +28,7 @@ try {
     $googleCalendarData = $integrationManager->getGoogleCalendarIntegration($company_id);
 
     // Verificar si hay datos de integración y si la integración está habilitada
-    if ($googleCalendarData !== null && $googleCalendarData['enabled']) {
+    if ($googleCalendarData !== null && $googleCalendarData['enabled'] && !isset($_GET['code'])) {
         $googleCalendarIntegrationData = $googleCalendarData['integration_data'];
 
         if (!empty($googleCalendarIntegrationData['access_token'])) {
@@ -55,6 +55,8 @@ try {
                     redirectToAuth($client);
                 }
             }
+        } else {
+            redirectToAuth($client);
         }
     } else {
         // No hay token o la integración no es válida, redirigir a la autenticación
