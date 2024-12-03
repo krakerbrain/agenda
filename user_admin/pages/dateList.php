@@ -1,12 +1,11 @@
 <?php
-// require_once dirname(__DIR__, 2) . '/configs/init.php';
-// require_once dirname(__DIR__, 2) . '/access-token/seguridad/JWTAuth.php';
-// require_once dirname(__DIR__, 2) . '/classes/Database.php';
-// require_once dirname(__DIR__, 2) . '/classes/ConfigUrl.php';
+require_once dirname(__DIR__, 2) . '/configs/init.php';
+require_once dirname(__DIR__, 2) . '/access-token/seguridad/JWTAuth.php';
+require_once dirname(__DIR__, 2) . '/classes/ConfigUrl.php';
 
-// $baseUrl = ConfigUrl::get();
-// $auth = new JWTAuth();
-// $auth->validarTokenUsuario();
+$baseUrl = ConfigUrl::get();
+$auth = new JWTAuth();
+$auth->validarTokenUsuario();
 ?>
 
 <div class="container mt-4">

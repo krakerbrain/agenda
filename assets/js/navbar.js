@@ -79,6 +79,10 @@ document.addEventListener("DOMContentLoaded", function () {
           const { initIntegrations } = await import("./integrations.js?v=1.0.4");
           initIntegrations();
           break;
+        case "eventos_unicos":
+          const { initEventosUnicos } = await import("./eventos_unicos.js?v=1.0.4");
+          initEventosUnicos();
+          break;
         default:
           console.error("No hay un módulo para la página:", page);
       }
