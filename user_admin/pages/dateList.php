@@ -23,6 +23,9 @@ $auth->validarTokenUsuario();
         <li class="nav-item" role="presentation">
             <button class="nav-link" data-bs-toggle="tab" data-bs-target="#all" role="tab">Todas</button>
         </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#events" role="tab">Eventos</button>
+        </li>
     </ul>
 
     <div class="table-responsive">

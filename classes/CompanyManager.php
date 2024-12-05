@@ -129,14 +129,16 @@ class CompanyManager
             }
 
             // Aquí no detenemos la transacción, solo registramos los errores si ocurren
+
+
+            $this->db->endTransaction(); // Commit de la transacción
+
             $integrationResult = $this->integrationManager->createDefaultIntegrationsForCompany($company_id);
 
             // Verificar si hubo un error al crear las integraciones
             if (!$integrationResult['success']) {
                 $this->logger->logError('Error al crear integraciones para la empresa con ID ' . $company_id . ': ' . $integrationResult['error']);
             }
-
-            $this->db->endTransaction(); // Commit de la transacción
 
             return ['success' => true, 'company_id' => $company_id];
         } catch (Exception $e) {

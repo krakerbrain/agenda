@@ -29,14 +29,22 @@ export function initDateList() {
 // Función para cargar citas de acuerdo al estado de la pestaña
 async function loadAppointments(status) {
   try {
-    const response = await fetch(`${baseUrl}user_admin/controllers/appointments.php?status=${status}`, {
-      method: "GET",
-    });
+    let url = `${baseUrl}user_admin/controllers/appointments.php?status=${status}`;
 
+    // Si la pestaña es "events", cambia el endpoint
+    if (status === "events") {
+      url = `${baseUrl}user_admin/controllers/unique_events.php?status=inscriptions`;
+    }
+
+    const response = await fetch(url, { method: "GET" });
     const { success, data } = await response.json();
 
     if (success) {
-      fillTable(data);
+      if (status === "events") {
+        fillEventTable(data); // Nueva función para llenar la tabla de eventos
+      } else {
+        fillTable(data); // Tabla de citas
+      }
     }
   } catch (error) {
     console.error("Error al obtener citas:", error);
@@ -99,6 +107,64 @@ function fillTable(data) {
 
     eliminarBtn.addEventListener("click", function () {
       deleteAppointment(appointment.id, appointment.event_id);
+    });
+  });
+}
+function fillEventTable(data) {
+  const tableContent = document.getElementById("tableContent");
+  let html = "";
+
+  data.forEach((event) => {
+    html += `
+          <tr>
+              <td data-cell="servicio" class="data">${event.event_name}</td>
+              <td data-cell="nombre" class="data">${event.participant_name}</td>
+              <td data-cell="telefono" class="data">${event.phone}</td>
+              <td data-cell="correo" class="data">${event.email}</td>
+              <td data-cell="fecha" class="data">${event.event_date}</td>
+              <td data-cell="hora" class="data">${event.event_start_time}</td>
+              <td data-cell="estado" class="data">${event.status ? "Confirmada" : "Pendiente"}</td>
+              <td class="d-flex justify-content-around">
+              ${
+                !event.status
+                  ? `
+                <button id="confirmarBtn${event.inscription_id}" 
+                        class="btn btn-success btn-sm confirm" 
+                        title="Confirmar reserva"
+                        data-id="${event.inscription_id}">
+                  <i class="fas fa-check"></i>
+                  <span class="spinner-border spinner-border-sm d-none" aria-hidden="true"></span>
+                  <span class="button-text"></span>
+                </button>`
+                  : ""
+              }
+              <button id="eliminarBtn${event.inscription_id}" 
+                      class="btn btn-danger btn-sm eliminarReserva" 
+                      title="Eliminar reserva"
+                      data-id="${event.inscription_id}">
+                <i class="fas fa-trash"></i>
+                <span class="spinner-border spinner-border-sm d-none" aria-hidden="true"></span>
+                <span class="button-text"></span>
+              </button>
+              </td>
+          </tr>
+      `;
+  });
+  tableContent.innerHTML = html;
+
+  // Añadir listeners para los botones de confirmación y eliminación después de actualizar el contenido
+  data.forEach((event_list) => {
+    const confirmarBtn = document.getElementById(`confirmarBtn${event_list.inscription_id}`);
+    const eliminarBtn = document.getElementById(`eliminarBtn${event_list.inscription_id}`);
+
+    if (confirmarBtn) {
+      confirmarBtn.addEventListener("click", function () {
+        confirmReservation(event_list.inscription_id);
+      });
+    }
+
+    eliminarBtn.addEventListener("click", function () {
+      deleteEvent(event_list.inscription_id);
     });
   });
 }
@@ -244,6 +310,42 @@ export async function deleteAppointment(appointmentID, calendarEventID) {
   } finally {
     // Ocultar spinner y habilitar botón después de que la solicitud se complete
     addSpinner(appointmentID, false, "eliminar");
+  }
+}
+
+async function deleteEvent(eventID) {
+  addSpinner(eventID, true, "eliminar");
+
+  try {
+    const response = await fetch(`${baseUrl}user_admin/controllers/event_inscription_list.php`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        eventID: eventID,
+      }),
+    });
+
+    logAction(`Respuesta recibida con estado HTTP: ${response.status}`);
+
+    const data = await response.json();
+    logAction(`Respuesta JSON recibida: ${JSON.stringify(data)}`);
+
+    if (data.success) {
+      handleInfoModal("infoAppointment", "Evento eliminado", data.message);
+      //obtener status de session storage
+      let status = sessionStorage.getItem("status");
+      loadAppointments(status);
+    } else {
+      alert("Error desconocido al eliminar la reserva.");
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    alert("Error al eliminar la reserva.");
+  } finally {
+    // Ocultar spinner y habilitar botón después de que la solicitud se complete
+    addSpinner(eventID, false, "eliminar");
   }
 }
 

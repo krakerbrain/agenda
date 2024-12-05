@@ -43,6 +43,7 @@ class UniqueEvents extends Database
             return ['error' => $e->getMessage()];
         }
     }
+
     public function get_upcoming_events($company_id)
     {
         $db = new Database();
@@ -82,16 +83,27 @@ class UniqueEvents extends Database
         return array_values($events); // Eliminar índices numéricos para facilitar el formato JSON
     }
 
-
     // Método para obtener las personas inscritas a un evento
-    public function get_event_inscriptions($event_id)
+    public function get_event_inscriptions($company_id)
     {
         $db = new Database();
-        $db->query('SELECT i.id, i.name, i.email, i.phone, i.rut, i.created_at
-                    FROM event_inscriptions i
-                    WHERE i.event_id = :event_id
-                    ORDER BY i.created_at ASC');
-        $db->bind(':event_id', $event_id);
+        $db->query('SELECT ei.id AS inscription_id, 
+                   ei.name AS participant_name, 
+                   ei.email, 
+                   ei.phone, 
+                   ei.rut, 
+                   ei.created_at, 
+                   ue.name AS event_name, 
+                   ued.event_date, 
+                   ued.event_start_time, 
+                   ued.event_end_time
+            FROM event_inscriptions ei
+            JOIN unique_events ue ON ei.event_id = ue.id
+            JOIN unique_event_dates ued ON ue.id = ued.event_id
+            WHERE ue.company_id = :company_id
+            ORDER BY ued.event_date, ued.event_start_time');
+
+        $db->bind(':company_id', $company_id);
         return $db->resultSet();
     }
 
@@ -149,8 +161,6 @@ class UniqueEvents extends Database
         }
     }
 
-
-
     // Método para registrar a un usuario en un evento
     public function register_user_to_event($data)
     {
@@ -158,8 +168,8 @@ class UniqueEvents extends Database
             $db = new Database();
 
             // Insertar la inscripción en la tabla `event_inscriptions`
-            $db->query('INSERT INTO event_inscriptions (event_id, name, email, phone, created_at)
-                        VALUES (:event_id, :name, :email, :phone, now())');
+            $db->query('INSERT INTO event_inscriptions (event_id, name, email, phone, aviso_reserva,created_at)
+                        VALUES (:event_id, :name, :email, :phone, 0, now())');
 
             // Vincular los parámetros
             $db->bind(':event_id', $data['event_id']);

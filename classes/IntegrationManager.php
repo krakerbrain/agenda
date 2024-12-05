@@ -94,4 +94,31 @@ class IntegrationManager
         // Ejecutar la actualización
         return $this->db->execute();
     }
+
+    public function createDefaultIntegrationsForCompany($companyId)
+    {
+        try {
+            // Obtener todas las integraciones disponibles
+            $this->db->query("SELECT id, name FROM integrations");
+            $integrations = $this->db->resultSet();
+
+            // Insertar cada integración con los valores predeterminados
+            foreach ($integrations as $integration) {
+                $defaultEnabled = ($integration['name'] === 'WhatsApp') ? 1 : 0; // WhatsApp en 12 y el resto en 0
+
+                $this->db->query("INSERT INTO company_integrations 
+                                  (company_id, integration_id, enabled) 
+                                  VALUES (:company_id, :integration_id, :enabled)");
+                $this->db->bind(':company_id', $companyId);
+                $this->db->bind(':integration_id', $integration['id']);
+                $this->db->bind(':enabled', $defaultEnabled);
+                $this->db->execute();
+            }
+
+            return ['success' => true];
+        } catch (Exception $e) {
+            $this->logger->logError('Error al crear integraciones para la compañía con ID ' . $companyId . ': ' . $e->getMessage());
+            return ['success' => false, 'error' => $e->getMessage()];
+        }
+    }
 }
