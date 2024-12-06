@@ -29,13 +29,14 @@ class EmailTemplate
         $this->emailBuilder = new EmailBuilder($this->baseUrl);
         $this->emailSender = new EmailSender();
     }
-    // Obtener plantillas por company_id
-    public function getTemplatesByCompanyId($company_id)
+
+    public function getTemplatesForMail($identifier, $template_name, $table)
     {
+        $template = "notas_correo_" . $template_name;
         try {
             // Preparar y ejecutar la consulta usando la instancia de Database
-            $this->db->query("SELECT notas_correo_reserva as reserva, notas_correo_confirmacion as confirmacion FROM companies WHERE id = :company_id");
-            $this->db->bind(':company_id', $company_id);
+            $this->db->query("SELECT $template as nota_correo FROM $table WHERE id = :identifier");
+            $this->db->bind(':identifier', $identifier);
             return $this->db->resultSet();
         } catch (PDOException $e) {
             return ['success' => false, 'message' => $e->getMessage()];
@@ -49,24 +50,19 @@ class EmailTemplate
     }
 
     // Actualizar una plantilla existente
-    public function updateTemplate($company_id, $template_name, $notas)
+    public function updateTemplate($identifier, $template_name, $table, $notas)
     {
+        $template = "notas_correo_" . $template_name;
         try {
             // Sanitizar las notas
             $notas = $this->sanitize($notas);
-
-            // Preparar la consulta
-            $sql = "
-        UPDATE companies
-        SET notas_correo_" . $template_name . " = :notas
-        WHERE id = :company_id";
 
             // Almacenar el JSON en una variable antes de pasarlo a bindParam
             $notasJson = json_encode($notas);
 
             // Preparar y ejecutar la consulta
-            $this->db->query($sql);
-            $this->db->bind(':company_id', $company_id);
+            $this->db->query("UPDATE $table SET $template = :notas WHERE id = :identifier");
+            $this->db->bind(':identifier', $identifier);
             $this->db->bind(':notas', $notasJson);
             $this->db->execute();
 

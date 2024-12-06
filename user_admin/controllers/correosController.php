@@ -12,13 +12,22 @@ $company_id = $datosUsuario['company_id'] ?? null;
 
 $input = json_decode(file_get_contents('php://input'), true);
 $action = $input['action'] ?? '';
+$tipo = $input['tipo'] ?? '';
+$table = $input['table'] ?? '';
+$eventId = $input['eventId'] ?? null;
 $response = ['success' => false, 'message' => 'Acción no válida.'];
+// Ajustar el identificador dependiendo del tipo de consulta
+$identifier = ($table === 'unique_events' && !empty($eventId)) ? $eventId : $company_id;
 
 switch ($action) {
     case 'getTemplates':
         if (!empty($company_id) && is_numeric($company_id)) {
             $emailTemplate = new EmailTemplate();
-            $result = $emailTemplate->getTemplatesByCompanyId($company_id);
+
+
+            // Usar el mismo método pero pasando el identificador adecuado
+            $result = $emailTemplate->getTemplatesForMail($identifier, $tipo, $table);
+
             $response = ['success' => true, 'data' => $result];
         } else {
             $response['message'] = 'ID de compañía no válido.';
@@ -27,13 +36,10 @@ switch ($action) {
 
     case 'saveTemplate':
         // Asume que los datos llegan en el cuerpo de la solicitud JSON
-        $template_name = $input['template_name'] ?? '';
         $notas = $input['notas'] ?? [];
-
-
-        $emailTemplate = new EmailTemplate();
-        if ($template_name) { // Asume que si template_name existe, es una actualización
-            $result = $emailTemplate->updateTemplate($company_id, $template_name, $notas);
+        if ($tipo) { // Asume que si template_name existe, es una actualización
+            $emailTemplate = new EmailTemplate();
+            $result = $emailTemplate->updateTemplate($identifier, $tipo, $table, $notas);
         }
         $response = $result;
 
