@@ -121,4 +121,36 @@ class IntegrationManager
             return ['success' => false, 'error' => $e->getMessage()];
         }
     }
+    /**
+     * Limpia los datos de integración de Google Calendar para una compañía específica.
+     *
+     * Este método se utiliza para manejar casos en los que la integración con Google Calendar
+     * ya no es válida, por ejemplo, debido a un token inválido (`invalid_grant`) o cualquier
+     * error crítico relacionado con los tokens almacenados. 
+     *
+     * Al establecer el campo `integration_data` como NULL en la tabla `company_integrations`, 
+     * se fuerza al sistema a requerir una nueva autenticación por parte del usuario para
+     * restablecer la integración.
+     *
+     * @param int $companyId El ID de la compañía para la cual se eliminarán los datos de integración.
+     * 
+     * Proceso:
+     * - Actualiza la columna `integration_data` en la tabla `company_integrations` a NULL.
+     * - Utiliza un parámetro enlazado para proteger contra inyecciones SQL.
+     * 
+     * Escenarios de Uso:
+     * - Cuando se detecta un error `invalid_grant` al intentar renovar el token.
+     * - Cuando la integración con Google Calendar ya no es válida o es inconsistente.
+     *
+     * Nota:
+     * Este método no genera una nueva autenticación automáticamente, 
+     * pero prepara el sistema para que requiera la autenticación nuevamente.
+     */
+    public function clearGoogleCalendarIntegration($companyId)
+    {
+        $this->db->query("UPDATE company_integrations SET integration_data = NULL WHERE company_id = :companyId");
+
+        $this->db->bind(':companyId', $companyId);
+        $this->db->execute();
+    }
 }
