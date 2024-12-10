@@ -1,128 +1,179 @@
 export function initCorreos() {
-  const formReserva = document.getElementById("reservaForm");
-  const formConfirmacion = document.getElementById("confirmacionForm");
+  const tipoCorreoSelect = document.getElementById("tipoCorreo");
+  const notasContainer = document.getElementById("notasContainer");
+  const agregarNotaBtn = document.getElementById("agregarNota");
+  const formNotas = document.getElementById("formNotas");
+  const eventoSelectContainer = document.getElementById("eventoSelectContainer");
 
-  async function getEmailTemplates() {
-    const response = await fetch(`${baseUrl}user_admin/controllers/correosController.php`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        action: "getTemplates",
-      }),
-    });
+  // const baseUrl = "tu-url-base-aqui"; // Ajusta según tu proyecto
 
-    const { success, data } = await response.json();
+  let tipoActual = "reserva"; // Valor inicial
+  let dataType = "companies";
+  tipoCorreoSelect.addEventListener("change", (event) => {
+    const selectedOption = event.target.selectedOptions[0];
+    dataType = selectedOption.getAttribute("data-type");
+    tipoActual = tipoCorreoSelect.value;
+    if (dataType === "unique_events") {
+      notasContainer.innerHTML = "";
+      cargarEventos();
+    } else {
+      eventoSelectContainer.innerHTML = ""; // Limpiar si no es uni
+      cargarNotas(tipoActual, dataType);
+    }
+  });
 
-    if (success && data.length > 0) {
-      formReserva.reset();
-      formConfirmacion.reset();
-      document.getElementById("reservaNotas").innerHTML = "";
-      document.getElementById("confirmacionNotas").innerHTML = "";
-
-      data.forEach((template) => {
-        cargarNotas(JSON.parse(template.reserva), "reserva");
-        cargarNotas(JSON.parse(template.confirmacion), "confirmacion");
+  async function cargarEventos() {
+    try {
+      const response = await fetch(`${baseUrl}user_admin/controllers/unique_events.php`, {
+        method: "GET",
       });
+
+      const { success, events } = await response.json();
+
+      if (success && events.length > 0) {
+        // Construir el select dinámico con una opción vacía al inicio
+        let selectHtml = `
+          <label for="eventoSelect" class="form-label">Seleccionar Evento:</label>
+          <select id="eventoSelect" class="form-select">
+            <option value="" disabled selected>Selecciona un evento</option>
+            ${events.map((event) => `<option value="${event.id}">${event.name}</option>`).join("")}
+          </select>
+        `;
+        eventoSelectContainer.innerHTML = selectHtml;
+
+        // Agregar evento al select para cargar notas al seleccionar un evento
+        const eventoSelect = document.getElementById("eventoSelect");
+        eventoSelect.addEventListener("change", () => {
+          cargarNotas(tipoActual, dataType); // Recarga las notas al cambiar de evento
+        });
+      } else {
+        eventoSelectContainer.innerHTML = "<p>No hay eventos disponibles.</p>";
+      }
+    } catch (error) {
+      console.error("Error al cargar los eventos:", error);
+      eventoSelectContainer.innerHTML = "<p>Error al cargar los eventos.</p>";
     }
   }
 
-  function cargarNotas(notas, tipo) {
-    notas.forEach((nota, index) => {
-      const notaIndex = index + 1;
+  // Función para obtener el ID del evento seleccionado
+  function obtenerIdEvento(table) {
+    if (table === "unique_events") {
+      const eventoSelect = document.getElementById("eventoSelect");
+      if (eventoSelect) {
+        return eventoSelect.value; // Devuelve el ID del evento seleccionado
+      }
+    }
+    return null; // Devuelve null si no es un evento o si no hay selección
+  }
+
+  async function cargarNotas(tipo, table) {
+    try {
+      // Limpia las notas actuales
+      notasContainer.innerHTML = "";
+
+      // Obtener el ID del evento si es necesario
+      const eventId = obtenerIdEvento(table);
+
+      // Realiza la solicitud usando fetch
+      const response = await fetch(`${baseUrl}user_admin/controllers/correosController.php`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          action: "getTemplates",
+          tipo, // Envía el tipo para obtener las notas correspondientes
+          table,
+          eventId, // Incluye el ID del evento si es un evento
+        }),
+      });
+
+      // Convierte la respuesta a JSON
+      const { success, data } = await response.json();
+
+      // Procesa las notas si la solicitud fue exitosa
+      if (success) {
+        if (data[0].nota_correo != "") {
+          data.forEach((nota, index) => agregarNotaAlHtml(index + 1, nota));
+        } else {
+          agregarNotaAlHtml(0);
+        }
+      }
+    } catch (error) {
+      console.error("Error al cargar las notas:", error);
+    }
+  }
+
+  function agregarNotaAlHtml(index, texto = "") {
+    let textoNota = texto !== "" ? JSON.parse(texto.nota_correo) : ["No hay notas de correo configuradas"]; // Convierte en arreglo si es necesario
+
+    // Si textoNota no es un arreglo, lo convertimos en uno
+    if (!Array.isArray(textoNota)) {
+      textoNota = [textoNota];
+    }
+
+    textoNota.forEach((nota, i) => {
       const notaDiv = document.createElement("div");
       notaDiv.classList.add("mb-3");
       notaDiv.innerHTML = `
-      <div class="d-flex justify-content-between mb-1"> 
-        <label for="${tipo}Nota${notaIndex}" class="form-label">Nota ${notaIndex}:</label>
-        <button type="button" class="btn btn-danger eliminarNota" style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;">
-          Eliminar Nota
-        </button>
-      </div>
-      <textarea class="form-control" id="${tipo}Nota${notaIndex}" name="notas[]" rows="3">${nota}</textarea>
+        <div class="d-flex justify-content-between mb-1">
+          <label for="${tipoActual}Nota${index + i}" class="form-label">Nota ${index + i}:</label>
+          <button type="button" class="btn btn-danger eliminarNota" style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;">
+            Eliminar Nota
+          </button>
+        </div>
+        <textarea class="form-control" id="${tipoActual}Nota${index + i}" name="notas[]" rows="3">${nota}</textarea>
       `;
-      document.getElementById(`${tipo}Notas`).appendChild(notaDiv);
+      notasContainer.appendChild(notaDiv);
 
-      // Añadir evento para eliminar la nota
-      notaDiv.querySelector(".eliminarNota").addEventListener("click", function () {
+      notaDiv.querySelector(".eliminarNota").addEventListener("click", () => {
         notaDiv.remove();
-        enviarFormulario(tipo);
       });
     });
   }
 
-  function enviarFormulario(tipo) {
-    const form = tipo === "reserva" ? formReserva : formConfirmacion;
-
-    const notas = Array.from(form.querySelectorAll('textarea[name="notas[]"]')).map((nota) => nota.value);
-
+  function guardarNotas() {
+    const notas = Array.from(notasContainer.querySelectorAll('textarea[name="notas[]"]')).map((nota) => nota.value);
+    // Obtener el ID del evento si es necesario
+    const eventId = obtenerIdEvento(dataType);
     fetch(`${baseUrl}user_admin/controllers/correosController.php`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        template_name: tipo,
-        notas,
         action: "saveTemplate",
+        tipo: tipoActual,
+        table: dataType,
+        eventId,
+        notas,
       }),
     })
       .then((response) => response.json())
       .then(({ success }) => {
         if (success) {
-          alert(`Notas del correo de ${tipo} guardadas exitosamente`);
+          alert("Notas guardadas exitosamente.");
         } else {
-          alert(`Error al guardar las notas del correo de ${tipo}`);
+          alert("Error al guardar las notas.");
         }
-      })
-      .catch((error) => {
-        alert(`Error al realizar la solicitud: ${error}`);
       });
   }
 
-  getEmailTemplates();
+  agregarNotaBtn.addEventListener("click", () => {
+    const index = notasContainer.querySelectorAll(".form-label").length + 1;
+    agregarNotaAlHtml(index);
+  });
 
-  formReserva.addEventListener("submit", async (event) => {
+  formNotas.addEventListener("submit", (event) => {
     event.preventDefault();
-    enviarFormulario("reserva");
+    guardarNotas();
   });
 
-  formConfirmacion.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    enviarFormulario("confirmacion");
-  });
-
-  document.getElementById("agregarNota").addEventListener("click", function () {
-    agregarNota("reserva");
-  });
-
-  document.getElementById("agregarNotaConfirmacion").addEventListener("click", function () {
-    agregarNota("confirmacion");
-  });
-
-  function agregarNota(tipo) {
-    const notaIndex = document.querySelectorAll(`#${tipo}Notas .form-label`).length + 1;
-    const notaDiv = document.createElement("div");
-    notaDiv.classList.add("mb-3");
-    notaDiv.innerHTML = `
-      <div class="d-flex justify-content-between mb-1"> 
-        <label for="${tipo}Nota${notaIndex}" class="form-label">Nota ${notaIndex}:</label>
-        <button type="button" class="btn btn-danger eliminarNota" style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;">
-          Eliminar Nota
-        </button>
-      </div>
-      <textarea class="form-control" id="${tipo}Nota${notaIndex}" name="notas[]" rows="3" placeholder="Escribe la nota ${notaIndex}"></textarea>
-    `;
-    document.getElementById(`${tipo}Notas`).appendChild(notaDiv);
-
-    // Añadir evento para eliminar la nota
-    notaDiv.querySelector(".eliminarNota").addEventListener("click", function () {
-      notaDiv.remove();
-      enviarFormulario(tipo);
-    });
+  // Cargar notas iniciales
+  if (tipoActual == "reserva") {
+    cargarNotas(tipoActual, dataType);
   }
 
   const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
-  const popoverList = [...popoverTriggerList].map((popoverTriggerEl) => new bootstrap.Popover(popoverTriggerEl));
+  [...popoverTriggerList].map((popoverTriggerEl) => new bootstrap.Popover(popoverTriggerEl));
 }

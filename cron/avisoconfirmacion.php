@@ -25,7 +25,8 @@ try {
             $appointment['date'],
             $appointment['start_time'],
             $emailContent['company_name'],
-            $appointment['appointment_token']
+            $appointment['appointment_token'],
+            $appointment['service_name']
         );
 
         //para pruebas

@@ -1,7 +1,7 @@
 <?php
 
 
-function sendWspReserva($template_name, $telefono, $nombre_cliente,  $fecha_cita, $hora_cita, $nombre_empresa, $appointment_token)
+function sendWspReserva($template_name, $telefono, $nombre_cliente,  $fecha_cita, $hora_cita, $nombre_empresa, $appointment_token, $evento)
 {
     $token = $_ENV['WSP_TOKEN'];
     //URL A DONDE SE MANDARA EL MENSAJE
@@ -32,6 +32,7 @@ function sendWspReserva($template_name, $telefono, $nombre_cliente,  $fecha_cita
                         "type" => "body",
                         "parameters" => [
                             ["type" => "text", "text" => $nombre_cliente],  // {{1}}
+                            ["type" => "text", "text" => $evento],  // {{2}}
                             ["type" => "text", "text" => $fecha_cita],    // {{3}}
                             ["type" => "text", "text" => $hora_cita]      // {{4}}
                         ]
@@ -63,7 +64,7 @@ function sendWspReserva($template_name, $telefono, $nombre_cliente,  $fecha_cita
         //OBTENEMOS LA RESPUESTA DEL ENVIO DE INFORMACION
         $response = json_decode(curl_exec($curl), true);
         //IMPRIMIMOS LA RESPUESTA 
-        // print_r($response);
+        print_r($response);
         //OBTENEMOS EL CODIGO DE LA RESPUESTA
         $status_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         //CERRAMOS EL CURL

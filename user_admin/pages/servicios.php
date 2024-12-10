@@ -1,3 +1,12 @@
+<?php
+require_once dirname(__DIR__, 2) . '/configs/init.php';
+require_once dirname(__DIR__, 2) . '/access-token/seguridad/JWTAuth.php';
+require_once dirname(__DIR__, 2) . '/classes/ConfigUrl.php';
+
+$baseUrl = ConfigUrl::get();
+$auth = new JWTAuth();
+$auth->validarTokenUsuario();
+?>
 <div class="container text-end">
     <a tabindex="0" role="button" data-bs-trigger="focus" class="btn" data-bs-placement="left" data-bs-toggle="popover"
         data-bs-title="Servicios"

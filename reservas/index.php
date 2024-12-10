@@ -2,7 +2,7 @@
 
 require_once dirname(__DIR__) . '/classes/ConfigUrl.php';
 require_once dirname(__DIR__) . '/classes/Appointments.php';
-require_once __DIR__ . '/controller/CompanyController.php';
+require_once dirname(__DIR__) . '/classes/CompanyController/CompanyController.php';
 
 $baseUrl = ConfigUrl::get();
 

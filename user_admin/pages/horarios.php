@@ -1,3 +1,12 @@
+<?php
+require_once dirname(__DIR__, 2) . '/configs/init.php';
+require_once dirname(__DIR__, 2) . '/access-token/seguridad/JWTAuth.php';
+require_once dirname(__DIR__, 2) . '/classes/ConfigUrl.php';
+
+$baseUrl = ConfigUrl::get();
+$auth = new JWTAuth();
+$auth->validarTokenUsuario();
+?>
 <div class="container my-5">
     <form id="workScheduleForm" method="POST" class="border p-4 rounded">
         <input type="hidden" name="company_id" id="company_id" value="1"> <!-- Replace with dynamic company ID -->
