@@ -25,10 +25,11 @@ try {
             $appointment['date'],
             $appointment['start_time'],
             $emailContent['company_name'],
-            $appointment['appointment_token']
+            $appointment['appointment_token'],
+            $appointment['service_name'],
         );
         //para pruebas
-        // $wspStatusCode = 200;
+        $wspStatusCode = 200;
         // Enviar notificación
         if ($wspStatusCode == 200 || $wspStatusCode == 201) {
             // Marcar como confirmada

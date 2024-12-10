@@ -203,4 +203,34 @@ class EmailTemplate
 
         return $this->emailSender->sendInscriptionAlert($inscriptionSubject, $userData['email'], $inscriptionBody);
     }
+
+    public function buildEventMail($data, $templateType)
+    {
+
+        try {
+            $companyData = $this->dataLoader->getCompanyData($data['company_id'], $templateType);
+            $notas = $templateType == 'reserva' ?  json_decode($data['notas_reserva'], true) : json_decode($data['notas_confirmacion'], true);
+
+            // Construir cuerpo del correo
+            $placeholders = [
+                '{nombre_cliente}' => $data['participant_name'],
+                '{fecha_reserva}' => date('d/m/Y', strtotime($data['event_date'])),
+                '{hora_reserva}' => date('h:i a', strtotime($data['event_start_time'])),
+                '{evento}' => $data['event_name'],
+                '{notas}' => $this->formatNotes($notas),
+                '{ruta_logo}' => $companyData['logo'],
+                '{nombre_empresa}' => $companyData['name']
+            ];
+            $templateType = $templateType . '_evento';
+            $body = $this->emailBuilder->buildTemplate($templateType, $placeholders);
+
+            $subject = $this->buildSubject($templateType, $data['event_date']);
+
+            $success = $this->emailSender->sendEmail($data['email'], ['subject' => $subject, 'body' => $body, 'company_name' => $companyData['name']]);
+            return ['success' => $success, 'company_name' => $companyData['name']];
+        } catch (Exception $e) {
+            error_log("Error al construir/enviar correo: " . $e->getMessage());
+            return ['error' => $e->getMessage()];
+        }
+    }
 }

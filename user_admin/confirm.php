@@ -1,6 +1,6 @@
 <?php
 date_default_timezone_set('UTC');
-require_once dirname(__DIR__) . '/classes/EmailTemplate.php';
+require_once dirname(__DIR__) . '/classes/ConfigUrl.php';
 require_once dirname(__DIR__) . '/classes/Appointments.php';
 require_once dirname(__DIR__) . '/classes/Integrations/GoogleIntegrationManager.php';
 require_once dirname(__DIR__) . '/classes/IntegrationManager.php';

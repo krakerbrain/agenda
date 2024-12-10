@@ -4,6 +4,29 @@ require_once dirname(__DIR__) . '/access-token/seguridad/JWTAuth.php';
 
 class Appointments extends Database
 {
+    /**
+     * Método para agregar una cita.
+     *
+     * Este método inserta una nueva cita en la base de datos y genera un token para la misma.
+     *
+     * Parámetros esperados en $data:
+     * - company_id: ID de la compañía.
+     * - name: Nombre del cliente.
+     * - phone: Teléfono del cliente.
+     * - mail: Correo electrónico del cliente.
+     * - date: Fecha de la cita (YYYY-MM-DD).
+     * - start_time: Hora de inicio de la cita (HH:MM:SS).
+     * - end_time: Hora de fin de la cita (HH:MM:SS).
+     * - id_service: ID del servicio asociado a la cita.
+     * - aviso_reserva: (Por defecto "0") Indica si el cliente ha sido notificado.
+     * - created_at: Fecha y hora de creación de la cita (asignado automáticamente).
+     *
+     * @param array $data Datos de la cita.
+     * @return array Resultado de la operación:
+     *               - Si es exitoso: ['appointment_id' => int, 'appointment_token' => string].
+     *               - Si hay error: ['error' => string].
+     * @throws PDOException Si ocurre un error en la base de datos.
+     */
     public function add_appointment($data)
     {
         try {
@@ -14,18 +37,6 @@ class Appointments extends Database
                 return ['error' => 'Cita ya ha sido enviada.'];
             }
 
-            /**
-                company_id = id de la compañia
-                name = nombre del cliente
-                phone  = telefono del cliente
-                mail  = correo del cliente
-                date  = fecha de la cita
-                start_time = hora  de inicio de la cita
-                end_time  = hora de fin de la cita
-                id_service  = id del servicio
-                aviso_reserva  = "0" indica que el cliente no ha sido notificado
-                created_at = inidca la fecha de creacion de la cita
-             *  */
             $db->query('INSERT INTO appointments (company_id, name, phone, mail, date, start_time, end_time, id_service, aviso_reserva, created_at) 
                     VALUES (:company_id, :name, :phone, :mail, :date, :start_time, :end_time, :id_service, 0, now())');
             $db->bind(':company_id', $data['company_id']);
@@ -184,15 +195,25 @@ class Appointments extends Database
     public function getUnconfirmedReserva()
     {
         $db = new Database();
-        $db->query("SELECT * FROM appointments WHERE aviso_reserva = 0");
+        $db->query("SELECT a.*, s.name as service_name FROM appointments a
+                JOIN services s
+                ON a.id_service = s.id
+                WHERE a.aviso_reserva = 0");
         return $db->resultSet();
     }
+
     public function getUnconfirmedAppointment()
     {
         $db = new Database();
-        $db->query("SELECT * FROM appointments WHERE aviso_confirmada = 0 AND aviso_reserva = 1 AND status = 1");
+        $db->query("SELECT a.*, s.name as service_name FROM appointments a
+                JOIN services s
+                ON a.id_service = s.id
+                WHERE aviso_confirmada = 0 
+                AND aviso_reserva = 1 
+                AND status = 1");
         return $db->resultSet();
     }
+
 
     public function markAsConfirmed($id, $type = 'reserva')
     {

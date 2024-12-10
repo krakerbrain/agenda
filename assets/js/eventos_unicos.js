@@ -46,10 +46,20 @@ export function initEventosUnicos() {
     var tableBody = document.querySelector("#eventDatesTable tbody");
     var newRow = document.createElement("tr");
     newRow.innerHTML = `
-          <td><input type="date" class="form-control" name="event_dates[]" required></td>
-          <td><input type="time" class="form-control" name="start_time[]" required></td>
-          <td><input type="time" class="form-control" name="end_time[]" required></td>
-          <td><button type="button" class="btn btn-danger removeRow">Eliminar</button></td>
+                        <td class="form-floating"><input type="date" class="form-control" id="floatingDate"
+                                name="event_dates[]" required>
+                            <label for="floatingDate">Selecciona una fecha</label>
+                        </td>
+                        <td class="form-floating"><input type="time" id="floatingStartTime" class="form-control"
+                                name="start_time[]" required>
+                            <label for="floatingStartTime">Hora de inicio</label>
+                        </td>
+                        <td class="form-floating"><input type="time" id="floatingEndTime" class="form-control"
+                                name="end_time[]" required>
+                            <label for="floatingEndTime">Hora de inicio</label>
+                        </td>
+                        <td class="form-floating"><button type="button"
+                                class="btn btn-danger removeRow">Eliminar</button></td>
       `;
     tableBody.appendChild(newRow);
   });
@@ -64,123 +74,103 @@ export function initEventosUnicos() {
 
 async function getEventos() {
   try {
-    const response = await fetch(`${baseUrl}user_admin/controllers/unique_events.php`, {
-      method: "GET",
-    });
+    const response = await fetch(`${baseUrl}user_admin/controllers/unique_events.php`, { method: "GET" });
     const { success, events } = await response.json();
 
-    if (success) {
-      const eventsList = document.getElementById("events-list");
-      eventsList.innerHTML = ""; // Limpiar la lista antes de agregar los nuevos eventos
-
-      events.forEach((event) => {
-        // Fila principal: Nombre, descripción y botón para eliminar todo el evento
-        const eventRow = document.createElement("tr");
-        eventRow.innerHTML = `
-          <td colspan="3">
-            <strong>${event.name}</strong><br>${event.description}
-          </td>
-          <td>
-            <button class="btn btn-danger delete-event-btn" 
-                    data-event-id="${event.id}">
-              Eliminar Todo
-            </button>
-          </td>
-        `;
-        eventsList.appendChild(eventRow);
-
-        // Fila para las fechas y horarios del evento
-        event.dates.forEach((date) => {
-          const dateRow = document.createElement("tr");
-          dateRow.innerHTML = `
-            <td style="padding-left: 20px;">${date.event_date}</td>
-            <td>${date.event_start_time} - ${date.event_end_time}</td>
-            <td>
-              <button class="btn btn-danger delete-date-btn" 
-                      data-event-id="${event.id}" 
-                      data-event-date="${date.event_date}" 
-                      data-start-time="${date.event_start_time}">
-                Eliminar Fecha
-              </button>
-            </td>
-          `;
-          eventsList.appendChild(dateRow);
-        });
-      });
-
-      // Eventos para eliminar un evento completo
-      const deleteEventButtons = document.querySelectorAll(".delete-event-btn");
-      deleteEventButtons.forEach((button) => {
-        button.addEventListener("click", async function () {
-          const eventId = button.getAttribute("data-event-id");
-          if (confirm("¿Estás seguro de que quieres eliminar todo el evento?")) {
-            await deleteEventoCompleto(eventId);
-          }
-        });
-      });
-
-      // Eventos para eliminar una fecha específica
-      const deleteDateButtons = document.querySelectorAll(".delete-date-btn");
-      deleteDateButtons.forEach((button) => {
-        button.addEventListener("click", async function () {
-          const eventId = button.getAttribute("data-event-id");
-          const eventDate = button.getAttribute("data-event-date");
-          const startTime = button.getAttribute("data-start-time");
-          if (confirm("¿Estás seguro de que quieres eliminar esta fecha del evento?")) {
-            await deleteFechaEvento(eventId, eventDate, startTime);
-          }
-        });
-      });
-    } else {
+    if (!success) {
       alert(`Error: ${result.message}`);
+      return;
     }
+
+    const containerEventList = document.querySelector(".event-container");
+    containerEventList.innerHTML = "";
+
+    events.forEach((event) => {
+      const eventHTML = `
+      <div>
+        <div>
+          <div class="d-flex justify-content-between">
+              <div class="d-flex">
+                  <h6 class="m-0 align-content-around table-title"> ${event.name}</h6>
+                  <span class="cupo_actual align-content-around ms-2">Cupo Actual (${event.cupo_maximo} personas)</span>
+              </div>
+              <button class="btn btn-danger delete-event-btn text-nowrap" data-event-id="event.id">Eliminar Evento</button>
+          </div>
+          <span class="table-description">${event.description}</span>
+        </div>
+        <table class="table eventListBody table-borderless">
+          <thead>
+              <!-- Segunda fila: Encabezados de las columnas -->
+              <tr>
+                  <th>Fecha</th>
+                  <th>Horario</th>
+                  <th>Acciones</th>
+              </tr>
+          </thead>
+          <tbody id="events-list-${event.id}">
+              <!-- Aquí se cargarán los eventos creados -->
+          </tbody>
+        </table>
+      </div>
+      <hr>`;
+
+      containerEventList.innerHTML += eventHTML;
+
+      // Crear filas de fechas y horarios del evento
+      const eventListBody = document.querySelector(`#events-list-${event.id}`);
+      event.dates.forEach((date) => {
+        const dateRow = createEventRow(event.id, date);
+        eventListBody.appendChild(dateRow);
+      });
+    });
+
+    attachEventHandlers(".delete-event-btn", handleDeleteEvent);
+    attachEventHandlers(".delete-date-btn", handleDeleteDate);
   } catch (error) {
     console.error("Error al obtener los eventos:", error);
     alert("Ocurrió un error inesperado al obtener los eventos.");
   }
 }
 
-// Función para eliminar un evento
-async function deleteEventoCompleto(eventId) {
-  try {
-    const response = await fetch(`${baseUrl}user_admin/controllers/unique_events.php`, {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ event_id: eventId }),
-    });
-    const { success, message } = await response.json();
-    if (success) {
-      alert("Evento eliminado correctamente.");
-      getEventos(); // Actualizar la lista
-    } else {
-      alert(`Error al eliminar el evento: ${message}`);
-    }
-  } catch (error) {
-    console.error("Error al eliminar el evento completo:", error);
-    alert("Ocurrió un error inesperado al eliminar el evento.");
+function createEventRow(eventId, date) {
+  const dateRow = document.createElement("tr");
+  dateRow.innerHTML = `
+    <td>${date.event_date}</td>
+    <td>${date.event_start_time} - ${date.event_end_time}</td>
+    <td>
+      <button class="btn btn-danger delete-date-btn"
+              data-event-id="${eventId}"
+              data-event-date="${date.event_date}"
+              data-start-time="${date.event_start_time}">
+        Eliminar
+      </button>
+    </td>
+  `;
+  return dateRow;
+}
+
+// Asignar controladores de eventos a botones
+function attachEventHandlers(selector, handler) {
+  const buttons = document.querySelectorAll(selector);
+  buttons.forEach((button) => button.addEventListener("click", handler));
+}
+
+// Manejar eliminación de evento completo
+async function handleDeleteEvent(event) {
+  const eventId = event.target.getAttribute("data-event-id");
+  if (confirm("¿Estás seguro de que quieres eliminar todo el evento?")) {
+    await deleteEventoCompleto(eventId);
   }
 }
 
-async function deleteFechaEvento(eventId, eventDate, startTime) {
-  try {
-    const response = await fetch(`${baseUrl}user_admin/controllers/unique_events.php`, {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        event_id: eventId,
-        event_date: eventDate,
-        start_time: startTime,
-      }),
-    });
-    const { success, message } = await response.json();
-    if (success) {
-      alert("Fecha eliminada correctamente.");
-      getEventos(); // Actualizar la lista
-    } else {
-      alert(`Error al eliminar la fecha: ${message}`);
-    }
-  } catch (error) {
-    console.error("Error al eliminar la fecha del evento:", error);
-    alert("Ocurrió un error inesperado al eliminar la fecha.");
+// Manejar eliminación de fecha específica
+async function handleDeleteDate(event) {
+  const button = event.target;
+  const eventId = button.getAttribute("data-event-id");
+  const eventDate = button.getAttribute("data-event-date");
+  const startTime = button.getAttribute("data-start-time");
+
+  if (confirm("¿Estás seguro de que quieres eliminar esta fecha del evento?")) {
+    await deleteFechaEvento(eventId, eventDate, startTime);
   }
 }

@@ -110,6 +110,7 @@ function fillTable(data) {
     });
   });
 }
+
 function fillEventTable(data) {
   const tableContent = document.getElementById("tableContent");
   let html = "";
@@ -131,7 +132,8 @@ function fillEventTable(data) {
                 <button id="confirmarBtn${event.inscription_id}" 
                         class="btn btn-success btn-sm confirm" 
                         title="Confirmar reserva"
-                        data-id="${event.inscription_id}">
+                        data-id="${event.inscription_id}"
+                        data-type="event">
                   <i class="fas fa-check"></i>
                   <span class="spinner-border spinner-border-sm d-none" aria-hidden="true"></span>
                   <span class="button-text"></span>
@@ -141,7 +143,8 @@ function fillEventTable(data) {
               <button id="eliminarBtn${event.inscription_id}" 
                       class="btn btn-danger btn-sm eliminarReserva" 
                       title="Eliminar reserva"
-                      data-id="${event.inscription_id}">
+                      data-id="${event.inscription_id}"
+                      data-type="evento">
                 <i class="fas fa-trash"></i>
                 <span class="spinner-border spinner-border-sm d-none" aria-hidden="true"></span>
                 <span class="button-text"></span>
@@ -159,7 +162,8 @@ function fillEventTable(data) {
 
     if (confirmarBtn) {
       confirmarBtn.addEventListener("click", function () {
-        confirmReservation(event_list.inscription_id);
+        const type = confirmarBtn.getAttribute("data-type");
+        confirmReservation(event_list.inscription_id, type);
       });
     }
 
@@ -169,15 +173,15 @@ function fillEventTable(data) {
   });
 }
 
-export async function confirmReservation(id) {
+export async function confirmReservation(id, type = null) {
   try {
     // Log de inicio de la función
     logAction(`Iniciando confirmación de reserva con ID: ${id}`);
 
     // Mostrar spinner
     addSpinner(id, true, "confirmar");
-
-    const response = await fetch(`${baseUrl}user_admin/confirm.php`, {
+    let url = type == "event" ? "eventos/controller/confirmar_inscripcion.php" : "user_admin/confirm.php";
+    const response = await fetch(`${baseUrl}${url}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -199,7 +203,7 @@ export async function confirmReservation(id) {
 
     if (data.success) {
       logAction("Reserva confirmada exitosamente");
-      handleSuccess(data);
+      handleSuccess(data, type);
     } else {
       logAction(`Error en la confirmación: ${data.message || "Sin mensaje"}`);
       handleError(data);
@@ -229,21 +233,24 @@ function handleAuthenticationModal() {
 }
 
 // Función para manejar la respuesta exitosa
-function handleSuccess(data) {
+function handleSuccess(data, type) {
   logAction(`Reserva exitosa: ${data.message}`);
   handleInfoModal("infoAppointment", "Evento creado", data.message);
+  if (type == "event") {
+    loadAppointments("events");
+  } else {
+    // Cambiar el tab a "confirmed" y actualizar la sesión
+    sessionStorage.setItem("status", "confirmed");
 
-  // Cambiar el tab a "confirmed" y actualizar la sesión
-  sessionStorage.setItem("status", "confirmed");
+    // Mostrar el tab "confirmed"
+    const confirmedTabTrigger = document.querySelector('button[data-bs-target="#confirmed"]');
+    if (confirmedTabTrigger) {
+      const confirmedTab = new bootstrap.Tab(confirmedTabTrigger);
+      confirmedTab.show();
+    }
 
-  // Mostrar el tab "confirmed"
-  const confirmedTabTrigger = document.querySelector('button[data-bs-target="#confirmed"]');
-  if (confirmedTabTrigger) {
-    const confirmedTab = new bootstrap.Tab(confirmedTabTrigger);
-    confirmedTab.show();
+    loadAppointments("confirmed");
   }
-
-  loadAppointments("confirmed");
 }
 
 // Función para manejar los errores según el código de respuesta

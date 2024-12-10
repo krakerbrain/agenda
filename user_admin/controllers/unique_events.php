@@ -33,12 +33,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['status']) && $_GET['sta
         try {
             $company_id = $datosUsuario['company_id'];
             $event_name = trim($_POST['event_name'] ?? '');
+            $event_quota = trim($_POST['event_quota'] ?? '');
             $event_description = trim($_POST['event_description'] ?? '');
             $event_dates = $_POST['event_dates'] ?? [];
             $start_times = $_POST['start_time'] ?? [];
             $end_times = $_POST['end_time'] ?? [];
 
-            if (!$company_id || empty($event_name) || empty($event_dates) || empty($start_times) || empty($end_times)) {
+            if (!$company_id || empty($event_name) || empty($event_quota) || empty($event_dates) || empty($start_times) || empty($end_times)) {
                 throw new Exception("Todos los campos son obligatorios.");
             }
 
@@ -81,6 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['status']) && $_GET['sta
             $data = [
                 'company_id' => $company_id,
                 'name' => $event_name,
+                'cupo_maximo' => $event_quota,
                 'description' => $event_description,
                 'dates' => $validDates,
                 'start_times' => $validStartTimes,
