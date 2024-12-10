@@ -1,7 +1,7 @@
 <?php
-require_once dirname(__DIR__, 2) . '/configs/init.php';
 require_once dirname(__DIR__, 2) . '/classes/ConfigUrl.php';
 require_once dirname(__DIR__, 2) . '/classes/UniqueEvents.php';
+require_once dirname(__DIR__, 2) . '/classes/CompanyManager.php';
 require_once dirname(__DIR__, 2) . '/access-token/seguridad/JWTAuth.php';
 
 $auth = new JWTAuth();
@@ -114,9 +114,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['status']) && $_GET['sta
             $uniqueEvents = new UniqueEvents();
             $events = $uniqueEvents->get_upcoming_events($company_id);
 
+
+            $companyManager = new CompanyManager();
+            $url = $companyManager->getCompanyCustomUrl($company_id);
+
             echo json_encode([
                 'success' => true,
-                'events' => $events
+                'events' => $events,
+                'url' => $url
             ]);
         } catch (Exception $e) {
             echo json_encode([

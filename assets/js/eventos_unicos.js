@@ -75,7 +75,7 @@ export function initEventosUnicos() {
 async function getEventos() {
   try {
     const response = await fetch(`${baseUrl}user_admin/controllers/unique_events.php`, { method: "GET" });
-    const { success, events } = await response.json();
+    const { success, events, url } = await response.json();
 
     if (!success) {
       alert(`Error: ${result.message}`);
@@ -94,7 +94,10 @@ async function getEventos() {
                   <h6 class="m-0 align-content-around table-title"> ${event.name}</h6>
                   <span class="cupo_actual align-content-around ms-2">Cupo Actual (${event.cupo_maximo} personas)</span>
               </div>
-              <button class="btn btn-danger delete-event-btn text-nowrap" data-event-id="event.id">Eliminar Evento</button>
+              <div class="d-flex gap-2">
+                  <button class="btn btn-success copy-url-btn text-nowrap" data-url="${baseUrl}eventos/${url}">Copiar URL</button>
+                  <button class="btn btn-danger delete-event-btn text-nowrap" data-event-id="${event.id}">Eliminar Evento</button>
+              </div>
           </div>
           <span class="table-description">${event.description}</span>
         </div>
@@ -126,6 +129,7 @@ async function getEventos() {
 
     attachEventHandlers(".delete-event-btn", handleDeleteEvent);
     attachEventHandlers(".delete-date-btn", handleDeleteDate);
+    attachEventHandlers(".copy-url-btn", handleCopyUrl);
   } catch (error) {
     console.error("Error al obtener los eventos:", error);
     alert("Ocurrió un error inesperado al obtener los eventos.");
@@ -173,4 +177,20 @@ async function handleDeleteDate(event) {
   if (confirm("¿Estás seguro de que quieres eliminar esta fecha del evento?")) {
     await deleteFechaEvento(eventId, eventDate, startTime);
   }
+}
+
+// Función para copiar la URL al portapapeles
+function handleCopyUrl(event) {
+  const button = event.target;
+  const url = button.getAttribute("data-url");
+
+  navigator.clipboard
+    .writeText(url)
+    .then(() => {
+      alert("URL copiada al portapapeles");
+    })
+    .catch((err) => {
+      console.error("Error al copiar la URL:", err);
+      alert("No se pudo copiar la URL");
+    });
 }
