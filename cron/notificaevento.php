@@ -20,19 +20,21 @@ try {
 
         foreach ($unconfirmedEvents as $event) {
             // Preparar el contenido del correo según el tipo
-            $emailContent = $type === 'reserva'
-                ? $emailTemplateBuilder->buildEventMail($event, 'reserva')
-                : $emailTemplateBuilder->buildEventMail($event, 'confirmacion');
+            $emailContent = $emailTemplateBuilder->buildEventMail($event, $type);
+
+            $templateName = $type === 'reserva'
+                ? 'registro_reserva'
+                : 'confirmar_reserva';
 
             $wspStatusCode = sendWspReserva(
-                "registro_reserva",
+                $templateName,
                 $event['phone'],
                 $event['participant_name'],
                 $event['date'],
                 $event['start_time'],
                 $emailContent['company_name'],
                 $event['event_token'],
-                $event['event_name'],
+                ucwords($event['event_name']),
             );
             //para pruebas
             $wspStatusCode = 200;
