@@ -192,30 +192,46 @@ class Appointments extends Database
         }
     }
 
-    public function getUnconfirmedReserva()
+    // public function getUnconfirmedReserva()
+    // {
+    //     $db = new Database();
+    //     $db->query("SELECT a.*, s.name as service_name FROM appointments a
+    //             JOIN services s
+    //             ON a.id_service = s.id
+    //             WHERE a.aviso_reserva = 0");
+    //     return $db->resultSet();
+    // }
+
+    // public function getUnconfirmedAppointment()
+    // {
+    //     $db = new Database();
+    //     $db->query("SELECT a.*, s.name as service_name FROM appointments a
+    //             JOIN services s
+    //             ON a.id_service = s.id
+    //             WHERE aviso_confirmada = 0 
+    //             AND aviso_reserva = 1 
+    //             AND status = 1");
+    //     return $db->resultSet();
+    // }
+
+    public function getUnconfirmedAppointment($type = 'reserva')
     {
+        $condition = $type === 'reserva'
+            ? 'WHERE a.aviso_reserva = 0'
+            : 'WHERE a.aviso_confirmada = 0 AND a.aviso_reserva = 1 AND a.status = 1';
+
         $db = new Database();
-        $db->query("SELECT a.*, s.name as service_name FROM appointments a
+        $db->query('SELECT a.*, s.name as service_name, c.name as company_name
+                FROM appointments a
                 JOIN services s
                 ON a.id_service = s.id
-                WHERE a.aviso_reserva = 0");
+                JOIN companies c
+                ON c.id = a.company_id
+                ' . $condition);
         return $db->resultSet();
     }
 
-    public function getUnconfirmedAppointment()
-    {
-        $db = new Database();
-        $db->query("SELECT a.*, s.name as service_name FROM appointments a
-                JOIN services s
-                ON a.id_service = s.id
-                WHERE aviso_confirmada = 0 
-                AND aviso_reserva = 1 
-                AND status = 1");
-        return $db->resultSet();
-    }
-
-
-    public function markAsConfirmed($id, $type = 'reserva')
+    public function markAsConfirmed($id, $type)
     {
         $db = new Database();
 

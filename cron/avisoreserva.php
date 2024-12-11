@@ -33,7 +33,7 @@ try {
         // Enviar notificación
         if ($wspStatusCode == 200 || $wspStatusCode == 201) {
             // Marcar como confirmada
-            $appointments->markAsConfirmed($appointment['id']);
+            $appointments->markAsConfirmed($appointment['id'], $type);
         } else {
             error_log("ERROR: Error al enviar el mensaje de WhatsApp para la cita ID: " . $appointment['id'] . " Código de estado: " . $wspStatusCode . PHP_EOL, 3, __DIR__ . '/log/avisoreserva.log');
         }

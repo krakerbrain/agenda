@@ -3,6 +3,7 @@
 require_once 'Database.php';
 require_once 'ConfigUrl.php';
 require_once 'EmailSender.php';
+require_once 'NotificationLog.php';
 require_once 'EmailDataLoader.php';
 require_once 'EmailBuilder.php';
 
@@ -115,6 +116,28 @@ class EmailTemplate
                 $this->emailSender->sendEmail($data['mail'], $alertEmailContent, null);
             }
             $success = $this->emailSender->sendEmail($data['mail'], ['subject' => $subject, 'body' => $body, 'company_name' => $companyData['name']], ucfirst($templateType));
+
+            // Si el correo fue enviado exitosamente, registrar en el log
+            if ($success) {
+                // Registrar en el log de notificaciones
+                $notificationLog = new NotificationLog();
+                $notificationLog->create([
+                    'appointment_id' => $data['id'],
+                    'type' => $templateType,
+                    'method' => 'email',
+                    'status' => 'sent'
+                ]);
+            } else {
+                // Registrar en el log como 'failed'
+                $notificationLog = new NotificationLog();
+                $notificationLog->create([
+                    'appointment_id' => $data['id'],
+                    'type' => $templateType,
+                    'method' => 'email',
+                    'status' => 'failed'
+                ]);
+            }
+
             return ['success' => $success, 'company_name' => $companyData['name'], 'social_token' => $companyData['social_token']];
         } catch (Exception $e) {
             error_log("Error al construir/enviar correo: " . $e->getMessage());
