@@ -64,7 +64,7 @@ function sendWspReserva($template_name, $telefono, $nombre_cliente,  $fecha_cita
         //OBTENEMOS LA RESPUESTA DEL ENVIO DE INFORMACION
         $response = json_decode(curl_exec($curl), true);
         //IMPRIMIMOS LA RESPUESTA 
-        print_r($response);
+        // print_r($response);
         //OBTENEMOS EL CODIGO DE LA RESPUESTA
         $status_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         //CERRAMOS EL CURL
@@ -72,6 +72,6 @@ function sendWspReserva($template_name, $telefono, $nombre_cliente,  $fecha_cita
         //IMPRIMIMOS EL CODIGO DE LA RESPUESTA
         return $status_code;
     } catch (Exception $e) {
-        return $e->getMessage();
+        throw new Exception("Error al enviar mensaje de whatsapp: " . $e->getMessage());
     }
 }

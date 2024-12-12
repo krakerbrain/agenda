@@ -37,22 +37,18 @@ class NotificationLog
         $this->db->execute();
     }
 
-    // public function getPendingOrFailed()
-    // {
-    //     $sql = "SELECT * FROM notifications_log 
-    //             WHERE (status = 'pending' OR status = 'failed') 
-    //             AND attempts < 3";
-    //     $this->db->query($sql);
-    //     return $this->db->resultSet();
-    // }
-
     public function getAllLogsForAppointment($appointmentId)
     {
-        $sql = "SELECT * FROM notifications_log 
+
+        try {
+            $sql = "SELECT * FROM notifications_log 
             WHERE appointment_id = :appointment_id";
-        $this->db->query($sql);
-        $this->db->bind(':appointment_id', $appointmentId);
-        return $this->db->resultSet();
+            $this->db->query($sql);
+            $this->db->bind(':appointment_id', $appointmentId);
+            return $this->db->resultSet();
+        } catch (Exception $e) {
+            throw new Exception("Error al logs para citas: " . $e->getMessage());
+        }
     }
 
 
