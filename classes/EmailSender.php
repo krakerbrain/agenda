@@ -49,8 +49,9 @@ class EmailSender
             // Devolver true si el correo fue enviado exitosamente
             return true;
         } catch (Exception $e) {
-            echo "Error al enviar el correo: {$this->mail->ErrorInfo}";
-            return false;
+            // echo "Error al enviar el correo: {$this->mail->ErrorInfo}";
+            // return false;
+            throw new Exception("Error al enviar el correo: {$this->mail->ErrorInfo}");
         }
     }
 
