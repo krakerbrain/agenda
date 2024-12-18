@@ -17,6 +17,9 @@ include dirname(__DIR__) . '/partials/head.php';
 </script>
 <style>
     @media(max-width:1000px) {
+        body {
+            font-size: 0.85rem;
+        }
 
         th {
             display: none;

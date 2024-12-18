@@ -177,6 +177,67 @@ class UniqueEvents extends Database
         return $db->resultSet();
     }
 
+    public function searchEventInscriptions($company_id, $status = null, $event = null, $name = null, $phone = null, $email = null, $date = null, $start_time = null)
+    {
+        $db = new Database();
+        $query = 'SELECT ei.id AS inscription_id, 
+                     ei.name AS participant_name, 
+                     ei.email, 
+                     ei.phone, 
+                     ei.rut, 
+                     ei.status,
+                     ei.created_at, 
+                     ue.name AS event_name, 
+                     ued.event_date, 
+                     ued.event_start_time, 
+                     ued.event_end_time
+              FROM event_inscriptions ei
+              JOIN unique_events ue ON ei.event_id = ue.id
+              JOIN unique_event_dates ued ON ue.id = ued.event_id
+              WHERE ue.company_id = :company_id';
+
+        // Agregar condiciones de búsqueda
+        if ($status !== null && $status !== 'all') {
+            $query .= ' AND ei.status = :status';
+        }
+        if ($event) {
+            $query .= ' AND ue.name LIKE :event_name';
+        }
+        if ($name) {
+            $query .= ' AND ei.name LIKE :name';
+        }
+        if ($email) {
+            $query .= ' AND ei.email LIKE :email';
+        }
+        if ($phone) {
+            $query .= ' AND ei.phone LIKE :phone';
+        }
+        if ($date) {
+            $query .= ' AND DATE(ued.event_date) = :date';
+        }
+        if ($start_time) {
+            $query .= ' AND TIME(ued.event_start_time) = :start_time';
+        }
+
+
+        $query .= ' ORDER BY ued.event_date, ued.event_start_time';
+
+        $db->query($query);
+        $db->bind(':company_id', $company_id);
+
+        // Vincular parámetros
+        if ($status !== null && $status !== 'all') $db->bind(':status', $status);
+        if ($name) $db->bind(':name', "%$name%");
+        if ($event) $db->bind(':event_name', "%$event%");
+        if ($email) $db->bind(':email', "%$email%");
+        if ($phone) $db->bind(':phone', "%$phone%");
+        if ($date) $db->bind(':date', $date);
+        if ($start_time) $db->bind(':start_time', $start_time);
+
+        return $db->resultSet();
+    }
+
+
     public function delete_event($event_id)
     {
         try {

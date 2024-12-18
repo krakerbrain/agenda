@@ -89,12 +89,12 @@ async function getEventos() {
       const eventHTML = `
       <div>
         <div>
-          <div class="d-flex justify-content-between">
+          <div class="d-sm-flex justify-content-between">
               <div class="d-flex">
                   <h6 class="m-0 align-content-around table-title"> ${event.name}</h6>
                   <span class="cupo_actual align-content-around ms-2">Cupo Actual (${event.cupo_maximo} personas)</span>
               </div>
-              <div class="d-flex gap-2">
+              <div class="d-flex gap-2 py-2 py-sm-0">
                   <button class="btn btn-success copy-url-btn text-nowrap" data-url="${baseUrl}eventos/${url}">Copiar URL</button>
                   <button class="btn btn-danger delete-event-btn text-nowrap" data-event-id="${event.id}">Eliminar Evento</button>
               </div>
