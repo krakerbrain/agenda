@@ -88,79 +88,90 @@ class Appointments extends Database
         return (int)$countResult['total'] > 0; // Retorna verdadero si hay al menos una cita existente
     }
 
-
-
-    public function get_appointments($company_id)
+    public function searchAppointments($company_id, $status, $service, $name, $phone, $email, $date, $hour, $tab = 'all')
     {
         $db = new Database();
-        $db->query('SELECT a.*, s.name AS service FROM appointments a 
-                         inner join services s 
-                         on a.id_service = s.id
-                         WHERE a.company_id = :company
-                         AND status != 2
-                         ORDER BY date DESC');
+        $query = 'SELECT a.*, s.name AS service,
+                     DATE_FORMAT(a.date, "%d-%m-%Y") as date 
+                     FROM appointments a 
+                     INNER JOIN services s ON a.id_service = s.id
+                     WHERE a.company_id = :company 
+                     AND status != 2';
+
+        // Filtrar según el tab actual
+        if ($tab === 'unconfirmed') {
+            $query .= ' AND a.status = 0 AND a.date >= CURDATE()';
+        } elseif ($tab === 'confirmed') {
+            $query .= ' AND a.status = 1 AND a.date >= CURDATE()';
+        } elseif ($tab === 'past') {
+            $query .= ' AND a.date < CURDATE()';
+        }
+
+        // Agregar condiciones de búsqueda
+        if ($status !== 'all') {
+            $query .= ' AND a.status = :status';
+        }
+        if ($service) {
+            $query .= ' AND s.name LIKE :service';
+        }
+        if ($name) {
+            $query .= ' AND a.name LIKE :name';
+        }
+        if ($phone) {
+            $query .= ' AND a.phone LIKE :phone';
+        }
+        if ($email) {
+            $query .= ' AND a.mail LIKE :email';
+        }
+        if ($date) {
+            $query .= ' AND DATE(a.date) = :date';
+        }
+        if ($hour) {
+            $query .= ' AND TIME(a.start_time) = :hour';
+        }
+
+        $db->query($query);
         $db->bind(':company', $company_id);
+        if ($status !== 'all') $db->bind(':status', $status);
+        if ($service) $db->bind(':service', "%$service%");
+        if ($name) $db->bind(':name', "%$name%");
+        if ($phone) $db->bind(':phone', "%$phone%");
+        if ($email) $db->bind(':email', "%$email%");
+        if ($date) $db->bind(':date', $date);
+        if ($hour) $db->bind(':hour', $hour);
+
         return $db->resultSet();
     }
 
-    public function get_all_appointments($company_id)
+    public function get_paginated_appointments($company_id, $status, $offset, $limit)
     {
         $db = new Database();
-        $db->query('SELECT a.*, s.name AS service, 
-                 DATE_FORMAT(a.date, "%d-%m-%Y") as date 
-                 FROM appointments a 
-                 INNER JOIN services s ON a.id_service = s.id
-                 WHERE a.company_id = :company
-                 AND status != 2
-                 ORDER BY a.date DESC');
+
+        $query = 'SELECT a.*, s.name AS service,
+                     DATE_FORMAT(a.date, "%d-%m-%Y") as date 
+                     FROM appointments a 
+                     INNER JOIN services s ON a.id_service = s.id
+                     WHERE a.company_id = :company 
+                     AND status != 2';
+
+        if ($status === 'unconfirmed') {
+            $query .= ' AND status = 0 AND a.date >= CURDATE()';
+        } elseif ($status === 'confirmed') {
+            $query .= ' AND status = 1 AND a.date >= CURDATE()';
+        } elseif ($status === 'past') {
+            $query .= ' AND date < CURDATE()';
+        }
+
+        $query .= ' ORDER BY a.date DESC LIMIT :offset, :limit';
+
+        $db->query($query);
         $db->bind(':company', $company_id);
+        $db->bind(':offset', $offset, PDO::PARAM_INT);
+        $db->bind(':limit', $limit, PDO::PARAM_INT);
+
         return $db->resultSet();
     }
 
-    public function get_unconfirmed_appointments($company_id)
-    {
-        $db = new Database();
-        $db->query('SELECT a.*, s.name AS service,
-                 DATE_FORMAT(a.date, "%d-%m-%Y") as date 
-                 FROM appointments a 
-                 INNER JOIN services s ON a.id_service = s.id
-                 WHERE a.company_id = :company
-                 AND status = 0
-                 AND a.date >= CURDATE()
-                 ORDER BY a.date DESC');
-        $db->bind(':company', $company_id);
-        return $db->resultSet();
-    }
-
-    public function get_confirmed_appointments($company_id)
-    {
-        $db = new Database();
-        $db->query('SELECT a.*, s.name AS service,
-                 DATE_FORMAT(a.date, "%d-%m-%Y") as date 
-                 FROM appointments a 
-                 INNER JOIN services s ON a.id_service = s.id
-                 WHERE a.company_id = :company
-                 AND status = 1
-                 AND a.date >= CURDATE()
-                 ORDER BY a.date DESC');
-        $db->bind(':company', $company_id);
-        return $db->resultSet();
-    }
-
-    public function get_past_appointments($company_id)
-    {
-        $db = new Database();
-        $db->query('SELECT a.*, s.name AS service,
-                 DATE_FORMAT(a.date, "%d-%m-%Y") as date 
-                 FROM appointments a 
-                 INNER JOIN services s ON a.id_service = s.id
-                 WHERE a.company_id = :company
-                 AND date < CURDATE()
-                 AND status != 2
-                 ORDER BY a.date DESC');
-        $db->bind(':company', $company_id);
-        return $db->resultSet();
-    }
 
     public function get_appointment($id)
     {

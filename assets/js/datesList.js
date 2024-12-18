@@ -19,6 +19,7 @@ export function initDateList() {
     // Agregar el evento de clic para cambiar de tab y actualizar el estado en sessionStorage
     triggerEl.addEventListener("click", (event) => {
       event.preventDefault();
+      document.querySelector("#searchForm").reset();
       const newStatus = event.target.dataset.bsTarget.substring(1);
       sessionStorage.setItem("status", newStatus);
       loadAppointments(newStatus);
@@ -26,24 +27,31 @@ export function initDateList() {
   });
 }
 
+let currentPage = 1;
+const limit = 10;
+
 // Función para cargar citas de acuerdo al estado de la pestaña
-async function loadAppointments(status) {
+async function loadAppointments(status, page = 1) {
   try {
-    let url = `${baseUrl}user_admin/controllers/appointments.php?status=${status}`;
+    let url = `${baseUrl}user_admin/controllers/appointments.php?status=${status}&page=${page}`;
 
     // Si la pestaña es "events", cambia el endpoint
     if (status === "events") {
-      url = `${baseUrl}user_admin/controllers/unique_events.php?status=inscriptions`;
+      url = `${baseUrl}user_admin/controllers/unique_events.php?status=inscriptions&page=${page}`;
     }
 
     const response = await fetch(url, { method: "GET" });
-    const { success, data } = await response.json();
+    const { success, data, totalPages: total } = await response.json();
 
     if (success) {
       if (status === "events") {
         fillEventTable(data); // Nueva función para llenar la tabla de eventos
       } else {
-        fillTable(data); // Tabla de citas
+        fillTable(data);
+        currentPage = page;
+        // Si el número de citas recibidas es menor que el límite, no hay más páginas
+        const hasMoreData = data.length === limit;
+        updatePaginationControls(hasMoreData);
       }
     }
   } catch (error) {
@@ -172,6 +180,23 @@ function fillEventTable(data) {
     });
   });
 }
+
+// Función para actualizar los controles de paginación
+function updatePaginationControls(hasMoreData) {
+  document.getElementById("currentPage").innerText = `Página ${currentPage}`;
+  document.getElementById("prevPage").disabled = currentPage === 1;
+  document.getElementById("nextPage").disabled = !hasMoreData; // Deshabilitar "Siguiente" si no hay más datos
+}
+
+document.getElementById("prevPage").addEventListener("click", () => {
+  if (currentPage > 1) {
+    loadAppointments("all", currentPage - 1);
+  }
+});
+
+document.getElementById("nextPage").addEventListener("click", () => {
+  loadAppointments("all", currentPage + 1);
+});
 
 export async function confirmReservation(id, type = null) {
   try {
@@ -379,5 +404,82 @@ export function addSpinner(appointmentID, activar, btn) {
     spinner.classList.add("d-none");
     icon.classList.remove("d-none");
     button.disabled = false;
+  }
+}
+
+// Manejo del formulario de búsqueda
+document.getElementById("searchForm").addEventListener("submit", function (e) {
+  e.preventDefault();
+
+  const formData = new FormData(this);
+  const searchParams = new URLSearchParams();
+
+  // Convertir el FormData a parámetros URL
+  for (let [key, value] of formData.entries()) {
+    if (value) {
+      // Solo agregar parámetros no vacíos
+      searchParams.append(key, value);
+    }
+  }
+
+  // Realizar la búsqueda
+  loadAppointmentsWithSearch(searchParams);
+});
+
+// Función para realizar la búsqueda con parámetros de búsqueda
+async function loadAppointmentsWithSearch(searchParams) {
+  try {
+    const savedStatus = sessionStorage.getItem("status") || "unconfirmed"; // Obtén el tab actual
+    searchParams.append("tab", savedStatus); // Agrega el contexto del tab
+    let url = `${baseUrl}user_admin/controllers/autocomplete.php?${searchParams.toString()}`;
+
+    const response = await fetch(url, { method: "GET" });
+    const { success, data } = await response.json();
+
+    if (success) {
+      if (savedStatus != "events") {
+        fillTable(data); // Mostrar los datos filtrados
+      } else {
+        fillEventTable(data);
+      }
+    }
+  } catch (error) {
+    console.error("Error al realizar la búsqueda:", error);
+  }
+}
+
+// Sugerencias de autocompletado (puedes hacer una búsqueda mínima de 3 caracteres)
+document.getElementById("service").addEventListener("input", autocomplete);
+document.getElementById("name").addEventListener("input", autocomplete);
+document.getElementById("phone").addEventListener("input", autocomplete);
+document.getElementById("mail").addEventListener("input", autocomplete);
+document.getElementById("date").addEventListener("input", autocomplete);
+document.getElementById("hour").addEventListener("input", autocomplete);
+document.getElementById("status").addEventListener("change", autocomplete);
+
+let lastQuery = ""; // Almacena la última búsqueda
+async function autocomplete(e) {
+  const input = e.target.id;
+  const query = e.target.value;
+  const savedStatus = sessionStorage.getItem("status") || "unconfirmed";
+  console.log(savedStatus);
+  if (query.length >= 3 || input == "status") {
+    // Si la consulta es diferente a la última, hacer la búsqueda
+    if (query !== lastQuery) {
+      lastQuery = query; // Actualizar la última consulta
+      const response = await fetch(`${baseUrl}user_admin/controllers/autocomplete.php?${input}=${query}&tab=${savedStatus}`);
+      const data = await response.json();
+      if (savedStatus != "events") {
+        fillTable(data.data);
+      } else {
+        fillEventTable(data.data);
+      }
+    }
+  } else {
+    // Solo recargar las citas si no hay consulta activa
+    if (query === "") {
+      const savedStatus = sessionStorage.getItem("status") || "unconfirmed";
+      loadAppointments(savedStatus);
+    }
   }
 }

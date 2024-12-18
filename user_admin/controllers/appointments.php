@@ -28,31 +28,16 @@ try {
             header('Content-Type: application/json');
             echo json_encode(['success' => false, 'error' => 'No se pudo eliminar la cita']);
         }
-    }
-    // Manejo de solicitudes GET para obtener citas
-    elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
-        $status = isset($_GET['status']) ? $_GET['status'] : 'all'; // Por defecto, cargar todas las citas
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
+
+        $status = isset($_GET['status']) ? $_GET['status'] : 'all';
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $limit = 10; // Número de registros por página
+        $offset = ($page - 1) * $limit;
+
+        $appointmentsData = $appointments->get_paginated_appointments($company_id, $status, $offset, $limit);
 
         header('Content-Type: application/json');
-
-        // Manejo de las diferentes solicitudes según el estado
-        switch ($status) {
-            case 'unconfirmed':
-                $appointmentsData = $appointments->get_unconfirmed_appointments($company_id);
-                break;
-            case 'confirmed':
-                $appointmentsData = $appointments->get_confirmed_appointments($company_id);
-                break;
-            case 'past':
-                $appointmentsData = $appointments->get_past_appointments($company_id);
-                break;
-            case 'all':
-            default:
-                $appointmentsData = $appointments->get_all_appointments($company_id);
-                break;
-        }
-
-        // Devolver las citas en formato JSON
         echo json_encode(['success' => true, 'data' => $appointmentsData]);
     } else {
         // Manejo de otros métodos (si es necesario)
