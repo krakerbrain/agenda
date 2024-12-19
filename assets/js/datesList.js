@@ -69,7 +69,7 @@ function fillTable(data) {
           <tr>
               <td data-cell="servicio" class="data">${appointment.service}</td>
               <td data-cell="nombre" class="data">${appointment.name}</td>
-              <td data-cell="telefono" class="data">${appointment.phone}</td>
+              <td data-cell="telefono" class="data"><a href="https://wa.me/${appointment.phone}" target="_blank">+${appointment.phone}</a></td>
               <td data-cell="correo" class="data">${appointment.mail}</td>
               <td data-cell="fecha" class="data">${appointment.date}</td>
               <td data-cell="hora" class="data">${appointment.start_time}</td>
@@ -128,7 +128,7 @@ function fillEventTable(data) {
           <tr>
               <td data-cell="servicio" class="data">${event.event_name}</td>
               <td data-cell="nombre" class="data">${event.participant_name}</td>
-              <td data-cell="telefono" class="data">${event.phone}</td>
+              <td data-cell="telefono" class="data"><a href="https://wa.me/${event.phone}" target="_blank">+${event.phone}</a></td>
               <td data-cell="correo" class="data">${event.email}</td>
               <td data-cell="fecha" class="data">${event.event_date}</td>
               <td data-cell="hora" class="data">${event.event_start_time}</td>
