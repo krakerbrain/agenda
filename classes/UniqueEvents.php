@@ -164,14 +164,14 @@ class UniqueEvents extends Database
                    ei.status,
                    ei.created_at, 
                    ue.name AS event_name, 
-                   ued.event_date, 
+                   DATE_FORMAT(ued.event_date, "%d-%m-%Y") as event_date, 
                    ued.event_start_time, 
                    ued.event_end_time
             FROM event_inscriptions ei
             JOIN unique_events ue ON ei.event_id = ue.id
             JOIN unique_event_dates ued ON ue.id = ued.event_id
             WHERE ue.company_id = :company_id
-            ORDER BY ued.event_date, ued.event_start_time');
+            ORDER BY event_date, ued.event_start_time');
 
         $db->bind(':company_id', $company_id);
         return $db->resultSet();
