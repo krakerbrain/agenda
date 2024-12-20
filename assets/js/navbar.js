@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", function () {
       hideCanvas();
       switch (page) {
         case "dateList":
-          const { initDateList } = await import("./datesList.js?v=2.0.6");
+          const { initDateList } = await import("./datesList.js?v=2.0.8");
           initDateList();
           break;
         case "horarios":
