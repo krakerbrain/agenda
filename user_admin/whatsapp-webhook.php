@@ -3,7 +3,7 @@ require_once dirname(__DIR__) . '/configs/init.php';
 
 // Verificación (ya lo tienes)
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    $verify_token = "www.agendarium.com";
+    $verify_token = "wwwagendariumcom";
     $challenge = $_GET['hub_challenge'];
     $hub_verify_token = $_GET['hub_verify_token'];
 
@@ -32,6 +32,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Aquí va la lógica para redirigir el mensaje o procesarlo
                 // Por ejemplo, enviar una respuesta automática
                 enviarMensaje($sender, "Gracias por tu mensaje. ¿En qué te podemos ayudar?");
+            } else {
+                // Responder con un mensaje por defecto si no es "reservar cita"
+                enviarMensaje($sender, "Recibido, estamos aquí para ayudarte.");
             }
         }
     }
@@ -64,10 +67,10 @@ function enviarMensaje($recipient, $message)
     ]);
 
     $response = curl_exec($ch);
+    if (curl_errno($ch)) {
+        echo 'Error en cURL: ' . curl_error($ch);
+    }
     curl_close($ch);
-}
 
-// Ejemplo de uso
-$recipient = '56975325574'; // El número de teléfono del destinatario (en formato internacional sin el '+')
-$message = '¡Hola! Este es un mensaje de prueba desde la API de WhatsApp';
-echo enviarMensaje($recipient, $message);
+    return $response; // Regresar la respuesta de cURL
+}
