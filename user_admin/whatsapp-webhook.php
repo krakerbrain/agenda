@@ -25,17 +25,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         foreach ($messages as $message) {
             $sender = $message['from']; // Número de teléfono del remitente
-            $message_body = $message['text']['body']; // Mensaje enviado
-
-            // Lógica de negocio: procesar el mensaje
-            if ($message_body == "reservar cita") {
-                // Aquí va la lógica para redirigir el mensaje o procesarlo
-                // Por ejemplo, enviar una respuesta automática
-                enviarMensaje($sender, "Gracias por tu mensaje. ¿En qué te podemos ayudar?");
-            } else {
-                // Responder con un mensaje por defecto si no es "reservar cita"
-                enviarMensaje($sender, "Recibido, estamos aquí para ayudarte.");
-            }
+            // Responder con un mensaje por defecto si no es "reservar cita"
+            enviarMensaje($sender, "¡Hola! Este es el número de Agendarium, la plataforma de agendamiento de citas. Para contactar con la empresa donde hiciste tu reserva, debes comunicarte directamente con ellos. ¡Gracias!");
         }
     }
 
