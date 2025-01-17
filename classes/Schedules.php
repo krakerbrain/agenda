@@ -1,44 +1,40 @@
 <?php
+require_once dirname(__DIR__) . '/classes/Database.php';
+
 class Schedules
 {
-    private $conn;
+    private $db;
     private $company_id;
 
-    public function __construct($conn, $company_id)
+    public function __construct($company_id)
     {
-        $this->conn = $conn;
+        $this->db = new Database(); // Usa la clase Database
         $this->company_id = $company_id;
     }
 
     public function getSchedules()
     {
-        $schedulesSql = $this->conn->prepare("
-            SELECT s.id AS schedule_id, s.day_id, d.day_name as day, s.work_start, s.work_end, s.break_start, s.break_end, s.is_enabled
+        $this->db->query("SELECT s.id AS schedule_id, s.day_id, d.day_name as day, s.work_start, s.work_end, s.break_start, s.break_end, s.is_enabled
             FROM company_schedules s
             JOIN days_of_week d ON s.day_id = d.id
             WHERE s.company_id = :company_id
-            ORDER BY s.id
-        ");
-        $schedulesSql->bindParam(':company_id', $this->company_id);
-        $schedulesSql->execute();
-        $schedulesData = $schedulesSql->fetchAll(PDO::FETCH_ASSOC);
-
-        return $schedulesData;
+            ORDER BY s.id");
+        $this->db->bind(':company_id', $this->company_id);
+        return $this->db->resultSet();
     }
 
     public function saveSchedules($schedulesData)
     {
         $schedulesData = $schedulesData['schedule'];
 
-        $this->conn->beginTransaction();
-
+        $this->db->beginTransaction();
         try {
             foreach ($schedulesData as $schedule) {
                 $scheduleId = $schedule['schedule_id'];
                 $isEnabled = $schedule['is_enabled'];
 
                 if ($scheduleId) {
-                    $updateScheduleSql = $this->conn->prepare("
+                    $this->db->query("
                     UPDATE company_schedules
                     SET 
                         work_start = " . (isset($schedule['start']) ? ":work_start" : "work_start") . ",
@@ -50,71 +46,99 @@ class Schedules
                 ");
 
                     if (isset($schedule['start'])) {
-                        $updateScheduleSql->bindParam(':work_start', $schedule['start']);
+                        $this->db->bind(':work_start', $schedule['start']);
                     }
                     if (isset($schedule['end'])) {
-                        $updateScheduleSql->bindParam(':work_end', $schedule['end']);
+                        $this->db->bind(':work_end', $schedule['end']);
                     }
                     if (isset($schedule['break_start'])) {
-                        $updateScheduleSql->bindParam(':break_start', $schedule['break_start']);
+                        $this->db->bind(':break_start', $schedule['break_start']);
                     }
                     if (isset($schedule['break_end'])) {
-                        $updateScheduleSql->bindParam(':break_end', $schedule['break_end']);
+                        $this->db->bind(':break_end', $schedule['break_end']);
                     }
-                    $updateScheduleSql->bindParam(':is_enabled', $isEnabled);
-                    $updateScheduleSql->bindParam(':schedule_id', $scheduleId);
+                    $this->db->bind(':is_enabled', $isEnabled);
+                    $this->db->bind(':schedule_id', $scheduleId);
 
-                    $updateScheduleSql->execute();
+                    $this->db->execute();
                 } else {
                     $dayId = $schedule['day_id'];
-                    $insertScheduleSql = $this->conn->prepare("
+                    $this->db->query("
                         INSERT INTO company_schedules (company_id, day_id, work_start, work_end, break_start, break_end, is_enabled)
                         VALUES (:company_id, :day_id, :work_start, :work_end, :break_start, :break_end, :is_enabled)
                     ");
-                    $insertScheduleSql->bindParam(':company_id', $this->company_id);
-                    $insertScheduleSql->bindParam(':day_id', $dayId);
-                    $insertScheduleSql->bindParam(':work_start', $schedule['work_start']);
-                    $insertScheduleSql->bindParam(':work_end', $schedule['work_end']);
-                    $insertScheduleSql->bindParam(':break_start', $schedule['break_start']);
-                    $insertScheduleSql->bindParam(':break_end', $schedule['break_end']);
-                    $insertScheduleSql->bindParam(':is_enabled', $isEnabled);
-                    $insertScheduleSql->execute();
+                    $this->db->bind(':company_id', $this->company_id);
+                    $this->db->bind(':day_id', $dayId);
+                    $this->db->bind(':work_start', $schedule['work_start']);
+                    $this->db->bind(':work_end', $schedule['work_end']);
+                    $this->db->bind(':break_start', $schedule['break_start']);
+                    $this->db->bind(':break_end', $schedule['break_end']);
+                    $this->db->bind(':is_enabled', $isEnabled);
+                    $this->db->execute();
                 }
             }
-
-            $this->conn->commit();
+            $this->db->endTransaction();
             return "Schedules saved successfully.";
         } catch (PDOException $e) {
-            $this->conn->rollBack();
+            $this->db->cancelTransaction();
             return "Error saving schedules: " . $e->getMessage();
         }
     }
 
     public function removeBreakTime($scheduleId)
     {
-        $sql = "UPDATE company_schedules SET break_start = NULL, break_end = NULL WHERE id = :schedule_id";
-        $stmt = $this->conn->prepare($sql);
-        $stmt->bindParam(':schedule_id', $scheduleId, PDO::PARAM_INT);
-        $stmt->execute();
+        $this->db->query("UPDATE company_schedules SET break_start = NULL, break_end = NULL WHERE id = :schedule_id");
+        $this->db->bind(':schedule_id', $scheduleId);
+        $this->db->execute();
     }
 
     public function copyMondayToAllDays($scheduleData)
     {
 
         for ($day = 1; $day <= 7; $day++) {
-            $sql = "UPDATE company_schedules
+
+            $this->db->query("UPDATE company_schedules
             SET work_start = :work_start, work_end = :work_end, break_start = :break_start, break_end = :break_end, is_enabled = :is_enabled
-            WHERE company_id = :company_id AND day_id = :day";
-            $stmt = $this->conn->prepare($sql);
-            $stmt->execute([
-                ':work_start' => $scheduleData['start'],
-                ':work_end' => $scheduleData['end'],
-                ':break_start' => $scheduleData['break_start'],
-                ':break_end' => $scheduleData['break_end'],
-                ':is_enabled' => $scheduleData['is_enabled'],
-                ':company_id' => $this->company_id,
-                ':day' => $day,
-            ]);
+            WHERE company_id = :company_id AND day_id = :day");
+            $this->db->bind(':work_start', $scheduleData['start']);
+            $this->db->bind(':work_end', $scheduleData['end']);
+            $this->db->bind(':break_start', $scheduleData['break_start']);
+            $this->db->bind(':break_end', $scheduleData['break_end']);
+            $this->db->bind(':is_enabled', $scheduleData['is_enabled']);
+            $this->db->bind(':company_id', $this->company_id);
+            $this->db->bind(':day', $day);
+            $this->db->execute();
         }
+    }
+
+    public function validateSelectedDate($day_of_week)
+    {
+        $db = new Database();
+
+        // Consultar el horario habilitado para el día seleccionado
+        $db->query("
+        SELECT work_start, work_end 
+        FROM company_schedules 
+        WHERE company_id = :company_id 
+          AND day_id = :day_of_week 
+          AND is_enabled = 1
+    ");
+        $db->bind(':company_id', $this->company_id);
+        $db->bind(':day_of_week', $day_of_week);
+
+        $schedule = $db->single();
+
+        if (!$schedule) {
+            return [
+                'success' => false,
+                'message' => 'El día seleccionado no esta habilitado en el horario de la empresa.',
+            ];
+        }
+
+        return [
+            'success' => true,
+            'work_start' => $schedule['work_start'],
+            'work_end' => $schedule['work_end'],
+        ];
     }
 }

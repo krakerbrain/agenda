@@ -89,6 +89,9 @@ include dirname(__DIR__) . '/partials/head.php';
                     <li class="nav-item">
                         <a class="nav-link" href="#" id="eventos_unicos">Eventos Únicos</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="block_hour">Bloqueo de horas</a>
+                    </li>
                 <?php } else { ?>
                     <li class="nav-item">
                         <a class="nav-link" href="#" id="master_add_company">Agrega Empresa</a>

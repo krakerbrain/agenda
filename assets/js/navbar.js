@@ -83,6 +83,10 @@ document.addEventListener("DOMContentLoaded", function () {
           const { initEventosUnicos } = await import("./eventos_unicos.js?v=1.0.6");
           initEventosUnicos();
           break;
+        case "block_hour":
+          const { initBloqueoHoras } = await import("./bloqueoHoras.js?v=1.0.6");
+          initBloqueoHoras();
+          break;
         default:
           console.error("No hay un módulo para la página:", page);
       }

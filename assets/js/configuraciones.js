@@ -27,29 +27,6 @@ export function initConfiguraciones() {
     });
   }
 
-  document.getElementById("addBlockedDate").addEventListener("click", function () {
-    const container = document.getElementById("blockedDatesContainer");
-    const newDateDiv = document.createElement("div");
-    newDateDiv.className = "d-flex align-items-end mb-2";
-
-    newDateDiv.innerHTML = `
-            <input type='date' class='form-control' name='blocked_dates[]'>
-            <button type='button' class='btn btn-danger btn-sm ms-2 remove-date'>Eliminar</button>
-        `;
-
-    container.appendChild(newDateDiv);
-
-    newDateDiv.querySelector(".remove-date").addEventListener("click", function () {
-      newDateDiv.remove();
-    });
-  });
-
-  document.querySelectorAll(".remove-date").forEach((button) => {
-    button.addEventListener("click", function () {
-      button.parentElement.remove();
-    });
-  });
-
   document.getElementById("background-color").addEventListener("input", function () {
     document.getElementById("example-card").style.backgroundColor = this.value;
   });

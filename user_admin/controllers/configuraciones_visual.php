@@ -43,7 +43,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Aquí puedes añadir el resto de la lógica común
     $schedule_mode = $_POST['schedule_mode'];
     $calendar_mode = $_POST['calendar_mode'];
-    $blocked_dates = implode(',', $_POST['blocked_dates']);
     $bg_color = $_POST['background-color'];
     $font_color = $_POST['font-color'];
     $btn1_color = $_POST['btn-primary-color'];
@@ -53,7 +52,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'company_id' => $company_id,
         'schedule_mode' => $schedule_mode,
         'calendar_mode' => $calendar_mode,
-        'blocked_dates' => $blocked_dates,
         'bg_color' => $bg_color,
         'font_color' => $font_color,
         'btn1_color' => $btn1_color,
