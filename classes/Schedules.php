@@ -23,6 +23,21 @@ class Schedules
         return $this->db->resultSet();
     }
 
+    //getenabledSchedulesDays
+    public function getEnabledSchedulesDays()
+    {
+        $this->db->query("SELECT day_id, 
+                                work_start, 
+                                work_end, 
+                                break_start, 
+                                break_end 
+                        FROM company_schedules 
+                        WHERE company_id = :company_id 
+                        AND is_enabled = 1");
+        $this->db->bind(':company_id', $this->company_id);
+        return $this->db->resultSet();
+    }
+
     public function saveSchedules($schedulesData)
     {
         $schedulesData = $schedulesData['schedule'];

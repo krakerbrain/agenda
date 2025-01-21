@@ -1,8 +1,8 @@
 export function initBloqueoHoras() {
   fetchBlockedDays();
+  const hourRange = document.getElementById("hour-range");
 
   document.getElementById("all-day").addEventListener("change", function () {
-    const hourRange = document.getElementById("hour-range");
     if (this.checked) {
       hourRange.style.display = "none";
       document.getElementById("start-hour").required = false;
@@ -45,6 +45,9 @@ export function initBloqueoHoras() {
 
       if (result.success) {
         alert("Fecha bloqueada correctamente.");
+        // Limpiar formulario
+        hourRange.style.display = "none";
+        document.getElementById("block-date-form").reset();
         fetchBlockedDays();
       } else {
         alert(result.message);
@@ -55,7 +58,7 @@ export function initBloqueoHoras() {
   });
 
   async function fetchBlockedDays() {
-    const response = await fetch(`${baseUrl}user_admin/controllers/getBlockedHours.php`);
+    const response = await fetch(`${baseUrl}user_admin/controllers/getDeleteBlockedHours.php`);
     const result = await response.json();
 
     if (result.success) {
@@ -85,11 +88,47 @@ export function initBloqueoHoras() {
               <td>${day.start_time || "Todo el día"}</td>
               <td>${day.end_time || "Todo el día"}</td>
               <td>
-                  <button class="btn btn-danger btn-sm" onclick="removeBlockedDate('${day.date}')">Eliminar</button>
+                  <button class="btn btn-danger btn-sm deleteBlockedDay" data-token="${day.token}" >Eliminar</button>
               </td>
           </tr>
       `;
       tbody.innerHTML += row;
     });
+    document.querySelectorAll(".deleteBlockedDay").forEach((button) => {
+      button.addEventListener("click", function () {
+        const token = this.getAttribute("data-token");
+        deleteBlockedDay(token);
+      });
+    });
   }
+
+  async function deleteBlockedDay(token) {
+    const requestData = {
+      token,
+    };
+
+    try {
+      const response = await fetch(`${baseUrl}user_admin/controllers/getDeleteBlockedHours.php`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestData),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        alert("Fecha desbloqueada correctamente.");
+        fetchBlockedDays();
+      } else {
+        alert(result.message);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  }
+
+  //eliminar fecha bloqueada
+
+  const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
+  const popoverList = [...popoverTriggerList].map((popoverTriggerEl) => new bootstrap.Popover(popoverTriggerEl));
 }

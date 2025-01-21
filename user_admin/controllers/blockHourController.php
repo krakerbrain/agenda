@@ -26,6 +26,15 @@ try {
         exit;
     }
 
+    $today = date('Y-m-d'); // Fecha actual en formato YYYY-MM-DD
+    if ($blockDate < $today) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'No se puede bloquear una fecha pasada.'
+        ]);
+        exit; // Terminar la ejecución
+    }
+
     // Instanciar clases necesarias
     $schedules = new Schedules($company_id);
     $appointments = new Appointments();

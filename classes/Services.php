@@ -56,6 +56,16 @@ class Services
         return $result;
     }
 
+    //getavailableservicedays
+
+    public function getAvailableServiceDays($serviceId)
+    {
+        $this->db->query("SELECT duration, available_days FROM services WHERE id = :service_id");
+        $this->db->bind(':service_id', $serviceId);
+        return $this->db->single();
+    }
+
+
 
     public function saveServices($servicesData)
     {

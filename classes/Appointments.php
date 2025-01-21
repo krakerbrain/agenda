@@ -2,6 +2,8 @@
 require_once 'Database.php';
 require_once dirname(__DIR__) . '/access-token/seguridad/JWTAuth.php';
 
+use Ramsey\Uuid\Uuid;
+
 class Appointments extends Database
 {
     /**
@@ -31,6 +33,7 @@ class Appointments extends Database
     {
         try {
             $db = new Database();
+
 
             // Verificar si ya existe una cita con los mismos datos
             if ($this->checkExistingAppointment($data)) {
@@ -108,11 +111,21 @@ class Appointments extends Database
             // Ejecutar la consulta
             $db->execute();
 
+            // Obtener el ID de la cita recién creada
+            $appointmentId = $db->lastInsertId();
+
+            // Generar el token identificador (UUID v4)
+            $appointmentToken = Uuid::uuid4()->toString();
+
+            // Actualizar la cita con el token generado
+            $db->query('UPDATE appointments SET appointment_token = :token WHERE id = :id');
+            $db->bind(':token', $appointmentToken);
+            $db->bind(':id', $appointmentId);
+            $db->execute();
             // Retornar el ID de la cita bloqueada
             return [
                 'success' => true,
                 'message' => 'Día bloqueado creado exitosamente.',
-                'appointment_id' => $db->lastInsertId(),
             ];
         } catch (Exception $e) {
             // Manejo de errores en caso de fallos
@@ -123,14 +136,27 @@ class Appointments extends Database
         }
     }
 
-    //getBlockedDays
+    // getBlockedDays
     public function getBlockedDays($company_id)
     {
         $db = new Database();
-        $db->query('SELECT date, start_time, end_time FROM appointments WHERE company_id = :company_id AND id_service = 0');
+        $db->query('
+        SELECT 
+            DATE_FORMAT(date, "%d-%m-%Y") AS date, 
+            start_time, 
+            end_time, 
+            appointment_token AS token 
+        FROM 
+            appointments 
+        WHERE 
+            company_id = :company_id 
+            AND id_service = 0
+            AND (date > CURDATE() OR (date = CURDATE() AND end_time >= NOW()))
+    ');
         $db->bind(':company_id', $company_id);
         return $db->resultSet();
     }
+
 
     public function checkExistingAppointment($data)
     {
@@ -283,6 +309,17 @@ class Appointments extends Database
         }
     }
 
+    // Obtener todas las citas en el rango de fechas
+    public function getAppointmentsByDateRange($company_id, $start_date, $end_date)
+    {
+        $db = new Database();
+        $db->query('SELECT date, start_time, end_time FROM appointments WHERE company_id = :company_id AND date BETWEEN :start_date AND :end_date');
+        $db->bind(':company_id', $company_id);
+        $db->bind(':start_date', $start_date);
+        $db->bind(':end_date', $end_date);
+        return $db->resultSet();
+    }
+
     public function checkAppointments($company_id, $date, $start_hour, $end_hour)
     {
         $db = new Database();
@@ -340,5 +377,15 @@ class Appointments extends Database
         $db->bind(':id', $id);
         $db->execute();
         return $db->rowCount();
+    }
+
+    public function deleteBlockedDay($token, $company_id)
+    {
+        $db = new Database();
+        $db->query("DELETE FROM appointments WHERE appointment_token = :token AND company_id = :company_id");
+        $db->bind(':token', $token);
+        $db->bind(':company_id', $company_id);
+
+        return $db->execute();
     }
 }

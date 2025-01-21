@@ -10,13 +10,12 @@ $datosUsuario = $auth->validarTokenUsuario();
 ?>
 
 <!-- Fechas bloqueadas -->
-<div id="block-date-form" class="mb-4">
-    <div class="d-flex align-items-baseline">
-        <h3 class="mb-3">Fechas Bloqueadas</h3>
+<form id="block-date-form" class="mb-4">
+    <div class="text-end">
         <a tabindex="0" role="button" data-bs-trigger="focus" class="btn help" data-bs-toggle="popover"
             data-bs-title="Fechas Bloqueadas"
             data-bs-content="Puedes bloquear fechas específicas o un rango de horas para que no se puedan hacer reservas en esos días">
-            <i class="fa fa-circle-question text-primary"></i>
+            <i class="fa fa-circle-question text-primary" style="font-size: 1.5rem;"></i>
         </a>
     </div>
 
@@ -43,9 +42,10 @@ $datosUsuario = $auth->validarTokenUsuario();
     </div>
 
     <button type="submit" class="btn btn-primary mb-4">Guardar Hora Bloqueada</button>
-
+</form>
+<div>
     <!-- Tabla para mostrar fechas y horas bloqueadas -->
-    <h4 class="mb-3">Fechas y Horas Bloqueadas</h4>
+    <h5 class="mb-3">Listado de Fechas y Horas Bloqueadas</h5>
     <table class="table table-bordered">
         <thead>
             <tr>
