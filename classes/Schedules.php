@@ -38,6 +38,18 @@ class Schedules
         return $this->db->resultSet();
     }
 
+    //getschedulebyday
+    public function getScheduleByDay($day_id)
+    {
+        $this->db->query("SELECT work_start, work_end, break_start, break_end 
+                        FROM company_schedules 
+                        WHERE company_id = :company_id 
+                        AND day_id = :day_id");
+        $this->db->bind(':company_id', $this->company_id);
+        $this->db->bind(':day_id', $day_id);
+        return $this->db->single();
+    }
+
     public function saveSchedules($schedulesData)
     {
         $schedulesData = $schedulesData['schedule'];

@@ -1,29 +1,44 @@
 <?php
-require_once dirname(__DIR__, 2) . '/classes/DatabaseSessionManager.php';
-$manager = new DatabaseSessionManager();
-$conn = $manager->getDB();
+require_once dirname(__DIR__, 2) . '/classes/CompanyManager.php';
+require_once dirname(__DIR__, 2) . '/classes/Services.php';
+require_once dirname(__DIR__, 2) . '/classes/Schedules.php';
+require_once dirname(__DIR__, 2) . '/classes/Appointments.php';
+// require_once dirname(__DIR__, 2) . '/classes/DatabaseSessionManager.php';
+// $manager = new DatabaseSessionManager();
+// $conn = $manager->getDB();
 
 $data = json_decode(file_get_contents('php://input'), true);
 $date = $data['date'];
 $service_id = $data['service_id'];
 $company_id = $data['company_id'];
 
-// Obtener datos de la empresa
-$sql = $conn->prepare("SELECT * FROM companies WHERE id = :company_id AND is_active = 1");
-$sql->bindParam(':company_id', $company_id);
-$sql->execute();
-$company = $sql->fetch(PDO::FETCH_ASSOC);
+$companyManager = new CompanyManager();
+$services = new Services($company_id);
+$schedulesData = new Schedules($company_id);
+$appointment = new Appointments();
 
-if (!$company) {
+$companyData = $companyManager->getAllCompanyData($company_id);
+
+
+// Obtener datos de la empresa
+// $sql = $conn->prepare("SELECT * FROM companies WHERE id = :company_id AND is_active = 1");
+// $sql->bindParam(':company_id', $company_id);
+// $sql->execute();
+// $company = $sql->fetch(PDO::FETCH_ASSOC);
+
+if (!$companyData) {
     echo json_encode(['success' => false, 'message' => 'Empresa no encontrada o inactiva.']);
     exit;
 }
 
 // Obtener la duración del servicio
-$sql_service = $conn->prepare("SELECT duration FROM services WHERE id = :service_id");
-$sql_service->bindParam(':service_id', $service_id);
-$sql_service->execute();
-$service = $sql_service->fetch(PDO::FETCH_ASSOC);
+$service = $services->getAvailableServiceDays($service_id);
+$service_duration_minutes = $service['duration'];
+
+// $sql_service = $conn->prepare("SELECT duration FROM services WHERE id = :service_id");
+// $sql_service->bindParam(':service_id', $service_id);
+// $sql_service->execute();
+// $service = $sql_service->fetch(PDO::FETCH_ASSOC);
 
 if (!$service) {
     echo json_encode(['success' => false, 'message' => 'Servicio no encontrado.']);
@@ -31,23 +46,25 @@ if (!$service) {
 }
 
 // Convertir la duración del servicio a minutos
-$service_duration = floatval($service['duration']);
-$service_duration_minutes = (int)($service_duration * 60);
+// $service_duration = floatval($service['duration']);
+// $service_duration_minutes = (int)($service_duration * 60);
 
 // Calcular day_id basado en la fecha seleccionada
 $dateObj = new DateTime($date);
 $day_id = (int)$dateObj->format('N'); // ISO-8601 (1=Lunes, 7=Domingo)
 
 // Obtener horas de trabajo y descanso desde company_schedules
-$sql_schedules = $conn->prepare("
-    SELECT work_start, work_end, break_start, break_end 
-    FROM company_schedules 
-    WHERE company_id = :company_id AND day_id = :day_id AND is_enabled = 1
-");
-$sql_schedules->bindParam(':company_id', $company_id);
-$sql_schedules->bindParam(':day_id', $day_id);
-$sql_schedules->execute();
-$schedule = $sql_schedules->fetch(PDO::FETCH_ASSOC);
+$schedule = $schedulesData->getScheduleByDay($day_id);
+
+// $sql_schedules = $conn->prepare("
+//     SELECT work_start, work_end, break_start, break_end 
+//     FROM company_schedules 
+//     WHERE company_id = :company_id AND day_id = :day_id AND is_enabled = 1
+// ");
+// $sql_schedules->bindParam(':company_id', $company_id);
+// $sql_schedules->bindParam(':day_id', $day_id);
+// $sql_schedules->execute();
+// $schedule = $sql_schedules->fetch(PDO::FETCH_ASSOC);
 
 if (!$schedule) {
     echo json_encode(['success' => false, 'message' => 'No hay horario de trabajo definido para esta fecha.']);
@@ -112,9 +129,11 @@ if ($service_duration_minutes > $minutes_before_break) {
 }
 
 // Obtener citas reservadas para la fecha seleccionada
-$sql_appointments = $conn->prepare("SELECT start_time, end_time FROM appointments WHERE company_id = ? AND date = ?");
-$sql_appointments->execute([$company['id'], $date]);
-$appointments = $sql_appointments->fetchAll(PDO::FETCH_ASSOC);
+// $sql_appointments = $conn->prepare("SELECT start_time, end_time FROM appointments WHERE company_id = ? AND date = ?");
+// $sql_appointments->execute([$company['id'], $date]);
+// $appointments = $sql_appointments->fetchAll(PDO::FETCH_ASSOC);
+
+$appointments = $appointment->getAppointmentsByDate($company_id, $date);
 
 // Filtrar horas disponibles eliminando las que ya están reservadas
 foreach ($appointments as $appointment) {

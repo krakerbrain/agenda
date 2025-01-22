@@ -15,13 +15,13 @@ class Services
     public function getServices()
     {
         $this->db->query("
-            SELECT s.id AS service_id, s.name AS service_name, s.duration, s.observations, s.is_enabled, s.available_days,
-                   sc.id AS category_id, sc.category_name, sc.category_description
-            FROM services s
-            LEFT JOIN service_categories sc ON s.id = sc.service_id
-            WHERE s.company_id = :company_id
-            ORDER BY s.id, sc.id
-        ");
+        SELECT s.id AS service_id, s.name AS service_name, s.duration, s.observations, s.is_enabled, s.available_days,
+               sc.id AS category_id, sc.category_name, sc.category_description
+        FROM services s
+        LEFT JOIN service_categories sc ON s.id = sc.service_id
+        WHERE s.company_id = :company_id
+        ORDER BY s.id, sc.id
+    ");
         $this->db->bind(':company_id', $this->company_id);
         $servicesData = $this->db->resultSet();
 
@@ -30,10 +30,12 @@ class Services
             $serviceId = $row['service_id'];
 
             if (!isset($organizedData[$serviceId])) {
+                $durationFormatted = $this->formatDuration($row['duration']); // Formatea la duración
                 $organizedData[$serviceId] = [
                     'service_id' => $row['service_id'],
                     'service_name' => $row['service_name'],
                     'duration' => $row['duration'],
+                    'duration_formatted' => $durationFormatted, // Agrega la duración formateada
                     'observations' => $row['observations'],
                     'is_enabled' => $row['is_enabled'],
                     'available_days' => $row['available_days'],
@@ -57,14 +59,12 @@ class Services
     }
 
     //getavailableservicedays
-
     public function getAvailableServiceDays($serviceId)
     {
         $this->db->query("SELECT duration, available_days FROM services WHERE id = :service_id");
         $this->db->bind(':service_id', $serviceId);
         return $this->db->single();
     }
-
 
 
     public function saveServices($servicesData)
@@ -78,11 +78,21 @@ class Services
                     ? implode(',', $servicesData['available_service_day'][$serviceId])
                     : '';
 
+                // Convertir horas y minutos a minutos totales
+                $hours = isset($servicesData['service_duration_hours'][$serviceId])
+                    ? (int)$servicesData['service_duration_hours'][$serviceId]
+                    : 0;
+                $minutes = isset($servicesData['service_duration_minutes'][$serviceId])
+                    ? (int)$servicesData['service_duration_minutes'][$serviceId]
+                    : 0;
+
+                $totalDuration = ($hours * 60) + $minutes; // Total de minutos
+
                 if (strpos($serviceId, 'new-service') !== false) {
                     // Nuevo servicio
                     $newServiceId = $this->addService(
                         $serviceName,
-                        $servicesData['service_duration'][$serviceId],
+                        $totalDuration, // Guardar la duración como minutos
                         $servicesData['service_observations'][$serviceId],
                         $isEnabled,
                         $availableDays
@@ -103,7 +113,7 @@ class Services
                     $this->updateService(
                         $serviceId,
                         $serviceName,
-                        $servicesData['service_duration'][$serviceId],
+                        $totalDuration, // Guardar la duración como minutos
                         $servicesData['service_observations'][$serviceId],
                         $isEnabled,
                         $availableDays
@@ -135,6 +145,7 @@ class Services
             return json_encode(['success' => false, 'message' => 'Error al guardar los servicios: ' . $e->getMessage()]);
         }
     }
+
 
     private function addService($name, $duration, $observations, $isEnabled, $availableDays)
     {
@@ -270,5 +281,16 @@ class Services
             // Luego, puedes lanzar una excepción o devolver un mensaje de error
             throw new Exception('No se pudo eliminar la categoría.');
         }
+    }
+
+    private function formatDuration($minutes)
+    {
+        $hours = intdiv($minutes, 60); // Calcula las horas
+        $remainingMinutes = $minutes % 60; // Calcula los minutos restantes
+
+        return [
+            'hours' => $hours,
+            'minutes' => $remainingMinutes
+        ];
     }
 }

@@ -320,6 +320,18 @@ class Appointments extends Database
         return $db->resultSet();
     }
 
+    //obtener citas por fecha
+
+    public function getAppointmentsByDate($company_id, $date)
+    {
+        $db = new Database();
+        $db->query('SELECT * FROM appointments WHERE company_id = :company_id AND date = :date');
+        $db->bind(':company_id', $company_id);
+        $db->bind(':date', $date);
+
+        return $db->resultSet();
+    }
+
     public function checkAppointments($company_id, $date, $start_hour, $end_hour)
     {
         $db = new Database();
