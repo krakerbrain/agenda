@@ -73,7 +73,7 @@ $auth->validarTokenUsuario();
     <div class="table-responsive">
         <table class="table table-striped table-hover">
             <thead>
-                <tr>
+                <tr class="head-table">
                     <th>Servicio</th>
                     <th>Nombre</th>
                     <th>Teléfono</th>

@@ -26,6 +26,7 @@ export function initHorarios() {
     const tableBody = document.getElementById("scheduleTableBody");
     const tr = document.createElement("tr");
     tr.classList.add("work-day");
+    tr.classList.add("body-table");
     const copiaTodo = day === "Lunes" ? "<button type='button' class='btn btn-link copy-all'>Copiar en todos</button>" : "";
     const checked = is_enabled === 1 ? "checked" : "";
     const disabled = is_enabled === 1 ? "" : "disabled";
@@ -77,6 +78,7 @@ export function initHorarios() {
     const tr = button.closest(".work-day");
     const breakRow = document.createElement("tr");
     breakRow.classList.add("break-row");
+    breakRow.classList.add("body-table");
 
     breakRow.innerHTML = `
       <td colspan="2">Hora de descanso</td>
@@ -103,6 +105,7 @@ export function initHorarios() {
   function addBreakTimeElement(tr, day, break_start, break_end) {
     const breakRow = document.createElement("tr");
     breakRow.classList.add("break-row");
+    breakRow.classList.add("body-table");
 
     breakRow.innerHTML = `
       <td colspan="2">Hora de descanso</td>

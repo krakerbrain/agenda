@@ -8,15 +8,7 @@ $auth = new JWTAuth();
 $auth->validarTokenUsuario();
 ?>
 <style>
-    .time-input {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        justify-content: center;
-        /* Espaciado entre los campos */
-    }
-
-    .time-field {
+    */ .time-field {
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -32,10 +24,10 @@ $auth->validarTokenUsuario();
     }
 
     .time-box {
-        width: 60px;
+        width: 50px;
         /* Ancho del campo */
         text-align: center;
-        padding: 0.5rem;
+        padding: 0.25rem;
     }
 </style>
 <div class="container text-end">
@@ -50,7 +42,7 @@ $auth->validarTokenUsuario();
         <input type="hidden" value="" id="tempId">
         <table class="table table-borderless table-striped table-sm">
             <thead>
-                <tr>
+                <tr class="head-table">
                     <th>Habilitado</th>
                     <th>Nombre del Servicio</th>
                     <th class="text-center">Duración</th>

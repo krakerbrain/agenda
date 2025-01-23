@@ -96,6 +96,7 @@ export function initServicios() {
   function addEmptyServiceRow() {
     const emptyServiceRow = document.createElement("tr");
     emptyServiceRow.classList.add("service-row");
+    emptyServiceRow.classList.add("body-table");
     const tempServiceId = `new-service-${tempServiceCounter}`;
     emptyServiceRow.innerHTML = `
       <td data-cell="Habilitado" class="data">
@@ -105,7 +106,7 @@ export function initServicios() {
       </td>
       <td data-cell="nombre servicio" class="data"><input type="text" class="form-control" name="service_name[${tempServiceId}]" value=""></td>
     <td data-cell="horas duración" class="data">
-      <div class="time-input">
+      <div class="time-input d-flex align-items-center justify-content-xl-center gap-2">
         <div class="time-field">
             <input type="number" id="hours" name="service_duration_hours[${tempServiceId}]" class="form-control time-box" min="0" step="1" value="0">
             <label for="hours" class="time-label">Horas</label>
@@ -239,6 +240,7 @@ function createServiceRow(serviceId, serviceName, serviceDuration, serviceObserv
   const daysStatus = Object.keys(schedules).length === 0 ? "" : getAvailableDays(serviceDays, schedules);
   const serviceRow = document.createElement("tr");
   serviceRow.classList.add("service-row");
+  serviceRow.classList.add("body-table");
   const isChecked = isEnabled ? "checked" : "";
   // Extrae las horas y minutos de serviceDuration
   const hours = serviceDuration.hours || 0;
@@ -252,7 +254,7 @@ function createServiceRow(serviceId, serviceName, serviceDuration, serviceObserv
     </td>
     <td data-cell="nombre servicio" class="data"><input type="text" class="form-control" name="service_name[${serviceId}]" value="${serviceName}"></td>
         <td data-cell="horas duración" class="data">
-      <div class="time-input">
+      <div class="time-input d-flex align-items-center justify-content-xl-center gap-2">
         <div class="time-field">
             <input type="number" id="hours-${serviceId}" name="service_duration_hours[${serviceId}]" class="form-control time-box" min="0" step="1" value="${hours}">
             <label for="hours-${serviceId}" class="time-label">Horas</label>
@@ -324,6 +326,7 @@ function addCategoryToService(serviceId, category) {
   const categoryRow = document.createElement("tr");
   const categoryId = category.category_id;
   categoryRow.classList.add("category-item");
+  categoryRow.classList.add("body-table");
   categoryRow.innerHTML = `
     <td></td>
     <td class="text-center">CATEGORÍA</td>
@@ -346,6 +349,7 @@ function addCategory(button) {
   const categoryId = `new-category-${tempServiceCounter}`;
   const categoryRow = document.createElement("tr");
   categoryRow.classList.add("category-item");
+  categoryRow.classList.add("body-table");
   categoryRow.innerHTML = `
       <td></td>
       <td class="text-center">Agregar categoría</td>

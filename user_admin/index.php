@@ -15,27 +15,7 @@ include dirname(__DIR__) . '/partials/head.php';
     const baseUrl = '<?php echo $baseUrl; ?>';
     const role_id = <?php echo $role_id; ?>;
 </script>
-<style>
-    @media(max-width:1000px) {
-        body {
-            font-size: 0.85rem;
-        }
 
-        th {
-            display: none;
-        }
-
-        td {
-            display: block;
-        }
-
-        .data::before {
-            content: attr(data-cell) ": ";
-            font-weight: 700;
-            text-transform: capitalize;
-        }
-    }
-</style>
 
 <body>
     <header class="nav navbar sticky-top bg-dark-subtle">

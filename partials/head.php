@@ -10,5 +10,5 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/dark.css">
-
+    <link rel="stylesheet" href="<?php echo $baseUrl; ?>assets/css/table.css?v=<?php echo time(); ?>">
 </head>

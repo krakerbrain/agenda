@@ -1,0 +1,19 @@
+@media (max-width: 1000px) {
+  body {
+    font-size: 0.85rem;
+  }
+
+  tr.head-table th {
+    display: none;
+  }
+
+  tr.body-table td {
+    display: block;
+  }
+
+  .data::before {
+    content: attr(data-cell) ": ";
+    font-weight: 700;
+    text-transform: capitalize;
+  }
+}

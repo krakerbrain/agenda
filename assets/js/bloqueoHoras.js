@@ -87,8 +87,8 @@ export function initBloqueoHoras() {
               <td>${day.date}</td>
               <td>${day.start_time || "Todo el día"}</td>
               <td>${day.end_time || "Todo el día"}</td>
-              <td>
-                  <button class="btn btn-danger btn-sm deleteBlockedDay" data-token="${day.token}" >Eliminar</button>
+              <td class="text-center text-md-start">
+                  <button class="btn btn-danger btn-sm deleteBlockedDay" data-token="${day.token}" title="Eliminar fecha bloqueada"> <i class="fas fa-trash-alt"></i></button>
               </td>
           </tr>
       `;

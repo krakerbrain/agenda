@@ -32,11 +32,11 @@ $datosUsuario = $auth->validarTokenUsuario();
 
     <div id="hour-range" class="row mb-3" style="display: none;">
         <div class="col">
-            <label for="start-hour" class="form-label">Hora de inicio</label>
+            <label for="start-hour" class="form-label">Inicio</label>
             <input type="time" id="start-hour" name="start_hour" class="form-control">
         </div>
         <div class="col">
-            <label for="end-hour" class="form-label">Hora de término</label>
+            <label for="end-hour" class="form-label">Término</label>
             <input type="time" id="end-hour" name="end_hour" class="form-control">
         </div>
     </div>
@@ -50,8 +50,8 @@ $datosUsuario = $auth->validarTokenUsuario();
         <thead>
             <tr>
                 <th>Fecha</th>
-                <th>Hora de Inicio</th>
-                <th>Hora de Término</th>
+                <th>Inicio</th>
+                <th>Término</th>
                 <th>Acción</th>
             </tr>
         </thead>
