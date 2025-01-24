@@ -2,6 +2,8 @@ export function initHorarios() {
   const form = document.getElementById("workScheduleForm");
   const tableBody = document.getElementById("scheduleTableBody");
 
+  let initialSchedules = [];
+
   async function getHorarios() {
     const response = await fetch(`${baseUrl}user_admin/controllers/schedulesController.php`, {
       method: "GET",
@@ -9,6 +11,8 @@ export function initHorarios() {
     const { success, data } = await response.json();
 
     if (success) {
+      // Guardar una copia de los datos iniciales
+      initialSchedules = JSON.parse(JSON.stringify(data)); // Copia profunda para evitar referencias
       // Limpiar el cuerpo de la tabla
       tableBody.innerHTML = "";
 
@@ -18,6 +22,69 @@ export function initHorarios() {
         });
       }
     }
+  }
+
+  function getCurrentSchedules() {
+    const rows = Array.from(tableBody.querySelectorAll("tr.work-day")); // Filas de la tabla
+    return rows.map((row) => {
+      const day = row.querySelector("td[data-cell='día']").textContent.trim();
+      const schedule_id = row.querySelector("input[name^='schedule[" + day + "][schedule_id]']").value;
+      const day_id = row.querySelector("input[name^='schedule[" + day + "][day_id]']").value;
+      const is_enabled = row.querySelector("input[name^='schedule[" + day + "][is_enabled]']").checked ? 1 : 0;
+      const work_start = row.querySelector("input[name^='schedule[" + day + "][start]']").value;
+      const work_end = row.querySelector("input[name^='schedule[" + day + "][end]']").value;
+
+      const break_start = row.querySelector("input[name^='schedule[" + day + "][break_start]']") ? row.querySelector("input[name^='schedule[" + day + "][break_start]']").value : null;
+      const break_end = row.querySelector("input[name^='schedule[" + day + "][break_end]']") ? row.querySelector("input[name^='schedule[" + day + "][break_end]']").value : null;
+
+      return {
+        schedule_id,
+        day_id,
+        day,
+        is_enabled,
+        work_start,
+        work_end,
+        break_start,
+        break_end,
+      };
+    });
+  }
+
+  form.addEventListener("input", () => {
+    const currentSchedules = getCurrentSchedules();
+    showSaveAlert(hasChanges(currentSchedules));
+  });
+
+  function showSaveAlert(haveChanges) {
+    if (haveChanges) {
+      document.getElementById("unsavedChangesAlert").classList.remove("d-none");
+    } else {
+      document.getElementById("unsavedChangesAlert").classList.add("d-none");
+    }
+  }
+
+  window.addEventListener("beforeunload", (event) => {
+    const currentSchedules = getCurrentSchedules();
+    if (hasChanges(currentSchedules)) {
+      event.preventDefault();
+    }
+  });
+
+  function hasChanges(currentSchedules) {
+    // Si las longitudes no coinciden, hay cambios
+    if (currentSchedules.length !== initialSchedules.length) return true;
+
+    // Comparar cada elemento
+    return currentSchedules.some((current, index) => {
+      const initial = initialSchedules[index];
+      return (
+        current.work_start !== initial.work_start ||
+        current.work_end !== initial.work_end ||
+        current.break_start !== initial.break_start ||
+        current.break_end !== initial.break_end ||
+        current.is_enabled !== initial.is_enabled
+      );
+    });
   }
 
   function addScheduleToTable(horario) {
@@ -150,7 +217,6 @@ export function initHorarios() {
 
         if (success) {
           alert(message);
-          getHorarios();
         }
       } catch (error) {
         console.error(error);
@@ -198,6 +264,7 @@ export function initHorarios() {
       if (success) {
         const modal = new bootstrap.Modal(document.getElementById("saveSchedules"));
         modal.show();
+        showSaveAlert(false);
         getHorarios();
       }
     } catch (error) {

@@ -10,6 +10,11 @@ $auth->validarTokenUsuario();
 
 <div class="container my-5">
     <form id="workScheduleForm" method="POST" class="border p-4 rounded">
+        <div id="unsavedChangesAlert" class="alert alert-warning d-none" role="alert">
+            <strong>Recuerda guardar los cambios antes de salir.</strong>
+            Si sales sin guardar, perderás los cambios realizados.
+            <button type="submit" class="btn btn-primary btn-sm">Guardar Configuración</button>
+        </div>
         <input type="hidden" name="company_id" id="company_id" value="1"> <!-- Replace with dynamic company ID -->
         <table class="table table-borderless table-striped table-sm">
             <thead>
