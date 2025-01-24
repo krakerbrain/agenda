@@ -8,7 +8,6 @@ require_once dirname(__DIR__, 2) . '/classes/Appointments.php';
 // Obtener datos enviados por el cliente
 $data = json_decode(file_get_contents('php://input'), true);
 $service_id = $data['service_id'];
-$calendar_days_available = $data['calendar_days_available'];
 $company_id = $data['company_id'];
 $today = new DateTime();
 
@@ -22,8 +21,15 @@ $scheduleDays = $schedules->getEnabledSchedulesDays();
 $service = $services->getAvailableServiceDays($service_id);
 $serviceDuration = $service['duration']; // En minutos
 
-$start_date = (clone $today)->modify("+1 days");
-$end_date = (clone $today)->modify("+$calendar_days_available days");
+// Suponiendo que fixed_start_date está en formato 'Y-m-d' en la base de datos
+$fixed_start_day = new DateTime($company['fixed_start_date']);
+$calendar_days_available = $company['calendar_mode'] === 'corrido' ? $company['calendar_days_available'] : $company['fixed_duration'];
+
+// Establecer las fechas de inicio y fin
+$today = new DateTime("2025-01-19");
+$start_date = $today; // Establece la fecha de inicio como fixed_start_day
+$end_date = $company['calendar_mode'] === 'corrido' ? clone $start_date : $fixed_start_day;
+$end_date->modify('+' . $calendar_days_available . ' days');
 
 $allAppointments = $appointmentsData->getAppointmentsByDateRange(
     $company_id,
@@ -37,11 +43,12 @@ foreach ($allAppointments as $appointment) {
 }
 
 $available_days = [];
-for ($i = 0; $i < $calendar_days_available; $i++) {
-    $currentDate = (clone $today)->modify("+$i days");
+$currentDate = clone $start_date; // Comienza desde start_date
+while ($currentDate <= $end_date) {
     $dayOfWeek = $currentDate->format('N');
 
     if ($currentDate->format('Y-m-d') == $today->format('Y-m-d')) {
+        $currentDate->modify('+1 day');
         continue;
     }
 
@@ -50,6 +57,7 @@ for ($i = 0; $i < $calendar_days_available; $i++) {
     });
 
     if (empty($schedule)) {
+        $currentDate->modify('+1 day');
         continue;
     }
 
@@ -87,6 +95,9 @@ for ($i = 0; $i < $calendar_days_available; $i++) {
     } elseif ($serviceDuration <= ($morningAvailable + $afternoonAvailable)) {
         $available_days[] = $currentDate->format('Y-m-d');
     }
+
+    $currentDate->modify('+1 day'); // Avanza al siguiente día
 }
+
 
 echo json_encode(['success' => true, 'available_days' => $available_days, 'calendar_mode' => $company['calendar_mode']]);

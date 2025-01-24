@@ -45,7 +45,7 @@ class CompanyModel
     // $sql = $conn->prepare("SELECT calendar_mode, fixed_start_date FROM companies WHERE id = :company_id AND is_active = 1"); crear funcion para query
     public function getCompanyCalendarData($companyId)
     {
-        $this->db->query("SELECT calendar_mode, fixed_start_date FROM companies WHERE id = :company_id AND is_active = 1");
+        $this->db->query("SELECT calendar_mode, fixed_start_date, calendar_days_available, fixed_duration FROM companies WHERE id = :company_id AND is_active = 1");
         $this->db->bind(':company_id', $companyId);
         return $this->db->single();
     }

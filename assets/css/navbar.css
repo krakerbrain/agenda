@@ -1,8 +1,3 @@
-/* body {
-  font-family: Arial, sans-serif;
-  background-color: #f0f0f0;
-} */
-
 .nav-container {
   max-width: 1000px;
   margin: 0 auto;
@@ -58,31 +53,6 @@
   cursor: pointer;
 }
 
-/* .navbar-toggle span {
-  width: 25px;
-  height: 2px;
-  background-color: #4caf50;
-  margin: 3px;
-} */
-
 #main-content {
   padding: 10px 0;
 }
-
-/* 
-@media (max-width: 768px) {
-  .navbar-toggle {
-    display: flex;
-  }
-
-  .navbar-nav {
-    display: none;
-    flex-direction: column;
-    width: 100%;
-    background-color: #ffffff;
-  }
-
-  .navbar-nav.active {
-    display: flex;
-  }
-} */
