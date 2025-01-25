@@ -23,7 +23,7 @@ export function initBloqueoHoras() {
     const endHour = document.getElementById("end-hour").value;
 
     if (!blockDate) {
-      alert("Por favor, selecciona una fecha.");
+      handleModal("Por favor, seleccione una fecha.");
       return;
     }
 
@@ -44,13 +44,13 @@ export function initBloqueoHoras() {
       const result = await response.json();
 
       if (result.success) {
-        alert("Fecha bloqueada correctamente.");
+        handleModal("Fecha bloqueada correctamente.");
         // Limpiar formulario
         hourRange.style.display = "none";
         document.getElementById("block-date-form").reset();
         fetchBlockedDays();
       } else {
-        alert(result.message);
+        handleModal(result.message);
       }
     } catch (error) {
       console.error("Error:", error);
@@ -64,7 +64,7 @@ export function initBloqueoHoras() {
     if (result.success) {
       updateBlockedDatesTable(result.data);
     } else {
-      alert(result.message || "Error al obtener los días bloqueados.");
+      handleModal(result.message || "Error al obtener los días bloqueados.");
     }
   }
 
@@ -117,17 +117,22 @@ export function initBloqueoHoras() {
       const result = await response.json();
 
       if (result.success) {
-        alert("Fecha desbloqueada correctamente.");
+        handleModal("Fecha desbloqueada correctamente.");
         fetchBlockedDays();
       } else {
-        alert(result.message);
+        handleModal(result.message);
       }
     } catch (error) {
       console.error("Error:", error);
     }
   }
 
-  //eliminar fecha bloqueada
+  function handleModal(message) {
+    const modal = new bootstrap.Modal(document.getElementById("modalErrorBlockHour"));
+    const modalBody = document.getElementById("responseMessage");
+    modalBody.innerHTML = message;
+    modal.show();
+  }
 
   const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
   const popoverList = [...popoverTriggerList].map((popoverTriggerEl) => new bootstrap.Popover(popoverTriggerEl));

@@ -248,6 +248,8 @@ $current_date->setTime(0, 0, 0);
         </div>
         <button type="submit" class="btn btn-success">Guardar Configuración</button>
     </form>
-    <?php include dirname(__DIR__, 2) . '/includes/modal-nuevo-periodo.php';
+    <?php
+    include dirname(__DIR__, 2) . '/includes/modal-nuevo-periodo.php';
+    include dirname(__DIR__, 2) . '/includes/modal-configuraciones.php';
     ?>
 </div>
