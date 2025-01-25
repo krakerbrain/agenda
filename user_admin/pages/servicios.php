@@ -7,10 +7,33 @@ $baseUrl = ConfigUrl::get();
 $auth = new JWTAuth();
 $auth->validarTokenUsuario();
 ?>
+<style>
+    */ .time-field {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .time-label {
+        font-size: 0.75rem;
+        /* Tamaño pequeño para el texto */
+        margin-bottom: 0.25rem;
+        /* Separación entre la etiqueta y el input */
+        color: #6c757d;
+        /* Color neutro */
+    }
+
+    .time-box {
+        width: 50px;
+        /* Ancho del campo */
+        text-align: center;
+        padding: 0.25rem;
+    }
+</style>
 <div class="container text-end">
     <a tabindex="0" role="button" data-bs-trigger="focus" class="btn" data-bs-placement="left" data-bs-toggle="popover"
         data-bs-title="Servicios"
-        data-bs-content="Aquí podrá configurar todos los servicios que preste con sus categorías, descripciones y duración de los servicios (en horas). Estos servicios más las configuraciones del calendario le permitiran a su cliente hacer correctamente la reserva">
+        data-bs-content="Aquí podrá configurar todos los servicios que prestes con sus categorías, descripciones y duración de los servicios (en horas). Estos servicios más las configuraciones del calendario le permitiran a su cliente hacer correctamente la reserva">
         <i class="fa fa-circle-question text-primary" style="font-size: 1.5rem;"></i>
     </a>
 </div>
@@ -19,10 +42,10 @@ $auth->validarTokenUsuario();
         <input type="hidden" value="" id="tempId">
         <table class="table table-borderless table-striped table-sm">
             <thead>
-                <tr>
+                <tr class="head-table">
                     <th>Habilitado</th>
                     <th>Nombre del Servicio</th>
-                    <th>Duración (horas)</th>
+                    <th class="text-center">Duración</th>
                     <th>Observaciones</th>
                     <th>Categorías</th>
                     <th>Días Disponible</th>

@@ -301,7 +301,6 @@ class CompanyManager
             $sql = "UPDATE companies SET 
                         schedule_mode = :schedule_mode,
                         calendar_mode = :calendar_mode,
-                        blocked_dates = :blocked_dates,
                         bg_color = :bg_color,
                         font_color = :font_color,
                         btn1 = :btn1_color,
@@ -315,7 +314,6 @@ class CompanyManager
             $this->db->query($sql);
             $this->db->bind(':schedule_mode', $data['schedule_mode']);
             $this->db->bind(':calendar_mode', $data['calendar_mode']);
-            $this->db->bind(':blocked_dates', $data['blocked_dates']);
             $this->db->bind(':bg_color', $data['bg_color']);
             $this->db->bind(':font_color', $data['font_color']);
             $this->db->bind(':btn1_color', $data['btn1_color']);

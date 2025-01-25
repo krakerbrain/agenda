@@ -66,7 +66,7 @@ function fillTable(data) {
 
   data.forEach((appointment) => {
     html += `
-          <tr>
+          <tr class="body-table">
               <td data-cell="servicio" class="data">${appointment.service}</td>
               <td data-cell="nombre" class="data">${appointment.name}</td>
                <td data-cell="telefono" class="data"><i class="fab fa-whatsapp pe-1" style="font-size:0.85rem"></i><a href="https://wa.me/${appointment.phone}" target="_blank">+${
@@ -127,7 +127,7 @@ function fillEventTable(data) {
 
   data.forEach((event) => {
     html += `
-          <tr>
+         <tr class="body-table">
               <td data-cell="servicio" class="data">${event.event_name}</td>
               <td data-cell="nombre" class="data">${event.participant_name}</td>
               <td data-cell="telefono" class="data"><i class="fab fa-whatsapp pe-1" style="font-size:0.85rem"><a href="https://wa.me/${event.phone}" target="_blank">+${event.phone}</a></td>

@@ -20,7 +20,7 @@ class CompanyModel
 
     public function getServicesByCompanyId($companyId)
     {
-        $this->db->query("SELECT id, observations, name FROM services WHERE company_id = :company_id");
+        $this->db->query("SELECT id, observations, name FROM services WHERE company_id = :company_id AND is_enabled = 1");
         $this->db->bind(':company_id', $companyId);
         return $this->db->resultSet();
     }
@@ -40,5 +40,13 @@ class CompanyModel
                           WHERE csn.company_id = :company_id");
         $this->db->bind(':company_id', $companyId);
         return $this->db->resultSet();
+    }
+
+    // $sql = $conn->prepare("SELECT calendar_mode, fixed_start_date FROM companies WHERE id = :company_id AND is_active = 1"); crear funcion para query
+    public function getCompanyCalendarData($companyId)
+    {
+        $this->db->query("SELECT calendar_mode, fixed_start_date, calendar_days_available, fixed_duration FROM companies WHERE id = :company_id AND is_active = 1");
+        $this->db->bind(':company_id', $companyId);
+        return $this->db->single();
     }
 }

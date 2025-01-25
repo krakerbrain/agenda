@@ -104,7 +104,7 @@ function getAvailableDays() {
 
   const data = {
     service_id: serviceId,
-    calendar_days_available: calendarDaysAvailable,
+    // calendar_days_available: calendarDaysAvailable,
     company_id: companyId,
   };
 

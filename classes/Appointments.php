@@ -2,6 +2,8 @@
 require_once 'Database.php';
 require_once dirname(__DIR__) . '/access-token/seguridad/JWTAuth.php';
 
+use Ramsey\Uuid\Uuid;
+
 class Appointments extends Database
 {
     /**
@@ -31,6 +33,7 @@ class Appointments extends Database
     {
         try {
             $db = new Database();
+
 
             // Verificar si ya existe una cita con los mismos datos
             if ($this->checkExistingAppointment($data)) {
@@ -72,6 +75,88 @@ class Appointments extends Database
             return ['error' => $e->getMessage()]; // Retornar el mensaje de error
         }
     }
+
+    public function addBlockedDay($data)
+    {
+        try {
+            $db = new Database();
+
+            // Consulta SQL para insertar un "día bloqueado" como cita especial
+            $query = "
+            INSERT INTO appointments (
+                company_id, name, phone, mail, date, start_time, end_time, 
+                id_service, status, aviso_reserva, aviso_confirmada, created_at
+            ) VALUES (
+                :company_id, :name, :phone, :mail, :date, :start_time, :end_time, 
+                :id_service, :status, :aviso_reserva, :aviso_confirmada, NOW()
+            )
+        ";
+
+            // Preparar la consulta
+            $db->query($query);
+
+            // Asignar valores a los parámetros
+            $db->bind(':company_id', $data['company_id']);
+            $db->bind(':name', 'Día Bloqueado'); // Nombre genérico para identificar el bloqueo
+            $db->bind(':phone', null); // Teléfono no aplica
+            $db->bind(':mail', null); // Correo no aplica
+            $db->bind(':date', $data['date']);
+            $db->bind(':start_time', $data['start_time']);
+            $db->bind(':end_time', $data['end_time']);
+            $db->bind(':id_service', 0); // ID de servicio 0 para identificar que es un bloqueo
+            $db->bind(':status', 1); // Estado activo
+            $db->bind(':aviso_reserva', 1); // Marcar como notificado
+            $db->bind(':aviso_confirmada', 1); // Marcar como confirmado
+
+            // Ejecutar la consulta
+            $db->execute();
+
+            // Obtener el ID de la cita recién creada
+            $appointmentId = $db->lastInsertId();
+
+            // Generar el token identificador (UUID v4)
+            $appointmentToken = Uuid::uuid4()->toString();
+
+            // Actualizar la cita con el token generado
+            $db->query('UPDATE appointments SET appointment_token = :token WHERE id = :id');
+            $db->bind(':token', $appointmentToken);
+            $db->bind(':id', $appointmentId);
+            $db->execute();
+            // Retornar el ID de la cita bloqueada
+            return [
+                'success' => true,
+                'message' => 'Día bloqueado creado exitosamente.',
+            ];
+        } catch (Exception $e) {
+            // Manejo de errores en caso de fallos
+            return [
+                'success' => false,
+                'error' => 'Error al crear el día bloqueado: ' . $e->getMessage(),
+            ];
+        }
+    }
+
+    // getBlockedDays
+    public function getBlockedDays($company_id)
+    {
+        $db = new Database();
+        $db->query('
+        SELECT 
+            DATE_FORMAT(date, "%d-%m-%Y") AS date, 
+            start_time, 
+            end_time, 
+            appointment_token AS token 
+        FROM 
+            appointments 
+        WHERE 
+            company_id = :company_id 
+            AND id_service = 0
+            AND (date > CURDATE() OR (date = CURDATE() AND end_time >= NOW()))
+    ');
+        $db->bind(':company_id', $company_id);
+        return $db->resultSet();
+    }
+
 
     public function checkExistingAppointment($data)
     {
@@ -224,6 +309,55 @@ class Appointments extends Database
         }
     }
 
+    // Obtener todas las citas en el rango de fechas
+    public function getAppointmentsByDateRange($company_id, $start_date, $end_date)
+    {
+        $db = new Database();
+        $db->query('SELECT date, start_time, end_time FROM appointments WHERE company_id = :company_id AND date BETWEEN :start_date AND :end_date');
+        $db->bind(':company_id', $company_id);
+        $db->bind(':start_date', $start_date);
+        $db->bind(':end_date', $end_date);
+        return $db->resultSet();
+    }
+
+    //obtener citas por fecha
+
+    public function getAppointmentsByDate($company_id, $date)
+    {
+        $db = new Database();
+        $db->query('SELECT * FROM appointments WHERE company_id = :company_id AND date = :date');
+        $db->bind(':company_id', $company_id);
+        $db->bind(':date', $date);
+
+        return $db->resultSet();
+    }
+
+    public function checkAppointments($company_id, $date, $start_hour, $end_hour)
+    {
+        $db = new Database();
+
+        // Verificar citas que se solapen con el rango horario dado
+        $db->query("
+                    SELECT * 
+                    FROM appointments 
+                    WHERE company_id = :company_id 
+                      AND DATE(date) = :date
+                      AND (
+                          (:start_hour BETWEEN start_time AND end_time) OR 
+                          (:end_hour BETWEEN start_time AND end_time) OR 
+                          (start_time BETWEEN :start_hour AND :end_hour)
+                      )
+        ");
+        $db->bind(':company_id', $company_id);
+        $db->bind(':date', $date);
+        $db->bind(':start_hour', $start_hour);
+        $db->bind(':end_hour', $end_hour);
+
+        return $db->resultSet();
+    }
+
+
+
     public function markAsConfirmed($id, $type)
     {
         $db = new Database();
@@ -255,5 +389,15 @@ class Appointments extends Database
         $db->bind(':id', $id);
         $db->execute();
         return $db->rowCount();
+    }
+
+    public function deleteBlockedDay($token, $company_id)
+    {
+        $db = new Database();
+        $db->query("DELETE FROM appointments WHERE appointment_token = :token AND company_id = :company_id");
+        $db->bind(':token', $token);
+        $db->bind(':company_id', $company_id);
+
+        return $db->execute();
     }
 }

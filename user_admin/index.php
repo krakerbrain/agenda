@@ -15,27 +15,7 @@ include dirname(__DIR__) . '/partials/head.php';
     const baseUrl = '<?php echo $baseUrl; ?>';
     const role_id = <?php echo $role_id; ?>;
 </script>
-<style>
-    @media(max-width:1000px) {
-        body {
-            font-size: 0.85rem;
-        }
 
-        th {
-            display: none;
-        }
-
-        td {
-            display: block;
-        }
-
-        .data::before {
-            content: attr(data-cell) ": ";
-            font-weight: 700;
-            text-transform: capitalize;
-        }
-    }
-</style>
 
 <body>
     <header class="nav navbar sticky-top bg-dark-subtle">
@@ -54,7 +34,8 @@ include dirname(__DIR__) . '/partials/head.php';
     </div> -->
 
     <!-- Offcanvas -->
-    <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasMenu" aria-labelledby="offcanvasMenuLabel">
+    <div class="offcanvas offcanvas-start overflow-auto" tabindex="-1" id="offcanvasMenu"
+        aria-labelledby="offcanvasMenuLabel">
         <div class="offcanvas-header">
             <h5 class="offcanvas-title" id="offcanvasMenuLabel">Configuraciones</h5>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
@@ -88,6 +69,9 @@ include dirname(__DIR__) . '/partials/head.php';
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#" id="eventos_unicos">Eventos Únicos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="block_hour">Bloqueo de horas</a>
                     </li>
                 <?php } else { ?>
                     <li class="nav-item">

@@ -175,25 +175,6 @@ $current_date->setTime(0, 0, 0);
 
         </div>
 
-        <div class=" d-flex align-items-baseline">
-            <h3 class="mb-3">Fechas Bloqueadas</h3>
-            <a tabindex="0" role="button" data-bs-trigger="focus" class="btn help" data-bs-toggle="popover"
-                data-bs-title="Fechas Bloqueadas"
-                data-bs-content="Puedes bloquear fechas específicas para que no se puedan hacer reservas en esos días"><i
-                    class="fa fa-circle-question text-primary"></i></a>
-        </div>
-        <div id="blockedDatesContainer" class="mb-4">
-            <?php
-            $blocked_dates = explode(',', $company['blocked_dates']);
-            foreach ($blocked_dates as $blocked_date) {
-                echo "<div class='d-flex align-items-end mb-2'>
-                            <input type='date' class='form-control' name='blocked_dates[]' value='$blocked_date'>
-                            <button type='button' class='btn btn-danger btn-sm ms-2 remove-date'>Eliminar</button>
-                          </div>";
-            }
-            ?>
-        </div>
-        <button type="button" id="addBlockedDate" class="btn btn-primary mb-4">Añadir Fecha Bloqueada</button>
 
         <div class="container mb-4">
             <div class="row">

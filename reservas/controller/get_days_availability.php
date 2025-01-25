@@ -1,216 +1,103 @@
 <?php
-require_once dirname(__DIR__, 2) . '/classes/DatabaseSessionManager.php';
-$manager = new DatabaseSessionManager();
-$conn = $manager->getDB();
+require_once dirname(__DIR__, 2) . '/classes/CompanyModel.php';
+require_once dirname(__DIR__, 2) . '/classes/Services.php';
+require_once dirname(__DIR__, 2) . '/classes/Schedules.php';
+require_once dirname(__DIR__, 2) . '/classes/Appointments.php';
 
+// Obtener los datos enviados en formato JSON desde el cliente
+// Obtener datos enviados por el cliente
 $data = json_decode(file_get_contents('php://input'), true);
 $service_id = $data['service_id'];
-$calendar_days_available = $data['calendar_days_available'];
 $company_id = $data['company_id'];
 $today = new DateTime();
 
-// Obtener datos de la empresa
-$sql = $conn->prepare("SELECT * FROM companies WHERE id = :company_id AND is_active = 1");
-$sql->bindParam(':company_id', $company_id);
-$sql->execute();
-$company = $sql->fetch(PDO::FETCH_ASSOC);
+$companyModel = new CompanyModel();
+$services = new Services($company_id);
+$schedules = new Schedules($company_id);
+$appointmentsData = new Appointments($company_id);
 
-if (!$company) {
-    echo json_encode(['success' => false, 'message' => 'Empresa no encontrada o inactiva.']);
-    exit;
-}
-
-// Obtener la duración del servicio y los días disponibles
-$sql_service = $conn->prepare("SELECT duration, available_days FROM services WHERE id = :service_id");
-$sql_service->bindParam(':service_id', $service_id);
-$sql_service->execute();
-$service = $sql_service->fetch(PDO::FETCH_ASSOC);
-
-if (!$service) {
-    echo json_encode(['success' => false, 'message' => 'Servicio no encontrado.']);
-    exit;
-}
-
-// Convertir la duración del servicio a minutos
-$service_duration = floatval($service['duration']);
-$service_duration_minutes = (int)($service_duration * 60);
-
-// Convertir available_days a un array de enteros
-$service_available_days = array_map('intval', explode(',', $service['available_days']));
-
-// Obtener días laborales y fechas bloqueadas
-$blocked_dates = explode(',', $company['blocked_dates']);
-
-// Obtener días laborables y horarios de trabajo desde company_schedules
-$sql_schedules = $conn->prepare("
-    SELECT day_id, work_start, work_end, break_start, break_end 
-    FROM company_schedules 
-    WHERE company_id = :company_id AND is_enabled = 1
-");
-$sql_schedules->bindParam(':company_id', $company_id);
-$sql_schedules->execute();
-$schedules = $sql_schedules->fetchAll(PDO::FETCH_ASSOC);
-
-// Mapeo de días de la semana
-$work_days_map = [
-    1 => "Lunes",
-    2 => "Martes",
-    3 => "Miércoles",
-    4 => "Jueves",
-    5 => "Viernes",
-    6 => "Sábado",
-    7 => "Domingo"
-];
-
-// Convertir los horarios de trabajo en un array de acceso rápido
-$work_days = [];
-foreach ($schedules as $schedule) {
-    $work_days[$schedule['day_id']] = [
-        'work_start' => new DateTime($schedule['work_start']),
-        'work_end' => new DateTime($schedule['work_end']),
-        'break_start' => new DateTime($schedule['break_start']),
-        'break_end' => new DateTime($schedule['break_end'])
-    ];
-}
+$company = $companyModel->getCompanyCalendarData($company_id);
+$scheduleDays = $schedules->getEnabledSchedulesDays();
+$service = $services->getAvailableServiceDays($service_id);
+$serviceDuration = $service['duration']; // En minutos
 
 // Suponiendo que fixed_start_date está en formato 'Y-m-d' en la base de datos
 $fixed_start_day = new DateTime($company['fixed_start_date']);
+$calendar_days_available = $company['calendar_mode'] === 'corrido' ? $company['calendar_days_available'] : $company['fixed_duration'];
 
 // Establecer las fechas de inicio y fin
+$today = new DateTime("2025-01-19");
 $start_date = $today; // Establece la fecha de inicio como fixed_start_day
 $end_date = $company['calendar_mode'] === 'corrido' ? clone $start_date : $fixed_start_day;
 $end_date->modify('+' . $calendar_days_available . ' days');
-// }
 
-// Obtener todas las citas en el rango de fechas
-$sql_appointments = $conn->prepare("
-    SELECT date, start_time, end_time 
-    FROM appointments 
-    WHERE company_id = :company_id 
-    AND date BETWEEN :start_date AND :end_date
-");
-$sql_appointments->bindValue(':company_id', $company_id);
-$sql_appointments->bindValue(':start_date', $start_date->format('Y-m-d'));
-$sql_appointments->bindValue(':end_date', $end_date->format('Y-m-d'));
-$sql_appointments->execute();
-$appointments = $sql_appointments->fetchAll(PDO::FETCH_ASSOC);
+$allAppointments = $appointmentsData->getAppointmentsByDateRange(
+    $company_id,
+    $start_date->format('Y-m-d'),
+    $end_date->format('Y-m-d')
+);
 
-// Organizar citas por fecha en un array temporal
-$appointments_by_date = [];
-foreach ($appointments as $appointment) {
-    $appointments_by_date[$appointment['date']][] = $appointment;
+$appointmentsByDay = [];
+foreach ($allAppointments as $appointment) {
+    $appointmentsByDay[$appointment['date']][] = $appointment;
 }
-
-$interval = new DateInterval('P1D');
-$daterange = new DatePeriod($start_date, $interval, $end_date);
 
 $available_days = [];
+$currentDate = clone $start_date; // Comienza desde start_date
+while ($currentDate <= $end_date) {
+    $dayOfWeek = $currentDate->format('N');
 
-foreach ($daterange as $date) {
-    $day_of_week = (int)$date->format('N'); // 1 (lunes) a 7 (domingo)
-    $date_str = $date->format('Y-m-d');
-
-    // Evitar el día actual
-    if ($date_str === ($today)->format('Y-m-d')) {
-        continue; // Saltar la fecha si es el mismo día
+    if ($currentDate->format('Y-m-d') == $today->format('Y-m-d')) {
+        $currentDate->modify('+1 day');
+        continue;
     }
 
-    // Verificar si el día está en los available_days del servicio
-    if (!in_array($day_of_week, $service_available_days)) {
-        continue; // Saltar esta fecha si el servicio no está disponible ese día
+    $schedule = array_filter($scheduleDays, function ($day) use ($dayOfWeek) {
+        return $day['day_id'] == $dayOfWeek;
+    });
+
+    if (empty($schedule)) {
+        $currentDate->modify('+1 day');
+        continue;
     }
 
-    // Verificar si es un día laborable y no está bloqueado
-    if (isset($work_days[$day_of_week]) && !in_array($date_str, $blocked_dates)) {
-        // Obtener horarios disponibles para el día
-        $work_start = $work_days[$day_of_week]['work_start'];
-        $work_end = $work_days[$day_of_week]['work_end'];
-        $break_start = $work_days[$day_of_week]['break_start'];
-        $break_end = $work_days[$day_of_week]['break_end'];
+    $schedule = reset($schedule);
+    $workStart = new DateTime($schedule['work_start']);
+    $workEnd = new DateTime($schedule['work_end']);
+    $breakStart = new DateTime($schedule['break_start']);
+    $breakEnd = new DateTime($schedule['break_end']);
 
-        // Obtener citas reservadas para la fecha seleccionada
-        $day_appointments = isset($appointments_by_date[$date_str]) ? $appointments_by_date[$date_str] : [];
+    $appointmentsForDay = $appointmentsByDay[$currentDate->format('Y-m-d')] ?? [];
+    $morningReserved = 0;
+    $afternoonReserved = 0;
 
-        // Calcular la duración disponible antes del descanso
-        $duration_before_break = $work_start->diff($break_start);
-        $minutes_before_break = $duration_before_break->h * 60 + $duration_before_break->i;
+    foreach ($appointmentsForDay as $appointment) {
+        $start = new DateTime($appointment['start_time']);
+        $end = new DateTime($appointment['end_time']);
 
-        $available_times = [];
-        $current_time = clone $work_start;
-
-        // Si la duración del servicio es mayor que el tiempo disponible antes del descanso, saltar el descanso
-        if ($service_duration_minutes > $minutes_before_break) {
-            $end_time = clone $current_time;
-            $end_time->add(new DateInterval('PT' . $service_duration_minutes . 'M'));
-
-            if ($end_time <= $work_end) {
-                $available_times[] = [
-                    'start' => $current_time->format('H:i'),
-                    'end' => $end_time->format('H:i')
-                ];
-            }
+        if ($end <= $breakStart) {
+            $morningReserved += ($end->getTimestamp() - $start->getTimestamp()) / 60;
+        } elseif ($start >= $breakEnd) {
+            $afternoonReserved += ($end->getTimestamp() - $start->getTimestamp()) / 60;
         } else {
-            // Calcular bloques de tiempo normalmente si el servicio cabe antes del descanso
-            while ($current_time < $work_end) {
-                $end_time = clone $current_time;
-                $end_time->add(new DateInterval('PT' . $service_duration_minutes . 'M'));
-
-                // Validar que el bloque de tiempo no caiga en el período de descanso
-                if ($current_time < $break_start && $end_time > $break_start) {
-                    if (($break_start->getTimestamp() - $current_time->getTimestamp()) >= ($service_duration_minutes * 60)) {
-                        $available_times[] = [
-                            'start' => $current_time->format('H:i'),
-                            'end' => $break_start->format('H:i')
-                        ];
-                    }
-                    // Saltar el periodo de descanso
-                    $current_time = clone $break_end;
-                } elseif ($current_time >= $break_start && $current_time < $break_end) {
-                    // Saltar el periodo de descanso
-                    $current_time = clone $break_end;
-                } elseif ($end_time <= $work_end) {
-                    // Añadir el bloque de tiempo si cabe en el horario de trabajo
-                    $block_duration = $current_time->diff($end_time);
-                    $block_duration_minutes = $block_duration->h * 60 + $block_duration->i;
-
-                    if ($block_duration_minutes >= $service_duration_minutes) {
-                        $available_times[] = [
-                            'start' => $current_time->format('H:i'),
-                            'end' => $end_time->format('H:i')
-                        ];
-                    }
-                    $current_time->add(new DateInterval('PT' . $service_duration_minutes . 'M'));
-                } else {
-                    // Si el bloque de tiempo excede las horas de trabajo, romper el bucle
-                    break;
-                }
-            }
-        }
-
-        // Filtrar horas disponibles eliminando las que ya están reservadas
-        foreach ($day_appointments as $appointment) {
-            $appointment_start_time = $date_str . ' ' . $appointment['start_time'];
-            $appointment_end_time = $date_str . ' ' . $appointment['end_time'];
-
-            $appointment_start = new DateTime($appointment_start_time);
-            $appointment_end = new DateTime($appointment_end_time);
-
-            foreach ($available_times as $key => $time_range) {
-                $range_start = new DateTime($date_str . ' ' . $time_range['start']);
-                $range_end = new DateTime($date_str . ' ' . $time_range['end']);
-
-                if (($range_start < $appointment_end && $range_end > $appointment_start)) {
-                    unset($available_times[$key]);
-                }
-            }
-        }
-
-        $available_times = array_values($available_times);
-
-        if (!empty($available_times)) {
-            $available_days[] = $date_str;
+            $morningOverlap = min($breakStart->getTimestamp(), $end->getTimestamp()) - $start->getTimestamp();
+            $afternoonOverlap = $end->getTimestamp() - max($breakEnd->getTimestamp(), $start->getTimestamp());
+            $morningReserved += max(0, $morningOverlap / 60);
+            $afternoonReserved += max(0, $afternoonOverlap / 60);
         }
     }
+
+    $morningAvailable = (($breakStart->getTimestamp() - $workStart->getTimestamp()) / 60) - $morningReserved;
+    $afternoonAvailable = (($workEnd->getTimestamp() - $breakEnd->getTimestamp()) / 60) - $afternoonReserved;
+
+    if ($serviceDuration <= $morningAvailable || $serviceDuration <= $afternoonAvailable) {
+        $available_days[] = $currentDate->format('Y-m-d');
+    } elseif ($serviceDuration <= ($morningAvailable + $afternoonAvailable)) {
+        $available_days[] = $currentDate->format('Y-m-d');
+    }
+
+    $currentDate->modify('+1 day'); // Avanza al siguiente día
 }
 
-echo json_encode(['success' => true, 'available_days' => $available_days, 'calendar_mode' =>  $company['calendar_mode']]);
+
+echo json_encode(['success' => true, 'available_days' => $available_days, 'calendar_mode' => $company['calendar_mode']]);
