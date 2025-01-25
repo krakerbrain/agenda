@@ -50,6 +50,13 @@ export function initHorarios() {
     });
   }
 
+  const beforeUnloadHandler = (event) => {
+    const currentSchedules = getCurrentSchedules();
+    if (hasChanges(currentSchedules)) {
+      event.preventDefault();
+    }
+  };
+
   form.addEventListener("input", () => {
     const currentSchedules = getCurrentSchedules();
     showSaveAlert(hasChanges(currentSchedules));
@@ -63,12 +70,8 @@ export function initHorarios() {
     }
   }
 
-  window.addEventListener("beforeunload", (event) => {
-    const currentSchedules = getCurrentSchedules();
-    if (hasChanges(currentSchedules)) {
-      event.preventDefault();
-    }
-  });
+  // Registrar el evento solo para esta página
+  window.addEventListener("beforeunload", beforeUnloadHandler);
 
   function hasChanges(currentSchedules) {
     // Si las longitudes no coinciden, hay cambios
@@ -295,4 +298,8 @@ export function initHorarios() {
   }
 
   getHorarios();
+  // Desregistrar el evento al salir de la página
+  return () => {
+    window.removeEventListener("beforeunload", beforeUnloadHandler);
+  };
 }
