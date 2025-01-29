@@ -63,13 +63,6 @@ export function initHorarios() {
     }
   }
 
-  window.addEventListener("beforeunload", (event) => {
-    const currentSchedules = getCurrentSchedules();
-    if (hasChanges(currentSchedules)) {
-      event.preventDefault();
-    }
-  });
-
   function hasChanges(currentSchedules) {
     // Si las longitudes no coinciden, hay cambios
     if (currentSchedules.length !== initialSchedules.length) return true;

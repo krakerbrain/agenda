@@ -43,18 +43,29 @@ foreach ($allAppointments as $appointment) {
 }
 
 $available_days = [];
+$availableServiceDays = explode(',', $service['available_days']);
 $currentDate = clone $start_date; // Comienza desde start_date
+
 while ($currentDate <= $end_date) {
     $dayOfWeek = $currentDate->format('N');
 
+    // Si el día de la semana no está en los días disponibles del servicio, pasamos al siguiente día
+    if (!in_array($dayOfWeek, $availableServiceDays)) {
+        $currentDate->modify('+1 day');
+        continue;
+    }
+
+    // Si la fecha actual es igual a la fecha de hoy, pasamos al siguiente día
     if ($currentDate->format('Y-m-d') == $today->format('Y-m-d')) {
         $currentDate->modify('+1 day');
         continue;
     }
 
+    // Si el día de la semana no está en los días de trabajo, pasamos al siguiente día
     $schedule = array_filter($scheduleDays, function ($day) use ($dayOfWeek) {
         return $day['day_id'] == $dayOfWeek;
     });
+
 
     if (empty($schedule)) {
         $currentDate->modify('+1 day');

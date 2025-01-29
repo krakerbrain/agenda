@@ -12,16 +12,15 @@ export function initConfiguraciones() {
 
       const { success, errors } = await response.json();
       if (success) {
-        alert("Configuración guardada correctamente.");
-        location.reload();
+        handleModal("modalReloadConfig", "Configuración guardada correctamente.");
       } else {
         // Aquí manejamos los errores
         if (errors) {
           // Unimos los errores en un string separado por saltos de línea
           const errorMessage = errors.join("\n");
-          alert(`Hubo un error al guardar la configuración:\n${errorMessage}`);
+          handleModal("modalErrorConfig", `Hubo un error al guardar la configuración:\n${errorMessage}`);
         } else {
-          alert("Hubo un error al guardar la configuración.");
+          handleModal("modalErrorConfig", "Hubo un error al guardar la configuración.");
         }
       }
     });
@@ -58,12 +57,12 @@ export function initConfiguraciones() {
     navigator.clipboard
       .writeText(copyText.value)
       .then(() => {
-        // Opción: muestra una alerta o un mensaje para confirmar la copia
-        alert("URL copiada al portapapeles: " + copyText.value);
+        // Opción: muestra una handleModala o un mensaje para confirmar la copia
+        handleModal("modalErrorConfig", "URL copiada al portapapeles: " + copyText.value);
       })
       .catch((error) => {
         console.error("Error:", error);
-        alert("Hubo un error al copiar la URL al portapapeles.");
+        handleModal("modalErrorConfig", "Hubo un error al copiar la URL al portapapeles.");
       });
   });
 
@@ -115,8 +114,7 @@ export function initConfiguraciones() {
     const { success, message } = await response.json();
     if (success) {
       newPeriodModal.hide();
-      alert(message);
-      location.reload();
+      handleModal("modalReloadConfig", message);
     }
   });
 
@@ -145,5 +143,17 @@ export function initConfiguraciones() {
     const checkbox = document.getElementById("auto_open");
     // Desmarca el checkbox si se cancela
     checkbox.checked = false;
+  });
+
+  function handleModal(modal, message) {
+    const modalSelected = new bootstrap.Modal(document.getElementById(modal));
+    const modalBody = document.getElementById(modal + "responseMessage");
+    modalBody.innerHTML = message;
+    modalSelected.show();
+  }
+
+  document.getElementById("modalAceptarBtn").addEventListener("click", function () {
+    const modal = new bootstrap.Modal(document.getElementById("modalErrorConfig"));
+    location.reload();
   });
 }

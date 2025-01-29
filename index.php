@@ -20,7 +20,7 @@ $baseUrl = ConfigUrl::get();
     <link rel="stylesheet" href="<?php echo $baseUrl; ?>assets/css/index.css?v=<?php echo time(); ?>">
 </head>
 <script>
-const baseUrl = '<?php echo $baseUrl; ?>';
+    const baseUrl = '<?php echo $baseUrl; ?>';
 </script>
 
 <body>

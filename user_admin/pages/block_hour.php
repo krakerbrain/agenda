@@ -62,3 +62,5 @@ $datosUsuario = $auth->validarTokenUsuario();
         </tbody>
     </table>
 </div>
+<?php include dirname(__DIR__, 2) . '/includes/modal-block-hour.php';
+?>
