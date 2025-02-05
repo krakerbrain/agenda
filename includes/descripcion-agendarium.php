@@ -1,34 +1,7 @@
 <!-- Sección Descubre Agendarium -->
-<style>
-    .carousel-item h5 {
-        font-size: 2.5rem;
-        font-weight: bold;
-        color: #c5c5c5;
-    }
 
-    .carousel-item {
-        min-height: 300px;
-        /* Ajusta este valor según lo que necesites */
-    }
-
-
-
-    @media (max-width: 576px) {
-        .carousel-item h5 {
-            font-size: 1.8rem;
-        }
-
-        .carousel-item p {
-            font-size: 0.9rem;
-        }
-
-        .carousel-inner {
-            height: 400px;
-        }
-    }
-</style>
 <div class="d-block">
-    <div class="text-white">
+    <div>
         <!-- Carrusel -->
         <div id="featuresCarousel" class="carousel slide" data-bs-interval="false">
             <div class="carousel-inner">
