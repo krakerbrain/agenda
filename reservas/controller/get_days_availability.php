@@ -26,7 +26,9 @@ $fixed_start_day = new DateTime($company['fixed_start_date']);
 $calendar_days_available = $company['calendar_mode'] === 'corrido' ? $company['calendar_days_available'] : $company['fixed_duration'];
 
 // Establecer las fechas de inicio y fin
-$today = new DateTime("2025-01-19");
+$today = new DateTime();
+//con fecha en duro para pruebas
+// $today = new DateTime("2025-01-19");
 $start_date = $today; // Establece la fecha de inicio como fixed_start_day
 $end_date = $company['calendar_mode'] === 'corrido' ? clone $start_date : $fixed_start_day;
 $end_date->modify('+' . $calendar_days_available . ' days');
