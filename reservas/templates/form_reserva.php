@@ -7,9 +7,9 @@
             <select id="service" name="service" class="form-select" required>
                 <option value="" selected>Selecciona un servicio</option>
                 <?php foreach ($services as $service) : ?>
-                <option value="<?php echo htmlspecialchars($service['id']); ?>"
-                    data-observation="<?php echo htmlspecialchars($service['observations']); ?>">
-                    <?php echo htmlspecialchars($service['name']); ?></option>
+                    <option value="<?php echo htmlspecialchars($service['id']); ?>"
+                        data-observation="<?php echo htmlspecialchars($service['observations']); ?>">
+                        <?php echo htmlspecialchars($service['name']); ?></option>
                 <?php endforeach; ?>
             </select>
         </div>
@@ -38,15 +38,20 @@
             <input type="date" id="date" name="date" class="form-control" required>
         </div>
         <div class="mb-3">
-            <label for="time" class="form-label">Hora:</label>
+            <label for="time" class="form-label">Horario Disponible:</label>
             <input type="hidden" name="schedule_mode" id="schedule_mode"
                 value="<?php echo htmlspecialchars($company['schedule_mode']); ?>">
-            <select id="time" name="time" class="form-select" required>
-                <option value="" selected>Selecciona una hora</option>
-            </select>
+
+            <!-- Contenedor para los botones de hora -->
+            <div id="time" class="time-buttons">
+                <!-- Los botones se generarán dinámicamente aquí -->
+            </div>
+
+            <!-- Campo oculto para almacenar la hora seleccionada -->
+            <input type="hidden" id="selected_time" name="time">
         </div>
-        <button type="button" class="btn btn-secondary btn-anterior" onclick="showStep(1)">Anterior</button>
-        <button type="button" class="btn btn-secondary btn-siguiente" onclick="showStep(3)">Siguiente</button>
+        <button type="button" class="btn btn-anterior" onclick="showStep(1)">Anterior</button>
+        <button type="button" class="btn btn-siguiente" onclick="showStep(3)">Siguiente</button>
     </div>
     <!-- PASO 3 -->
     <div id="step3" class="step d-none">

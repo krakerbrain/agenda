@@ -214,15 +214,39 @@ async function fetchAvailableTimes() {
       const { success, available_times, message } = await response.json();
 
       timeInput.innerHTML = ""; // Clear previous options
+
       if (success) {
         if (available_times.length > 0) {
-          let availableTimesOption = '<option value="">Selecciona una hora</option>';
-          available_times.forEach((time) => {
-            availableTimesOption += `<option value="${time.start} - ${time.end}">${time.start} - ${time.end}</option>`;
+          let availableTimesButtons = "";
+
+          let firstTime = Object.values(available_times)[0].split("-")[0].trim(); // Get the first time slot
+
+          // Create a button for the first time slot and mark it as selected
+          // availableTimesButtons += `<button type="button" class="btn selected-time" data-time="${firstTime}">${firstTime}</button>`;
+
+          // Loop through available times and create additional buttons
+          Object.values(available_times).forEach((time) => {
+            let formatedTime = time.split("-")[0].trim();
+            availableTimesButtons += `<button type="button" class="btn btn-outline-dark btn-light mb-2 me-2 available-time" data-time="${formatedTime}">${formatedTime}</button>`;
           });
-          timeInput.innerHTML = availableTimesOption;
+
+          // Insert the buttons into the DOM
+          timeInput.innerHTML = availableTimesButtons;
+
+          // Add an event listener for button selection
+          const timeButtons = document.querySelectorAll("button");
+          timeButtons.forEach((button) => {
+            button.addEventListener("click", () => {
+              // Mark the clicked button as selected and update the form value
+              document.querySelectorAll(".available-time").forEach((btn) => btn.classList.remove("selected-time"));
+              button.classList.add("selected-time");
+
+              // Update hidden input field with selected time value (for form submission)
+              document.getElementById("selected_time").value = button.getAttribute("data-time");
+            });
+          });
         } else {
-          timeInput.innerHTML = '<option value="">No hay horas disponibles</option>';
+          timeInput.innerHTML = "<p>No hay horas disponibles</p>";
         }
       } else {
         alert(message);
