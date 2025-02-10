@@ -47,7 +47,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   document.getElementById("appointmentForm").addEventListener("submit", function (event) {
     event.preventDefault();
-
     const name = document.getElementById("name").value;
     const phone = document.getElementById("phone").value;
     const mail = document.getElementById("mail").value;

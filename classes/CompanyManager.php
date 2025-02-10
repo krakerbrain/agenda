@@ -52,6 +52,19 @@ class CompanyManager
         $this->db->bind(':id', $company_id);
         return $this->db->single();
     }
+
+    /**
+     * Verifica si una empresa existe y está activa.
+     * Usado en lógica de validación antes de obtener horarios o datos de la empresa.
+     */
+    public function companyExists($company_id)
+    {
+        $sql = "SELECT 1 FROM companies WHERE id = :id AND is_active = 1";
+        $this->db->query($sql);
+        $this->db->bind(':id', $company_id);
+        return (bool) $this->db->single();
+    }
+
     public function getCompanyCustomUrl($company_id)
     {
         $sql = "SELECT custom_url FROM companies WHERE id = :id AND is_active = 1";
