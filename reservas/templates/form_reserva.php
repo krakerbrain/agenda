@@ -7,15 +7,17 @@
             <select id="service" name="service" class="form-select" required>
                 <option value="" selected>Selecciona un servicio</option>
                 <?php foreach ($services as $service) : ?>
-                    <option value="<?php echo htmlspecialchars($service['id']); ?>"
-                        data-observation="<?php echo htmlspecialchars($service['observations']); ?>">
-                        <?php echo htmlspecialchars($service['name']); ?></option>
+                <option value="<?php echo htmlspecialchars($service['id']); ?>"
+                    data-observation="<?php echo htmlspecialchars($service['observations']); ?>"
+                    data-duration="<?php echo htmlspecialchars($service['duration']); ?>">
+                    <?php echo htmlspecialchars($service['name']); ?></option>
                 <?php endforeach; ?>
             </select>
+            <input type="hidden" name="service_duration" id="service_duration" value>
         </div>
         <div id="serviceObservation" class="mb-3 d-none">
-            <span id="serviceTextObservation"
-                class="form-control-plaintext bg-danger-subtle text-danger-emphasis p-2"></span>
+            <pre id="serviceTextObservation"
+                class="form-control-plaintext bg-danger-subtle text-danger-emphasis p-2"></pre>
         </div>
         <div id="categoryContainer" class="mb-3 d-none">
             <label for="category" class="form-label">Categoría:</label>
@@ -24,8 +26,8 @@
             </select>
         </div>
         <div id="categoryObservation" class="mb-3 d-none">
-            <span id="categoryTextObservation"
-                class="form-control-plaintext bg-danger-subtle text-danger-emphasis p-2"></span>
+            <pre id="categoryTextObservation"
+                class="form-control-plaintext bg-danger-subtle text-danger-emphasis p-2"></pre>
         </div>
 
         <button type="button" class="btn btn-secondary btn-siguiente" onclick="showStep(2)">Siguiente</button>

@@ -82,10 +82,10 @@ class HoursAvailabilityManager
         ];
     }
 
-    private function calculateStep($duration)
-    {
-        return ($duration % 30 == 0 && $duration % 60 != 0) ? 30 : 60;
-    }
+    // private function calculateStep($duration)
+    // {
+    //     return ($duration % 30 == 0 && $duration % 60 != 0) ? 30 : 60;
+    // }
 
     private function generateTimeSlots($horaInicio, $horaFin, $duracion, $break_start = null, $break_end = null)
     {
@@ -98,7 +98,7 @@ class HoursAvailabilityManager
         $breakEndTimestamp = $break_end ? strtotime($break_end) : null;
 
         // Definir el paso de tiempo (30 o 60 minutos según la duración)
-        $paso = ($duracion % 30 == 0 && $duracion % 60 != 0) ? 30 : 60;
+        // $paso = $duracion;
 
         // Si el servicio dura 4 horas o más, se restringe su disponibilidad
         if ($duracion >= 240) {
@@ -119,7 +119,7 @@ class HoursAvailabilityManager
             }
         } else {
             if (!$breakStartTimestamp || !$breakEndTimestamp) {
-                for ($inicio = $horaInicioTimestamp; $inicio < $horaFinTimestamp; $inicio += ($paso * 60)) {
+                for ($inicio = $horaInicioTimestamp; $inicio < $horaFinTimestamp; $inicio += ($duracion * 60)) {
                     $fin = $inicio + ($duracion * 60);
 
                     // Evitar que el rango supere la hora de cierre
@@ -131,7 +131,7 @@ class HoursAvailabilityManager
                 }
             } else {
                 // Iteramos para generar los rangos antes del descanso
-                for ($inicio = $horaInicioTimestamp; $inicio < $breakStartTimestamp; $inicio += ($paso * 60)) {
+                for ($inicio = $horaInicioTimestamp; $inicio < $breakStartTimestamp; $inicio += ($duracion * 60)) {
                     $fin = $inicio + ($duracion * 60);
 
                     // $inicioFormateado = date('H:i', $inicio);
@@ -147,7 +147,7 @@ class HoursAvailabilityManager
                 }
 
                 // Iteramos para generar los rangos después del descanso
-                for ($inicio = $breakEndTimestamp; $inicio < $horaFinTimestamp; $inicio += ($paso * 60)) {
+                for ($inicio = $breakEndTimestamp; $inicio < $horaFinTimestamp; $inicio += ($duracion * 60)) {
                     $fin = $inicio + ($duracion * 60);
 
                     if ($fin > $horaFinTimestamp) {

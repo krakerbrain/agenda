@@ -18,12 +18,15 @@ try {
         throw new Exception('Datos inválidos recibidos');
     }
 
-    // Separar el tiempo en inicio y fin
-    list($start_time, $end_time) = explode(' - ', $data['time']);
+    // Convertir la duración del servicio a un número entero
+    $serviceDuration = (int) $data['service_duration'];
 
-    // Crear objetos DateTime a partir de las cadenas de tiempo
-    $startDateTime = new DateTime($data['date'] . ' ' . $start_time);
-    $endDateTime = new DateTime($data['date'] . ' ' . $end_time);
+    // Crear objeto DateTime para el inicio de la cita
+    $startDateTime = new DateTime($data['date'] . ' ' . $data['time']);
+
+    // Calcular el tiempo de finalización sumando la duración en minutos
+    $endDateTime = clone $startDateTime; // Clonar para evitar modificar el original
+    $endDateTime->modify("+{$serviceDuration} minutes");
 
     // Formatear el tiempo en "H:i" (horas:minutos)
     $formattedStartTime = $startDateTime->format('H:i');

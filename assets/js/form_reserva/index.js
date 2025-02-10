@@ -10,7 +10,7 @@ function validarPaso(step) {
     return service !== "";
   } else if (step === 3) {
     const date = document.getElementById("date").value;
-    const time = document.getElementById("time").value;
+    const time = document.getElementById("selected_time").value;
     return date !== "" && time !== "";
   }
   return true; // Paso 3 no necesita validación adicional
@@ -31,6 +31,7 @@ function showStep(step) {
 }
 
 document.getElementById("service").addEventListener("change", function (event) {
+  updateServiceDuration();
   getObservation("service");
   getServiceCategory(event.target.value);
   getAvailableDays();
@@ -44,18 +45,49 @@ document.getElementById("date").addEventListener("change", function () {
   fetchAvailableTimes();
 });
 
+function updateServiceDuration() {
+  const serviceSelect = document.getElementById("service");
+  const selectedOption = serviceSelect.options[serviceSelect.selectedIndex];
+  const duration = selectedOption.getAttribute("data-duration");
+
+  document.getElementById("service_duration").value = duration || ""; // Evita valores nulos
+}
+
 function getObservation(id) {
   var serviceSelect = document.getElementById(id);
   var observation = serviceSelect.options[serviceSelect.selectedIndex].getAttribute("data-observation");
+  var duration = parseInt(serviceSelect.options[serviceSelect.selectedIndex].getAttribute("data-duration"), 10);
   var observationField = document.getElementById(id + "Observation");
   var observationSpan = document.getElementById(id + "TextObservation");
 
-  if (observation) {
+  if (observation || duration) {
     observationField.classList.remove("d-none");
-    observationSpan.textContent = observation;
+
+    // Construir el mensaje con observación
+    var message = observation ? observation + "<br>" : "";
+
+    // Calcular duración en horas y minutos
+    if (duration) {
+      var hours = Math.floor(duration / 60);
+      var minutes = duration % 60;
+      var durationText = "<p class='mt-1'><strong>Duración aproximada:</strong> ";
+
+      if (hours > 0) {
+        durationText += hours + (hours === 1 ? " hora" : " horas");
+      }
+
+      if (minutes > 0) {
+        durationText += (hours > 0 ? " y " : "") + minutes + " minutos";
+      }
+
+      durationText += "</p>";
+      message += durationText;
+    }
+
+    observationSpan.innerHTML = message; // Usamos innerHTML para interpretar el formato
   } else {
     observationField.classList.add("d-none");
-    observationSpan.textContent = "";
+    observationSpan.innerHTML = "";
   }
 }
 
@@ -157,7 +189,9 @@ function getAvailableDays() {
 
         flatpickr("#date", {
           enableTime: false,
+          altInput: true,
           dateFormat: "Y-m-d",
+          altFormat: "d-m-Y",
           minDate: "today",
           maxDate: data.calendar_mode == "fijo" ? availableDates[availableDates.length - 1] : new Date().fp_incr(calendarDaysAvailable),
           enable: [
@@ -219,15 +253,8 @@ async function fetchAvailableTimes() {
         if (available_times.length > 0) {
           let availableTimesButtons = "";
 
-          let firstTime = Object.values(available_times)[0].split("-")[0].trim(); // Get the first time slot
-
-          // Create a button for the first time slot and mark it as selected
-          // availableTimesButtons += `<button type="button" class="btn selected-time" data-time="${firstTime}">${firstTime}</button>`;
-
-          // Loop through available times and create additional buttons
-          Object.values(available_times).forEach((time) => {
-            let formatedTime = time.split("-")[0].trim();
-            availableTimesButtons += `<button type="button" class="btn btn-outline-dark btn-light mb-2 me-2 available-time" data-time="${formatedTime}">${formatedTime}</button>`;
+          available_times.forEach((time, index) => {
+            availableTimesButtons += `<button type="button" class="btn btn-outline-dark btn-light mb-2 me-2 available-time" data-time="${time}">${time}</button>`;
           });
 
           // Insert the buttons into the DOM
@@ -240,9 +267,8 @@ async function fetchAvailableTimes() {
               // Mark the clicked button as selected and update the form value
               document.querySelectorAll(".available-time").forEach((btn) => btn.classList.remove("selected-time"));
               button.classList.add("selected-time");
-
               // Update hidden input field with selected time value (for form submission)
-              document.getElementById("selected_time").value = button.getAttribute("data-time");
+              document.getElementById("selected_time").value = document.getElementById("selected_time").value != "" ? document.getElementById("selected_time").value : button.getAttribute("data-time");
             });
           });
         } else {
