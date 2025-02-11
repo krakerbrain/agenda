@@ -47,6 +47,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $font_color = $_POST['font-color'];
     $btn1_color = $_POST['btn-primary-color'];
     $btn2_color = $_POST['btn-secondary-color'];
+    $time_step = $_POST['time_step'];
+    $time_step_value = $_POST['time_step_value'];
 
     $data = [
         'company_id' => $company_id,
@@ -59,7 +61,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'calendar_days_available' => null,
         'fixed_start_date' => null,
         'fixed_duration' => null,
-        'auto_open' => 0
+        'auto_open' => 0,
+        'time_step' => empty($time_step) ? null : $time_step_value, // Asigna null si está vacío, sino toma el valor de time_step_value
     ];
 
     if ($calendar_mode === 'corrido') {

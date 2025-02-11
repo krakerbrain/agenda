@@ -57,12 +57,12 @@ class CompanyManager
      * Verifica si una empresa existe y está activa.
      * Usado en lógica de validación antes de obtener horarios o datos de la empresa.
      */
-    public function companyExists($company_id)
+    public function getCompanyTimeStep($company_id)
     {
-        $sql = "SELECT 1 FROM companies WHERE id = :id AND is_active = 1";
+        $sql = "SELECT time_step FROM companies WHERE id = :id AND is_active = 1";
         $this->db->query($sql);
         $this->db->bind(':id', $company_id);
-        return (bool) $this->db->single();
+        return $this->db->single(); // Retorna un array asociativo con 'time_step' o null si no existe
     }
 
     public function getCompanyCustomUrl($company_id)
@@ -321,7 +321,8 @@ class CompanyManager
                         calendar_days_available = :calendar_days_available,
                         fixed_start_date = :fixed_start_date,
                         fixed_duration = :fixed_duration,
-                        auto_open = :auto_open
+                        auto_open = :auto_open,
+                        time_step = :time_step
                     WHERE id = :company_id AND is_active = 1";
 
             $this->db->query($sql);
@@ -336,6 +337,7 @@ class CompanyManager
             $this->db->bind(':fixed_duration', $data['fixed_duration']);
             $this->db->bind(':auto_open', $data['auto_open']);
             $this->db->bind(':company_id', $data['company_id']);
+            $this->db->bind(':time_step', $data['time_step']);
             $this->db->execute();
 
             $this->db->endTransaction(); // Commit de la transacción

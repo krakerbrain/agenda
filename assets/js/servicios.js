@@ -291,7 +291,7 @@ function generateDaysCheckboxes(daysStatus, serviceId) {
       const dayId = index + 1; // Los días empiezan desde 1
       const { enabled = true, checked = false } = daysStatus[dayId] || {}; // Si no hay datos en daysStatus, habilitado por defecto
       const disabledClass = !enabled ? "disabled-day" : ""; // Clase para días deshabilitados
-      const tooltipAttributes = !enabled ? `tabindex="0" data-bs-toggle="tooltip" title="Día no disponible. Habilitarlo en Servicios"` : "";
+      const tooltipAttributes = !enabled ? `tabindex="0" data-bs-toggle="tooltip" title="Día no disponible. Habilitarlo en Horarios"` : "";
 
       return `
       <div class="day align-items-center d-flex flex-column text-center ${disabledClass}" ${tooltipAttributes}>

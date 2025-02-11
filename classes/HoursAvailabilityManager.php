@@ -25,8 +25,16 @@ class HoursAvailabilityManager
     public function getAvailableHours($date, $service_id, $company_id)
     {
         // Validar que la empresa exista
-        if (!$this->companyManager->companyExists($company_id)) {
-            return ['success' => false, 'message' => 'Empresa no encontrada o inactiva.'];
+        // if (!$this->companyManager->companyExists($company_id)) {
+        //     return ['success' => false, 'message' => 'Empresa no encontrada o inactiva.'];
+        // }
+
+        $companyData = $this->companyManager->getCompanyTimeStep($company_id);
+
+        if ($companyData) {
+            $time_step = $companyData['time_step']; // Puede ser null o un valor definido
+        } else {
+            echo "La empresa no existe o no está activa.";
         }
 
         // Obtener duración del servicio
@@ -50,7 +58,7 @@ class HoursAvailabilityManager
         $break_end = $schedule['break_end'];
 
         // Generar horarios disponibles
-        $available_slots = $this->generateTimeSlots($work_start, $work_end, $service_duration, $break_start, $break_end);
+        $available_slots = $this->generateTimeSlots($work_start, $work_end, $service_duration, $break_start, $break_end, $time_step);
 
         // Filtrar citas reservadas
         $reserved_appointments = $this->appointments->getAppointmentsByDate($company_id, $date);
@@ -67,7 +75,8 @@ class HoursAvailabilityManager
                 'work_end' => $work_end,
                 'break_start' => $break_start,
                 'break_end' => $break_end,
-                'reserved_appointments' => $reserved_appointments
+                'reserved_appointments' => $reserved_appointments,
+                'time_step' => $time_step,
             ];
         }
 
@@ -87,7 +96,7 @@ class HoursAvailabilityManager
     //     return ($duration % 30 == 0 && $duration % 60 != 0) ? 30 : 60;
     // }
 
-    private function generateTimeSlots($horaInicio, $horaFin, $duracion, $break_start = null, $break_end = null)
+    private function generateTimeSlots($horaInicio, $horaFin, $duracion, $break_start = null, $break_end = null, $time_step = null)
     {
         $rangos = [];
 
@@ -98,7 +107,7 @@ class HoursAvailabilityManager
         $breakEndTimestamp = $break_end ? strtotime($break_end) : null;
 
         // Definir el paso de tiempo (30 o 60 minutos según la duración)
-        // $paso = $duracion;
+        $paso = $time_step ?? $duracion;
 
         // Si el servicio dura 4 horas o más, se restringe su disponibilidad
         if ($duracion >= 240) {
@@ -119,11 +128,19 @@ class HoursAvailabilityManager
             }
         } else {
             if (!$breakStartTimestamp || !$breakEndTimestamp) {
-                for ($inicio = $horaInicioTimestamp; $inicio < $horaFinTimestamp; $inicio += ($duracion * 60)) {
-                    $fin = $inicio + ($duracion * 60);
+                for ($inicio = $horaInicioTimestamp; $inicio < $horaFinTimestamp; $inicio += ($paso * 60)) {
+                    $fin = $inicio + ($paso * 60);
 
+                    // $finFormateado = date('H:i', $fin);
+                    // $horaFinTimestampFormateado = date('H:i', $horaFinTimestamp);
                     // Evitar que el rango supere la hora de cierre
                     if ($fin > $horaFinTimestamp) {
+                        break;
+                    }
+
+                    // Verificar si el servicio supera la hora de cierre
+                    if ($duracion > 60 && $inicio > ($horaFinTimestamp - $duracion * 60)) {
+                        // Si el servicio supera el cierre, no lo agregamos
                         break;
                     }
 
@@ -131,8 +148,8 @@ class HoursAvailabilityManager
                 }
             } else {
                 // Iteramos para generar los rangos antes del descanso
-                for ($inicio = $horaInicioTimestamp; $inicio < $breakStartTimestamp; $inicio += ($duracion * 60)) {
-                    $fin = $inicio + ($duracion * 60);
+                for ($inicio = $horaInicioTimestamp; $inicio < $breakStartTimestamp; $inicio += ($paso * 60)) {
+                    $fin = $inicio + ($paso * 60);
 
                     // $inicioFormateado = date('H:i', $inicio);
                     // $finFormateado = date('H:i', $fin);
@@ -147,10 +164,18 @@ class HoursAvailabilityManager
                 }
 
                 // Iteramos para generar los rangos después del descanso
-                for ($inicio = $breakEndTimestamp; $inicio < $horaFinTimestamp; $inicio += ($duracion * 60)) {
-                    $fin = $inicio + ($duracion * 60);
+                for ($inicio = $breakEndTimestamp; $inicio < $horaFinTimestamp; $inicio += ($paso * 60)) {
+                    $fin = $inicio + ($paso * 60);
 
+                    // $finFormateado = date('H:i', $fin);
+                    // $horaFinTimestampFormateado = date('H:i', $horaFinTimestamp);
                     if ($fin > $horaFinTimestamp) {
+                        break;
+                    }
+
+                    // Verificar si el servicio supera la hora de cierre
+                    if ($duracion > 60 && $inicio > ($horaFinTimestamp - $duracion * 60)) {
+                        // Si el servicio supera el cierre, no lo agregamos
                         break;
                     }
 

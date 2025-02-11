@@ -172,11 +172,68 @@ $current_date->setTime(0, 0, 0);
                     <i class="fa fa-circle-question text-primary"></i>
                 </a>
             </div>
-
         </div>
 
+        <!-- Intervalo de horarios -->
+        <div class="d-flex align-items-baseline mt-4">
+            <h3 class="mb-3">Opciones de Intervalo de Horarios</h3>
+            <a tabindex="0" role="button" data-bs-trigger="focus" class="btn help" data-bs-toggle="popover"
+                data-bs-title="Intervalo de Horarios"
+                data-bs-content="Selecciona cómo se organizarán los horarios disponibles para las citas. Puedes elegir intervalos fijos de 30, 45 o 60 minutos, o basar los horarios en la duración del servicio."><i
+                    class="fa fa-circle-question text-primary"></i></a>
+        </div>
 
-        <div class="container mb-4">
+        <!-- Radio para usar la duración del servicio -->
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="time_step" id="serviceDuration" value=""
+                <?php echo is_null($company['time_step']) ? 'checked' : ''; ?>>
+            <label class="form-check-label" for="serviceDuration">
+                Según la duración del servicio (Ejemplo: si un servicio dura 2 horas → 9:00 - 11:00, 11:00 - 13:00,
+                etc.)
+            </label>
+        </div>
+
+        <!-- Nota que aparece cuando se selecciona "Según la duración del servicio" -->
+        <div id="serviceDurationNote" class="alert alert-info mt-2"
+            style="display: <?php echo is_null($company['time_step']) ? 'block' : 'none'; ?>;">
+            💡 Nota: Si configuraste una hora de descanso, el sistema intentará no asignar citas en ese periodo.
+            Esto puede hacer que algunos horarios no aparezcan disponibles cuando elijas la opción "Según la duración
+            del servicio".
+        </div>
+
+        <!-- Radio para usar intervalos fijos -->
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="time_step" id="fixedIntervals" value="fixed"
+                <?php echo !is_null($company['time_step']) ? 'checked' : ''; ?>>
+            <label class="form-check-label" for="fixedIntervals">
+                Intervalos Fijos (Ejemplo: 9:00 - 10:00, 10:00 - 11:00, etc.)
+            </label>
+        </div>
+
+        <!-- Opciones de intervalo (solo si se seleccionan intervalos fijos) -->
+        <div id="fixedIntervalsOptions" class="ms-4 mb-3"
+            style="display: <?php echo !is_null($company['time_step']) ? 'block' : 'none'; ?>;">
+            <label class="form-label">Selecciona el intervalo:</label>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="time_step_value" id="step30" value="30"
+                    <?php echo ($company['time_step'] == 30) ? 'checked' : ''; ?>>
+                <label class="form-check-label" for="step30">30 minutos</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="time_step_value" id="step45" value="45"
+                    <?php echo ($company['time_step'] == 45) ? 'checked' : ''; ?>>
+                <label class="form-check-label" for="step45">45 minutos</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="time_step_value" id="step60" value="60"
+                    <?php echo ($company['time_step'] == 60) ? 'checked' : ''; ?>>
+                <label class="form-check-label" for="step60">60 minutos</label>
+            </div>
+        </div>
+        <!-- Fin intervalo de horarios -->
+
+        <!-- Configuracion de color de formulario de reserva -->
+        <div class="container my-4">
             <div class="row">
                 <div class="d-flex align-items-baseline">
                     <h3 class="mb-3">Color del Formulario</h3>

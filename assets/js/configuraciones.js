@@ -156,4 +156,22 @@ export function initConfiguraciones() {
     const modal = new bootstrap.Modal(document.getElementById("modalErrorConfig"));
     location.reload();
   });
+
+  const fixedIntervalsRadio = document.getElementById("fixedIntervals");
+  const serviceDurationRadio = document.getElementById("serviceDuration");
+  const fixedIntervalsOptions = document.getElementById("fixedIntervalsOptions");
+  const serviceDurationNote = document.getElementById("serviceDurationNote");
+
+  function toggleOptions() {
+    if (serviceDurationRadio.checked) {
+      fixedIntervalsOptions.style.display = "none";
+      serviceDurationNote.style.display = "block";
+    } else {
+      fixedIntervalsOptions.style.display = "block";
+      serviceDurationNote.style.display = "none";
+    }
+  }
+
+  fixedIntervalsRadio.addEventListener("change", toggleOptions);
+  serviceDurationRadio.addEventListener("change", toggleOptions);
 }
