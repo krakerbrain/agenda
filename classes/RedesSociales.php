@@ -13,6 +13,13 @@ class RedesSociales
         $this->company_id = $company_id;
     }
 
+    public function getSocialForDatosEmpresa()
+    {
+        $sql = "SELECT id, name FROM social_networks ORDER BY name";
+        $this->db->query($sql);
+        return $this->db->resultSet();
+    }
+
     public function agregarRedSocial($socialNetworkId, $url)
     {
         try {

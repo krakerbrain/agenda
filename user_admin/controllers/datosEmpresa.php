@@ -12,13 +12,26 @@ try {
     $companyManager = new CompanyManager();
     $company_id = $datosUsuario['company_id'];
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-        echo json_encode(['success' => true, 'data' => $companyManager->getCompanyDataForDatosEmpresa($company_id)]);
+        $bannerDir = dirname(__DIR__, 2) . "/assets/img/banners/user_" . $company_id;
+        $savedBanner = null;
+
+        if (is_dir($bannerDir)) {
+            $files = scandir($bannerDir);
+            foreach ($files as $file) {
+                if ($file !== "." && $file !== ".." && !is_dir($bannerDir . "/" . $file)) {
+                    $savedBanner = $file; // Guarda el primer archivo encontrado
+                    break;
+                }
+            }
+        }
+        echo json_encode(['success' => true, 'data' => $companyManager->getCompanyDataForDatosEmpresa($company_id), 'savedBanner' => $savedBanner]);
     } else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Capturar los datos de la empresa desde $_POST
         $phone = $_POST['phone'] ?? null;
         $address = $_POST['address'] ?? null;
         $description = $_POST['description'] ?? null;
         $logoUrl = $_POST['logo_url'] ?? null;  // Logo existente si no se sube uno nuevo
+        $selected_banner = $_POST['selected-banner'] ?? null;
 
         // Manejo del archivo de imagen (logo) en $_FILES
         $logoName = $logoUrl;  // Mantener el logo anterior si no hay nuevo
@@ -33,7 +46,8 @@ try {
             'phone' => $fomattedPhone,
             'address' => $address,
             'description' => $description,
-            'logo' => $logoName
+            'logo' => $logoName,
+            'selected_banner' => $selected_banner
         ];
 
         $companyManager->updateCompanyData($company_id, $data);

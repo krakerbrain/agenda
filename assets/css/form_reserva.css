@@ -53,6 +53,7 @@ body {
 
 .company-card img {
   min-width: 150px;
+  width: 70%;
 }
 
 #appointmentForm {
@@ -61,23 +62,29 @@ body {
 
 .company-name,
 .company-info,
-.social-icons a {
+.social-icons a,
+.description {
   color: var(--primary-color);
 }
 
+.description {
+  font-size: 0.9rem;
+  font-style: italic;
+  line-height: normal;
+}
 .company-name {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   font-weight: bold;
   text-transform: capitalize;
 }
 
 .company-info {
-  font-size: 1rem;
+  font-size: 0.9rem;
 }
 
 .social-icons a {
-  font-size: 1.4rem;
-  margin: 0 10px;
+  font-size: 1rem;
+  margin: 0 0 0 20px;
 }
 
 .social-icons a:hover {
@@ -98,7 +105,7 @@ pre {
 
 @media (max-width: 768px) {
   .company-card img {
-    width: 55%;
+    width: 45%;
   }
   .company-info {
     font-size: 0.9rem;

@@ -7,11 +7,32 @@ export function initDatosEmpresa() {
       const response = await fetch(`${baseUrl}user_admin/controllers/datosEmpresa.php`, {
         method: "GET",
       });
-      const { success, data } = await response.json();
+      const { success, data, savedBanner } = await response.json();
 
       if (success) {
-        const { name, phone, address, description, logo } = data[0];
-        const logoUrl = logo != "" ? logo : "assets/images/logo.png";
+        const { name, phone, address, description, logo, selected_banner, saved_banner } = data[0];
+        const logoUrl = logo !== "" ? logo : "assets/images/logo.png";
+        const company_id = document.querySelector("#companyId").value;
+
+        // Mantener siempre la imagen recortada guardada en la carpeta del usuario
+        const savedCropUrl = `${baseUrl}assets/img/banners/user_${company_id}/${savedBanner}`;
+
+        // Determinar la imagen a mostrar en la selección de banner
+        let bannerUrl;
+
+        if (!selected_banner) {
+          // Si no hay banner seleccionado, mostrar banner vacío
+          bannerUrl = `${baseUrl}assets/img/banners/banner_vacio.png`;
+        } else if (selected_banner.startsWith("default_")) {
+          // Si es un banner predeterminado, usar la ruta general
+          bannerUrl = `${baseUrl}assets/img/banners/${selected_banner}`;
+        } else {
+          // Si es un banner personalizado, usar la carpeta del usuario
+          bannerUrl = `${baseUrl}assets/img/banners/user_${company_id}/${selected_banner}`;
+        }
+
+        // Mostrar SIEMPRE la imagen recortada guardada
+        document.querySelector("#saved-cropped-image").src = savedCropUrl;
 
         document.querySelector(".companyName").textContent = name;
         document.querySelector(".logoEmpresa").src = `${baseUrl}${logoUrl}`;
@@ -20,9 +41,17 @@ export function initDatosEmpresa() {
         document.querySelector("#description").textContent = description;
         document.querySelector("#companyName").value = name;
         document.querySelector("#logoUrl").value = logoUrl;
+
+        // Marcar el radio correspondiente
+        const bannerRadio = document.querySelector(`input[value="${selected_banner}"]`);
+        if (bannerRadio) {
+          bannerRadio.checked = true;
+        } else {
+          document.getElementById("banner-custom").checked = true;
+        }
       }
     } catch (error) {
-      console.error(error);
+      console.error("Error al obtener los datos de la empresa:", error);
     }
   }
 
@@ -110,12 +139,13 @@ export function initDatosEmpresa() {
     socialsTable.innerHTML = "";
     data.forEach((social) => {
       const tr = document.createElement("tr");
+      tr.classList.add("body-table");
       let redPreferida = social.red_preferida == 1 ? "checked" : "";
       tr.innerHTML = `
-        <td>${social.nombre}</td>
-        <td>${social.url}</td>
-      <td class="text-center">
-          <input class="form-check-input" type="radio" name="redPreferida" 
+        <td data-cell="red social" class="data">${social.nombre}</td>
+        <td data-cell="url" class="data">${social.url}</td>
+      <td data-cell="preferida" class="data text-md-center">
+          <input class="form-check-input ms-1 ms-md-0" type="radio" name="redPreferida" 
           id="redPreferida-${social.id}" value="${social.id}" ${redPreferida} disabled>
       </td>
         <td>
@@ -306,4 +336,127 @@ export function initDatosEmpresa() {
 
   const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
   const popoverList = [...popoverTriggerList].map((popoverTriggerEl) => new bootstrap.Popover(popoverTriggerEl));
+
+  let cropper;
+
+  document.getElementById("banner").addEventListener("change", function (e) {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function (event) {
+        const image = document.getElementById("image-to-crop");
+        image.src = event.target.result;
+
+        // Mostrar el contenedor de la imagen
+        document.getElementById("image-container").style.display = "block";
+
+        // Si ya existe una instancia de Cropper, destruirla antes de crear una nueva
+        if (cropper) {
+          cropper.destroy();
+        }
+
+        // Inicializar Cropper.js
+        cropper = new Cropper(image, {
+          aspectRatio: 600 / 150, // Relación de aspecto 4:1 (600x150)
+          viewMode: 1, // Restringir el movimiento de la imagen dentro del contenedor
+          autoCropArea: 1, // Área de recorte ocupa el 100% de la imagen inicialmente
+          movable: true, // Permitir mover la imagen
+          rotatable: false, // No permitir rotación
+          scalable: false, // No permitir escalar la imagen
+          zoomable: true, // Permitir hacer zoom
+          minCropBoxWidth: 600, // Ancho mínimo del área de recorte
+          minCropBoxHeight: 150, // Alto mínimo del área de recorte
+          maxCropBoxWidth: 600, // Ancho máximo del área de recorte
+          maxCropBoxHeight: 150, // Alto máximo del área de recorte
+          crop(event) {
+            // Obtener el canvas recortado con el tamaño deseado (600x150)
+            const canvas = cropper.getCroppedCanvas({
+              width: 600,
+              height: 150,
+            });
+
+            // Mostrar la imagen recortada en la previsualización
+            const croppedImage = document.getElementById("cropped-image");
+            croppedImage.src = canvas.toDataURL();
+            croppedImage.style.display = "block";
+          },
+        });
+
+        // Mostrar el botón de guardar
+        document.getElementById("save-banner").style.display = "block";
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+  document.getElementById("save-banner").addEventListener("click", async function () {
+    if (cropper) {
+      const previewCanvas = cropper.getCroppedCanvas({
+        width: 600,
+        height: 300,
+        imageSmoothingEnabled: true,
+        imageSmoothingQuality: "high",
+      });
+
+      const highResCanvas = cropper.getCroppedCanvas({
+        width: 600,
+        height: 150,
+      });
+
+      if (!highResCanvas) {
+        alert("Error al obtener la imagen recortada.");
+        return;
+      }
+
+      highResCanvas.toBlob(
+        async (blob) => {
+          const companyId = document.getElementById("companyId").value;
+          const formData = new FormData();
+          const fileName = `banner_user_prefered_${Date.now()}.png`;
+
+          formData.append("banner", blob, fileName);
+          formData.append("companyId", companyId);
+
+          try {
+            const response = await fetch(`${baseUrl}user_admin/controllers/uploadBanner.php`, {
+              method: "POST",
+              body: formData,
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+              const savedCroppedImage = document.getElementById("saved-cropped-image");
+              savedCroppedImage.src = `${baseUrl}${data.imageUrl}`;
+              document.getElementById("banner-custom").value = fileName;
+              document.getElementById("banner-custom").checked = true;
+            } else {
+              alert("Error al guardar la imagen.");
+            }
+          } catch (error) {
+            console.error("Error:", error);
+          }
+        },
+        "image/png",
+        1
+      );
+
+      resetCropper();
+    }
+  });
+
+  function resetCropper() {
+    if (cropper) {
+      cropper.destroy();
+      cropper = null;
+    }
+
+    document.getElementById("image-container").style.display = "none";
+    document.getElementById("banner-preview").style.display = "none";
+    document.getElementById("cropped-image").style.display = "none";
+    document.getElementById("image-to-crop").src = "#";
+    document.getElementById("cropped-image").src = "#";
+    document.getElementById("banner").value = "";
+    document.getElementById("save-banner").style.display = "none";
+  }
 }
