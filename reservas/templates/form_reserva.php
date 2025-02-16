@@ -36,11 +36,11 @@
     <div id="step2" class="step d-none">
         <h4 class="text-center mb-4 pass-title">Paso 2: Escoge Fecha y Hora</h4>
         <div class="mb-3">
-            <label for="date" class="form-label">Fecha:</label>
+            <label for="date" class="form-label">Selecciona la fecha:</label>
             <input type="date" id="date" name="date" class="form-control" required>
         </div>
         <div class="mb-3">
-            <label for="time" class="form-label">Horario Disponible:</label>
+            <label for="time" class="form-label">Selecciona el horario:</label>
             <input type="hidden" name="schedule_mode" id="schedule_mode"
                 value="<?php echo htmlspecialchars($company['schedule_mode']); ?>">
 
@@ -57,7 +57,7 @@
     </div>
     <!-- PASO 3 -->
     <div id="step3" class="step d-none">
-        <h4 class="text-center mb-4 pass-title">Paso 3: Llena tus Datos</h4>
+        <h4 class="text-center mb-4 pass-title">Paso 3: Completa tus datos</h4>
         <input type="hidden" name="company_id" id="company_id" value="<?php echo htmlspecialchars($company['id']); ?>">
         <div class="mb-3">
             <label for="name" class="form-label">Nombre:</label>
