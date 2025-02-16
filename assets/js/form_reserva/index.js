@@ -23,7 +23,7 @@ function showStep(step) {
     });
     document.getElementById("step" + step).classList.remove("d-none");
   } else {
-    var modalBody = document.querySelector(".modal-body");
+    var modalBody = document.querySelector("#responseModalBody");
     modalBody.innerText = "Por favor, completa el formulario antes de continuar.";
     var modal = new bootstrap.Modal(document.getElementById("responseModal"));
     modal.show();
@@ -254,7 +254,11 @@ async function fetchAvailableTimes() {
           let availableTimesButtons = "";
 
           available_times.forEach((time, index) => {
-            availableTimesButtons += `<button type="button" class="btn btn-outline-dark btn-light mb-2 me-2 available-time" data-time="${time}">${time}</button>`;
+            if (index === 0) {
+              document.getElementById("selected_time").value = time;
+            }
+            //si solo hay uno agregar al boton la  clase selected_time
+            availableTimesButtons += `<button type="button" class="btn btn-outline-dark btn-light mb-2 me-2 available-time ${index === 0 ? "selected-time" : ""}" data-time="${time}">${time}</button>`;
           });
 
           // Insert the buttons into the DOM
@@ -272,7 +276,7 @@ async function fetchAvailableTimes() {
             });
           });
         } else {
-          timeInput.innerHTML = "<p>No hay horas disponibles</p>";
+          timeInput.innerHTML = "<p class='text-dark'>No hay horas disponibles este día. Selecciona otro</p>";
         }
       } else {
         alert(message);
@@ -290,9 +294,54 @@ document.getElementById("appointmentForm").addEventListener("submit", function (
   const scheduleMode = document.getElementById("schedule_mode").value;
 
   if (scheduleMode === "blocks") {
-    sendAppointment(formData);
+    showConfirmationModal(formData);
   }
 });
+
+function showConfirmationModal(formData) {
+  // Extraer los datos del formulario
+  const service = document.getElementById("service").selectedOptions[0].text;
+  const dateRaw = document.getElementById("date").value;
+  const date = formatDate(dateRaw);
+  const time = document.getElementById("selected_time").value;
+  const name = document.getElementById("name").value;
+  const phone = document.getElementById("phone").value;
+  const mail = document.getElementById("mail").value;
+
+  // Crear el contenido del modal
+  const confirmationContent = `
+       <p style="margin-bottom: 0.5rem;">Hola <strong>${name}</strong>,</p>
+        <p style="margin-bottom: 0.5rem;">Estos son los detalles de tu reserva:</p>
+        <p style="margin-bottom: 0.5rem;"><strong>Servicio:</strong> ${service}</p>
+        <p style="margin-bottom: 0.5rem;"><strong>Fecha:</strong> ${date}</p>
+        <p style="margin-bottom: 0.5rem;"><strong>Hora:</strong> ${time}</p>
+        <p style="margin-bottom: 0.5rem;"><strong>Teléfono:</strong> ${phone}</p>
+        <p style="margin-bottom: 0.5rem;"><strong>Correo:</strong> ${mail}</p>
+        <p style="margin-bottom: 0.5rem;">¿Son correctos estos datos?</p>
+  `;
+
+  document.getElementById("confirmationModalBody").innerHTML = confirmationContent;
+
+  // Mostrar el modal de confirmación
+  const confirmationModal = new bootstrap.Modal(document.getElementById("confirmationModal"));
+  confirmationModal.show();
+
+  // Manejar la confirmación
+  document.getElementById("confirmReservation").onclick = function () {
+    confirmationModal.hide(); // Ocultar el modal de confirmación
+    sendAppointment(formData); // Enviar la reserva
+  };
+}
+
+function formatDate(dateString) {
+  const date = new Date(dateString);
+  return new Intl.DateTimeFormat("es-ES", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(date);
+}
 
 async function sendAppointment(formData) {
   const BASE_URL = `${baseUrl}reservas/controller/`;
@@ -313,16 +362,14 @@ async function sendAppointment(formData) {
     });
 
     const { message } = await response.json();
-
     // Aquí puedes seguir con la lógica anterior si el JSON es válido
-    var modalBody = document.querySelector(".modal-body");
-    modalBody.innerText = message;
+    var modalConfirm = document.querySelector("#responseModalBody");
+    modalConfirm.innerText = message;
     var modal = new bootstrap.Modal(document.getElementById("responseModal"));
     modal.show();
 
     var acceptButton = document.getElementById("acceptButton");
     acceptButton.addEventListener("click", function () {
-      // if (message === "Cita reservada exitosamente y correo enviado!") {
       if (response.ok) {
         location.reload();
       }
