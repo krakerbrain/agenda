@@ -7,10 +7,10 @@
             <select id="service" name="service" class="form-select" required>
                 <option value="" selected>Selecciona un servicio</option>
                 <?php foreach ($services as $service) : ?>
-                <option value="<?php echo htmlspecialchars($service['id']); ?>"
-                    data-observation="<?php echo htmlspecialchars($service['observations']); ?>"
-                    data-duration="<?php echo htmlspecialchars($service['duration']); ?>">
-                    <?php echo htmlspecialchars($service['name']); ?></option>
+                    <option value="<?php echo htmlspecialchars($service['id']); ?>"
+                        data-observation="<?php echo htmlspecialchars($service['observations']); ?>"
+                        data-duration="<?php echo htmlspecialchars($service['duration']); ?>">
+                        <?php echo htmlspecialchars($service['name']); ?></option>
                 <?php endforeach; ?>
             </select>
             <input type="hidden" name="service_duration" id="service_duration" value>
@@ -78,6 +78,27 @@
         </button>
     </div>
 </form>
+
+
+<!-- Modal de Confirmación -->
+<div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel"
+    data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmationModalLabel">Confirmar Reserva</h5>
+            </div>
+            <div class="modal-body" id="confirmationModalBody">
+                <!-- Aquí se mostrarán los datos de la reserva -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-anterior" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-siguiente" id="confirmReservation">Confirmar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Modal de Respuesta -->
 <div class="modal fade" id="responseModal" tabindex="-1" aria-labelledby="responseModalLabel" data-bs-backdrop="static"
     data-bs-keyboard="false" aria-hidden="true">
@@ -86,9 +107,9 @@
             <div class="modal-header">
                 <h5 class="modal-title" id="responseModalLabel">Reserva exitosa</h5>
             </div>
-            <div class="modal-body"></div>
+            <div class="modal-body" id="responseModalBody"></div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary btn-siguiente" id="acceptButton"
+                <button type="button" class="btn btn-siguiente" id="acceptButton"
                     data-bs-dismiss="modal">Aceptar</button>
             </div>
         </div>
