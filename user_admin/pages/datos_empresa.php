@@ -24,13 +24,13 @@ $media = $redesSociales->getSocialForDatosEmpresa();
                 <img src="" alt="Logo de la Empresa" class="img-fluid w-25 logoEmpresa">
             </div>
             <div class="">
-                <label for="logo" class="form-label">Cambiar Logo</label>
+                <label for="logo" class="form-label" style="font-size: 1.2rem; font-weight: bold;">Cambiar Logo</label>
                 <input type="file" class="form-control" id="logo" name="logo">
             </div>
         </div>
         <!-- Campo para subir el banner -->
         <div class="mb-3">
-            <label for="banner" class="form-label">Subir Banner</label>
+            <label for="banner" class="form-label" style="font-size: 1.2rem; font-weight: bold;">Subir Banner</label>
             <input type="file" class="form-control" id="banner" name="banner" accept="image/*">
             <small class="form-text text-muted">Sube una imagen y ajústala al área del banner.</small>
         </div>
