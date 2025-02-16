@@ -40,7 +40,7 @@ class CompanyManager
 
     public function getCompanyDataForDatosEmpresa($company_id)
     {
-        $sql = "SELECT name, logo, phone, address, description FROM companies WHERE id = :id AND is_active = 1";
+        $sql = "SELECT name, logo, selected_banner, phone, address, description FROM companies WHERE id = :id AND is_active = 1";
         $this->db->query($sql);
         $this->db->bind(':id', $company_id);
         return $this->db->resultSet();
@@ -285,15 +285,17 @@ class CompanyManager
             $address = $data['address'] ?? null;
             $description = $data['description'] ?? null;
             $logo = $data['logo'] ?? null;
+            $selected_banner = $data['selected_banner'] ?? null;
 
             // Actualizar los datos de la empresa
-            $sql = "UPDATE companies SET logo = :logo, phone = :phone, address = :address, description = :description WHERE id = :id";
+            $sql = "UPDATE companies SET logo = :logo, phone = :phone, address = :address, description = :description, selected_banner = :selected_banner WHERE id = :id";
             $this->db->query($sql);
             $this->db->bind(':phone', $phone);
             $this->db->bind(':address', $address);
             $this->db->bind(':description', $description);
             $this->db->bind(':logo', $logo);
             $this->db->bind(':id', $company_id);
+            $this->db->bind(':selected_banner', $selected_banner);
             $this->db->execute();
 
             $this->db->endTransaction(); // Commit de la transacción

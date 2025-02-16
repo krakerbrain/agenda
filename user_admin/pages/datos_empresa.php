@@ -1,23 +1,22 @@
 <?php
-require_once dirname(__DIR__, 2) . '/access-token/seguridad/JWTAuth.php';
-require_once dirname(__DIR__, 2) . '/classes/DatabaseSessionManager.php';
-require_once dirname(__DIR__, 2) . '/classes/ConfigUrl.php';
 
+require_once dirname(__DIR__, 2) . '/configs/init.php';
+require_once dirname(__DIR__, 2) . '/access-token/seguridad/JWTAuth.php';
+require_once dirname(__DIR__, 2) . '/classes/ConfigUrl.php';
+require_once dirname(__DIR__, 2) . '/classes/RedesSociales.php';
 $baseUrl = ConfigUrl::get();
-$manager = new DatabaseSessionManager();
-$conn = $manager->getDB();
 $auth = new JWTAuth();
 $datosUsuario = $auth->validarTokenUsuario();
-
 $company_id = $datosUsuario['company_id'];
 
-$media = $conn->prepare("SELECT id, name FROM social_networks ORDER BY name");
-$media->execute();
+$redesSociales = new RedesSociales($company_id);
+$media = $redesSociales->getSocialForDatosEmpresa();
 
 ?>
 <div class="container mt-5">
     <form id="datosEmpresaForm" action="" method="POST">
         <input type="hidden" name="logo_url" id="logoUrl" value="">
+        <input type="hidden" name="company_id" id="companyId" value="<?php echo $company_id ?>">
         <input type="hidden" name="company_name" id="companyName" value="">
         <h4 class="companyName"></h4>
         <div class="mb-3">
@@ -25,8 +24,82 @@ $media->execute();
                 <img src="" alt="Logo de la Empresa" class="img-fluid w-25 logoEmpresa">
             </div>
             <div class="">
-                <label for="logo" class="form-label">Cambiar Logo</label>
+                <label for="logo" class="form-label" style="font-size: 1.2rem; font-weight: bold;">Cambiar Logo</label>
                 <input type="file" class="form-control" id="logo" name="logo">
+            </div>
+        </div>
+        <!-- Campo para subir el banner -->
+        <div class="mb-3">
+            <label for="banner" class="form-label" style="font-size: 1.2rem; font-weight: bold;">Subir Banner</label>
+            <input type="file" class="form-control" id="banner" name="banner" accept="image/*">
+            <small class="form-text text-muted">Sube una imagen y ajústala al área del banner.</small>
+        </div>
+
+        <!-- Contenedor para la imagen subida -->
+        <div class="mb-3">
+            <div id="image-container" style="display: none; max-width: 600px; margin: 0 auto;">
+                <img id="image-to-crop" src="#" alt="Imagen subida" style="max-width: 100%;">
+            </div>
+        </div>
+
+        <!-- Área de previsualización del banner -->
+        <div class="mb-3">
+            <label class="form-label">Previsualización del Banner</label>
+            <div id="banner-preview"
+                style="max-width: 600px; width: 100%; height: 150px; overflow: hidden; background-color: #f0f0f0;">
+                <img id="cropped-image" src="#" alt="Banner recortado"
+                    style="width: 100%; height: 100%; object-fit: cover; display: none;">
+            </div>
+        </div>
+
+        <!-- Botón para guardar el banner -->
+        <button type="button" id="save-banner" class="btn btn-primary" style="display: none;">Guardar Banner</button>
+
+        <!-- Selección de imágenes -->
+        <div class="mb-3">
+            <label class="form-label">Seleccionar un banner predeterminado</label>
+
+            <div class="row" id="default-banners-container">
+                <div class="col-md-6 mb-3">
+                    <div class="card">
+                        <img id="saved-cropped-image"
+                            src="<?php echo $baseUrl . 'assets/img/banners/banner_vacio.png'; ?>" class="card-img-top"
+                            alt="Banner Personalizado">
+                        <div class="card-body text-center">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="selected-banner" id="banner-custom"
+                                    value="custom">
+                                <label class="form-check-label" for="banner-custom">
+                                    Seleccionar
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <?php
+                // Array de imágenes predeterminadas
+                $defaultBanners = [
+                    'default_belleza.png',
+                    'default_salud.png',
+                    'default_deportes.png'
+                ];
+                foreach ($defaultBanners as $banner) : ?>
+                    <div class="col-md-6 mb-3">
+                        <div class="card">
+                            <img src="<?php echo $baseUrl . 'assets/img/banners/' . $banner; ?>" class="card-img-top"
+                                alt="Banner Predeterminado">
+                            <div class="card-body text-center">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="selected-banner"
+                                        id="banner-<?php echo $banner; ?>" value="<?php echo $banner; ?>">
+                                    <label class="form-check-label" for="banner-<?php echo $banner; ?>">
+                                        Seleccionar
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
             </div>
         </div>
         <!-- Teléfono y Dirección -->
@@ -62,7 +135,7 @@ $media->execute();
                     <label for="social-network" class="form-label">Red Social</label>
                     <select id="social-network" name="social_network" class="form-select">
                         <?php foreach ($media as $red) { ?>
-                        <option value="<?php echo $red['id'] ?>"><?php echo $red['name'] ?></option>
+                            <option value="<?php echo $red['id'] ?>"><?php echo $red['name'] ?></option>
                         <?php } ?>
                     </select>
 
@@ -81,10 +154,10 @@ $media->execute();
     <div class="container mt-4">
         <table class="table">
             <thead>
-                <tr>
+                <tr class="head-table">
                     <th>Red Social</th>
                     <th>URL</th>
-                    <th>Red preferida
+                    <th class="text-center">Red preferida
                         <button id="edit-preferred" class="btn btn-link p-0" title="Editar Red Preferida">
                             <i class="fas fa-pencil-alt"></i>
                         </button>
@@ -119,5 +192,5 @@ $media->execute();
 
 </div>
 <script>
-const baseUrl = '<?php echo $baseUrl ?>';
+    const baseUrl = '<?php echo $baseUrl ?>';
 </script>

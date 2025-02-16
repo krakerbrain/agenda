@@ -40,51 +40,51 @@ document.addEventListener("DOMContentLoaded", function () {
       hideCanvas();
       switch (page) {
         case "dateList":
-          const { initDateList } = await import("./datesList.js?v=1.1.9");
+          const { initDateList } = await import("./datesList.js?v=1.2.0");
           initDateList();
           break;
         case "horarios":
-          const { initHorarios } = await import("./horarios.js?v=1.1.9");
+          const { initHorarios } = await import("./horarios.js?v=1.2.0");
           initHorarios();
           break;
         case "servicios":
-          const { initServicios } = await import("./servicios.js?v=1.1.9");
+          const { initServicios } = await import("./servicios.js?v=1.2.0");
           initServicios();
           break;
         case "configuraciones":
-          const { initConfiguraciones } = await import("./configuraciones.js?v=1.1.9");
+          const { initConfiguraciones } = await import("./configuraciones.js?v=1.2.0");
           initConfiguraciones();
           break;
         case "correos":
-          const { initCorreos } = await import("./correos.js?v=1.1.9");
+          const { initCorreos } = await import("./correos.js?v=1.2.0");
           initCorreos();
           break;
         case "datos_empresa":
-          const { initDatosEmpresa } = await import("./datosEmpresa.js?v=1.1.9");
+          const { initDatosEmpresa } = await import("./datosEmpresa.js?v=1.2.0");
           initDatosEmpresa();
           break;
         case "add_user":
-          const { initAddUser } = await import("./addUser.js?v=1.1.9");
+          const { initAddUser } = await import("./addUser.js?v=1.2.0");
           initAddUser();
           break;
         case "master_add_company":
-          const { initAddCompany } = await import("./master_admin/master_add_company.js?v=1.1.9");
+          const { initAddCompany } = await import("./master_admin/master_add_company.js?v=1.2.0");
           initAddCompany();
           break;
         case "master_company_list":
-          const { initCompanyList } = await import("./master_admin/master_company_list.js?v=1.1.9");
+          const { initCompanyList } = await import("./master_admin/master_company_list.js?v=1.2.0");
           initCompanyList();
           break;
         case "integrations":
-          const { initIntegrations } = await import("./integrations.js?v=1.1.9");
+          const { initIntegrations } = await import("./integrations.js?v=1.2.0");
           initIntegrations();
           break;
         case "eventos_unicos":
-          const { initEventosUnicos } = await import("./eventos_unicos.js?v=1.1.9");
+          const { initEventosUnicos } = await import("./eventos_unicos.js?v=1.2.0");
           initEventosUnicos();
           break;
         case "block_hour":
-          const { initBloqueoHoras } = await import("./bloqueoHoras.js?v=1.1.9");
+          const { initBloqueoHoras } = await import("./bloqueoHoras.js?v=1.2.0");
           initBloqueoHoras();
           break;
         default:

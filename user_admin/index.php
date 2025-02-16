@@ -93,6 +93,9 @@ include dirname(__DIR__) . '/partials/head.php';
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
     </script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <!-- JavaScript de Cropper.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+
     <script type="module" src="<?php echo $baseUrl; ?>assets/js/navbar.js?v=<?php echo time(); ?>"></script>
 </body>
 
