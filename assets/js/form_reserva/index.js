@@ -265,14 +265,14 @@ async function fetchAvailableTimes() {
           timeInput.innerHTML = availableTimesButtons;
 
           // Add an event listener for button selection
-          const timeButtons = document.querySelectorAll("button");
+          const timeButtons = document.querySelectorAll(".available-time");
           timeButtons.forEach((button) => {
             button.addEventListener("click", () => {
               // Mark the clicked button as selected and update the form value
               document.querySelectorAll(".available-time").forEach((btn) => btn.classList.remove("selected-time"));
               button.classList.add("selected-time");
               // Update hidden input field with selected time value (for form submission)
-              document.getElementById("selected_time").value = document.getElementById("selected_time").value != "" ? document.getElementById("selected_time").value : button.getAttribute("data-time");
+              document.getElementById("selected_time").value = button.getAttribute("data-time");
             });
           });
         } else {
