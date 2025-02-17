@@ -300,6 +300,7 @@ document.getElementById("appointmentForm").addEventListener("submit", function (
 
 function showConfirmationModal(formData) {
   // Extraer los datos del formulario
+  debugger;
   const service = document.getElementById("service").selectedOptions[0].text;
   const dateRaw = document.getElementById("date").value;
   const date = formatDate(dateRaw);
@@ -334,13 +335,12 @@ function showConfirmationModal(formData) {
 }
 
 function formatDate(dateString) {
-  const date = new Date(dateString);
   return new Intl.DateTimeFormat("es-ES", {
     weekday: "long",
     day: "numeric",
     month: "long",
     year: "numeric",
-  }).format(date);
+  }).format(new Date(dateString + "T00:00:00"));
 }
 
 async function sendAppointment(formData) {
