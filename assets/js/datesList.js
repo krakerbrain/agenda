@@ -61,6 +61,7 @@ async function loadAppointments(status, page = 1) {
 
 // Función para rellenar la tabla con las citas obtenidas
 function fillTable(data) {
+  console.log(data);
   const tableContent = document.getElementById("tableContent");
   let html = "";
 

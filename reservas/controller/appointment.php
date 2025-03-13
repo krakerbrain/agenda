@@ -3,9 +3,13 @@
 require_once dirname(__DIR__, 2) . '/configs/init.php';
 require_once dirname(__DIR__, 2) . '/classes/ConfigUrl.php';
 require_once dirname(__DIR__, 2) . '/classes/Appointments.php';
+require_once dirname(__DIR__, 2) . '/classes/Customers.php';
 
 // Crear instancia de la clase Appointments
 $appointments = new Appointments();
+
+// Crear instancia de la clase Customers
+$customers = new Customers();
 
 try {
     // Iniciar la transacción
@@ -34,12 +38,22 @@ try {
 
     $phone = formatPhoneNumber($data['phone']);
 
+    //Verificar si existe el cliente en la base de datos
+    $customer_id = $customers->checkAndAssociateCustomer($phone, $data['mail'], $data['company_id']);
+    if (!$customer_id) {
+        $customerData = [
+            'name' => $data['name'],
+            'phone' => $phone,
+            'mail' => $data['mail'],
+            'company_id' => $data['company_id']
+        ];
+        $customer_id = $customers->add_customer($customerData);
+    }
+
     // Preparar los datos para insertar la cita
     $appointmentData = [
         'company_id' => $data['company_id'],
-        'name' => $data['name'],
-        'phone' => $phone,
-        'mail' => $data['mail'],
+        'customer_id' => $customer_id,
         'date' => $data['date'],
         'start_time' => $formattedStartTime,
         'end_time' => $formattedEndTime,

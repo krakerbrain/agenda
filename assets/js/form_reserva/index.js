@@ -300,7 +300,7 @@ document.getElementById("appointmentForm").addEventListener("submit", function (
 
 function showConfirmationModal(formData) {
   // Extraer los datos del formulario
-  debugger;
+
   const service = document.getElementById("service").selectedOptions[0].text;
   const dateRaw = document.getElementById("date").value;
   const date = formatDate(dateRaw);

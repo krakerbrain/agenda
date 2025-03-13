@@ -34,18 +34,15 @@ class Appointments extends Database
         try {
             $db = new Database();
 
-
             // Verificar si ya existe una cita con los mismos datos
             if ($this->checkExistingAppointment($data)) {
                 return ['error' => 'Cita ya ha sido enviada.'];
             }
 
-            $db->query('INSERT INTO appointments (company_id, name, phone, mail, date, start_time, end_time, id_service, aviso_reserva, created_at) 
-                    VALUES (:company_id, :name, :phone, :mail, :date, :start_time, :end_time, :id_service, 0, now())');
+            $db->query('INSERT INTO appointments (company_id, customer_id, date, start_time, end_time, id_service, aviso_reserva, created_at) 
+                    VALUES (:company_id, :customer_id, :date, :start_time, :end_time, :id_service, 0, now())');
             $db->bind(':company_id', $data['company_id']);
-            $db->bind(':name', $data['name']);
-            $db->bind(':phone', $data['phone']);
-            $db->bind(':mail', $data['mail']);
+            $db->bind(':customer_id', $data['customer_id']);
             $db->bind(':date', $data['date']);
             $db->bind(':start_time', $data['start_time']);
             $db->bind(':end_time', $data['end_time']);
@@ -84,10 +81,10 @@ class Appointments extends Database
             // Consulta SQL para insertar un "día bloqueado" como cita especial
             $query = "
             INSERT INTO appointments (
-                company_id, name, phone, mail, date, start_time, end_time, 
+                company_id,customer_id, date, start_time, end_time, 
                 id_service, status, aviso_reserva, aviso_confirmada, created_at
             ) VALUES (
-                :company_id, :name, :phone, :mail, :date, :start_time, :end_time, 
+                :company_id, 0, :date, :start_time, :end_time, 
                 :id_service, :status, :aviso_reserva, :aviso_confirmada, NOW()
             )
         ";
@@ -97,9 +94,6 @@ class Appointments extends Database
 
             // Asignar valores a los parámetros
             $db->bind(':company_id', $data['company_id']);
-            $db->bind(':name', 'Día Bloqueado'); // Nombre genérico para identificar el bloqueo
-            $db->bind(':phone', null); // Teléfono no aplica
-            $db->bind(':mail', null); // Correo no aplica
             $db->bind(':date', $data['date']);
             $db->bind(':start_time', $data['start_time']);
             $db->bind(':end_time', $data['end_time']);
@@ -176,11 +170,14 @@ class Appointments extends Database
     public function searchAppointments($company_id, $status, $service, $name, $phone, $email, $date, $hour, $tab = 'all')
     {
         $db = new Database();
-        $query = 'SELECT a.*, s.name AS service,
+        $query = 'SELECT a.*, s.name AS service, c.*,
                      DATE_FORMAT(a.date, "%d-%m-%Y") as date 
                      FROM appointments a 
                      INNER JOIN services s ON a.id_service = s.id
-                     WHERE a.company_id = :company 
+                     INNER JOIN customers c ON a.customer_id = c.id
+                     INNER JOIN company_customers cc ON c.id = cc.customer_id
+                     WHERE a.company_id = :company
+                     AND cc.company_id = :company  
                      AND status != 2';
 
         // Filtrar según el tab actual
@@ -200,13 +197,13 @@ class Appointments extends Database
             $query .= ' AND s.name LIKE :service';
         }
         if ($name) {
-            $query .= ' AND a.name LIKE :name';
+            $query .= ' AND c.name LIKE :name';
         }
         if ($phone) {
-            $query .= ' AND a.phone LIKE :phone';
+            $query .= ' AND c.phone LIKE :phone';
         }
         if ($email) {
-            $query .= ' AND a.mail LIKE :email';
+            $query .= ' AND c.mail LIKE :email';
         }
         if ($date) {
             $query .= ' AND DATE(a.date) = :date';
@@ -232,11 +229,14 @@ class Appointments extends Database
     {
         $db = new Database();
 
-        $query = 'SELECT a.*, s.name AS service,
+        $query = 'SELECT a.*, s.name AS service, c.*,
                      DATE_FORMAT(a.date, "%d-%m-%Y") as date 
                      FROM appointments a 
                      INNER JOIN services s ON a.id_service = s.id
-                     WHERE a.company_id = :company 
+                     INNER JOIN customers c ON a.customer_id = c.id
+                     INNER JOIN company_customers cc ON c.id = cc.customer_id
+                     WHERE a.company_id = :company
+                     AND cc.company_id = :company  
                      AND status != 2';
 
         if ($status === 'unconfirmed') {
