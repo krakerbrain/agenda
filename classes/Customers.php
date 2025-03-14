@@ -12,6 +12,40 @@ class Customers
 
     }
 
+    public function get_paginated_customers($company_id, $status, $offset, $limit)
+    {
+        $db = new Database();
+
+        // Consulta base
+        $query = 'SELECT c.*, 
+                     CASE WHEN ci.id IS NOT NULL THEN 1 ELSE 0 END AS has_incidents
+              FROM customers c
+              LEFT JOIN company_customers cc ON c.id = cc.customer_id
+              LEFT JOIN customer_incidents ci ON c.id = ci.customer_id
+              WHERE cc.company_id = :company';
+
+        // Filtros según el estado
+        if ($status === 'incidencias') {
+            $query .= ' AND ci.id IS NOT NULL';  // Solo clientes con incidencias
+        } elseif ($status === 'blocked') {
+            $query .= ' AND c.blocked = 1';  // Solo clientes bloqueados
+        }
+
+        // Agrupar por cliente para evitar duplicados
+        $query .= ' GROUP BY c.id';
+
+        // Paginación
+        $query .= ' LIMIT :offset, :limit';
+
+        // Preparar y ejecutar la consulta
+        $db->query($query);
+        $db->bind(':company', $company_id);
+        $db->bind(':offset', $offset, PDO::PARAM_INT);
+        $db->bind(':limit', $limit, PDO::PARAM_INT);
+
+        return $db->resultSet();
+    }
+
     // crear metodo que verifique si el cliente ya existe verificando por el telefono y el correo, si existe retorna id
     public function checkAndAssociateCustomer($phone, $email, $companyId)
     {

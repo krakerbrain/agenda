@@ -47,6 +47,9 @@ include dirname(__DIR__) . '/partials/head.php';
                         <a class="nav-link active" aria-current="page" href="#" id="dateList">Lista de citas</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="#" id="clientes">Clientes</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="#" id="horarios">Horarios</a>
                     </li>
                     <li class="nav-item">

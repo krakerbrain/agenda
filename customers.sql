@@ -1,10 +1,14 @@
 -- Se crea la tabla customers
+sql
+Copy
 CREATE TABLE `customers` (
-    `id` int(11) NOT NULL AUTO_INCREMENT,
-    `name` varchar(255) NOT NULL,
-    `phone` varchar(15) DEFAULT NULL, -- Sin UNIQUE
-    `mail` varchar(100) DEFAULT NULL,  -- Sin UNIQUE
-    `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+    `id` INT(11) NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(255) NOT NULL,
+    `phone` VARCHAR(15) DEFAULT NULL,
+    `mail` VARCHAR(100) DEFAULT NULL,
+    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+    `blocked` TINYINT(1) NOT NULL DEFAULT 0,
+    `notes` TEXT DEFAULT NULL,
     PRIMARY KEY (`id`)
 );
 
@@ -17,6 +21,16 @@ CREATE TABLE `company_customers` (
     PRIMARY KEY (`id`),
     UNIQUE (`company_id`, `customer_id`), -- Evita que un cliente se asocie más de una vez a la misma empresa
     FOREIGN KEY (`company_id`) REFERENCES `companies`(`id`) ON DELETE CASCADE,
+    FOREIGN KEY (`customer_id`) REFERENCES `customers`(`id`) ON DELETE CASCADE
+);
+
+CREATE TABLE `customer_incidents` (
+    `id` INT(11) NOT NULL AUTO_INCREMENT,
+    `customer_id` INT(11) NOT NULL,
+    `description` VARCHAR(255) NOT NULL,
+    `incident_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+    `note` TEXT DEFAULT NULL,
+    PRIMARY KEY (`id`),
     FOREIGN KEY (`customer_id`) REFERENCES `customers`(`id`) ON DELETE CASCADE
 );
 
