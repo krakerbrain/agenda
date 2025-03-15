@@ -67,3 +67,5 @@ $auth->validarTokenUsuario();
     </div>
 </div>
 <!-- agregar un modal para clientes -->
+<?php include dirname(__DIR__, 2) . '/includes/customer-modal.php';
+?>

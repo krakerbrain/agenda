@@ -139,4 +139,68 @@ class Customers
             echo "Error: " . $e->getMessage();
         }
     }
+
+    // Método para obtener los detalles de un cliente
+    public function getCustomerDetail($customerId)
+    {
+        try {
+            // Consulta para obtener los detalles básicos del cliente
+            $query = 'SELECT c.id, c.name, c.phone, c.mail, c.blocked, 
+                             CASE WHEN ci.id IS NOT NULL THEN 1 ELSE 0 END AS has_incidents
+                      FROM customers c
+                      LEFT JOIN customer_incidents ci ON c.id = ci.customer_id
+                      WHERE c.id = :customerId
+                      GROUP BY c.id';
+
+            $this->db->query($query);
+            $this->db->bind(':customerId', $customerId);
+            $customerDetails = $this->db->single();
+
+            if (!$customerDetails) {
+                return null; // Si no se encuentra el cliente, retornar null
+            }
+
+            // Consulta para obtener los últimos servicios del cliente
+            $servicesQuery = 'SELECT 
+                s.id AS service_id, 
+                s.name AS service_name, 
+                a.date AS appointment_date, 
+                a.start_time, 
+                a.end_time, 
+                a.status AS appointment_status
+            FROM 
+                appointments a
+            INNER JOIN 
+                services s ON a.id_service = s.id
+            WHERE 
+                a.customer_id = :customerId
+            ORDER BY 
+                a.date DESC, 
+                a.start_time DESC
+            LIMIT 5'; // Limitar a los últimos 5 servicios
+
+            $this->db->query($servicesQuery);
+            $this->db->bind(':customerId', $customerId);
+            $lastServices = $this->db->resultSet();
+
+            // Consulta para obtener las incidencias del cliente
+            $incidentsQuery = 'SELECT ci.id, ci.description, ci.incident_date, ci.note
+                               FROM customer_incidents ci
+                               WHERE ci.customer_id = :customerId
+                               ORDER BY ci.incident_date DESC';
+
+            $this->db->query($incidentsQuery);
+            $this->db->bind(':customerId', $customerId);
+            $incidents = $this->db->resultSet();
+
+            // Combinar toda la información en un solo array
+            $customerDetails['last_services'] = $lastServices;
+            $customerDetails['incidents'] = $incidents;
+
+            return $customerDetails;
+        } catch (PDOException $e) {
+            echo "Error: " . $e->getMessage();
+            return null;
+        }
+    }
 }
