@@ -122,4 +122,21 @@ class Customers
             echo "Error: " . $e->getMessage();
         }
     }
+    // Método para crear una incidencia
+    public function createIncident($customerId, $reason, $notes)
+    {
+        try {
+            $query = 'INSERT INTO customer_incidents (customer_id, description, incident_date, note)
+                  VALUES (:customerId, :reason, NOW(), :notes)';
+
+            $this->db->query($query);
+            $this->db->bind(':customerId', $customerId);
+            $this->db->bind(':reason', $reason);
+            $this->db->bind(':notes', $notes);
+
+            return $this->db->execute();
+        } catch (PDOException $e) {
+            echo "Error: " . $e->getMessage();
+        }
+    }
 }

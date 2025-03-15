@@ -229,7 +229,7 @@ class Appointments extends Database
     {
         $db = new Database();
 
-        $query = 'SELECT a.*, s.name AS service, c.*,
+        $query = 'SELECT a.id as id_appointment, a.*, s.name AS service, c.id as id_customer, c.*,
                      DATE_FORMAT(a.date, "%d-%m-%Y") as date 
                      FROM appointments a 
                      INNER JOIN services s ON a.id_service = s.id
