@@ -167,60 +167,62 @@ class Appointments extends Database
         return (int)$countResult['total'] > 0; // Retorna verdadero si hay al menos una cita existente
     }
 
-    public function searchAppointments($company_id, $status, $service, $name, $phone, $email, $date, $hour, $tab = 'all')
+    public function searchAppointments($company_id, $input, $query, $tab = 'all')
     {
         $db = new Database();
-        $query = 'SELECT a.*, s.name AS service, c.*,
-                     DATE_FORMAT(a.date, "%d-%m-%Y") as date 
-                     FROM appointments a 
-                     INNER JOIN services s ON a.id_service = s.id
-                     INNER JOIN customers c ON a.customer_id = c.id
-                     INNER JOIN company_customers cc ON c.id = cc.customer_id
-                     WHERE a.company_id = :company
-                     AND cc.company_id = :company  
-                     AND status != 2';
+
+        // Consulta base
+        $querySql = 'SELECT a.*, s.name AS service, c.*,
+                        DATE_FORMAT(a.date, "%d-%m-%Y") as date 
+                 FROM appointments a 
+                 INNER JOIN services s ON a.id_service = s.id
+                 INNER JOIN customers c ON a.customer_id = c.id
+                 INNER JOIN company_customers cc ON c.id = cc.customer_id
+                 WHERE a.company_id = :company
+                 AND cc.company_id = :company  
+                 AND status != 2';
 
         // Filtrar según el tab actual
         if ($tab === 'unconfirmed') {
-            $query .= ' AND a.status = 0 AND a.date >= CURDATE()';
+            $querySql .= ' AND a.status = 0 AND a.date >= CURDATE()';
         } elseif ($tab === 'confirmed') {
-            $query .= ' AND a.status = 1 AND a.date >= CURDATE()';
+            $querySql .= ' AND a.status = 1 AND a.date >= CURDATE()';
         } elseif ($tab === 'past') {
-            $query .= ' AND a.date < CURDATE()';
+            $querySql .= ' AND a.date < CURDATE()';
         }
 
-        // Agregar condiciones de búsqueda
-        if ($status !== 'all') {
-            $query .= ' AND a.status = :status';
-        }
-        if ($service) {
-            $query .= ' AND s.name LIKE :service';
-        }
-        if ($name) {
-            $query .= ' AND c.name LIKE :name';
-        }
-        if ($phone) {
-            $query .= ' AND c.phone LIKE :phone';
-        }
-        if ($email) {
-            $query .= ' AND c.mail LIKE :email';
-        }
-        if ($date) {
-            $query .= ' AND DATE(a.date) = :date';
-        }
-        if ($hour) {
-            $query .= ' AND TIME(a.start_time) = :hour';
+        // Agregar condición de búsqueda dinámica
+        if ($input && $query) {
+            switch ($input) {
+                case 'service':
+                    $querySql .= ' AND s.name LIKE :query';
+                    break;
+                case 'name':
+                    $querySql .= ' AND c.name LIKE :query';
+                    break;
+                case 'phone':
+                    $querySql .= ' AND c.phone LIKE :query';
+                    break;
+                case 'mail':
+                    $querySql .= ' AND c.mail LIKE :query';
+                    break;
+                case 'date':
+                    $querySql .= ' AND DATE(a.date) = :query';
+                    break;
+                case 'hour':
+                    $querySql .= ' AND TIME(a.start_time) = :query';
+                    break;
+                default:
+                    throw new Exception("Campo de búsqueda no válido.");
+            }
         }
 
-        $db->query($query);
+        // Preparar y ejecutar la consulta
+        $db->query($querySql);
         $db->bind(':company', $company_id);
-        if ($status !== 'all') $db->bind(':status', $status);
-        if ($service) $db->bind(':service', "%$service%");
-        if ($name) $db->bind(':name', "%$name%");
-        if ($phone) $db->bind(':phone', "%$phone%");
-        if ($email) $db->bind(':email', "%$email%");
-        if ($date) $db->bind(':date', $date);
-        if ($hour) $db->bind(':hour', $hour);
+        if ($input && $query) {
+            $db->bind(':query', $input === 'date' || $input === 'hour' ? $query : "%$query%");
+        }
 
         return $db->resultSet();
     }

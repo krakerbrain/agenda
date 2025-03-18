@@ -225,4 +225,53 @@ class Customers
             return null;
         }
     }
+
+    public function searchCustomers($company_id, $input, $query, $status = null)
+    {
+        try {
+            // Consulta base
+            $sql = "SELECT c.id, c.name, c.phone, c.mail, 
+                       CASE WHEN ci.id IS NOT NULL THEN 1 ELSE 0 END AS has_incidents, 
+                       c.blocked
+                FROM customers c
+                LEFT JOIN company_customers cc ON c.id = cc.customer_id
+                LEFT JOIN customer_incidents ci ON c.id = ci.customer_id
+                WHERE cc.company_id = :company_id";
+
+            // Filtrar por el campo de búsqueda (name, phone, mail)
+            switch ($input) {
+                case 'name':
+                    $sql .= " AND c.name LIKE :query";
+                    break;
+                case 'phone':
+                    $sql .= " AND c.phone LIKE :query";
+                    break;
+                case 'mail':
+                    $sql .= " AND c.mail LIKE :query";
+                    break;
+                default:
+                    throw new Exception("Parámetro de búsqueda no válido.");
+            }
+
+            // Filtrar por estado (incidencias o bloqueados)
+            if ($status === 'incidencias') {
+                $sql .= " AND ci.id IS NOT NULL"; // Solo clientes con incidencias
+            } elseif ($status === 'blocked') {
+                $sql .= " AND c.blocked = 1"; // Solo clientes bloqueados
+            }
+
+            // Agrupar por cliente para evitar duplicados
+            $sql .= " GROUP BY c.id";
+
+            // Preparar y ejecutar la consulta
+            $this->db->query($sql);
+            $this->db->bind(':company_id', $company_id);
+            $this->db->bind(':query', "%$query%");
+
+            return $this->db->resultSet();
+        } catch (PDOException $e) {
+            echo "Error: " . $e->getMessage();
+            return [];
+        }
+    }
 }

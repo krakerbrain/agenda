@@ -38,7 +38,7 @@ async function loadCustomers(status, page = 1) {
     const { success, data, totalPages: total } = await response.json();
 
     if (success) {
-      fillTableCustomers(data, status);
+      fillTableCustomers(data);
       currentPage = page;
       // Si el número de citas recibidas es menor que el límite, no hay más páginas
       const hasMoreData = data.length === limit;
@@ -49,9 +49,10 @@ async function loadCustomers(status, page = 1) {
   }
 }
 
-function fillTableCustomers(data, status) {
+function fillTableCustomers(data) {
   const tableContent = document.getElementById("tableContent");
   let html = "";
+  const status = sessionStorage.getItem("customerStatus") || "todos";
 
   data.forEach((customer) => {
     html += `
@@ -64,7 +65,7 @@ function fillTableCustomers(data, status) {
               <td data-cell="estado" class="data">${getStatusIcon(customer.blocked, customer.has_incidents)}</td>
               <td data-cell="acciones" class="data align-content-around">
               <div class="d-flex justify-content-evenly">
-                ${getActionIcons(customer.id, status)}
+                ${getActionIcons(customer.id)}
               </div>
               </td>
           </tr>
@@ -95,8 +96,9 @@ function fillTableCustomers(data, status) {
   });
 }
 
-function getActionIcons(customerId, status) {
+function getActionIcons(customerId) {
   let icons = "";
+  const status = sessionStorage.getItem("customerStatus") || "todos";
 
   if (status === "todos") {
     icons = `
@@ -233,3 +235,28 @@ document.getElementById("nextPage").addEventListener("click", () => {
   const savedStatus = sessionStorage.getItem("customerStatus") || "todos";
   loadCustomers(savedStatus, currentPage + 1);
 });
+
+// Sugerencias de autocompletado (puedes hacer una búsqueda mínima de 3 caracteres)
+
+document.getElementById("name").addEventListener("input", autocomplete);
+document.getElementById("phone").addEventListener("input", autocomplete);
+document.getElementById("mail").addEventListener("input", autocomplete);
+
+let lastQuery = "";
+
+async function autocomplete(e) {
+  const input = e.target.id;
+  const query = e.target.value;
+  const savedStatus = sessionStorage.getItem("customerStatus") || "todos";
+
+  if (query.length >= 3 || input == "status") {
+    if (query !== lastQuery) {
+      lastQuery = query;
+      const response = await fetch(`${baseUrl}user_admin/controllers/autocomplete.php?input=${input}&query=${query}&tab=customers&status=${savedStatus}`);
+      const data = await response.json();
+      fillTableCustomers(data.data);
+    }
+  } else if (query === "") {
+    loadCustomers(savedStatus);
+  }
+}

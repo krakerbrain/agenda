@@ -521,17 +521,17 @@ document.getElementById("date").addEventListener("input", autocomplete);
 document.getElementById("hour").addEventListener("input", autocomplete);
 document.getElementById("status").addEventListener("change", autocomplete);
 
-let lastQuery = ""; // Almacena la última búsqueda
+let lastQuery = "";
+
 async function autocomplete(e) {
   const input = e.target.id;
   const query = e.target.value;
   const savedStatus = sessionStorage.getItem("status") || "unconfirmed";
-  console.log(savedStatus);
+
   if (query.length >= 3 || input == "status") {
-    // Si la consulta es diferente a la última, hacer la búsqueda
     if (query !== lastQuery) {
-      lastQuery = query; // Actualizar la última consulta
-      const response = await fetch(`${baseUrl}user_admin/controllers/autocomplete.php?${input}=${query}&tab=${savedStatus}`);
+      lastQuery = query;
+      const response = await fetch(`${baseUrl}user_admin/controllers/autocomplete.php?input=${input}&query=${query}&tab=${savedStatus}`);
       const data = await response.json();
       if (savedStatus != "events") {
         fillTable(data.data);
@@ -539,11 +539,8 @@ async function autocomplete(e) {
         fillEventTable(data.data);
       }
     }
-  } else {
-    // Solo recargar las citas si no hay consulta activa
-    if (query === "") {
-      const savedStatus = sessionStorage.getItem("status") || "unconfirmed";
-      loadAppointments(savedStatus);
-    }
+  } else if (query === "") {
+    const savedStatus = sessionStorage.getItem("status") || "unconfirmed";
+    loadAppointments(savedStatus);
   }
 }
