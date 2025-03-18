@@ -29,10 +29,6 @@ include dirname(__DIR__) . '/partials/head.php';
             </button>
         </nav>
     </header>
-    <!-- <div class="container mt-5 d-flex justify-content-between">
-        
-    </div> -->
-
     <!-- Offcanvas -->
     <div class="offcanvas offcanvas-start overflow-auto" tabindex="-1" id="offcanvasMenu"
         aria-labelledby="offcanvasMenuLabel">

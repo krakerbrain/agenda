@@ -141,7 +141,7 @@ class Customers
     }
 
     // Método para obtener los detalles de un cliente
-    public function getCustomerDetail($customerId)
+    public function getCustomerDetail($customerId, $companyId)
     {
         try {
             // Consulta para obtener los detalles básicos del cliente
@@ -149,11 +149,14 @@ class Customers
                              CASE WHEN ci.id IS NOT NULL THEN 1 ELSE 0 END AS has_incidents
                       FROM customers c
                       LEFT JOIN customer_incidents ci ON c.id = ci.customer_id
+                      LEFT JOIN company_customers cc ON c.id = cc.customer_id
                       WHERE c.id = :customerId
+                      AND cc.company_id = :company
                       GROUP BY c.id';
 
             $this->db->query($query);
             $this->db->bind(':customerId', $customerId);
+            $this->db->bind(':company', $companyId);
             $customerDetails = $this->db->single();
 
             if (!$customerDetails) {
@@ -174,6 +177,7 @@ class Customers
                 services s ON a.id_service = s.id
             WHERE 
                 a.customer_id = :customerId
+                AND s.company_id = :company
             ORDER BY 
                 a.date DESC, 
                 a.start_time DESC
@@ -181,16 +185,21 @@ class Customers
 
             $this->db->query($servicesQuery);
             $this->db->bind(':customerId', $customerId);
+            $this->db->bind(':company', $companyId);
             $lastServices = $this->db->resultSet();
 
             // Consulta para obtener las incidencias del cliente
             $incidentsQuery = 'SELECT ci.id, ci.description, ci.incident_date, ci.note
                                FROM customer_incidents ci
+                               LEFT JOIN customers c ON ci.customer_id = c.id
+                               LEFT JOIN company_customers cc ON c.id = cc.customer_id
                                WHERE ci.customer_id = :customerId
+                                 AND cc.company_id = :company
                                ORDER BY ci.incident_date DESC';
 
             $this->db->query($incidentsQuery);
             $this->db->bind(':customerId', $customerId);
+            $this->db->bind(':company', $companyId);
             $incidents = $this->db->resultSet();
 
             // Combinar toda la información en un solo array
@@ -198,6 +207,19 @@ class Customers
             $customerDetails['incidents'] = $incidents;
 
             return $customerDetails;
+        } catch (PDOException $e) {
+            echo "Error: " . $e->getMessage();
+            return null;
+        }
+    }
+
+    public function getCustomerById($customerId)
+    {
+        try {
+            $query = 'SELECT * FROM customers WHERE id = :customerId';
+            $this->db->query($query);
+            $this->db->bind(':customerId', $customerId);
+            return $this->db->single();
         } catch (PDOException $e) {
             echo "Error: " . $e->getMessage();
             return null;

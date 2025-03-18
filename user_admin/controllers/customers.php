@@ -6,6 +6,7 @@ require_once dirname(__DIR__, 2) . '/configs/init.php';
 require_once dirname(__DIR__, 2) . '/access-token/seguridad/JWTAuth.php';
 require_once dirname(__DIR__, 2) . '/classes/Customers.php';
 require_once dirname(__DIR__, 2) . '/classes/ConfigUrl.php';
+require_once dirname(__DIR__, 2) . '/classes/CompanyModel.php';
 
 $baseUrl = ConfigUrl::get();
 $auth = new JWTAuth();
@@ -16,16 +17,32 @@ try {
     $customer = new Customers;
 
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-        if (isset($_GET['action']) && $_GET['action'] === 'getCustomerDetail') {
-            $customerId = $_GET['id'];
-            $customerDetails = $customer->getCustomerDetail($customerId);
+        if (isset($_GET['action'])) {
+            if ($_GET['action'] === 'getCustomerDetail') {
+                $customerId = $_GET['id'];
+                $customerDetails = $customer->getCustomerDetail($customerId, $company_id);
 
-            if ($customerDetails) {
-                echo json_encode(['success' => true, 'data' => $customerDetails]);
-            } else {
-                echo json_encode(['success' => false, 'message' => 'Cliente no encontrado']);
+                if ($customerDetails) {
+                    echo json_encode(['success' => true, 'data' => $customerDetails]);
+                } else {
+                    echo json_encode(['success' => false, 'message' => 'Cliente no encontrado']);
+                }
+                exit;
+            } else if ($_GET['action'] === 'getUrl') {
+
+                // Crear una instancia de Company_Model
+                $companyModel = new CompanyModel();
+
+                // Obtener la custom_url de la empresa
+                $customUrl = $companyModel->getCustomUrl($company_id);
+
+                if ($customUrl) {
+                    echo json_encode(['success' => true, 'custom_url' => $customUrl]);
+                } else {
+                    echo json_encode(['success' => false, 'message' => 'No se encontró la URL de la empresa.']);
+                }
+                exit;
             }
-            exit;
         } else {
             $status = isset($_GET['status']) ? $_GET['status'] : 'all';
             $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;

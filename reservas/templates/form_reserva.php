@@ -1,4 +1,11 @@
 <form id="appointmentForm" style="max-width: 600px; margin: 0 auto;">
+    <?php if ($customerData): ?>
+        <!-- Botón para volver a user_admin/index.php -->
+        <div class="text-end mb-3">
+            <a href="<?php echo $baseUrl . 'user_admin/index.php'; ?>">Volver a
+                Configuraciones</a>
+        </div>
+    <?php endif; ?>
     <!-- PASO 1 -->
     <div id="step1" class="step">
         <h4 class="text-center mb-4 pass-title">Paso 1: Escoge el Servicio</h4>
@@ -7,10 +14,10 @@
             <select id="service" name="service" class="form-select" required>
                 <option value="" selected>Selecciona un servicio</option>
                 <?php foreach ($services as $service) : ?>
-                <option value="<?php echo htmlspecialchars($service['id']); ?>"
-                    data-observation="<?php echo htmlspecialchars($service['observations']); ?>"
-                    data-duration="<?php echo htmlspecialchars($service['duration']); ?>">
-                    <?php echo htmlspecialchars($service['name']); ?></option>
+                    <option value="<?php echo htmlspecialchars($service['id']); ?>"
+                        data-observation="<?php echo htmlspecialchars($service['observations']); ?>"
+                        data-duration="<?php echo htmlspecialchars($service['duration']); ?>">
+                        <?php echo htmlspecialchars($service['name']); ?></option>
                 <?php endforeach; ?>
             </select>
             <input type="hidden" name="service_duration" id="service_duration" value>
@@ -55,22 +62,44 @@
         <button type="button" class="btn btn-anterior" onclick="showStep(1)">Anterior</button>
         <button type="button" class="btn btn-siguiente" onclick="showStep(3)">Siguiente</button>
     </div>
-    <!-- PASO 3 -->
+    <!-- Paso 3: Confirmación de datos -->
     <div id="step3" class="step d-none">
         <h4 class="text-center mb-4 pass-title">Paso 3: Completa tus datos</h4>
         <input type="hidden" name="company_id" id="company_id" value="<?php echo htmlspecialchars($company['id']); ?>">
+        <input type="hidden" name="customer_id" id="customer_id"
+            value="<?php echo $customerData ? htmlspecialchars($customerData['id']) : '';  ?>">
+        <input type="hidden" name="authenticated" id="authenticated"
+            value="<?php echo $authenticated ? 'true' : 'false'; ?>">
+        <!-- Checkbox para editar (solo visible si $customerData existe) -->
+        <?php if ($customerData): ?>
+            <div class="mb-3 form-check">
+                <input type="checkbox" id="editCustomer" class="form-check-input">
+                <label for="editCustomer" class="form-check-label text-dark">Editar datos</label>
+                <a tabindex="0" role="button" data-bs-trigger="focus" data-bs-toggle="popover" data-bs-title="Editar Datos"
+                    data-bs-content="Si marcas esta casilla podrás editar los datos de tu cliente. Esta opción estará disponible solo una vez">
+                    <i class="fa fa-circle-question text-secondary" style="font-size: 1.2rem;"></i>
+                </a>
+            </div>
+        <?php endif; ?>
         <div class="mb-3">
             <label for="name" class="form-label">Nombre:</label>
-            <input type="text" id="name" name="name" class="form-control" required>
+            <input type="text" id="name" name="name" class="form-control customer-field"
+                value="<?php echo $customerData ? htmlspecialchars($customerData['name']) : ''; ?>"
+                <?php echo $customerData ? 'disabled' : ''; ?> required>
         </div>
         <div class="mb-3">
             <label for="phone" class="form-label">Teléfono:</label>
-            <input type="tel" id="phone" name="phone" class="form-control" required>
+            <input type="tel" id="phone" name="phone" class="form-control customer-field"
+                value="<?php echo $customerData ? htmlspecialchars($customerData['phone']) : ''; ?>"
+                <?php echo $customerData ? 'disabled' : ''; ?> required>
         </div>
         <div class="mb-3">
             <label for="mail" class="form-label">Correo:</label>
-            <input type="email" id="mail" name="mail" class="form-control" required>
+            <input type="email" id="mail" name="mail" class="form-control customer-field"
+                value="<?php echo $customerData ? htmlspecialchars($customerData['mail']) : ''; ?>"
+                <?php echo $customerData ? 'disabled' : ''; ?> required>
         </div>
+        <!-- Botones de navegación -->
         <button type="button" class="btn btn-secondary btn-anterior" onclick="showStep(2)">Anterior</button>
         <button id="reservarBtn" class="btn btn-secondary btn-siguiente" type="submit">
             <span class="spinner-border spinner-border-sm d-none" aria-hidden="true"></span>
@@ -92,7 +121,8 @@
                 <!-- Aquí se mostrarán los datos de la reserva -->
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-anterior" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-anterior" data-bs-dismiss="modal"
+                    id="cancelReservation">Cancelar</button>
                 <button type="button" class="btn btn-siguiente" id="confirmReservation">Confirmar</button>
             </div>
         </div>

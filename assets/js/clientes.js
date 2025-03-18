@@ -1,6 +1,6 @@
 export function initClientes() {
   // Obtener el último estado guardado o usar "unconfirmed" por defecto
-  const savedStatus = sessionStorage.getItem("status") || "todos";
+  const savedStatus = sessionStorage.getItem("customerStatus") || "todos";
 
   // Cargar citas para la pestaña correspondiente al último estado guardado
   loadCustomers(savedStatus);
@@ -20,7 +20,7 @@ export function initClientes() {
       event.preventDefault();
       document.querySelector("#searchCustomerForm").reset();
       const newStatus = event.target.dataset.bsTarget.substring(1);
-      sessionStorage.setItem("status", newStatus);
+      sessionStorage.setItem("customerStatus", newStatus);
       loadCustomers(newStatus);
     });
   });
@@ -38,7 +38,7 @@ async function loadCustomers(status, page = 1) {
     const { success, data, totalPages: total } = await response.json();
 
     if (success) {
-      fillTableCustomers(data);
+      fillTableCustomers(data, status);
       currentPage = page;
       // Si el número de citas recibidas es menor que el límite, no hay más páginas
       const hasMoreData = data.length === limit;
@@ -49,7 +49,7 @@ async function loadCustomers(status, page = 1) {
   }
 }
 
-function fillTableCustomers(data) {
+function fillTableCustomers(data, status) {
   const tableContent = document.getElementById("tableContent");
   let html = "";
 
@@ -62,6 +62,11 @@ function fillTableCustomers(data) {
                <td data-cell="telefono" class="data"><i class="fab fa-whatsapp pe-1" style="font-size:0.85rem"></i><a href="https://wa.me/${customer.phone}" target="_blank">+${customer.phone}</a></td>
               <td data-cell="correo" class="data">${customer.mail}</td>
               <td data-cell="estado" class="data">${getStatusIcon(customer.blocked, customer.has_incidents)}</td>
+              <td data-cell="acciones" class="data align-content-around">
+              <div class="d-flex justify-content-evenly">
+                ${getActionIcons(customer.id, status)}
+              </div>
+              </td>
           </tr>
       `;
   });
@@ -75,7 +80,71 @@ function fillTableCustomers(data) {
       openCustomerDetail(customer.id); // Llamar a la función correcta
     });
   });
+
+  data.forEach((customer) => {
+    if (status === "todos") {
+      document.getElementById(`agendar-${customer.id}`).onclick = () => agendarCliente(customer);
+      document.getElementById(`editar-${customer.id}`).onclick = () => editarCliente(customer.id);
+      document.getElementById(`bloquear-${customer.id}`).onclick = () => bloquearCliente(customer.id);
+      document.getElementById(`eliminar-${customer.id}`).onclick = () => eliminarCliente(customer.id);
+    } else if (status === "incidencias") {
+      document.getElementById(`eliminar-incidencia-${customer.id}`).onclick = () => eliminarIncidencia(customer.id);
+    } else if (status === "blocked") {
+      document.getElementById(`desbloquear-${customer.id}`).onclick = () => desbloquearCliente(customer.id);
+    }
+  });
 }
+
+function getActionIcons(customerId, status) {
+  let icons = "";
+
+  if (status === "todos") {
+    icons = `
+      <i id="agendar-${customerId}" class="fas fa-calendar-plus action-icon text-primary" title="Agendar"></i>
+      <i id="editar-${customerId}" class="fas fa-edit action-icon text-warning" title="Editar"></i>
+      <i id="bloquear-${customerId}" class="fas fa-lock action-icon" title="Bloquear"></i>
+      <i id="eliminar-${customerId}" class="fas fa-trash-alt action-icon text-danger" title="Eliminar"></i>
+    `;
+  } else if (status === "incidencias") {
+    icons = `
+      <i id="eliminar-incidencia-${customerId}" class="fas fa-trash-alt action-icon" title="Eliminar incidencia"></i>
+    `;
+  } else if (status === "blocked") {
+    icons = `
+      <i id="desbloquear-${customerId}" class="fas fa-unlock action-icon" title="Desbloquear"></i>
+    `;
+  }
+
+  return icons;
+}
+
+async function agendarCliente(customer) {
+  try {
+    // Hacer un fetch para obtener la custom_url de la empresa
+    const response = await fetch(`${baseUrl}user_admin/controllers/customers.php?action=getUrl&company_id=${customer.company_id}`);
+    const { success, custom_url } = await response.json();
+
+    if (success) {
+      // Redirigir a la página de reservas con la custom_url y el customer_id
+      window.location.href = `${baseUrl}reservas/${custom_url}?customer_id=${customer.id}`;
+    } else {
+      console.error("Error al obtener la URL de la empresa.");
+    }
+  } catch (error) {
+    console.error("Error:", error);
+  }
+}
+
+// function openReservationModal(customer) {
+//   // Precargar los datos del cliente en el formulario
+//   document.getElementById("name").value = customer.name;
+//   document.getElementById("phone").value = customer.phone;
+//   document.getElementById("mail").value = customer.mail;
+
+//   // Mostrar el modal
+//   const reservationModal = new bootstrap.Modal(document.getElementById("reservationModal"));
+//   reservationModal.show();
+// }
 
 async function openCustomerDetail(customerId) {
   try {
@@ -146,6 +215,7 @@ function getStatusIcon(blocked, hasIncidents) {
   if (hasIncidents) return '<i class="fas fa-exclamation-triangle" style="color: orange;"></i>'; // Tiene incidencias
   return '<i class="fas fa-check-circle" style="color: green;"></i>'; // Estado normal
 }
+
 function updatePaginationControls(hasMoreData) {
   document.getElementById("currentPage").innerText = `Página ${currentPage}`;
   document.getElementById("prevPage").disabled = currentPage === 1;
@@ -154,10 +224,12 @@ function updatePaginationControls(hasMoreData) {
 
 document.getElementById("prevPage").addEventListener("click", () => {
   if (currentPage > 1) {
-    loadCustomers("all", currentPage - 1);
+    const savedStatus = sessionStorage.getItem("customerStatus") || "todos";
+    loadCustomers(savedStatus, currentPage - 1);
   }
 });
 
 document.getElementById("nextPage").addEventListener("click", () => {
-  loadCustomers("all", currentPage + 1);
+  const savedStatus = sessionStorage.getItem("customerStatus") || "todos";
+  loadCustomers(savedStatus, currentPage + 1);
 });

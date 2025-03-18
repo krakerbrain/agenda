@@ -15,11 +15,20 @@ try {
     // Iniciar la transacción
     $appointments->beginTransaction();
 
+    // Verificar si se recibieron datos POST
+    if (empty($_POST)) {
+        throw new Exception('No se recibieron datos.');
+    }
+
     // Recibir los datos del cuerpo de la solicitud
     $data = $_POST;
 
-    if (!$data) {
-        throw new Exception('Datos inválidos recibidos');
+    // Validar campos requeridos
+    $requiredFields = ['date', 'time', 'service_duration', 'phone', 'mail', 'company_id', 'service', 'name'];
+    foreach ($requiredFields as $field) {
+        if (empty($data[$field])) {
+            throw new Exception("El campo '$field' es requerido.");
+        }
     }
 
     // Convertir la duración del servicio a un número entero
@@ -35,11 +44,10 @@ try {
     // Formatear el tiempo en "H:i" (horas:minutos)
     $formattedStartTime = $startDateTime->format('H:i');
     $formattedEndTime = $endDateTime->format('H:i');
-
     $phone = formatPhoneNumber($data['phone']);
 
-    //Verificar si existe el cliente en la base de datos
-    $customer_id = $customers->checkAndAssociateCustomer($phone, $data['mail'], $data['company_id']);
+    // Verificar si el cliente ya existe
+    $customer_id = empty($data['customer_id']) ? $customers->checkAndAssociateCustomer($phone, $data['mail'], $data['company_id']) : $data['customer_id'];
     if (!$customer_id) {
         $customerData = [
             'name' => $data['name'],
@@ -67,7 +75,7 @@ try {
     if (isset($result['error'])) {
         // Retornar el mensaje de error si la cita ya fue enviada
         if ($result['error'] === 'Cita ya ha sido enviada.') {
-            echo json_encode(['message' => $result['error']]);
+            echo json_encode(['success' => false, 'message' => $result['error']]);
             http_response_code(400); // Bad Request
         } else {
             throw new Exception('Error al reservar la cita: ' . $result['error']);
@@ -75,19 +83,18 @@ try {
     } else {
         // Confirmar la transacción si todo fue exitoso
         $appointments->endTransaction();
-        echo json_encode(['message' => 'Cita reservada exitosamente. Recibirás una confirmación en breve.']);
-        http_response_code(200);
+        echo json_encode(['success' => true, 'message' => 'Cita reservada exitosamente. Recibirás una confirmación en breve.']);
+        http_response_code(200); // OK
     }
 } catch (Exception $e) {
     // Revertir la transacción en caso de error
     $appointments->cancelTransaction();
-    echo json_encode(['message' => 'Error: ' . $e->getMessage()]);
-    http_response_code(500);
+    echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+    http_response_code(500); // Internal Server Error
 } finally {
     // Cerrar la conexión
     $appointments = null;
 }
-
 
 function formatPhoneNumber($telefono)
 {
