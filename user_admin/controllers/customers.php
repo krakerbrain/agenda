@@ -54,6 +54,38 @@ try {
             header('Content-Type: application/json');
             echo json_encode(['success' => true, 'data' => $customersData]);
         }
+    } else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        if (isset($_POST['action']) && $_POST['action'] === 'updateCustomer') {
+            if ($_POST['action'] === 'updateCustomer') {
+                $customerId = $_POST['id'];
+                $name = $_POST['name'];
+                $phone = $_POST['phone'];
+                $mail = $_POST['mail'];
+                $blocked = isset($_POST['blocked']) ? 1 : 0;
+                $notes = !empty($_POST['notes']) ? trim($_POST['notes']) : NULL;
+
+                // Actualizar el cliente
+                $result = $customer->updateCustomer($customerId, $name, $phone, $mail, $blocked, $notes);
+
+                if ($result) {
+                    echo json_encode(['success' => true, 'message' => 'Cliente actualizado correctamente']);
+                } else {
+                    echo json_encode(['success' => false, 'message' => 'Error al actualizar el cliente']);
+                }
+                exit;
+            }
+        }
+        if ($_GET['action'] === 'blockCustomer') {
+
+            $data = json_decode(file_get_contents('php://input'), true);
+            $customerId = $data['customer_id'];
+            $nota = $data['nota'];
+
+            // Obtener la custom_url de la empresa
+            $result = $customer->toggleBlockCustomer($customerId, $nota);
+            echo json_encode($result);
+            exit;
+        }
     } else {
         // Manejo de otros métodos (si es necesario)
         header('Content-Type: application/json');

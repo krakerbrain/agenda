@@ -1,3 +1,20 @@
+<!-- modal generico de informacion -->
+<div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="infoModalLabel"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="infoModalMessage">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- customer_modal.php -->
 <div class="modal fade" id="customerDetailModal" tabindex="-1" aria-labelledby="customerDetailModalLabel"
     aria-hidden="true">
@@ -33,11 +50,81 @@
                     <h6>Incidencias</h6>
                     <ul class="list-group" id="customerIncidentsList"></ul>
                 </div>
-            </div>
 
-            <!-- Modal Footer -->
+                <!-- Sección de Notas -->
+                <div class="mb-4"></div>
+                <h6>Notas</h6>
+                <ul class="list-group" id="customerNotes"></ul>
+            </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- modal de edicion -->
+<div class="modal fade" id="editCustomerModal" tabindex="-1" aria-labelledby="editCustomerModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editCustomerModalLabel">Editar Cliente</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editCustomerForm">
+                    <input type="hidden" id="editCustomerId" name="id">
+                    <div class="mb-3">
+                        <label for="editCustomerName" class="form-label">Nombre:</label>
+                        <input type="text" class="form-control" id="editCustomerName" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editCustomerPhone" class="form-label">Teléfono:</label>
+                        <input type="text" class="form-control" id="editCustomerPhone" name="phone">
+                    </div>
+                    <div class="mb-3">
+                        <label for="editCustomerMail" class="form-label">Correo:</label>
+                        <input type="email" class="form-control" id="editCustomerMail" name="mail">
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="editCustomerBlocked" name="blocked">
+                        <label class="form-check-label" for="editCustomerBlocked">Bloqueado</label>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editCustomerNotes" class="form-label">Notas:</label>
+                        <textarea class="form-control" id="editCustomerNotes" name="notes" rows="4"></textarea>
+                    </div>
+                </form>
+            </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-primary" form="editCustomerForm">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para agregar la nota de bloqueo -->
+<div class="modal fade" id="modalBloquearCliente" tabindex="-1" aria-labelledby="modalBloquearClienteLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalBloquearClienteLabel">Bloquear Cliente</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formBloquearCliente">
+                    <div class="mb-3">
+                        <label for="notaBloqueo" class="form-label">Razón del bloqueo</label>
+                        <textarea class="form-control" id="notaBloqueo" name="notaBloqueo" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Confirmar Bloqueo</button>
+                </form>
             </div>
         </div>
     </div>

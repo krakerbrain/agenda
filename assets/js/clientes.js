@@ -3,7 +3,7 @@ export function initClientes() {
   const savedStatus = sessionStorage.getItem("customerStatus") || "todos";
 
   // Cargar citas para la pestaña correspondiente al último estado guardado
-  loadCustomers(savedStatus);
+  loadCustomers();
 
   const triggerTabList = document.querySelectorAll("#customerTab button");
 
@@ -21,7 +21,7 @@ export function initClientes() {
       document.querySelector("#searchCustomerForm").reset();
       const newStatus = event.target.dataset.bsTarget.substring(1);
       sessionStorage.setItem("customerStatus", newStatus);
-      loadCustomers(newStatus);
+      loadCustomers();
     });
   });
 }
@@ -29,8 +29,9 @@ export function initClientes() {
 let currentPage = 1;
 const limit = 10;
 
-// Función para cargar citas de acuerdo al estado de la pestaña
-async function loadCustomers(status, page = 1) {
+// Función para cargar cliente de acuerdo al estado de la pestaña
+async function loadCustomers(page = 1) {
+  const status = sessionStorage.getItem("customerStatus") || "todos";
   try {
     let url = `${baseUrl}user_admin/controllers/customers.php?status=${status}&page=${page}`;
 
@@ -40,12 +41,12 @@ async function loadCustomers(status, page = 1) {
     if (success) {
       fillTableCustomers(data);
       currentPage = page;
-      // Si el número de citas recibidas es menor que el límite, no hay más páginas
+      // Si el número de cliente recibidas es menor que el límite, no hay más páginas
       const hasMoreData = data.length === limit;
       updatePaginationControls(hasMoreData);
     }
   } catch (error) {
-    console.error("Error al obtener citas:", error);
+    console.error("Error al obtener cliente:", error);
   }
 }
 
@@ -65,7 +66,7 @@ function fillTableCustomers(data) {
               <td data-cell="estado" class="data">${getStatusIcon(customer.blocked, customer.has_incidents)}</td>
               <td data-cell="acciones" class="data align-content-around">
               <div class="d-flex justify-content-evenly">
-                ${getActionIcons(customer.id)}
+                ${getActionIcons(customer.id, customer.blocked)}
               </div>
               </td>
           </tr>
@@ -85,18 +86,22 @@ function fillTableCustomers(data) {
   data.forEach((customer) => {
     if (status === "todos") {
       document.getElementById(`agendar-${customer.id}`).onclick = () => agendarCliente(customer);
-      document.getElementById(`editar-${customer.id}`).onclick = () => editarCliente(customer.id);
-      document.getElementById(`bloquear-${customer.id}`).onclick = () => bloquearCliente(customer.id);
+      document.getElementById(`editar-${customer.id}`).onclick = () => editarCliente(customer);
+      if (customer.blocked == 1) {
+        document.getElementById(`desbloquear-${customer.id}`).onclick = () => toggleBlockSubmit(customer.id);
+      } else {
+        document.getElementById(`bloquear-${customer.id}`).onclick = () => toggleBlockWithModal(customer);
+      }
       document.getElementById(`eliminar-${customer.id}`).onclick = () => eliminarCliente(customer.id);
     } else if (status === "incidencias") {
       document.getElementById(`eliminar-incidencia-${customer.id}`).onclick = () => eliminarIncidencia(customer.id);
     } else if (status === "blocked") {
-      document.getElementById(`desbloquear-${customer.id}`).onclick = () => desbloquearCliente(customer.id);
+      document.getElementById(`desbloquear-${customer.id}`).onclick = () => toggleBlockSubmit(customer.id);
     }
   });
 }
 
-function getActionIcons(customerId) {
+function getActionIcons(customerId, isBlocked) {
   let icons = "";
   const status = sessionStorage.getItem("customerStatus") || "todos";
 
@@ -104,7 +109,11 @@ function getActionIcons(customerId) {
     icons = `
       <i id="agendar-${customerId}" class="fas fa-calendar-plus action-icon text-primary" title="Agendar"></i>
       <i id="editar-${customerId}" class="fas fa-edit action-icon text-warning" title="Editar"></i>
-      <i id="bloquear-${customerId}" class="fas fa-lock action-icon" title="Bloquear"></i>
+        ${
+          isBlocked === 1
+            ? `<i id="desbloquear-${customerId}" class="fas fa-unlock action-icon" title="Desbloquear"></i>`
+            : `<i id="bloquear-${customerId}" class="fas fa-lock action-icon" title="Bloquear"></i>`
+        }
       <i id="eliminar-${customerId}" class="fas fa-trash-alt action-icon text-danger" title="Eliminar"></i>
     `;
   } else if (status === "incidencias") {
@@ -137,16 +146,129 @@ async function agendarCliente(customer) {
   }
 }
 
-// function openReservationModal(customer) {
-//   // Precargar los datos del cliente en el formulario
-//   document.getElementById("name").value = customer.name;
-//   document.getElementById("phone").value = customer.phone;
-//   document.getElementById("mail").value = customer.mail;
+// Función para abrir el modal y cargar los datos del cliente
+async function editarCliente(customer) {
+  try {
+    // Obtener los datos del cliente
+    const response = await fetch(`${baseUrl}user_admin/controllers/customers.php?action=getCustomerDetail&id=${customer.id}`);
+    const data = await response.json();
 
-//   // Mostrar el modal
-//   const reservationModal = new bootstrap.Modal(document.getElementById("reservationModal"));
-//   reservationModal.show();
-// }
+    if (data.success) {
+      const customer = data.data;
+
+      // Llenar el formulario con los datos del cliente
+      document.getElementById("editCustomerId").value = customer.id;
+      document.getElementById("editCustomerName").value = customer.name;
+      document.getElementById("editCustomerPhone").value = customer.phone;
+      document.getElementById("editCustomerMail").value = customer.mail;
+      document.getElementById("editCustomerBlocked").checked = customer.blocked;
+      document.getElementById("editCustomerNotes").value = customer.notes || "";
+
+      // Mostrar el modal
+      const editModal = new bootstrap.Modal(document.getElementById("editCustomerModal"));
+      editModal.show();
+    } else {
+      console.error("Error al cargar los datos del cliente:", data.message);
+    }
+  } catch (error) {
+    console.error("Error en la solicitud:", error);
+  }
+}
+
+// Evento para guardar los cambios
+document.getElementById("editCustomerForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const formData = new FormData(e.target);
+  formData.append("action", "updateCustomer"); // Agregar la acción al FormData
+
+  try {
+    const response = await fetch(`${baseUrl}user_admin/controllers/customers.php`, {
+      method: "POST",
+      body: formData,
+    });
+    const data = await response.json();
+
+    if (data.success) {
+      console.log("Cliente actualizado:", data.message);
+      // Cerrar el modal
+      const editModal = bootstrap.Modal.getInstance(document.getElementById("editCustomerModal"));
+      editModal.hide();
+      // Recargar la lista de clientes o actualizar la interfaz
+      loadCustomers();
+    } else {
+      console.error("Error al guardar los cambios:", data.message);
+    }
+  } catch (error) {
+    console.error("Error en la solicitud:", error);
+  }
+});
+
+// Función para bloquear un cliente
+async function toggleBlockSubmit(customerId, nota = null) {
+  try {
+    // Hacer un fetch para bloquear/desbloquear al cliente
+    const response = await fetch(`${baseUrl}user_admin/controllers/customers.php?action=blockCustomer`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        customer_id: customerId,
+        nota: nota, // Enviar la nota solo si se está bloqueando
+      }),
+    });
+
+    const { success, message } = await response.json();
+
+    if (success) {
+      infoModal("Atención", message); // Mostrar mensaje de éxito
+      loadCustomers(); // Recargar la lista de clientes
+    } else {
+      infoModal("Error", message || "Ocurrió un error al intentar bloquear/desbloquear el cliente.");
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    infoModal("Error", "Ocurrió un error al intentar bloquear/desbloquear el cliente.");
+  }
+}
+
+function toggleBlockWithModal(customer) {
+  const modalElement = document.getElementById("modalBloquearCliente");
+  if (!modalElement) {
+    console.error("Modal no encontrado.");
+    return;
+  }
+
+  const modal = new bootstrap.Modal(modalElement);
+
+  // Limpiar el formulario cada vez que se abre el modal
+  modalElement.addEventListener("show.bs.modal", () => {
+    document.getElementById("notaBloqueo").value = "";
+  });
+
+  // Manejar el envío del formulario
+  const form = document.getElementById("formBloquearCliente");
+  form.onsubmit = (event) => {
+    event.preventDefault(); // Evitar que el formulario se envíe de forma tradicional
+
+    const notaBloqueo = document.getElementById("notaBloqueo").value;
+
+    if (!notaBloqueo) {
+      infoModal("Atención", "Por favor, ingrese una razón para el bloqueo.");
+      return;
+    }
+
+    // Ocultar el modal
+    modal.hide();
+
+    // Llamar a toggleBlockSubmit con la nota
+    toggleBlockSubmit(customer.id, notaBloqueo);
+  };
+
+  // Mostrar el modal
+  modal.show();
+}
 
 async function openCustomerDetail(customerId) {
   try {
@@ -173,8 +295,9 @@ function showCustomerDetailModal(customer) {
   document.getElementById("customerPhone").textContent = customer.phone;
   document.getElementById("customerPhone").href = `https://wa.me/${customer.phone}`;
   document.getElementById("customerEmail").textContent = customer.mail;
-  document.getElementById("customerStatus").textContent = customer.blocked ? "Bloqueado" : "Activo";
+  document.getElementById("customerStatus").innerHTML = customer.blocked ? `Bloqueado<br><small class="text-danger">Razón: ${customer.nota_bloqueo || "Sin razón especificada"}</small>` : "Activo";
   document.getElementById("customerIncidents").textContent = customer.has_incidents ? "Sí" : "No";
+  document.getElementById("customerNotes").textContent = customer.notes ?? "Sin notas";
 
   // Llenar los últimos servicios
   const lastServicesList = document.getElementById("customerLastServices");
@@ -226,14 +349,12 @@ function updatePaginationControls(hasMoreData) {
 
 document.getElementById("prevPage").addEventListener("click", () => {
   if (currentPage > 1) {
-    const savedStatus = sessionStorage.getItem("customerStatus") || "todos";
-    loadCustomers(savedStatus, currentPage - 1);
+    loadCustomers(currentPage - 1);
   }
 });
 
 document.getElementById("nextPage").addEventListener("click", () => {
-  const savedStatus = sessionStorage.getItem("customerStatus") || "todos";
-  loadCustomers(savedStatus, currentPage + 1);
+  loadCustomers(currentPage + 1);
 });
 
 // Sugerencias de autocompletado (puedes hacer una búsqueda mínima de 3 caracteres)
@@ -259,4 +380,11 @@ async function autocomplete(e) {
   } else if (query === "") {
     loadCustomers(savedStatus);
   }
+}
+
+function infoModal(label, body) {
+  document.getElementById("infoModalLabel").textContent = label;
+  document.getElementById("infoModalMessage").textContent = body;
+  const infoModal = new bootstrap.Modal(document.getElementById("infoModal"));
+  infoModal.show();
 }

@@ -145,7 +145,7 @@ class Customers
     {
         try {
             // Consulta para obtener los detalles básicos del cliente
-            $query = 'SELECT c.id, c.name, c.phone, c.mail, c.blocked, 
+            $query = 'SELECT c.id, c.name, c.phone, c.mail, c.notes, c.blocked, c.nota_bloqueo,
                              CASE WHEN ci.id IS NOT NULL THEN 1 ELSE 0 END AS has_incidents
                       FROM customers c
                       LEFT JOIN customer_incidents ci ON c.id = ci.customer_id
@@ -272,6 +272,59 @@ class Customers
         } catch (PDOException $e) {
             echo "Error: " . $e->getMessage();
             return [];
+        }
+    }
+
+
+    public function toggleBlockCustomer($customerId, $nota)
+    {
+        try {
+            // verificamos si el usaurio esta bloqueado
+
+            $sql = "SELECT blocked FROM customers WHERE id = :customerId";
+            $this->db->query($sql);
+            $this->db->bind(':customerId', $customerId);
+            $result = $this->db->single();
+            $status = $result['blocked'] == 1 ? $status = 0 : $status = 1;
+            $nota = $result['blocked'] == 1 ? $nota = NULL : $nota = $nota;
+            $message = $result['blocked'] == 1 ? 'Cliente desbloqueado correctamente' : 'Cliente bloqueado correctamente';
+
+            $sql = "UPDATE customers SET blocked = :status, nota_bloqueo = :nota WHERE id = :customerId";
+            $this->db->query($sql);
+            $this->db->bind(':customerId', $customerId);
+            $this->db->bind(':status', $status);
+            $this->db->bind(':nota', $nota);
+            $this->db->execute();
+            return ['success' => true, 'message' => $message];
+        } catch (PDOException $e) {
+            echo "Error: " . $e->getMessage();
+            return false;
+        }
+    }
+
+    public function updateCustomer($customerId, $name, $phone, $mail, $blocked, $notes)
+    {
+        try {
+            $sql = "UPDATE customers 
+                SET name = :name, 
+                    phone = :phone, 
+                    mail = :mail, 
+                    blocked = :blocked, 
+                    notes = :notes 
+                WHERE id = :customerId";
+
+            $this->db->query($sql);
+            $this->db->bind(':name', $name);
+            $this->db->bind(':phone', $phone);
+            $this->db->bind(':mail', $mail);
+            $this->db->bind(':blocked', $blocked);
+            $this->db->bind(':notes', $notes);
+            $this->db->bind(':customerId', $customerId);
+
+            return $this->db->execute();
+        } catch (PDOException $e) {
+            echo "Error: " . $e->getMessage();
+            return false;
         }
     }
 }
