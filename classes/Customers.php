@@ -327,4 +327,17 @@ class Customers
             return false;
         }
     }
+
+    public function deleteCustomer($customerId)
+    {
+        try {
+            $sql = "DELETE FROM customers WHERE id = :customerId";
+            $this->db->query($sql);
+            $this->db->bind(':customerId', $customerId);
+            return $this->db->execute();
+        } catch (PDOException $e) {
+            echo "Error: " . $e->getMessage();
+            return false;
+        }
+    }
 }

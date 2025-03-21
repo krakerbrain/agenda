@@ -92,7 +92,7 @@ function fillTableCustomers(data) {
       } else {
         document.getElementById(`bloquear-${customer.id}`).onclick = () => toggleBlockWithModal(customer);
       }
-      document.getElementById(`eliminar-${customer.id}`).onclick = () => eliminarCliente(customer.id);
+      document.getElementById(`eliminar-${customer.id}`).onclick = () => modalEliminarCliente(customer.id);
     } else if (status === "incidencias") {
       document.getElementById(`eliminar-incidencia-${customer.id}`).onclick = () => eliminarIncidencia(customer.id);
     } else if (status === "blocked") {
@@ -195,6 +195,7 @@ document.getElementById("editCustomerForm").addEventListener("submit", async (e)
       const editModal = bootstrap.Modal.getInstance(document.getElementById("editCustomerModal"));
       editModal.hide();
       // Recargar la lista de clientes o actualizar la interfaz
+      infoModal("Éxito", "Edición exitosa.");
       loadCustomers();
     } else {
       console.error("Error al guardar los cambios:", data.message);
@@ -268,6 +269,49 @@ function toggleBlockWithModal(customer) {
 
   // Mostrar el modal
   modal.show();
+}
+
+function modalEliminarCliente(customerId) {
+  const modalElement = document.getElementById("modalEliminarCliente");
+  if (!modalElement) {
+    console.error("Modal no encontrado.");
+    return;
+  }
+
+  const modal = new bootstrap.Modal(modalElement);
+  modal.show();
+
+  document.querySelector("#btnEliminarCliente").onclick = () => {
+    eliminarCliente(customerId);
+    modal.hide();
+  };
+}
+
+async function eliminarCliente(customerId) {
+  try {
+    // Hacer un fetch para obtener la custom_url de la empresa
+    const response = await fetch(`${baseUrl}user_admin/controllers/customers.php`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        action: "deleteCustomer",
+        customer_id: customerId,
+      }),
+    });
+
+    const { success, message } = await response.json();
+
+    if (success) {
+      infoModal("Atención", message); // Mostrar mensaje de éxito
+      loadCustomers(); // Recargar la lista de clientes
+    } else {
+      infoModal("Error", message || "Ocurrió un error al intentar eliminar el cliente.");
+    }
+  } catch (error) {
+    console.error("Error:", error);
+  }
 }
 
 async function openCustomerDetail(customerId) {

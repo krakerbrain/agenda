@@ -129,3 +129,32 @@
         </div>
     </div>
 </div>
+<!-- Modal eliminar cliente -->
+<div class="modal fade" id="modalEliminarCliente" tabindex="-1" aria-labelledby="modalEliminarClienteLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalEliminarClienteLabel">¿Estás seguro de que quieres eliminar este
+                    cliente?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Se eliminarán todos los datos del cliente, incluyendo:</p>
+                <ul>
+                    <li>Información personal (nombre, teléfono, etc.).</li>
+                    <li>Citas futuras (se liberarán los horarios).</li>
+                    <li>Citas pasadas (no se conservará el historial).</li>
+                </ul>
+                <p><strong>El cliente no será bloqueado.</strong> Podrá registrarse nuevamente en el futuro si lo desea.
+                    Si quieres evitar que reserve citas, te recomendamos usar la opción <strong>Bloquear</strong>.</p>
+                <p class="text-danger"><strong>Esta acción no se puede deshacer.</strong> Asegúrate de que es lo que
+                    quieres hacer.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="btnEliminarCliente">Eliminar</button>
+            </div>
+        </div>
+    </div>
+</div>

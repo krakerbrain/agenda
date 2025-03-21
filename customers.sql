@@ -2,15 +2,16 @@
 sql
 Copy
 CREATE TABLE `customers` (
-    `id` INT(11) NOT NULL AUTO_INCREMENT,
-    `name` VARCHAR(255) NOT NULL,
-    `phone` VARCHAR(15) DEFAULT NULL,
-    `mail` VARCHAR(100) DEFAULT NULL,
-    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
-    `blocked` TINYINT(1) NOT NULL DEFAULT 0,
-    `notes` TEXT DEFAULT NULL,
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `name` varchar(255) NOT NULL,
+    `phone` varchar(15) DEFAULT NULL,
+    `mail` varchar(100) DEFAULT NULL,
+    `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+    `blocked` tinyint(1) NOT NULL DEFAULT 0,
+    `notes` text DEFAULT NULL,
+    `nota_bloqueo` text DEFAULT NULL,
     PRIMARY KEY (`id`)
-);
+)
 
 -- Se crea la tabla company_customers para asociar clientes a empresas
 CREATE TABLE `company_customers` (
@@ -19,20 +20,22 @@ CREATE TABLE `company_customers` (
     `customer_id` int(11) NOT NULL,
     `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
     PRIMARY KEY (`id`),
-    UNIQUE (`company_id`, `customer_id`), -- Evita que un cliente se asocie más de una vez a la misma empresa
-    FOREIGN KEY (`company_id`) REFERENCES `companies`(`id`) ON DELETE CASCADE,
-    FOREIGN KEY (`customer_id`) REFERENCES `customers`(`id`) ON DELETE CASCADE
-);
+    UNIQUE KEY `company_id` (`company_id`, `customer_id`),
+    KEY `customer_id` (`customer_id`),
+    CONSTRAINT `company_customers_ibfk_1` FOREIGN KEY (`company_id`) REFERENCES `companies` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `company_customers_ibfk_2` FOREIGN KEY (`customer_id`) REFERENCES `customers` (`id`) ON DELETE CASCADE
+) 
 
 CREATE TABLE `customer_incidents` (
-    `id` INT(11) NOT NULL AUTO_INCREMENT,
-    `customer_id` INT(11) NOT NULL,
-    `description` VARCHAR(255) NOT NULL,
-    `incident_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
-    `note` TEXT DEFAULT NULL,
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `customer_id` int(11) NOT NULL,
+    `description` varchar(255) NOT NULL,
+    `incident_date` timestamp NOT NULL DEFAULT current_timestamp(),
+    `note` text DEFAULT NULL,
     PRIMARY KEY (`id`),
-    FOREIGN KEY (`customer_id`) REFERENCES `customers`(`id`) ON DELETE CASCADE
-);
+    KEY `customer_id` (`customer_id`),
+    CONSTRAINT `customer_incidents_ibfk_1` FOREIGN KEY (`customer_id`) REFERENCES `customers` (`id`) ON DELETE CASCADE
+)
 
 -- Se agrega la columna customer_id a appointments
 ALTER TABLE `appointments` 
@@ -53,8 +56,8 @@ AND (a.mail = c.mail OR (a.mail IS NULL AND c.mail IS NULL))
 SET a.customer_id = c.id;
 
     -- Se crea la clave foránea en appointments
-ALTER TABLE `appointments`
-ADD CONSTRAINT `fk_customer_id`
-FOREIGN KEY (`customer_id`) REFERENCES `customers`(`id`) ON DELETE CASCADE;
 
-ALTER TABLE `appointments` CHANGE `name` `name` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL;
+ALTER TABLE `appointments`
+ADD CONSTRAINT `fk_appointments_customers`
+FOREIGN KEY (`customer_id`) REFERENCES `customers` (`id`)
+ON DELETE CASCADE;

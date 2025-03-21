@@ -16,7 +16,12 @@ try {
     $company_id = $datosUsuario['company_id'];
     $customer = new Customers;
 
+    $input = file_get_contents('php://input');
+    $data = json_decode($input, true);
+
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+
+
         if (isset($_GET['action'])) {
             if ($_GET['action'] === 'getCustomerDetail') {
                 $customerId = $_GET['id'];
@@ -85,6 +90,21 @@ try {
             $result = $customer->toggleBlockCustomer($customerId, $nota);
             echo json_encode($result);
             exit;
+        }
+    } else if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+
+        try {
+            // Manejo de la eliminación de un cliente
+            $data = json_decode(file_get_contents('php://input'), true);
+            if ($data['action'] == 'deleteCustomer') {
+                $customerId = $data['customer_id'];
+
+                $result = $customer->deleteCustomer($customerId);
+                echo json_encode(["success" => $result, "message" => "Cliente eliminado correctamente"]);
+                exit;
+            }
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => 'Error al eliminar el cliente' . $e->getMessage()]);
         }
     } else {
         // Manejo de otros métodos (si es necesario)
