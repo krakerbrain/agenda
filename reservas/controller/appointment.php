@@ -4,6 +4,7 @@ require_once dirname(__DIR__, 2) . '/configs/init.php';
 require_once dirname(__DIR__, 2) . '/classes/ConfigUrl.php';
 require_once dirname(__DIR__, 2) . '/classes/Appointments.php';
 require_once dirname(__DIR__, 2) . '/classes/Customers.php';
+require_once dirname(__DIR__, 2) . '/classes/EmailTemplate.php';
 
 // Crear instancia de la clase Appointments
 $appointments = new Appointments();
@@ -46,9 +47,26 @@ try {
     $formattedEndTime = $endDateTime->format('H:i');
     $phone = formatPhoneNumber($data['phone']);
 
-    // Verificar si el cliente ya existe
+    // Verificar si el cliente ya existe o si esta bloqueado
     $customer_id = empty($data['customer_id']) ? $customers->checkAndAssociateCustomer($phone, $data['mail'], $data['company_id']) : $data['customer_id'];
-    if (!$customer_id) {
+
+    if (is_array($customer_id) && isset($customer_id['error'])) {
+        // Si hay un error, devolver el mensaje de error
+        if ($customer_id['error'] === 'blocked') {
+            // Manejar el caso de cliente bloqueado
+            echo json_encode(['success' => false, 'message' => $customer_id['message']]);
+            http_response_code(403); // Forbidden (o 400 si prefieres mantener Bad Request)
+
+            // Enviar un correo electrónico (aquí iría la lógica para enviar el correo)
+            $emailTemplate = new EmailTemplate();
+            $emailTemplate->buildBlockedUserAlertMail($data);
+        } else {
+            // Manejar otros errores (si los hay en el futuro)
+            echo json_encode(['success' => false, 'message' => $customer_id['message']]);
+            http_response_code(400); // Bad Request
+        }
+        exit;
+    } elseif (!$customer_id) {
         $customerData = [
             'name' => $data['name'],
             'phone' => $phone,

@@ -234,4 +234,24 @@ class EmailTemplate
             return ['error' => $e->getMessage()];
         }
     }
+    // construir correo para avisar a la emporesa que un usuario bloqueado intento hacer una cita
+
+    public function buildBlockedUserAlertMail($data)
+    {
+        $companyData = $this->dataLoader->getCompanyData($data['company_id'], 'reserva');
+        $userData = $this->dataLoader->getUserData($data['company_id']);
+        $placeholders = [
+            '{empresa}' => $companyData['name'],
+            '{nombre_cliente}' => $data['name'],
+            '{telefono_cliente}' => $data['phone'],
+            '{email_cliente}' => $data['mail'],
+            // fecha intento hoy
+            '{fecha_intento}' => date('d/m/Y H:i:s')
+        ];
+        $alertBody = $this->emailBuilder->buildTemplate('alerta_usuario_bloqueado', $placeholders);
+        $alertSubject = 'Alerta: Cliente bloqueado intentó hacer una cita';
+
+        // return $this->emailSender->sendEmail($userData['mail'], ['subject' => $alertSubject, 'body' => $alertBody, 'company_name' => $companyData['name']]);
+        return $this->emailSender->sendEmail('marioplantabaja@gmail.com', ['subject' => $alertSubject, 'body' => $alertBody, 'company_name' => $companyData['name']]);
+    }
 }

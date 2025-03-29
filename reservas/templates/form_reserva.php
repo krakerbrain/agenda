@@ -135,7 +135,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="responseModalLabel">Reserva exitosa</h5>
+                <h5 class="modal-title" id="responseModalLabel"></h5>
             </div>
             <div class="modal-body" id="responseModalBody"></div>
             <div class="modal-footer">

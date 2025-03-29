@@ -3,6 +3,8 @@
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
+require_once dirname(__DIR__, 2) . '/configs/init.php';
+
 class EmailSender
 {
     private $mail;
@@ -19,10 +21,22 @@ class EmailSender
         $this->mail->isSMTP();
         $this->mail->Host = 'smtp.gmail.com';
         $this->mail->SMTPAuth = true;
-        $this->mail->Username = 'agendaroad@gmail.com'; // Tu dirección de correo de Gmail
-        $this->mail->Password = 'ngua iwiw vogx xkwx'; // Tu contraseña de Gmail
-        $this->mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $this->mail->Port = 587;
+        $this->mail->Username = getenv(SMTP_USER); // Tu dirección de correo de Gmail
+        $this->mail->Password = getenv(SMTP_PASS); // Tu contraseña de Gmail
+        if (getenv(APP_ENV) == 'local') {
+            $this->mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+            $this->mail->Port = 465;
+            $this->mail->SMTPOptions = [
+                'ssl' => [
+                    'verify_peer' => false,
+                    'verify_peer_name' => false,
+                    'allow_self_signed' => true,
+                ],
+            ];
+        } else {
+            $this->mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $this->mail->Port = 587;
+        }
     }
 
     // Método común para enviar el correo

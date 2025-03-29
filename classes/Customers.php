@@ -46,41 +46,72 @@ class Customers
         return $db->resultSet();
     }
 
-    // crear metodo que verifique si el cliente ya existe verificando por el telefono y el correo, si existe retorna id
+
+    // Verifica si el cliente existe por teléfono o email
+    private function checkCustomerExists($phone, $email)
+    {
+        $sql = "SELECT id FROM customers WHERE phone = :phone OR mail = :email";
+        $this->db->query($sql);
+        $this->db->bind(':phone', $phone);
+        $this->db->bind(':email', $email);
+        return $this->db->single();
+    }
+
+    // Verifica si el cliente está asociado a una compañía específica
+    private function isCustomerAssociatedWithCompany($customerId, $companyId)
+    {
+        $sql = "SELECT 1 FROM company_customers WHERE customer_id = :customer_id AND company_id = :company_id";
+        $this->db->query($sql);
+        $this->db->bind(':customer_id', $customerId);
+        $this->db->bind(':company_id', $companyId);
+        return $this->db->single();
+    }
+
+    // Verifica si el cliente está bloqueado
+    private function isCustomerBlocked($customerId)
+    {
+        $sql = "SELECT blocked FROM customers WHERE id = :customer_id";
+        $this->db->query($sql);
+        $this->db->bind(':customer_id', $customerId);
+        $result = $this->db->single();
+        return $result && $result['blocked'] == 1;
+    }
+
+    // Asocia un cliente a una compañía
+    private function associateCustomerWithCompany($customerId, $companyId)
+    {
+        $sql = "INSERT INTO company_customers (customer_id, company_id) VALUES (:customer_id, :company_id)";
+        $this->db->query($sql);
+        $this->db->bind(':customer_id', $customerId);
+        $this->db->bind(':company_id', $companyId);
+        return $this->db->execute();
+    }
+
+    // Método principal para verificar y asociar un cliente
     public function checkAndAssociateCustomer($phone, $email, $companyId)
     {
         try {
-            // Primero, verificamos si el cliente existe por teléfono o email
-            $sql = "SELECT c.id
-                    FROM customers c
-                    LEFT JOIN company_customers cc ON c.id = cc.customer_id
-                    WHERE (c.phone = :phone OR c.mail = :email)";
-            $this->db->query($sql);
-            $this->db->bind(':phone', $phone);
-            $this->db->bind(':email', $email);
-            $result = $this->db->single();
+            // Verifica si el cliente existe
+            $customer = $this->checkCustomerExists($phone, $email);
 
-            // Si el cliente existe
-            if ($result) {
-                // Verificamos si el cliente ya está asociado a la compañía
-                $customerId = $result['id'];
-                $sqlCheckAssociation = "SELECT 1 FROM company_customers WHERE customer_id = :customer_id AND company_id = :company_id";
-                $this->db->query($sqlCheckAssociation);
-                $this->db->bind(':customer_id', $customerId);
-                $this->db->bind(':company_id', $companyId);
-                $associationExists = $this->db->single();
+            if ($customer) {
+                $customerId = $customer['id'];
+                // Verifica si el cliente está bloqueado
+                if ($this->isCustomerBlocked($customerId)) {
+                    return ['error' => 'blocked', 'message' => 'Tu reserva no podrá ser procesada. Por favor, contáctanos a través de nuestras redes.'];
+                }
 
-                // Si no está asociado, lo asociamos
-                if (!$associationExists) {
-                    $this->associate_company_with_customer($customerId, $companyId);
+                // Verifica si el cliente ya está asociado a la compañía
+                if (!$this->isCustomerAssociatedWithCompany($customerId, $companyId)) {
+                    $this->associateCustomerWithCompany($customerId, $companyId);
                 }
 
                 return $customerId;
             }
 
-            // Si el cliente no existe, creamos uno nuevo
+            // Si el cliente no existe, retorna false
             return false;
-        } catch (PDOException $e) {
+        } catch (Exception $e) {
             echo "Error: " . $e->getMessage();
             return false;
         }
@@ -110,18 +141,18 @@ class Customers
         }
     }
 
-    private function associate_company_with_customer($customerId, $companyId)
-    {
-        try {
-            $sql = "INSERT INTO company_customers (company_id, customer_id) VALUES (:company_id, :customer_id)";
-            $this->db->query($sql);
-            $this->db->bind(':company_id', $companyId);
-            $this->db->bind(':customer_id', $customerId);
-            $this->db->execute();
-        } catch (PDOException $e) {
-            echo "Error: " . $e->getMessage();
-        }
-    }
+    // private function associate_company_with_customer($customerId, $companyId)
+    // {
+    //     try {
+    //         $sql = "INSERT INTO company_customers (company_id, customer_id) VALUES (:company_id, :customer_id)";
+    //         $this->db->query($sql);
+    //         $this->db->bind(':company_id', $companyId);
+    //         $this->db->bind(':customer_id', $customerId);
+    //         $this->db->execute();
+    //     } catch (PDOException $e) {
+    //         echo "Error: " . $e->getMessage();
+    //     }
+    // }
     // Método para crear una incidencia
     public function createIncident($customerId, $reason, $notes)
     {
