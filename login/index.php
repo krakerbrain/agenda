@@ -55,9 +55,43 @@ include '../partials/head.php';
                     <input type="submit" value="Ingresar" class="btn btn-info w-100">
                 </div>
 
+                <!-- Dentro del formulario de login, después del botón de Ingresar -->
+                <div class="form-group mt-3 text-center">
+                    <a href="#" class="text-info" id="forgot-password-link">¿Olvidaste tu contraseña?</a>
+                </div>
+
+
+
                 <!-- Mostrar mensaje de error -->
                 <div id="error-message" class="d-flex justify-content-center mt-1 text-danger"></div>
             </form>
+        </div>
+    </div>
+    <!-- Modal para recuperación de contraseña -->
+    <div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content login-container">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title">Recuperar Contraseña</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="forgotPasswordForm" novalidate>
+                        <div class="mb-3">
+                            <label for="recovery-email" class="form-label">Ingresa tu correo electrónico</label>
+                            <input type="email" class="form-control" id="recovery-email" name="email" required
+                                pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$">
+                            <div class="invalid-feedback">Por favor ingresa un correo válido</div>
+                        </div>
+                        <button type="submit" class="btn btn-info w-100" id="recovery-submit">
+                            <span class="spinner-border spinner-border-sm d-none" id="recovery-spinner"></span>
+                            <span id="recovery-text">Enviar enlace</span>
+                        </button>
+                    </form>
+                    <div id="recovery-message" class="mt-3 text-center"></div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -93,5 +127,61 @@ include '../partials/head.php';
             var pass = document.getElementById('contrasenia');
             pass.type = pass.type === "password" ? "text" : "password";
         }
+
+        // Agrega esto al script de tu login.html
+        document.getElementById('forgot-password-link').addEventListener('click', function(e) {
+            e.preventDefault();
+            // Asumiendo que estás usando Bootstrap 5
+            const modal = new bootstrap.Modal(document.getElementById('forgotPasswordModal'));
+            modal.show();
+        });
+
+        document.getElementById('forgotPasswordForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const submitBtn = document.getElementById('recovery-submit');
+            const spinner = document.getElementById('recovery-spinner');
+            const btnText = document.getElementById('recovery-text');
+
+            // Mostrar spinner y deshabilitar botón
+            spinner.classList.remove('d-none');
+            btnText.textContent = 'Enviando...';
+            submitBtn.disabled = true;
+            const email = document.getElementById('recovery-email').value;
+
+            try {
+                const response = await fetch(`${baseUrl}login/controllers/password_recovery_controller.php`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `email=${encodeURIComponent(email)}`
+                });
+                const result = await response.json();
+
+                const messageElement = document.getElementById('recovery-message');
+                messageElement.innerText = result.message;
+                messageElement.className = result.success ? 'mt-3 text-center text-success' :
+                    'mt-3 text-center text-info';
+
+                if (result.success) {
+                    setTimeout(() => {
+                        bootstrap.Modal.getInstance(document.getElementById('forgotPasswordModal'))
+                            .hide();
+                    }, 3000);
+                }
+            } catch (error) {
+                document.getElementById('recovery-message').innerText = "Error en la conexión.";
+            } finally {
+                // Siempre restaurar el estado del botón
+                spinner.classList.add('d-none');
+                btnText.textContent = 'Enviar enlace';
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
     </script>
 </body>
+
+</html>

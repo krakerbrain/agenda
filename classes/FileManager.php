@@ -38,7 +38,7 @@ class FileManager
             }
 
             // Devolver la ruta relativa del logo
-            $logo = '/assets/img/uploads/logo-' . $company_id . '/' . $formatted_name;
+            $logo = 'assets/img/uploads/logo-' . $company_id . '/' . $formatted_name;
             return $logo;
         } else {
             throw new Exception('No se seleccionó ningún archivo.');
