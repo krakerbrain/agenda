@@ -65,7 +65,7 @@ function fillTableCustomers(data) {
               <td data-cell="correo" class="data">${customer.mail}</td>
               <td data-cell="estado" class="data">${getStatusIcon(customer.blocked, customer.has_incidents)}</td>
               <td data-cell="acciones" class="data align-content-around">
-              <div class="d-flex justify-content-evenly">
+              <div class="actionBtns">
                 ${getActionIcons(customer.id, customer.blocked)}
               </div>
               </td>

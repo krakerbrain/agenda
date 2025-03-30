@@ -154,20 +154,169 @@ class Customers
     //     }
     // }
     // Método para crear una incidencia
-    public function createIncident($customerId, $reason, $notes)
+    public function createIncident($company_id, $customerId, $reason, $notes)
+    {
+        try {
+            $this->db->beginTransaction();
+
+            // 1. Insertar incidente
+            $insertResult = $this->insertIncidentRecord($customerId, $reason, $notes);
+            if (!$insertResult['success']) {
+                throw new Exception($insertResult['message']);
+            }
+
+            // 2. Obtener configuración de la compañía
+            $companyInfo = $this->getCompanyInfo($company_id);
+            if (!$companyInfo) {
+                throw new Exception("Configuración de compañía no disponible");
+            }
+
+            $response = [
+                'success' => true,
+                'message' => 'Incidencia registrada exitosamente',
+                'incident_count' => null,
+                'blocked' => false,
+                'threshold' => null
+            ];
+
+            // 3. Verificar si el bloqueo automático está activado
+            if ($companyInfo['block_by_incidents']) {
+                $incidentCount = $this->countCustomerIncidents($customerId);
+                if ($incidentCount === false) {
+                    throw new Exception("Error al contar incidentes");
+                }
+
+                $response['incident_count'] = $incidentCount;
+                $response['threshold'] = $companyInfo['incidents_threshold'];
+
+                // 4. Bloquear si supera el umbral
+                if ($incidentCount >= $companyInfo['incidents_threshold']) {
+                    $blockResult = $this->blockCustomerAutomatically(
+                        $customerId,
+                        "Bloqueado automáticamente por alcanzar {$incidentCount} incidentes"
+                    );
+
+                    if (!$blockResult) {
+                        throw new Exception("Error al bloquear cliente");
+                    }
+
+                    $response['blocked'] = true;
+                    $response['message'] = 'Incidencia registrada y cliente bloqueado por acumulación de incidentes';
+                }
+            }
+
+            $this->db->endTransaction();
+            return $response;
+        } catch (PDOException $e) {
+            $this->db->cancelTransaction();
+            error_log("PDOException en createIncident: " . $e->getMessage());
+            return [
+                'success' => false,
+                'message' => 'Error de base de datos',
+                'error_code' => 'DB_ERROR',
+                'debug' => $e->getMessage()
+            ];
+        } catch (Exception $e) {
+            $this->db->cancelTransaction();
+            error_log("Exception en createIncident: " . $e->getMessage());
+            return [
+                'success' => false,
+                'message' => $e->getMessage(),
+                'error_code' => 'PROCESS_ERROR'
+            ];
+        }
+    }
+
+
+    private function insertIncidentRecord($customerId, $reason, $notes)
     {
         try {
             $query = 'INSERT INTO customer_incidents (customer_id, description, incident_date, note)
-                  VALUES (:customerId, :reason, NOW(), :notes)';
+              VALUES (:customerId, :reason, NOW(), :notes)';
 
             $this->db->query($query);
             $this->db->bind(':customerId', $customerId);
             $this->db->bind(':reason', $reason);
             $this->db->bind(':notes', $notes);
 
-            return $this->db->execute();
+            $result = $this->db->execute();
+
+            return [
+                'success' => $result,
+                'message' => $result ? 'Incidente registrado' : 'Error al insertar incidente'
+            ];
         } catch (PDOException $e) {
-            echo "Error: " . $e->getMessage();
+            error_log("Error en insertIncidentRecord: " . $e->getMessage());
+            return [
+                'success' => false,
+                'message' => 'Error de base de datos al insertar incidente'
+            ];
+        }
+    }
+
+    private function getCompanyInfo($company_id)
+    {
+        try {
+            $sql = "SELECT incidents_threshold, block_by_incidents 
+                    FROM companies
+                    WHERE id = :companyId";
+
+            $this->db->query($sql);
+            $this->db->bind(':companyId', $company_id);  // Corregido el nombre del parámetro
+            $result = $this->db->single();
+
+            if (empty($result)) {
+                throw new Exception("Configuración de compañía no encontrada");
+            }
+
+            return $result;
+        } catch (PDOException $e) {
+            error_log("Error en getCompanyInfoByCustomer: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    private function countCustomerIncidents($customerId)
+    {
+        try {
+            $sql = "SELECT COUNT(*) as count 
+                FROM customer_incidents 
+                WHERE customer_id = :customerId";
+
+            $this->db->query($sql);
+            $this->db->bind(':customerId', $customerId);
+            $result = $this->db->single();
+
+            return $result['count'] ?? 0;
+        } catch (PDOException $e) {
+            error_log("Error en countCustomerIncidents: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    private function blockCustomerAutomatically($customerId, $reason)
+    {
+        try {
+            $sql = "UPDATE customers 
+                SET blocked = 1, 
+                    nota_bloqueo = :reason,
+                    updated_at = NOW()
+                WHERE id = :customerId
+                AND blocked = 0";
+
+            $this->db->query($sql);
+            $this->db->bind(':customerId', $customerId);
+            $this->db->bind(':reason', $reason);
+
+            $result = $this->db->execute();
+
+            if ($result && $this->db->rowCount() > 0) {
+                return true;
+            }
+            return false;
+        } catch (PDOException $e) {
+            error_log("Error en blockCustomerAutomatically: " . $e->getMessage());
+            return false;
         }
     }
 

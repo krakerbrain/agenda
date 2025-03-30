@@ -45,12 +45,12 @@ try {
             $notes = isset($data['notes']) ? $data['notes'] : "";
 
             // Generar la incidencia
-            $incidentCreated = $customer->createIncident($customerId, $reason, $notes);
-
-            if ($incidentCreated) {
-                echo json_encode(['success' => true, 'message' => 'Evento eliminado e incidencia generada exitosamente']);
+            $incidentCreated = $customer->createIncident($company_id, $customerId, $reason, $notes);
+            $message = isset($incidentCreated['message']) ? $incidentCreated['message'] : "Incidencia generada exitosamente";
+            if ($incidentCreated['success']) {
+                echo json_encode(['success' => true, 'message' => $message]);
             } else {
-                echo json_encode(['success' => true, 'message' => 'Evento eliminado, pero no se pudo generar la incidencia']);
+                echo json_encode(['success' => true, 'message' => $message]);
             }
         } else {
             echo json_encode(['success' => true, 'message' => 'Evento eliminado exitosamente']);

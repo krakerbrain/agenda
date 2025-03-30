@@ -174,4 +174,15 @@ export function initConfiguraciones() {
 
   fixedIntervalsRadio.addEventListener("change", toggleOptions);
   serviceDurationRadio.addEventListener("change", toggleOptions);
+
+  const blockUsersSwitch = document.getElementById("blockUsersSwitch");
+  const incidentsThresholdContainer = document.getElementById("incidentsThresholdContainer");
+
+  blockUsersSwitch.addEventListener("change", function () {
+    if (this.checked) {
+      incidentsThresholdContainer.style.display = "inline-block";
+    } else {
+      incidentsThresholdContainer.style.display = "none";
+    }
+  });
 }

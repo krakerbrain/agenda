@@ -8,7 +8,16 @@ $auth = new JWTAuth();
 $auth->validarTokenUsuario();
 
 ?>
+<style>
+    .actionBtns {
+        display: flex;
+        justify-content: space-evenly;
+    }
 
+    .actionBtns i {
+        cursor: pointer;
+    }
+</style>
 <div class="container mt-4">
     <ul class="nav nav-tabs" id="customerTab" role="tablist">
         <li class="nav-item" role="presentation">

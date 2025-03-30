@@ -232,6 +232,38 @@ $current_date->setTime(0, 0, 0);
         </div>
         <!-- Fin intervalo de horarios -->
 
+
+        <!-- Configuración de bloqueo por incidencias -->
+        <div class="container my-4">
+            <div class="row">
+                <div class="d-flex align-items-baseline">
+                    <h3 class="mb-3">Bloqueo por Incidencias</h3>
+                    <a tabindex="0" role="button" data-bs-trigger="focus" class="btn help" data-bs-toggle="popover"
+                        data-bs-title="Bloqueo por Incidencias"
+                        data-bs-content="Puedes configurar el sistema para bloquear automáticamente a usuarios que acumulen un número determinado de incidencias"><i
+                            class="fa fa-circle-question text-primary"></i></a>
+                </div>
+                <div class="col-md-6 mb-2 row">
+                    <div class="form-check form-switch mb-3 d-flex align-items-center">
+                        <input class="form-check-input" type="checkbox" role="switch" id="blockUsersSwitch"
+                            name="block_users"
+                            <?php echo isset($company['block_by_incidents']) && $company['block_by_incidents'] > 0 ? 'checked' : ''; ?>>
+                        <label class="form-check-label ms-2" for="blockUsersSwitch">Bloquear usuarios con más de:
+                        </label>
+
+                        <div id="incidentsThresholdContainer" class="ms-2"
+                            style="display: <?php echo isset($company['block_by_incidents']) && $company['block_by_incidents'] > 0 ? 'inline-block' : 'none'; ?>;">
+                            <input type="number" class="form-control form-control-sm d-inline-block"
+                                style="width: 60px;" id="blockAfterIncidents" name="incidents_threshold" min="1"
+                                value="<?php echo isset($company['block_by_incidents']) ? $company['incidents_threshold'] : 2; ?>">
+                            <label for="blockAfterIncidents" class="ms-1">incidencias</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Fin configuración de bloqueo por incidencias -->
+
         <!-- Configuracion de color de formulario de reserva -->
         <div class="container my-4">
             <div class="row">

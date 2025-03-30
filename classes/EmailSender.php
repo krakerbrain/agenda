@@ -3,7 +3,7 @@
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-require_once dirname(__DIR__, 2) . '/configs/init.php';
+require_once dirname(__DIR__) . '/configs/init.php';
 
 class EmailSender
 {
@@ -18,12 +18,13 @@ class EmailSender
     // Configuración del servidor SMTP
     private function configureSMTP()
     {
+
         $this->mail->isSMTP();
-        $this->mail->Host = 'smtp.gmail.com';
+        $this->mail->Host = "smtp.gmail.com";
         $this->mail->SMTPAuth = true;
-        $this->mail->Username = getenv(SMTP_USER); // Tu dirección de correo de Gmail
-        $this->mail->Password = getenv(SMTP_PASS); // Tu contraseña de Gmail
-        if (getenv(APP_ENV) == 'local') {
+        $this->mail->Username = $_ENV["SMTP_USER"]; // Tu dirección de correo de Gmail
+        $this->mail->Password = $_ENV["SMTP_PASS"]; // Tu contraseña de Gmail
+        if ($_ENV["APP_ENV"] == 'local') {
             $this->mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
             $this->mail->Port = 465;
             $this->mail->SMTPOptions = [
