@@ -147,4 +147,55 @@ class Users
         $this->db->execute();
         return ['success' => true];
     }
+
+    // Recovery password functions
+
+    // Dentro de tu clase Users (que debería usar Database)
+    public function get_user_by_email($email)
+    {
+        $this->db->query("SELECT * FROM users WHERE email = :email");
+        $this->db->bind(':email', $email);
+        return $this->db->single();
+    }
+
+    public function save_password_reset_token($userId, $token, $expires)
+    {
+        $this->db->query("INSERT INTO password_resets (user_id, token, expires_at) VALUES (:user_id, :token, :expires_at)");
+        $this->db->bind(':user_id', $userId);
+        $this->db->bind(':token', $token);
+        $this->db->bind(':expires_at', $expires);
+        return $this->db->execute();
+    }
+
+    public function validate_reset_token($token)
+    {
+        $this->db->query("SELECT * FROM password_resets WHERE token = :token AND used = 0");
+        $this->db->bind(':token', $token);
+        return $this->db->single();
+    }
+
+    public function update_user_password($userId, $newPassword)
+    {
+        $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+        $this->db->query("UPDATE users SET password = :password WHERE id = :id");
+        $this->db->bind(':password', $hashedPassword);
+        $this->db->bind(':id', $userId);
+        return $this->db->execute();
+    }
+
+    public function invalidate_reset_token($token)
+    {
+        $this->db->query("UPDATE password_resets SET used = 1 WHERE token = :token");
+        $this->db->bind(':token', $token);
+        return $this->db->execute();
+    }
+
+    // Método adicional para verificar si el token pertenece al usuario
+    public function verify_user_reset_token($userId, $token)
+    {
+        $this->db->query("SELECT * FROM password_resets WHERE user_id = :user_id AND token = :token AND used = 0 AND expires_at > NOW()");
+        $this->db->bind(':user_id', $userId);
+        $this->db->bind(':token', $token);
+        return $this->db->single();
+    }
 }

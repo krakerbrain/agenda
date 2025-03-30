@@ -254,4 +254,79 @@ class EmailTemplate
         // return $this->emailSender->sendEmail($userData['mail'], ['subject' => $alertSubject, 'body' => $alertBody, 'company_name' => $companyData['name']]);
         return $this->emailSender->sendEmail('marioplantabaja@gmail.com', ['subject' => $alertSubject, 'body' => $alertBody, 'company_name' => $companyData['name']]);
     }
+
+    public function sendSuperAdminPasswordRecovery(array $data): array
+    {
+        try {
+            $placeholders = [
+                '{nombre_usuario}' => $data['user_name'],
+                '{enlace_recuperacion}' => $data['reset_link'],
+                '{tiempo_expiracion}' => $data['expiration_time'],
+                '{nombre_empresa}' => 'Agendarium.com',
+                '{user_email}' => $data['user_email'],
+                '{year}' => date('Y')
+            ];
+
+            $body = $this->emailBuilder->buildTemplate('recuperacion_contrasenia', $placeholders);
+            $subject = "Recuperación de contraseña - Agendarium.com";
+
+            $sent = $this->emailSender->sendEmail(
+                $data['user_email'],
+                [
+                    'subject' => $subject,
+                    'body' => $body,
+                    'company_name' => 'Agendarium.com'
+                ],
+                'password_recovery'
+            );
+
+            if (!$sent) {
+                throw new Exception("Error al enviar el correo electrónico.");
+            }
+
+            return ['success' => true, 'message' => 'Correo enviado correctamente'];
+        } catch (Exception $e) {
+            error_log("Error en sendSuperAdminPasswordRecovery: " . $e->getMessage());
+            return ['success' => false, 'message' => $e->getMessage()];
+        }
+    }
+
+    public function sendCompanyPasswordRecovery(array $data): array
+    {
+        try {
+            $companyData = $this->dataLoader->getCompanyData($data['company_id']);
+
+            $placeholders = [
+                '{nombre_usuario}' => $data['user_name'],
+                '{enlace_recuperacion}' => $data['reset_link'],
+                '{tiempo_expiracion}' => $data['expiration_time'],
+                '{ruta_logo}' => $companyData['logo'],
+                '{nombre_empresa}' => $companyData['name'],
+                '{user_email}' => $data['user_email'],
+                '{year}' => date('Y')
+            ];
+
+            $body = $this->emailBuilder->buildTemplate('recuperacion_contrasenia', $placeholders);
+            $subject = "Recuperación de contraseña - " . $companyData['name'];
+
+            $sent = $this->emailSender->sendEmail(
+                $data['user_email'],
+                [
+                    'subject' => $subject,
+                    'body' => $body,
+                    'company_name' => $companyData['name']
+                ],
+                'password_recovery'
+            );
+
+            if (!$sent) {
+                throw new Exception("Error al enviar el correo electrónico.");
+            }
+
+            return ['success' => true, 'message' => 'Correo enviado correctamente'];
+        } catch (Exception $e) {
+            error_log("Error en sendCompanyPasswordRecovery: " . $e->getMessage());
+            return ['success' => false, 'message' => $e->getMessage()];
+        }
+    }
 }

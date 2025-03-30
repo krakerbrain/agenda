@@ -44,6 +44,7 @@ class EmailSender
     public function sendEmail($to, $mailContent, $template = '')
     {
         $template = mb_encode_mimeheader($template, 'UTF-8', 'B', "\n");
+        $encodedSubject = mb_encode_mimeheader($mailContent['subject'], 'UTF-8', 'B', "\n");
         try {
             // Si se pasa un template personalizado
             if ($template !== '') {
@@ -54,7 +55,7 @@ class EmailSender
 
             $this->mail->addAddress($to);
             $this->mail->isHTML(true);
-            $this->mail->Subject = $mailContent['subject'];
+            $this->mail->Subject = $encodedSubject;
             $this->mail->Body = $mailContent['body'];
 
             $this->mail->send();

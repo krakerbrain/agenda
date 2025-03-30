@@ -8,9 +8,17 @@ class EmailDataLoader
         $this->db = $db;
     }
 
-    public function getCompanyData($company_id, $templateType)
+    public function getCompanyData($company_id, $templateType = null)
     {
-        $this->db->query("SELECT name, logo, notas_correo_{$templateType} as notas, social_token FROM companies WHERE id = :company_id");
+        // Columnas base que siempre se solicitan
+        $columns = ['name', 'logo', 'social_token'];
+
+        // Agregar columna de notas solo si se especifica templateType
+        if (!empty($templateType)) {
+            $columns[] = "notas_correo_{$templateType} as notas";
+        }
+
+        $this->db->query("SELECT " . implode(', ', $columns) . " FROM companies WHERE id = :company_id");
         $this->db->bind(':company_id', $company_id);
         $data = $this->db->single();
 
@@ -18,8 +26,11 @@ class EmailDataLoader
             throw new Exception("Empresa no encontrada.");
         }
 
+        // Procesamiento común
         $data['logo'] = 'https://agendarium.com/' . $data['logo'];
-        $data['notas'] = json_decode($data['notas'], true);
+
+        // Procesar notas solo si existen en los datos
+        $data['notas'] = isset($data['notas']) ? json_decode($data['notas'], true) : [];
 
         return $data;
     }
