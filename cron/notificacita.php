@@ -59,8 +59,8 @@ try {
                     $templateName = $type === 'reserva' ? 'registro_reserva' : 'confirmar_reserva';
                     $wspStatusCode = sendWspReserva(
                         $templateName,
-                        $appointment['phone'],
-                        $appointment['name'],
+                        $appointment['customer_phone'],
+                        $appointment['customer_name'],
                         $appointment['date'],
                         $appointment['start_time'],
                         $appointment['company_name'],

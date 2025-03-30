@@ -77,7 +77,7 @@ if ($view === 'details') {
 
             // Aquí deberías obtener los detalles de la reserva desde la base de datos
             $preReserva = [
-                'nombre' => $reservation['name'],
+                'nombre' => $reservation['customer_name'],
                 'servicio' => $reservation['service'],
                 'fecha' => date('d-m-Y', strtotime($reservation['date'])), // Formato dd-mm-aaaa
                 'hora' => date('h:i A', strtotime($reservation['start_time'])), // Formato hh:mm am/pm

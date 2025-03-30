@@ -259,14 +259,16 @@ class Appointments extends Database
         return $db->resultSet();
     }
 
-
+    // Metodo usado para mostrar al cliente los datos de su cita desde el link de whatsapp
     public function get_appointment($id)
     {
         try {
             //code...
 
             $db = new Database();
-            $db->query('SELECT s.name as service, a.* FROM appointments a
+            $db->query('SELECT s.name as service, a.*, c.name as customer_name FROM appointments a
+                            JOIN customers c
+                            ON a.customer_id = c.id
                             JOIN services s
                             ON a.id_service = s.id
                             WHERE a.id = :id');
@@ -276,6 +278,8 @@ class Appointments extends Database
             return $e->getMessage();
         }
     }
+
+
     public function get_appointment_token($token)
     {
         try {
@@ -294,16 +298,21 @@ class Appointments extends Database
     {
         try {
             $condition = $type === 'reserva'
-                ? 'WHERE a.aviso_reserva = 0'
-                : 'WHERE a.aviso_confirmada = 0 AND a.aviso_reserva = 1 AND a.status = 1';
+                ? ' AND a.aviso_reserva = 0'
+                : ' AND a.aviso_confirmada = 0 AND a.aviso_reserva = 1 AND a.status = 1';
 
             $db = new Database();
-            $db->query('SELECT a.*, s.name as service_name, c.name as company_name
+            $db->query('SELECT a.*, cu.name as customer_name, cu.phone as customer_phone, cu.mail as customer_mail, s.name as service_name, c.name as company_name
                 FROM appointments a
+                JOIN customers cu
+                ON a.customer_id = cu.id
+                JOIN company_customers cc
+                ON cu.id = cc.customer_id
                 JOIN services s
                 ON a.id_service = s.id
                 JOIN companies c
                 ON c.id = a.company_id
+                WHERE cc.company_id = c.id
                 ' . $condition);
             return $db->resultSet();
         } catch (Exception $e) {

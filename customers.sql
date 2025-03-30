@@ -12,6 +12,8 @@ CREATE TABLE `customers` (
     `nota_bloqueo` text DEFAULT NULL,
     PRIMARY KEY (`id`)
 )
+ALTER TABLE `appointments` 
+ADD COLUMN `customer_id` INT(11) NOT NULL AFTER `company_id`;
 
 -- Se crea la tabla company_customers para asociar clientes a empresas
 CREATE TABLE `company_customers` (
@@ -38,8 +40,7 @@ CREATE TABLE `customer_incidents` (
 )
 
 -- Se agrega la columna customer_id a appointments
-ALTER TABLE `appointments` 
-ADD COLUMN `customer_id` INT(11) NOT NULL AFTER `company_id`;
+
 
 -- Insertar clientes únicos en la tabla customers
 INSERT INTO customers (name, phone, mail)
@@ -61,3 +62,7 @@ ALTER TABLE `appointments`
 ADD CONSTRAINT `fk_appointments_customers`
 FOREIGN KEY (`customer_id`) REFERENCES `customers` (`id`)
 ON DELETE CASCADE;
+
+ALTER TABLE companies
+ADD COLUMN block_by_incidents TINYINT(1) NOT NULL DEFAULT 0,
+ADD COLUMN incidents_threshold INT(11) NOT NULL DEFAULT 2;
