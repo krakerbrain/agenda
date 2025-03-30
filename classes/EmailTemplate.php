@@ -113,9 +113,9 @@ class EmailTemplate
 
             if ($templateType == 'reserva') {
                 $alertEmailContent = $this->buildAppointmentAlert($data, $companyData, $serviceData);
-                $this->emailSender->sendEmail($data['mail'], $alertEmailContent, null);
+                $this->emailSender->sendEmail($data['customer_mail'], $alertEmailContent, null);
             }
-            $success = $this->emailSender->sendEmail($data['mail'], ['subject' => $subject, 'body' => $body, 'company_name' => $companyData['name']], ucfirst($templateType));
+            $success = $this->emailSender->sendEmail($data['customer_mail'], ['subject' => $subject, 'body' => $body, 'company_name' => $companyData['name']], ucfirst($templateType));
 
             return ['success' => $success, 'company_name' => $companyData['name'], 'social_token' => $companyData['social_token']];
         } catch (Exception $e) {
