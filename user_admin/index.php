@@ -29,10 +29,6 @@ include dirname(__DIR__) . '/partials/head.php';
             </button>
         </nav>
     </header>
-    <!-- <div class="container mt-5 d-flex justify-content-between">
-        
-    </div> -->
-
     <!-- Offcanvas -->
     <div class="offcanvas offcanvas-start overflow-auto" tabindex="-1" id="offcanvasMenu"
         aria-labelledby="offcanvasMenuLabel">
@@ -45,6 +41,9 @@ include dirname(__DIR__) . '/partials/head.php';
                 <?php if ($role_id != 1) { ?>
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="#" id="dateList">Lista de citas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="clientes">Clientes</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#" id="horarios">Horarios</a>

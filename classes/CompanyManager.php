@@ -324,7 +324,9 @@ class CompanyManager
                         fixed_start_date = :fixed_start_date,
                         fixed_duration = :fixed_duration,
                         auto_open = :auto_open,
-                        time_step = :time_step
+                        time_step = :time_step,
+                        block_by_incidents = :block_by_incident,
+                        incidents_threshold = :incidents_threshold
                     WHERE id = :company_id AND is_active = 1";
 
             $this->db->query($sql);
@@ -340,6 +342,8 @@ class CompanyManager
             $this->db->bind(':auto_open', $data['auto_open']);
             $this->db->bind(':company_id', $data['company_id']);
             $this->db->bind(':time_step', $data['time_step']);
+            $this->db->bind(':block_by_incident', $data['block_by_incident']);
+            $this->db->bind(':incidents_threshold', $data['incidents_threshold']);
             $this->db->execute();
 
             $this->db->endTransaction(); // Commit de la transacción

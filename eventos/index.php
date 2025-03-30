@@ -24,6 +24,14 @@ $background_color = $style['background_color'];
 $button_color = $style['button_color'];
 $border_color = $style['border_color'];
 
+if (strpos($company['selected_banner'], "default_") === 0) {
+    // Es un banner predeterminado
+    $selected_banner = "assets/img/banners/" . $company['selected_banner'];
+} else {
+    // Es un banner personalizado (subido por el usuario)
+    $selected_banner = "assets/img/banners/user_" . $company['id'] . "/" . $company['selected_banner'];
+}
+
 // Crear una instancia de la clase UniqueEvents
 $uniqueEvents = new UniqueEvents();
 
@@ -34,7 +42,7 @@ $events = $uniqueEvents->get_upcoming_events($company['id']);
 $selectedEventId = isset($_GET['event_id']) ? intval($_GET['event_id']) : null;
 
 
-include __DIR__ . '/templates/header.php';
+include dirname(__DIR__) . '/reservas/templates/header.php';
 ?>
 <div class="container mt-4 events-container" style="max-width: 600px;">
     <h1 class="text-center">Eventos Disponibles</h1>

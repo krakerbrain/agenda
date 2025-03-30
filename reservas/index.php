@@ -1,13 +1,30 @@
 <?php
-
+require_once dirname(__DIR__) . '/configs/init.php';
+require_once dirname(__DIR__) . '/access-token/seguridad/JWTAuth.php';
 require_once dirname(__DIR__) . '/classes/ConfigUrl.php';
 require_once dirname(__DIR__) . '/classes/Appointments.php';
 require_once dirname(__DIR__) . '/classes/CompanyController/CompanyController.php';
+require_once dirname(__DIR__) . '/classes/Customers.php';
 
 $baseUrl = ConfigUrl::get();
 
 $url = isset($_GET['path']) ? $_GET['path'] : null;
 $view = isset($_GET['view']) ? $_GET['view'] : 'form';
+$customerId = isset($_GET['customer_id']) ? intval($_GET['customer_id']) : null;
+
+// Verificar autenticación solo si se proporciona un customer_id
+$authenticated = false;
+if ($customerId) {
+    $auth = new JWTAuth();
+    $datosUsuario = $auth->validarTokenUsuario();
+
+    if ($datosUsuario) {
+        $authenticated = true;
+    } else {
+        header("Location: " . $baseUrl . "login/index.php");
+        exit();
+    }
+}
 
 // Crear una instancia del controlador
 $controller = new CompanyController();
@@ -18,6 +35,13 @@ $company = $data['company'];
 $socialNetworks = $data['socialNetworks'];
 $services = $data['services'];
 $style = $data['style'];
+
+// Si se proporciona un customer_id, obtener los datos del cliente
+$customerData = null;
+if ($customerId) {
+    $customers = new Customers();
+    $customerData = $customers->getCustomerById($customerId); // Asegúrate de que este método exista en la clase Customers
+}
 
 // Establecer variables de estilo
 $primary_color = $style['primary_color'];

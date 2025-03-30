@@ -3,19 +3,33 @@
 require_once dirname(__DIR__, 2) . '/configs/init.php';
 require_once dirname(__DIR__, 2) . '/classes/ConfigUrl.php';
 require_once dirname(__DIR__, 2) . '/classes/Appointments.php';
+require_once dirname(__DIR__, 2) . '/classes/Customers.php';
+require_once dirname(__DIR__, 2) . '/classes/EmailTemplate.php';
 
 // Crear instancia de la clase Appointments
 $appointments = new Appointments();
+
+// Crear instancia de la clase Customers
+$customers = new Customers();
 
 try {
     // Iniciar la transacción
     $appointments->beginTransaction();
 
+    // Verificar si se recibieron datos POST
+    if (empty($_POST)) {
+        throw new Exception('No se recibieron datos.');
+    }
+
     // Recibir los datos del cuerpo de la solicitud
     $data = $_POST;
 
-    if (!$data) {
-        throw new Exception('Datos inválidos recibidos');
+    // Validar campos requeridos
+    $requiredFields = ['date', 'time', 'service_duration', 'phone', 'mail', 'company_id', 'service', 'name'];
+    foreach ($requiredFields as $field) {
+        if (empty($data[$field])) {
+            throw new Exception("El campo '$field' es requerido.");
+        }
     }
 
     // Convertir la duración del servicio a un número entero
@@ -31,15 +45,41 @@ try {
     // Formatear el tiempo en "H:i" (horas:minutos)
     $formattedStartTime = $startDateTime->format('H:i');
     $formattedEndTime = $endDateTime->format('H:i');
-
     $phone = formatPhoneNumber($data['phone']);
+
+    // Verificar si el cliente ya existe o si esta bloqueado
+    $customer_id = empty($data['customer_id']) ? $customers->checkAndAssociateCustomer($phone, $data['mail'], $data['company_id']) : $data['customer_id'];
+
+    if (is_array($customer_id) && isset($customer_id['error'])) {
+        // Si hay un error, devolver el mensaje de error
+        if ($customer_id['error'] === 'blocked') {
+            // Manejar el caso de cliente bloqueado
+            echo json_encode(['success' => false, 'message' => $customer_id['message']]);
+            http_response_code(403); // Forbidden (o 400 si prefieres mantener Bad Request)
+
+            // Enviar un correo electrónico (aquí iría la lógica para enviar el correo)
+            $emailTemplate = new EmailTemplate();
+            $emailTemplate->buildBlockedUserAlertMail($data);
+        } else {
+            // Manejar otros errores (si los hay en el futuro)
+            echo json_encode(['success' => false, 'message' => $customer_id['message']]);
+            http_response_code(400); // Bad Request
+        }
+        exit;
+    } elseif (!$customer_id) {
+        $customerData = [
+            'name' => $data['name'],
+            'phone' => $phone,
+            'mail' => $data['mail'],
+            'company_id' => $data['company_id']
+        ];
+        $customer_id = $customers->add_customer($customerData);
+    }
 
     // Preparar los datos para insertar la cita
     $appointmentData = [
         'company_id' => $data['company_id'],
-        'name' => $data['name'],
-        'phone' => $phone,
-        'mail' => $data['mail'],
+        'customer_id' => $customer_id,
         'date' => $data['date'],
         'start_time' => $formattedStartTime,
         'end_time' => $formattedEndTime,
@@ -53,7 +93,7 @@ try {
     if (isset($result['error'])) {
         // Retornar el mensaje de error si la cita ya fue enviada
         if ($result['error'] === 'Cita ya ha sido enviada.') {
-            echo json_encode(['message' => $result['error']]);
+            echo json_encode(['success' => false, 'message' => $result['error']]);
             http_response_code(400); // Bad Request
         } else {
             throw new Exception('Error al reservar la cita: ' . $result['error']);
@@ -61,19 +101,18 @@ try {
     } else {
         // Confirmar la transacción si todo fue exitoso
         $appointments->endTransaction();
-        echo json_encode(['message' => 'Cita reservada exitosamente. Recibirás una confirmación en breve.']);
-        http_response_code(200);
+        echo json_encode(['success' => true, 'message' => 'Cita reservada exitosamente. Recibirás una confirmación en breve.']);
+        http_response_code(200); // OK
     }
 } catch (Exception $e) {
     // Revertir la transacción en caso de error
     $appointments->cancelTransaction();
-    echo json_encode(['message' => 'Error: ' . $e->getMessage()]);
-    http_response_code(500);
+    echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+    http_response_code(500); // Internal Server Error
 } finally {
     // Cerrar la conexión
     $appointments = null;
 }
-
 
 function formatPhoneNumber($telefono)
 {

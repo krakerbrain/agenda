@@ -48,7 +48,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $btn1_color = $_POST['btn-primary-color'];
     $btn2_color = $_POST['btn-secondary-color'];
     $time_step = $_POST['time_step'];
-    $time_step_value = $_POST['time_step_value'];
+    $time_step_value = $_POST['time_step_value'] ?? null;
+    $block_by_incidents = isset($_POST['block_users']) ? 1 : 0;
+    $incidents_threshold = $_POST['incidents_threshold'] ?? 0; // Valor por defecto si no se envía
+
 
     $data = [
         'company_id' => $company_id,
@@ -63,6 +66,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'fixed_duration' => null,
         'auto_open' => 0,
         'time_step' => empty($time_step) ? null : $time_step_value, // Asigna null si está vacío, sino toma el valor de time_step_value
+        'block_by_incident' => $block_by_incidents,
+        'incidents_threshold' => $incidents_threshold
     ];
 
     if ($calendar_mode === 'corrido') {

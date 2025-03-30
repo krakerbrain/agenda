@@ -2,6 +2,7 @@
 // Cargar dependencias solo una vez al inicio del archivo
 require_once dirname(__DIR__) . '/google_services/google_client.php';
 require_once dirname(__DIR__) . '/classes/Appointments.php';
+require_once dirname(__DIR__) . '/classes/Customers.php';
 require_once dirname(__DIR__) . '/classes/Integrations/GoogleIntegrationManager.php';
 require_once dirname(__DIR__) . '/classes/IntegrationManager.php';
 require_once dirname(__DIR__) . '/classes/ConfigUrl.php';
@@ -16,10 +17,12 @@ $company_id = $datosUsuario['company_id'];
 // Obtener datos de la solicitud
 $data = json_decode(file_get_contents('php://input'), true);
 $appointmentId = $data['appointmentID'];
+$customerId = $data['customerID'];
 $eventId = isset($data['calendarEventID']) ? $data['calendarEventID'] : "";
 
 // Crear una instancia de la clase de citas (Appointments)
 $appointment = new Appointments();
+$customer = new Customers();
 $integrationManager = new IntegrationManager();
 
 try {
@@ -35,7 +38,23 @@ try {
 
     // Si se eliminó la cita correctamente, responder con éxito
     if ($deletedRows > 0) {
-        echo json_encode(['success' => true, 'message' => 'Evento eliminado exitosamente']);
+        // Verificar si se debe generar una incidencia
+        if (isset($data['generateIncident']) && $data['generateIncident']) {
+            // Obtener la razón y las notas de la solicitud
+            $reason = isset($data['reason']) ? $data['reason'] : "Razón no especificada";
+            $notes = isset($data['notes']) ? $data['notes'] : "";
+
+            // Generar la incidencia
+            $incidentCreated = $customer->createIncident($company_id, $customerId, $reason, $notes);
+            $message = isset($incidentCreated['message']) ? $incidentCreated['message'] : "Incidencia generada exitosamente";
+            if ($incidentCreated['success']) {
+                echo json_encode(['success' => true, 'message' => $message]);
+            } else {
+                echo json_encode(['success' => true, 'message' => $message]);
+            }
+        } else {
+            echo json_encode(['success' => true, 'message' => 'Evento eliminado exitosamente']);
+        }
     } else {
         echo json_encode(['success' => false, 'message' => 'No se encontró la cita para eliminar']);
     }

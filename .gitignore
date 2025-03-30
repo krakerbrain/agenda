@@ -9,6 +9,7 @@ composer.lock
 composer.phar 
 tareas.md
 README.MD
+ideas_paracciones_clientes.md
 /master_admin/uploads/*.png
 /master_admin/uploads/*.jpg
 /__tests__/

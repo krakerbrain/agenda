@@ -49,4 +49,11 @@ class CompanyModel
         $this->db->bind(':company_id', $companyId);
         return $this->db->single();
     }
+
+    public function getCustomUrl($companyId)
+    {
+        $this->db->query("SELECT custom_url FROM companies WHERE id = :company_id AND is_active = 1");
+        $this->db->bind(':company_id', $companyId);
+        return $this->db->singleValue();
+    }
 }

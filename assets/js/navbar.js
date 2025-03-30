@@ -43,6 +43,10 @@ document.addEventListener("DOMContentLoaded", function () {
           const { initDateList } = await import("./datesList.js?v=1.2.0");
           initDateList();
           break;
+        case "clientes":
+          const { initClientes } = await import("./clientes.js?v=1.2.0");
+          initClientes();
+          break;
         case "horarios":
           const { initHorarios } = await import("./horarios.js?v=1.2.0");
           initHorarios();

@@ -23,10 +23,8 @@ function showStep(step) {
     });
     document.getElementById("step" + step).classList.remove("d-none");
   } else {
-    var modalBody = document.querySelector("#responseModalBody");
-    modalBody.innerText = "Por favor, completa el formulario antes de continuar.";
-    var modal = new bootstrap.Modal(document.getElementById("responseModal"));
-    modal.show();
+    // Mostrar mensaje de error
+    handleModal("Formulario incompleto", "Por favor, completa el formulario antes de continuar.");
   }
 }
 
@@ -152,25 +150,15 @@ function getAvailableDays() {
         const dateString = element.getAttribute("aria-label");
         const clickedDate = new Date(dateString); // Convertimos el string a objeto Date
 
-        let message; // Variable para el mensaje
-        let modalTitle = document.querySelector(".modal-title");
         if (clickedDate > maxDate) {
           // Si la fecha es mayor a la fecha máxima permitida
-          modalTitle.textContent = "Fecha deshabilitada";
-          message = `Lo sentimos, esta fecha aún no ha sido habilitada para reservas.`;
+          handleModal("Fecha deshabilitada", "Lo sentimos, esta fecha aún no ha sido habilitada para reservas.");
         } else {
           // Si es una fecha anterior pero está deshabilitada
-          modalTitle.textContent = "Fecha ocupada";
-          message = `Lo sentimos, este día no está disponible para reservas.`;
+          handleModal("Fecha ocupada", "Lo sentimos, este día no está disponible para reservas.");
         }
-
         // Cerrar el calendario antes de mostrar el modal
         instance.close();
-        // Mostrar el mensaje en el modal
-        const modalBody = document.querySelector(".modal-body");
-        modalBody.innerText = message;
-        const modal = new bootstrap.Modal(document.getElementById("responseModal"));
-        modal.show();
       });
     });
   }
@@ -289,6 +277,9 @@ async function fetchAvailableTimes() {
 
 document.getElementById("appointmentForm").addEventListener("submit", function (event) {
   event.preventDefault();
+  document.querySelectorAll(".customer-field").forEach((field) => {
+    field.disabled = false;
+  });
   const form = document.querySelector("#appointmentForm"); // Selecciona un formulario del DOM
   const formData = new FormData(form);
   const scheduleMode = document.getElementById("schedule_mode").value;
@@ -300,7 +291,7 @@ document.getElementById("appointmentForm").addEventListener("submit", function (
 
 function showConfirmationModal(formData) {
   // Extraer los datos del formulario
-  debugger;
+
   const service = document.getElementById("service").selectedOptions[0].text;
   const dateRaw = document.getElementById("date").value;
   const date = formatDate(dateRaw);
@@ -332,6 +323,11 @@ function showConfirmationModal(formData) {
     confirmationModal.hide(); // Ocultar el modal de confirmación
     sendAppointment(formData); // Enviar la reserva
   };
+  document.getElementById("cancelReservation").onclick = function () {
+    document.querySelectorAll(".customer-field").forEach((field) => {
+      field.disabled = true;
+    });
+  };
 }
 
 function formatDate(dateString) {
@@ -361,21 +357,42 @@ async function sendAppointment(formData) {
       body: formData,
     });
 
-    const { message } = await response.json();
-    // Aquí puedes seguir con la lógica anterior si el JSON es válido
-    var modalConfirm = document.querySelector("#responseModalBody");
-    modalConfirm.innerText = message;
-    var modal = new bootstrap.Modal(document.getElementById("responseModal"));
-    modal.show();
+    // Verificar si la respuesta es exitosa
+    if (!response.ok) {
+      // Si la respuesta no es exitosa, intentar leer el cuerpo de la respuesta como JSON
+      const errorResponse = await response.json();
+      throw new Error(errorResponse.message || "Error en la solicitud: " + response.statusText);
+    }
 
-    var acceptButton = document.getElementById("acceptButton");
-    acceptButton.addEventListener("click", function () {
-      if (response.ok) {
-        location.reload();
-      }
-    });
+    // Si la respuesta es exitosa, procesar el JSON
+    const { message, success } = await response.json();
+
+    if (success) {
+      handleModal("Reserva exitosa", message);
+
+      // Configurar el botón de aceptar
+      const acceptButton = document.getElementById("acceptButton");
+      acceptButton.addEventListener("click", function () {
+        const authenticated = document.getElementById("authenticated").value === "true";
+        if (authenticated) {
+          // Guardar estado en sessionStorage
+          sessionStorage.setItem("lastPage", "dateList");
+          sessionStorage.setItem("status", "unconfirmed");
+
+          // Redirigir a las configuraciones
+          window.location.href = `${baseUrl}user_admin/index.php`;
+        } else {
+          // Recargar la página para usuarios no autenticados
+          location.reload();
+        }
+      });
+    } else {
+      handleModal("Error", message);
+    }
   } catch (error) {
     console.error("Error:", error);
+    handleModal("Error", error.message || "Ocurrió un error al procesar la reserva. Por favor, inténtalo de nuevo.", true);
+    // Redirigir al usuario después de mostrar el mensaje de error
   } finally {
     // Ocultar spinner y habilitar botón después de que la solicitud se complete
     spinner.classList.add("d-none");
@@ -383,3 +400,33 @@ async function sendAppointment(formData) {
     reservarBtn.disabled = false;
   }
 }
+function handleModal(title, message, reload = false) {
+  const modal = new bootstrap.Modal(document.getElementById("responseModal")); // Obtener el modal
+  const modalTitle = document.getElementById("responseModalLabel"); // Obtener el elemento con el ID "responseModalTitle"
+  const modalBody = document.getElementById("responseModalBody"); // Obtener el elemento con el ID "responseModalBody"
+  modalTitle.innerText = title; // Establecer el título del modal
+  modalBody.innerText = message; // Establecer el contenido del modal
+  modal.show(); // Mostrar el modal
+
+  // if (reload) {
+  //   document.getElementById("acceptButton").addEventListener("click", function () {
+  //     location.reload(); // Recargar la página
+  //   });
+  // }
+}
+
+const editCheckBox = document.querySelector("#editCustomer");
+if (editCheckBox) {
+  editCheckBox.addEventListener("change", function () {
+    const customerFields = document.querySelectorAll(".customer-field");
+    document.querySelector("#customer_id").value = ""; // Limpiar el campo oculto
+    customerFields.forEach((field) => {
+      field.disabled = !editCheckBox.checked;
+      // desabilitar el checkbox cuando se presione la primera vez
+      editCheckBox.disabled = true;
+    });
+  });
+}
+
+const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
+[...popoverTriggerList].map((popoverTriggerEl) => new bootstrap.Popover(popoverTriggerEl));

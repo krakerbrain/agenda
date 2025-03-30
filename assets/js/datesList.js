@@ -61,6 +61,7 @@ async function loadAppointments(status, page = 1) {
 
 // Función para rellenar la tabla con las citas obtenidas
 function fillTable(data) {
+  console.log(data);
   const tableContent = document.getElementById("tableContent");
   let html = "";
 
@@ -80,20 +81,20 @@ function fillTable(data) {
               ${
                 !appointment.status
                   ? `
-                <button id="confirmarBtn${appointment.id}" 
+                <button id="confirmarBtn${appointment.id_appointment}" 
                         class="btn btn-success btn-sm confirm" 
                         title="Confirmar reserva"
-                        data-id="${appointment.id}">
+                        data-id="${appointment.id_appointment}">
                   <i class="fas fa-check"></i>
                   <span class="spinner-border spinner-border-sm d-none" aria-hidden="true"></span>
                   <span class="button-text"></span>
                 </button>`
                   : ""
               }
-              <button id="eliminarBtn${appointment.id}" 
+              <button id="eliminarBtn${appointment.id_appointment}" 
                       class="btn btn-danger btn-sm eliminarReserva" 
                       title="Eliminar reserva"
-                      data-id="${appointment.id}">
+                      data-id="${appointment.id_appointment}">
                 <i class="fas fa-trash"></i>
                 <span class="spinner-border spinner-border-sm d-none" aria-hidden="true"></span>
                 <span class="button-text"></span>
@@ -106,17 +107,17 @@ function fillTable(data) {
 
   // Añadir listeners para los botones de confirmación y eliminación después de actualizar el contenido
   data.forEach((appointment) => {
-    const confirmarBtn = document.getElementById(`confirmarBtn${appointment.id}`);
-    const eliminarBtn = document.getElementById(`eliminarBtn${appointment.id}`);
+    const confirmarBtn = document.getElementById(`confirmarBtn${appointment.id_appointment}`);
+    const eliminarBtn = document.getElementById(`eliminarBtn${appointment.id_appointment}`);
 
     if (confirmarBtn) {
       confirmarBtn.addEventListener("click", function () {
-        confirmReservation(appointment.id);
+        confirmReservation(appointment.id_appointment);
       });
     }
 
     eliminarBtn.addEventListener("click", function () {
-      deleteAppointment(appointment.id, appointment.event_id);
+      openDeleteModal(appointment); // Abrir el modal antes de eliminar
     });
   });
 }
@@ -130,7 +131,7 @@ function fillEventTable(data) {
          <tr class="body-table">
               <td data-cell="servicio" class="data">${event.event_name}</td>
               <td data-cell="nombre" class="data">${event.participant_name}</td>
-              <td data-cell="telefono" class="data"><i class="fab fa-whatsapp pe-1" style="font-size:0.85rem"><a href="https://wa.me/${event.phone}" target="_blank">+${event.phone}</a></td>
+              <td data-cell="telefono" class="data"><i class="fab fa-whatsapp pe-1" style="font-size:0.85rem"></i><a href="https://wa.me/${event.phone}" target="_blank">+${event.phone}</a></td>
               <td data-cell="correo" class="data">${event.email}</td>
               <td data-cell="fecha" class="data">${event.event_date}</td>
               <td data-cell="hora" class="data">${event.event_start_time}</td>
@@ -304,8 +305,65 @@ function logAction(message) {
   console.log(`[LOG]: ${message}`); // También muestra el log en la consola para depuración en tiempo real
 }
 
-export async function deleteAppointment(appointmentID, calendarEventID) {
-  addSpinner(appointmentID, true, "eliminar");
+// Función para abrir el modal
+function openDeleteModal(appointment) {
+  const modal = new bootstrap.Modal(document.getElementById("deleteModal"));
+
+  // Mostrar el modal
+  modal.show();
+
+  // Botón "Eliminar cita"
+  document.getElementById("delete-button").addEventListener("click", () => {
+    const reason = document.querySelector('input[name="reason"]:checked')?.value || "Otro";
+    const notes = document.getElementById("notes").value;
+    deleteAppointment(appointment, reason, notes, false); // No generar incidencia
+    modal.hide();
+  });
+
+  document.getElementById("delete-and-incident-button").addEventListener("click", () => {
+    const reason = document.querySelector('input[name="reason"]:checked')?.value || null;
+    const notes = document.getElementById("notes").value;
+
+    if (!reason) {
+      // No se seleccionó una razón, abrir el modal de advertencia
+      const warningModal = new bootstrap.Modal(document.getElementById("warningModal"));
+      warningModal.show();
+    } else {
+      // Si hay una razón, proceder a eliminar y generar la incidencia
+      deleteAppointment(appointment, reason, notes, true); // Generar incidencia
+      resetDeleteModal(); // Limpiar el modal después de eliminar
+    }
+  });
+
+  // Botón "Aceptar" en el modal de advertencia. verificar antes si el botón existe
+  if (document.getElementById("go-back-button")) {
+    document.getElementById("go-back-button").addEventListener("click", () => {
+      const warningModal = new bootstrap.Modal(document.getElementById("warningModal"));
+      warningModal.hide(); // Cerrar el modal de advertencia
+    });
+  }
+
+  // Evento para "Cancelar" en el modal de eliminación
+  document.querySelector("#deleteModal .btn-secondary").addEventListener("click", () => {
+    resetDeleteModal(); // Restablecer el modal al cancelar
+  });
+
+  // Evento para cerrar el modal de eliminación con la "X"
+  document.querySelector("#deleteModal .btn-close").addEventListener("click", () => {
+    resetDeleteModal(); // Restablecer el modal al cerrar
+  });
+}
+
+function resetDeleteModal() {
+  // Desmarcar todas las opciones de razón
+  const reasonInputs = document.querySelectorAll('input[name="reason"]');
+  reasonInputs.forEach((input) => (input.checked = false));
+
+  // Limpiar el campo de notas
+  document.getElementById("notes").value = "";
+}
+export async function deleteAppointment(appointment, reason, notes, generateIncident) {
+  addSpinner(appointment.id_appointment, true, "eliminar");
 
   try {
     const response = await fetch(`${baseUrl}user_admin/delete_calendar_event.php`, {
@@ -314,8 +372,12 @@ export async function deleteAppointment(appointmentID, calendarEventID) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        calendarEventID: calendarEventID,
-        appointmentID: appointmentID,
+        calendarEventID: appointment.event_id,
+        appointmentID: appointment.id_appointment,
+        customerID: appointment.id_customer,
+        reason: reason, // Razón para eliminar la reserva
+        notes: notes, // Notas adicionales
+        generateIncident: generateIncident,
       }),
     });
 
@@ -343,7 +405,7 @@ export async function deleteAppointment(appointmentID, calendarEventID) {
     alert("Error al eliminar la reserva.");
   } finally {
     // Ocultar spinner y habilitar botón después de que la solicitud se complete
-    addSpinner(appointmentID, false, "eliminar");
+    addSpinner(appointment.id_appointment, false, "eliminar");
   }
 }
 
@@ -459,17 +521,17 @@ document.getElementById("date").addEventListener("input", autocomplete);
 document.getElementById("hour").addEventListener("input", autocomplete);
 document.getElementById("status").addEventListener("change", autocomplete);
 
-let lastQuery = ""; // Almacena la última búsqueda
+let lastQuery = "";
+
 async function autocomplete(e) {
   const input = e.target.id;
   const query = e.target.value;
   const savedStatus = sessionStorage.getItem("status") || "unconfirmed";
-  console.log(savedStatus);
+
   if (query.length >= 3 || input == "status") {
-    // Si la consulta es diferente a la última, hacer la búsqueda
     if (query !== lastQuery) {
-      lastQuery = query; // Actualizar la última consulta
-      const response = await fetch(`${baseUrl}user_admin/controllers/autocomplete.php?${input}=${query}&tab=${savedStatus}`);
+      lastQuery = query;
+      const response = await fetch(`${baseUrl}user_admin/controllers/autocomplete.php?input=${input}&query=${query}&tab=${savedStatus}`);
       const data = await response.json();
       if (savedStatus != "events") {
         fillTable(data.data);
@@ -477,11 +539,8 @@ async function autocomplete(e) {
         fillEventTable(data.data);
       }
     }
-  } else {
-    // Solo recargar las citas si no hay consulta activa
-    if (query === "") {
-      const savedStatus = sessionStorage.getItem("status") || "unconfirmed";
-      loadAppointments(savedStatus);
-    }
+  } else if (query === "") {
+    const savedStatus = sessionStorage.getItem("status") || "unconfirmed";
+    loadAppointments(savedStatus);
   }
 }
