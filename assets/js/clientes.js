@@ -94,7 +94,7 @@ function fillTableCustomers(data) {
       }
       document.getElementById(`eliminar-${customer.id}`).onclick = () => modalEliminarCliente(customer.id);
     } else if (status === "incidencias") {
-      document.getElementById(`eliminar-incidencia-${customer.id}`).onclick = () => eliminarIncidencia(customer.id);
+      document.getElementById(`eliminar-incidencia-${customer.id}`).onclick = () => handleIncidentDelete(customer.id);
     } else if (status === "blocked") {
       document.getElementById(`desbloquear-${customer.id}`).onclick = () => toggleBlockSubmit(customer.id);
     }
@@ -204,6 +204,102 @@ document.getElementById("editCustomerForm").addEventListener("submit", async (e)
     console.error("Error en la solicitud:", error);
   }
 });
+
+async function handleIncidentDelete(customerId) {
+  try {
+    // 1. Obtener y mostrar incidencias en el modal
+    await fetchAndDisplayIncidents(customerId); // <-- Sin asignar a variable
+
+    // 2. Configurar el evento de eliminación
+    setupDeleteHandler(customerId);
+  } catch (error) {
+    console.error("Error en handleIncidentDelete:", error);
+    infoModal("Error", "Error al procesar la solicitud");
+  }
+}
+
+// Función para obtener incidencias y mostrarlas en el modal
+async function fetchAndDisplayIncidents(customerId) {
+  try {
+    const response = await fetch(`${baseUrl}user_admin/controllers/customers.php?action=getCustomerIncidents&id=${customerId}`);
+    const data = await response.json();
+
+    if (!data.success) {
+      throw new Error(data.message || "Error al cargar incidencias");
+    }
+
+    // Mostrar en el modal
+    const incidentsList = document.getElementById("incidents-list");
+    incidentsList.innerHTML = data.data
+      .map(
+        (incident) => `
+      <div class="form-check">
+        <input class="form-check-input incident-checkbox" type="checkbox" 
+               value="${incident.id}" id="incident-${incident.id}">
+        <label class="form-check-label" for="incident-${incident.id}">
+          ${incident.description} - ${new Date(incident.incident_date).toLocaleDateString()}
+        </label>
+      </div>
+    `
+      )
+      .join("");
+
+    // Mostrar el modal
+    new bootstrap.Modal(document.getElementById("deleteIncidentsModal")).show();
+
+    return data.data;
+  } catch (error) {
+    console.error("Error al obtener incidencias:", error);
+    infoModal("Error", "No se pudieron cargar las incidencias");
+    throw error;
+  }
+}
+
+// Función para configurar el manejador de eliminación
+function setupDeleteHandler(customerId) {
+  const confirmBtn = document.getElementById("confirm-delete");
+  confirmBtn.disabled = true;
+  const modalElement = document.getElementById("deleteIncidentsModal");
+
+  // Habilitar/deshabilitar botón según selección
+  modalElement.addEventListener("change", (e) => {
+    if (e.target.classList.contains("incident-checkbox")) {
+      confirmBtn.disabled = !document.querySelector("#incidents-list .incident-checkbox:checked");
+    }
+  });
+
+  // Manejador de eliminación
+  confirmBtn.addEventListener("click", async () => {
+    const selected = Array.from(document.querySelectorAll("#incidents-list .incident-checkbox:checked")).map((checkbox) => checkbox.value);
+
+    if (selected.length === 0) return;
+
+    try {
+      const response = await fetch(`${baseUrl}user_admin/controllers/customers.php`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "deleteIncidents",
+          customer_id: customerId,
+          incidents: selected,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        infoModal("Éxito", "Incidencias eliminadas correctamente");
+        bootstrap.Modal.getInstance(modalElement).hide();
+        // Aquí podrías recargar datos o actualizar UI si es necesario
+      } else {
+        throw new Error(result.message || "Error al eliminar");
+      }
+    } catch (error) {
+      console.error("Error al eliminar:", error);
+      infoModal("Error", error.message);
+    }
+  });
+}
 
 // Función para bloquear un cliente
 async function toggleBlockSubmit(customerId, nota = null) {

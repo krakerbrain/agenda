@@ -18,7 +18,7 @@
 <!-- customer_modal.php -->
 <div class="modal fade" id="customerDetailModal" tabindex="-1" aria-labelledby="customerDetailModalLabel"
     aria-hidden="true">
-    <div class="modal-dialog modal-fullscreen">
+    <div class="modal-dialog">
         <div class="modal-content">
             <!-- Modal Header -->
             <div class="modal-header bg-primary text-white">
@@ -154,6 +154,28 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                 <button type="button" class="btn btn-danger" id="btnEliminarCliente">Eliminar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteIncidentsModal" tabindex="-1" aria-labelledby="deleteIncidentsModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteIncidentsModalLabel">Eliminar Incidencias</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Seleccione las incidencias que desea eliminar:</p>
+                <div id="incidents-list" class="mb-3">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" id="confirm-delete" class="btn btn-danger" disabled>Eliminar
+                    seleccionadas</button>
             </div>
         </div>
     </div>

@@ -20,8 +20,6 @@ try {
     $data = json_decode($input, true);
 
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-
-
         if (isset($_GET['action'])) {
             if ($_GET['action'] === 'getCustomerDetail') {
                 $customerId = $_GET['id'];
@@ -45,6 +43,16 @@ try {
                     echo json_encode(['success' => true, 'custom_url' => $customUrl]);
                 } else {
                     echo json_encode(['success' => false, 'message' => 'No se encontró la URL de la empresa.']);
+                }
+                exit;
+            } else if ($_GET['action'] === 'getCustomerIncidents') {
+                $customerId = $_GET['id'];
+                $incidents = $customer->getCustomerIncidents($customerId, $company_id);
+
+                if ($incidents !== false) {
+                    echo json_encode(['success' => true, 'data' => $incidents]);
+                } else {
+                    echo json_encode(['success' => false, 'message' => 'Error al obtener incidencias']);
                 }
                 exit;
             }
@@ -92,19 +100,24 @@ try {
             exit;
         }
     } else if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-
         try {
-            // Manejo de la eliminación de un cliente
             $data = json_decode(file_get_contents('php://input'), true);
+
             if ($data['action'] == 'deleteCustomer') {
                 $customerId = $data['customer_id'];
-
                 $result = $customer->deleteCustomer($customerId);
                 echo json_encode(["success" => $result, "message" => "Cliente eliminado correctamente"]);
                 exit;
+            } else if ($data['action'] == 'deleteIncidents') {
+                $customerId = $data['customer_id'];
+                $incidentIds = $data['incidents'];
+
+                $result = $customer->deleteIncidents($incidentIds, $customerId);
+                echo json_encode(["success" => $result, "message" => "Incidencias eliminadas correctamente"]);
+                exit;
             }
         } catch (Exception $e) {
-            echo json_encode(['success' => false, 'message' => 'Error al eliminar el cliente' . $e->getMessage()]);
+            echo json_encode(['success' => false, 'message' => 'Error al eliminar: ' . $e->getMessage()]);
         }
     } else {
         // Manejo de otros métodos (si es necesario)

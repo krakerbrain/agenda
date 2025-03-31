@@ -406,6 +406,28 @@ class Customers
         }
     }
 
+    public function getCustomerIncidents($customerId, $companyId)
+    {
+        try {
+            $sql = "SELECT ci.id, ci.description, ci.incident_date 
+                    FROM customer_incidents ci
+                    JOIN customers c ON ci.customer_id = c.id
+                    JOIN company_customers cc ON c.id = cc.customer_id
+                    WHERE ci.customer_id = :customerId 
+                    AND cc.company_id = :companyId
+                    ORDER BY ci.incident_date DESC";
+
+            $this->db->query($sql);
+            $this->db->bind(':customerId', $customerId);
+            $this->db->bind(':companyId', $companyId);
+
+            $this->db->execute();
+            return $this->db->resultSet();
+        } catch (PDOException $e) {
+            error_log("Error getting customer incidents: " . $e->getMessage());
+            return false;
+        }
+    }
     public function searchCustomers($company_id, $input, $query, $status = null)
     {
         try {
@@ -517,6 +539,30 @@ class Customers
             return $this->db->execute();
         } catch (PDOException $e) {
             echo "Error: " . $e->getMessage();
+            return false;
+        }
+    }
+
+    public function deleteIncidents($incidentIds, $customerId)
+    {
+        try {
+            // Crear placeholders para la consulta IN
+            $placeholders = implode(',', array_fill(0, count($incidentIds), '?'));
+
+            $sql = "DELETE FROM customer_incidents 
+                    WHERE id IN ($placeholders) AND customer_id = ?";
+
+            $this->db->query($sql);
+
+            // Bind parameters
+            foreach ($incidentIds as $key => $id) {
+                $this->db->bind($key + 1, $id);
+            }
+            $this->db->bind(count($incidentIds) + 1, $customerId);
+
+            return $this->db->execute();
+        } catch (PDOException $e) {
+            error_log("Error deleting incidents: " . $e->getMessage());
             return false;
         }
     }
