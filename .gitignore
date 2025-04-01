@@ -24,3 +24,4 @@ __documentacion__
 /utils
 *copy.*
 /assets/img/banners/user*
+.prettierignore
