@@ -60,9 +60,13 @@ $auth->validarTokenUsuario();
             <div class="card shadow-sm">
                 <div class="card-body">
                     <h4 class="card-title mb-4 text-center">Agregar Usuario Inicial</h4>
-                    <form id="addUserForm">
+                    <form id="addUserForm" autocomplete="off">
                         <div class="mb-3">
                             <input type="hidden" class="form-control" id="role_id" name="role_id" value="2">
+                        </div>
+                        <div class="mb-3">
+                            <label for="company_id" class="form-label">ID de la Empresa:</label>
+                            <input type="text" class="form-control" id="company_id" name="company_id" required>
                         </div>
                         <div class="mb-3">
                             <label for="username" class="form-label">Nombre de Usuario:</label>
@@ -70,20 +74,20 @@ $auth->validarTokenUsuario();
                         </div>
                         <div class="mb-3">
                             <label for="email" class="form-label">Correo Electrónico:</label>
-                            <input type="email" class="form-control" id="email" name="correo" required>
+                            <input type="email" class="form-control" id="email" name="correo" autocomplete="nope"
+                                required>
                         </div>
                         <div class="mb-3">
                             <label for="password" class="form-label">Contraseña:</label>
-                            <input type="password" class="form-control" id="password" name="password" required>
+                            <input type="password" class="form-control" id="password" name="password"
+                                autocomplete="new-password" required>
                         </div>
                         <div class="mb-3">
                             <label for="password2" class="form-label">Repetir Contraseña:</label>
-                            <input type="password" class="form-control" id="password2" name="password2" required>
+                            <input type="password" class="form-control" id="password2" name="password2"
+                                autocomplete="new-password" required>
                         </div>
-                        <div class="mb-3">
-                            <label for="company_id" class="form-label">ID de la Empresa:</label>
-                            <input type="text" class="form-control" id="company_id" name="company_id" required>
-                        </div>
+
                         <div class="text-center">
                             <button type="submit" class="btn btn-primary" id="addUser">
                                 <span class="spinner-border spinner-border-sm d-none" aria-hidden="true"></span>
