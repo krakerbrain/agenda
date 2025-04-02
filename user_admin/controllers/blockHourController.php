@@ -3,6 +3,7 @@ require_once dirname(__DIR__, 2) . '/configs/init.php';
 require_once dirname(__DIR__, 2) . '/access-token/seguridad/JWTAuth.php';
 require_once dirname(__DIR__, 2) . '/classes/Appointments.php'; // Clase Appointments
 require_once dirname(__DIR__, 2) . '/classes/Schedules.php';   // Clase Schedules
+require_once dirname(__DIR__, 2) . '/classes/Customers.php';
 require_once dirname(__DIR__, 2) . '/classes/ConfigUrl.php';
 
 $baseUrl = ConfigUrl::get();
@@ -38,6 +39,7 @@ try {
     // Instanciar clases necesarias
     $schedules = new Schedules($company_id);
     $appointments = new Appointments();
+    $customers = new Customers();
 
     // Validar horario habilitado en la fecha seleccionada
     $dayOfWeek = date('N', strtotime($blockDate)); // Obtener día de la semana (1 = lunes, 7 = domingo)
@@ -70,8 +72,11 @@ try {
 
     // // Si no hay conflictos, permitir el bloqueo del día o rango
     if ($validation['success'] && empty($conflictingAppointments)) {
+        // Obtener el cliente especial (se crea solo si no existe)
+        $blockedCustomerId = $customers->getOrCreateBlockedDayCustomer($company_id);
         $blockData = [
             'company_id' => $company_id,
+            'customer_id' => $blockedCustomerId['id'],
             'date' => $blockDate,
             'start_time' => $startHour,
             'end_time' => $endHour,

@@ -6,11 +6,11 @@ class Customers
     private $db;
 
 
-    public function __construct()
+    public function __construct(?Database $db = null)
     {
-        $this->db = new Database(); // Usa la clase Database
-
+        $this->db = $db ?? new Database();
     }
+
 
     public function get_paginated_customers($company_id, $status, $offset, $limit)
     {
@@ -22,7 +22,8 @@ class Customers
               FROM customers c
               LEFT JOIN company_customers cc ON c.id = cc.customer_id
               LEFT JOIN customer_incidents ci ON c.id = ci.customer_id
-              WHERE cc.company_id = :company';
+              WHERE cc.company_id = :company
+              AND c.is_system = 0';
 
         // Filtros según el estado
         if ($status === 'incidencias') {
@@ -438,7 +439,8 @@ class Customers
                 FROM customers c
                 LEFT JOIN company_customers cc ON c.id = cc.customer_id
                 LEFT JOIN customer_incidents ci ON c.id = ci.customer_id
-                WHERE cc.company_id = :company_id";
+                WHERE cc.company_id = :company_id
+                AND c.is_system = 0";
 
             // Filtrar por el campo de búsqueda (name, phone, mail)
             switch ($input) {
@@ -564,6 +566,52 @@ class Customers
         } catch (PDOException $e) {
             error_log("Error deleting incidents: " . $e->getMessage());
             return false;
+        }
+    }
+    public function getOrCreateBlockedDayCustomer($company_id)
+    {
+        // 1. Buscar si ya existe el cliente especial para esta compañía
+        $sql = "SELECT c.id 
+              FROM customers c
+              JOIN company_customers cc ON c.id = cc.customer_id
+              WHERE cc.company_id = :company_id AND c.is_system = 1 AND c.name = 'DÍA BLOQUEADO'
+              LIMIT 1";
+        $this->db->query($sql);
+        $this->db->bind(':company_id', $company_id);
+        $customer_id = $this->db->single();
+
+        if ($customer_id) {
+            return $customer_id; // Ya existe, retornar ID
+        }
+
+        // 2. Si no existe, crearlo (con transacción para seguridad)
+
+        $this->db->beginTransaction();
+
+        try {
+            // Insertar el cliente especial
+            $sql = "INSERT INTO customers 
+                 (name, phone, mail, created_at, is_system) 
+                 VALUES ('DÍA BLOQUEADO', '000000000', 'noreply@blocked.day', NOW(), 1)";
+            $this->db->query($sql);
+            $this->db->execute();
+            $customer_id = $this->db->lastInsertId();
+
+
+            // Asociar a la compañía
+            $sql = "INSERT INTO company_customers (company_id, customer_id) VALUES (:company_id, :customer_id)";
+            $this->db->query($sql);
+            $this->db->bind(':company_id', $company_id);
+            $this->db->bind(':customer_id', $customer_id);
+            $this->db->execute();
+
+            // Confirmar la transacción si todo fue exitoso
+            $this->db->endTransaction();
+            return $customer_id;
+        } catch (Exception $e) {
+            $this->db->cancelTransaction();
+            // Si falla (por colisión), intentar obtener el ID nuevamente
+            return $this->getOrCreateBlockedDayCustomer($company_id);
         }
     }
 }

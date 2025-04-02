@@ -4,63 +4,43 @@ require_once dirname(__DIR__) . '/access-token/seguridad/JWTAuth.php';
 
 use Ramsey\Uuid\Uuid;
 
-class Appointments extends Database
+class Appointments
 {
-    /**
-     * Método para agregar una cita.
-     *
-     * Este método inserta una nueva cita en la base de datos y genera un token para la misma.
-     *
-     * Parámetros esperados en $data:
-     * - company_id: ID de la compañía.
-     * - name: Nombre del cliente.
-     * - phone: Teléfono del cliente.
-     * - mail: Correo electrónico del cliente.
-     * - date: Fecha de la cita (YYYY-MM-DD).
-     * - start_time: Hora de inicio de la cita (HH:MM:SS).
-     * - end_time: Hora de fin de la cita (HH:MM:SS).
-     * - id_service: ID del servicio asociado a la cita.
-     * - aviso_reserva: (Por defecto "0") Indica si el cliente ha sido notificado.
-     * - created_at: Fecha y hora de creación de la cita (asignado automáticamente).
-     *
-     * @param array $data Datos de la cita.
-     * @return array Resultado de la operación:
-     *               - Si es exitoso: ['appointment_id' => int, 'appointment_token' => string].
-     *               - Si hay error: ['error' => string].
-     * @throws PDOException Si ocurre un error en la base de datos.
-     */
+    private $db;
+    public function __construct(?Database $db = null)
+    {
+        $this->db = $db ?? new Database();
+    }
     public function add_appointment($data)
     {
         try {
-            $db = new Database();
-
             // Verificar si ya existe una cita con los mismos datos
             if ($this->checkExistingAppointment($data)) {
                 return ['error' => 'Cita ya ha sido enviada.'];
             }
 
-            $db->query('INSERT INTO appointments (company_id, customer_id, date, start_time, end_time, id_service, aviso_reserva, created_at) 
+            $this->db->query('INSERT INTO appointments (company_id, customer_id, date, start_time, end_time, id_service, aviso_reserva, created_at) 
                     VALUES (:company_id, :customer_id, :date, :start_time, :end_time, :id_service, 0, now())');
-            $db->bind(':company_id', $data['company_id']);
-            $db->bind(':customer_id', $data['customer_id']);
-            $db->bind(':date', $data['date']);
-            $db->bind(':start_time', $data['start_time']);
-            $db->bind(':end_time', $data['end_time']);
-            $db->bind(':id_service', $data['id_service']);
-            $db->execute();
+            $this->db->bind(':company_id', $data['company_id']);
+            $this->db->bind(':customer_id', $data['customer_id']);
+            $this->db->bind(':date', $data['date']);
+            $this->db->bind(':start_time', $data['start_time']);
+            $this->db->bind(':end_time', $data['end_time']);
+            $this->db->bind(':id_service', $data['id_service']);
+            $this->db->execute();
 
             // Obtener el ID de la cita recién creada
-            $appointmentId = $db->lastInsertId();
+            $appointmentId = $this->db->lastInsertId();
 
             // Generar el token para la cita usando el ID
             $jwtAuth = new JWTAuth();
             $appointmentToken = $jwtAuth->generarTokenCita($data['company_id'], $appointmentId);
 
             // Actualizar la cita con el token generado
-            $db->query('UPDATE appointments SET appointment_token = :token WHERE id = :id');
-            $db->bind(':token', $appointmentToken);
-            $db->bind(':id', $appointmentId);
-            $db->execute();
+            $this->db->query('UPDATE appointments SET appointment_token = :token WHERE id = :id');
+            $this->db->bind(':token', $appointmentToken);
+            $this->db->bind(':id', $appointmentId);
+            $this->db->execute();
 
             // Retornar el ID de la cita y el token generado
             return [
@@ -76,7 +56,7 @@ class Appointments extends Database
     public function addBlockedDay($data)
     {
         try {
-            $db = new Database();
+
 
             // Consulta SQL para insertar un "día bloqueado" como cita especial
             $query = "
@@ -84,38 +64,39 @@ class Appointments extends Database
                 company_id,customer_id, date, start_time, end_time, 
                 id_service, status, aviso_reserva, aviso_confirmada, created_at
             ) VALUES (
-                :company_id, 0, :date, :start_time, :end_time, 
+                :company_id, :customer_id, :date, :start_time, :end_time, 
                 :id_service, :status, :aviso_reserva, :aviso_confirmada, NOW()
             )
         ";
 
             // Preparar la consulta
-            $db->query($query);
+            $this->db->query($query);
 
             // Asignar valores a los parámetros
-            $db->bind(':company_id', $data['company_id']);
-            $db->bind(':date', $data['date']);
-            $db->bind(':start_time', $data['start_time']);
-            $db->bind(':end_time', $data['end_time']);
-            $db->bind(':id_service', 0); // ID de servicio 0 para identificar que es un bloqueo
-            $db->bind(':status', 1); // Estado activo
-            $db->bind(':aviso_reserva', 1); // Marcar como notificado
-            $db->bind(':aviso_confirmada', 1); // Marcar como confirmado
+            $this->db->bind(':company_id', $data['company_id']);
+            $this->db->bind(':customer_id', $data['customer_id']);
+            $this->db->bind(':date', $data['date']);
+            $this->db->bind(':start_time', $data['start_time']);
+            $this->db->bind(':end_time', $data['end_time']);
+            $this->db->bind(':id_service', 0); // ID de servicio 0 para identificar que es un bloqueo
+            $this->db->bind(':status', 1); // Estado activo
+            $this->db->bind(':aviso_reserva', 1); // Marcar como notificado
+            $this->db->bind(':aviso_confirmada', 1); // Marcar como confirmado
 
             // Ejecutar la consulta
-            $db->execute();
+            $this->db->execute();
 
             // Obtener el ID de la cita recién creada
-            $appointmentId = $db->lastInsertId();
+            $appointmentId = $this->db->lastInsertId();
 
             // Generar el token identificador (UUID v4)
             $appointmentToken = Uuid::uuid4()->toString();
 
             // Actualizar la cita con el token generado
-            $db->query('UPDATE appointments SET appointment_token = :token WHERE id = :id');
-            $db->bind(':token', $appointmentToken);
-            $db->bind(':id', $appointmentId);
-            $db->execute();
+            $this->db->query('UPDATE appointments SET appointment_token = :token WHERE id = :id');
+            $this->db->bind(':token', $appointmentToken);
+            $this->db->bind(':id', $appointmentId);
+            $this->db->execute();
             // Retornar el ID de la cita bloqueada
             return [
                 'success' => true,
@@ -133,8 +114,8 @@ class Appointments extends Database
     // getBlockedDays
     public function getBlockedDays($company_id)
     {
-        $db = new Database();
-        $db->query('
+
+        $this->db->query('
         SELECT 
             DATE_FORMAT(date, "%d-%m-%Y") AS date, 
             start_time, 
@@ -147,21 +128,21 @@ class Appointments extends Database
             AND id_service = 0
             AND (date > CURDATE() OR (date = CURDATE() AND end_time >= NOW()))
     ');
-        $db->bind(':company_id', $company_id);
-        return $db->resultSet();
+        $this->db->bind(':company_id', $company_id);
+        return $this->db->resultSet();
     }
 
 
     public function checkExistingAppointment($data)
     {
-        $db = new Database();
-        $db->query('SELECT COUNT(*) as total FROM appointments WHERE company_id = :company_id AND date = :date AND start_time = :start_time AND end_time = :end_time');
-        $db->bind(':company_id', $data['company_id']);
-        $db->bind(':date', $data['date']);
-        $db->bind(':start_time', $data['start_time']);
-        $db->bind(':end_time', $data['end_time']);
+
+        $this->db->query('SELECT COUNT(*) as total FROM appointments WHERE company_id = :company_id AND date = :date AND start_time = :start_time AND end_time = :end_time');
+        $this->db->bind(':company_id', $data['company_id']);
+        $this->db->bind(':date', $data['date']);
+        $this->db->bind(':start_time', $data['start_time']);
+        $this->db->bind(':end_time', $data['end_time']);
         // Obtener el resultado y acceder a la propiedad 'total'
-        $countResult = $db->single();
+        $countResult = $this->db->single();
 
         // Asegurarnos de acceder al conteo correctamente
         return (int)$countResult['total'] > 0; // Retorna verdadero si hay al menos una cita existente
@@ -169,7 +150,7 @@ class Appointments extends Database
 
     public function searchAppointments($company_id, $input, $query, $tab = 'all')
     {
-        $db = new Database();
+
 
         // Consulta base
         $querySql = 'SELECT a.*, s.name AS service, c.*,
@@ -218,18 +199,18 @@ class Appointments extends Database
         }
 
         // Preparar y ejecutar la consulta
-        $db->query($querySql);
-        $db->bind(':company', $company_id);
+        $this->db->query($querySql);
+        $this->db->bind(':company', $company_id);
         if ($input && $query) {
-            $db->bind(':query', $input === 'date' || $input === 'hour' ? $query : "%$query%");
+            $this->db->bind(':query', $input === 'date' || $input === 'hour' ? $query : "%$query%");
         }
 
-        return $db->resultSet();
+        return $this->db->resultSet();
     }
 
     public function get_paginated_appointments($company_id, $status, $offset, $limit)
     {
-        $db = new Database();
+
 
         $query = 'SELECT a.id as id_appointment, a.*, s.name AS service, c.id as id_customer, c.*,
                      DATE_FORMAT(a.date, "%d-%m-%Y") as date 
@@ -251,12 +232,12 @@ class Appointments extends Database
 
         $query .= ' ORDER BY a.date DESC LIMIT :offset, :limit';
 
-        $db->query($query);
-        $db->bind(':company', $company_id);
-        $db->bind(':offset', $offset, PDO::PARAM_INT);
-        $db->bind(':limit', $limit, PDO::PARAM_INT);
+        $this->db->query($query);
+        $this->db->bind(':company', $company_id);
+        $this->db->bind(':offset', $offset, PDO::PARAM_INT);
+        $this->db->bind(':limit', $limit, PDO::PARAM_INT);
 
-        return $db->resultSet();
+        return $this->db->resultSet();
     }
 
     // Metodo usado para mostrar al cliente los datos de su cita desde el link de whatsapp
@@ -265,15 +246,15 @@ class Appointments extends Database
         try {
             //code...
 
-            $db = new Database();
-            $db->query('SELECT s.name as service, a.*, c.name as customer_name FROM appointments a
+
+            $this->db->query('SELECT s.name as service, a.*, c.name as customer_name FROM appointments a
                             JOIN customers c
                             ON a.customer_id = c.id
                             JOIN services s
                             ON a.id_service = s.id
                             WHERE a.id = :id');
-            $db->bind(':id', $id);
-            return $db->single();
+            $this->db->bind(':id', $id);
+            return $this->db->single();
         } catch (Exception $e) {
             return $e->getMessage();
         }
@@ -285,10 +266,10 @@ class Appointments extends Database
         try {
             //code...
 
-            $db = new Database();
-            $db->query('SELECT id FROM appointments WHERE  appointment_token = :token');
-            $db->bind(':token', $token);
-            return $db->single();
+
+            $this->db->query('SELECT id FROM appointments WHERE  appointment_token = :token');
+            $this->db->bind(':token', $token);
+            return $this->db->single();
         } catch (Exception $e) {
             return $e->getMessage();
         }
@@ -301,8 +282,8 @@ class Appointments extends Database
                 ? ' AND a.aviso_reserva = 0'
                 : ' AND a.aviso_confirmada = 0 AND a.aviso_reserva = 1 AND a.status = 1';
 
-            $db = new Database();
-            $db->query('SELECT a.*, cu.name as customer_name, cu.phone as customer_phone, cu.mail as customer_mail, s.name as service_name, c.name as company_name
+
+            $this->db->query('SELECT a.*, cu.name as customer_name, cu.phone as customer_phone, cu.mail as customer_mail, s.name as service_name, c.name as company_name
                 FROM appointments a
                 JOIN customers cu
                 ON a.customer_id = cu.id
@@ -314,7 +295,7 @@ class Appointments extends Database
                 ON c.id = a.company_id
                 WHERE cc.company_id = c.id
                 ' . $condition);
-            return $db->resultSet();
+            return $this->db->resultSet();
         } catch (Exception $e) {
             throw new Exception("Error al obtener citas no confirmadas: " . $e->getMessage());
         }
@@ -323,32 +304,32 @@ class Appointments extends Database
     // Obtener todas las citas en el rango de fechas
     public function getAppointmentsByDateRange($company_id, $start_date, $end_date)
     {
-        $db = new Database();
-        $db->query('SELECT date, start_time, end_time FROM appointments WHERE company_id = :company_id AND date BETWEEN :start_date AND :end_date');
-        $db->bind(':company_id', $company_id);
-        $db->bind(':start_date', $start_date);
-        $db->bind(':end_date', $end_date);
-        return $db->resultSet();
+
+        $this->db->query('SELECT date, start_time, end_time FROM appointments WHERE company_id = :company_id AND date BETWEEN :start_date AND :end_date');
+        $this->db->bind(':company_id', $company_id);
+        $this->db->bind(':start_date', $start_date);
+        $this->db->bind(':end_date', $end_date);
+        return $this->db->resultSet();
     }
 
     //obtener citas por fecha
 
     public function getAppointmentsByDate($company_id, $date)
     {
-        $db = new Database();
-        $db->query('SELECT * FROM appointments WHERE company_id = :company_id AND date = :date');
-        $db->bind(':company_id', $company_id);
-        $db->bind(':date', $date);
 
-        return $db->resultSet();
+        $this->db->query('SELECT * FROM appointments WHERE company_id = :company_id AND date = :date');
+        $this->db->bind(':company_id', $company_id);
+        $this->db->bind(':date', $date);
+
+        return $this->db->resultSet();
     }
 
     public function checkAppointments($company_id, $date, $start_hour, $end_hour)
     {
-        $db = new Database();
+
 
         // Verificar citas que se solapen con el rango horario dado
-        $db->query("
+        $this->db->query("
                     SELECT * 
                     FROM appointments 
                     WHERE company_id = :company_id 
@@ -359,56 +340,56 @@ class Appointments extends Database
                           (start_time BETWEEN :start_hour AND :end_hour)
                       )
         ");
-        $db->bind(':company_id', $company_id);
-        $db->bind(':date', $date);
-        $db->bind(':start_hour', $start_hour);
-        $db->bind(':end_hour', $end_hour);
+        $this->db->bind(':company_id', $company_id);
+        $this->db->bind(':date', $date);
+        $this->db->bind(':start_hour', $start_hour);
+        $this->db->bind(':end_hour', $end_hour);
 
-        return $db->resultSet();
+        return $this->db->resultSet();
     }
 
 
 
     public function markAsConfirmed($id, $type)
     {
-        $db = new Database();
+
 
         if ($type  === 'reserva') {
-            $db->query("UPDATE appointments SET aviso_reserva = 1, aviso_confirmada  = 0 WHERE id = :id");
+            $this->db->query("UPDATE appointments SET aviso_reserva = 1, aviso_confirmada  = 0 WHERE id = :id");
         } else {
-            $db->query("UPDATE appointments SET aviso_confirmada = 1 WHERE id = :id");
+            $this->db->query("UPDATE appointments SET aviso_confirmada = 1 WHERE id = :id");
         }
-        $db->bind(':id', $id);
-        return $db->execute();
+        $this->db->bind(':id', $id);
+        return $this->db->execute();
     }
 
     public function updateAppointment($id, $status, $eventId = null)
     {
-        $db = new Database();
-        $db->query("UPDATE appointments SET status = :status, event_id = :event_id, updated_at = now() WHERE id = :id");
-        $db->bind(':status', $status);
-        $db->bind(':event_id', $eventId);
-        $db->bind(':id', $id);
-        $db->execute();
-        return $db->rowCount();
+
+        $this->db->query("UPDATE appointments SET status = :status, event_id = :event_id, updated_at = now() WHERE id = :id");
+        $this->db->bind(':status', $status);
+        $this->db->bind(':event_id', $eventId);
+        $this->db->bind(':id', $id);
+        $this->db->execute();
+        return $this->db->rowCount();
     }
 
     public function delete_appointment($id)
     {
-        $db = new Database();
-        $db->query('DELETE FROM appointments WHERE id = :id');
-        $db->bind(':id', $id);
-        $db->execute();
-        return $db->rowCount();
+
+        $this->db->query('DELETE FROM appointments WHERE id = :id');
+        $this->db->bind(':id', $id);
+        $this->db->execute();
+        return $this->db->rowCount();
     }
 
     public function deleteBlockedDay($token, $company_id)
     {
-        $db = new Database();
-        $db->query("DELETE FROM appointments WHERE appointment_token = :token AND company_id = :company_id");
-        $db->bind(':token', $token);
-        $db->bind(':company_id', $company_id);
 
-        return $db->execute();
+        $this->db->query("DELETE FROM appointments WHERE appointment_token = :token AND company_id = :company_id");
+        $this->db->bind(':token', $token);
+        $this->db->bind(':company_id', $company_id);
+
+        return $this->db->execute();
     }
 }
