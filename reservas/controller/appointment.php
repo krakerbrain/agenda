@@ -48,7 +48,7 @@ try {
     $phone = formatPhoneNumber($data['phone']);
 
     // Verificar si el cliente ya existe o si esta bloqueado
-    $customer_id = empty($data['customer_id']) ? $customers->checkAndAssociateCustomer($phone, $data['mail'], $data['company_id']) : $data['customer_id'];
+    $customer_id = $customers->checkAndAssociateCustomer($phone, $data['mail'], $data['company_id']);
 
     if (is_array($customer_id) && isset($customer_id['error'])) {
         // Si hay un error, devolver el mensaje de error

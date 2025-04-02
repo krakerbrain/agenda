@@ -141,18 +141,18 @@ class Customers
         }
     }
 
-    // private function associate_company_with_customer($customerId, $companyId)
-    // {
-    //     try {
-    //         $sql = "INSERT INTO company_customers (company_id, customer_id) VALUES (:company_id, :customer_id)";
-    //         $this->db->query($sql);
-    //         $this->db->bind(':company_id', $companyId);
-    //         $this->db->bind(':customer_id', $customerId);
-    //         $this->db->execute();
-    //     } catch (PDOException $e) {
-    //         echo "Error: " . $e->getMessage();
-    //     }
-    // }
+    private function associate_company_with_customer($customerId, $companyId)
+    {
+        try {
+            $sql = "INSERT INTO company_customers (company_id, customer_id) VALUES (:company_id, :customer_id)";
+            $this->db->query($sql);
+            $this->db->bind(':company_id', $companyId);
+            $this->db->bind(':customer_id', $customerId);
+            $this->db->execute();
+        } catch (PDOException $e) {
+            echo "Error: " . $e->getMessage();
+        }
+    }
     // Método para crear una incidencia
     public function createIncident($company_id, $customerId, $reason, $notes)
     {

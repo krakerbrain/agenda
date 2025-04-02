@@ -12,8 +12,8 @@ $role_id = $userData['role_id'];
 include dirname(__DIR__) . '/partials/head.php';
 ?>
 <script>
-const baseUrl = '<?php echo $baseUrl; ?>';
-const role_id = <?php echo $role_id; ?>;
+    const baseUrl = '<?php echo $baseUrl; ?>';
+    const role_id = <?php echo $role_id; ?>;
 </script>
 
 
@@ -39,46 +39,46 @@ const role_id = <?php echo $role_id; ?>;
         <div class="offcanvas-body">
             <ul class="nav nav-underline flex-column">
                 <?php if ($role_id != 1) { ?>
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="#" id="dateList">Lista de citas</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="clientes">Clientes</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="horarios">Horarios</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="servicios">Servicios</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="correos">Correos</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="datos_empresa">Datos Empresa</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="add_user">Agregar Usuario</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="configuraciones">Otras configuraciones</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="integrations">Servicios Integrados</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="eventos_unicos">Eventos Únicos</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="block_hour">Bloqueo de horas</a>
-                </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#" id="dateList">Lista de citas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="clientes">Clientes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="horarios">Horarios</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="servicios">Servicios</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="correos">Correos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="datos_empresa">Datos Empresa</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="add_user">Agregar Usuario</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="configuraciones">Otras configuraciones</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="integrations">Servicios Integrados</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="eventos_unicos">Eventos Únicos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="block_hour">Bloqueo de horas</a>
+                    </li>
                 <?php } else { ?>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="master_add_company">Agrega Empresa</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="master_company_list">Lista de Empresas</a>
-                </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="master_add_company">Agrega Empresa</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="master_company_list">Lista de Empresas</a>
+                    </li>
                 <?php } ?>
                 <li class="nav-item">
                     <a class="nav-link" href="#" id="logout">Cerrar sesión</a>
@@ -87,7 +87,7 @@ const role_id = <?php echo $role_id; ?>;
         </div>
     </div>
     <div id="main-content" class="container mt-5"></div>
-
+    <!-- Usado en configuracion de eventos únicos para múltiples fechas -->
     <script src="<?php echo $baseUrl; ?>assets/vendors/js/flatpickr/flatpickr.min.js"></script>
     <script src="<?php echo $baseUrl; ?>assets/vendors/js/bootstrap/bootstrap.bundle.min.js"></script>
     <!-- JavaScript de Cropper.js -->
