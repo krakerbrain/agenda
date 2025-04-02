@@ -12,7 +12,6 @@ README.MD
 ideas_paracciones_clientes.md
 /master_admin/uploads/*.png
 /master_admin/uploads/*.jpg
-/__tests__/
 package-lock.json
 package.json
 jest.config.js
@@ -25,3 +24,6 @@ __documentacion__
 *copy.*
 /assets/img/banners/user*
 .prettierignore
+phpunit.xml
+.phpunit.cache
+tests
