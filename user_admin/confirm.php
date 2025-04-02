@@ -48,7 +48,15 @@ try {
     }
 
     // Actualizar el ID del evento en la base de datos
-    $appointments->updateAppointment($id, 1, $eventId);
+    $updateResult = $appointments->updateAppointment($id, 1, $eventId);
+
+    if (!$updateResult['success']) {
+        throw new Exception('Error al actualizar la cita: ' . ($updateResult['message'] ?? ''));
+    }
+
+    if ($updateResult['rows_affected'] === 0) {
+        throw new Exception('No se encontró la cita para actualizar');
+    }
 
     // Confirmar la transacción
     header('Content-Type: application/json');

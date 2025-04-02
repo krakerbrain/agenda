@@ -362,16 +362,37 @@ class Appointments
         $this->db->bind(':id', $id);
         return $this->db->execute();
     }
-
     public function updateAppointment($id, $status, $eventId = null)
     {
+        try {
+            $this->db->query("UPDATE appointments SET status = :status, event_id = :event_id, updated_at = now() WHERE id = :id");
+            $this->db->bind(':status', $status);
+            $this->db->bind(':event_id', $eventId);
+            $this->db->bind(':id', $id);
+            $this->db->execute();
 
-        $this->db->query("UPDATE appointments SET status = :status, event_id = :event_id, updated_at = now() WHERE id = :id");
-        $this->db->bind(':status', $status);
-        $this->db->bind(':event_id', $eventId);
-        $this->db->bind(':id', $id);
-        $this->db->execute();
-        return $this->db->rowCount();
+            $rowCount = $this->db->rowCount();
+
+            if ($rowCount === 0) {
+                return [
+                    'success' => false,
+                    'message' => 'No se actualizó ninguna cita. Verifica que el ID exista.',
+                    'rows_affected' => 0
+                ];
+            }
+
+            return [
+                'success' => true,
+                'message' => 'Cita actualizada exitosamente',
+                'rows_affected' => $rowCount
+            ];
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'error' => $e->getMessage(),
+                'message' => 'Error al actualizar la cita'
+            ];
+        }
     }
 
     public function delete_appointment($id)
