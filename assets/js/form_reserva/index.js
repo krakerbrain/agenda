@@ -419,7 +419,7 @@ const editCheckBox = document.querySelector("#editCustomer");
 if (editCheckBox) {
   editCheckBox.addEventListener("change", function () {
     const customerFields = document.querySelectorAll(".customer-field");
-    document.querySelector("#customer_id").value = ""; // Limpiar el campo oculto
+    // document.querySelector("#customer_id").value = ""; // Limpiar el campo oculto
     customerFields.forEach((field) => {
       field.disabled = !editCheckBox.checked;
       // desabilitar el checkbox cuando se presione la primera vez

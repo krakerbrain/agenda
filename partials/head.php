@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $title ?> </title>
     <link rel="stylesheet" href="<?php echo $baseUrl; ?>assets/vendors/css/bootstrap.min.css">
+    <!-- Usado en configuracion de eventos únicos para múltiples fechas -->
     <link rel="stylesheet" href="<?php echo $baseUrl; ?>assets/vendors/css/flatpickr/flatpickr.min.css">
     <link rel="stylesheet" href="<?php echo $baseUrl; ?>assets/vendors/css/flatpickr/theme/dark.css">
     <link rel="stylesheet" href="<?php echo $baseUrl; ?>assets/vendors/css/font-awesome/all.min.css">
