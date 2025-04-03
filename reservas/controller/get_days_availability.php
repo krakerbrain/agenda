@@ -14,7 +14,7 @@ $today = new DateTime();
 $companyModel = new CompanyModel();
 $services = new Services($company_id);
 $schedules = new Schedules($company_id);
-$appointmentsData = new Appointments($company_id);
+$appointmentsData = new Appointments();
 
 $company = $companyModel->getCompanyCalendarData($company_id);
 $scheduleDays = $schedules->getEnabledSchedulesDays();

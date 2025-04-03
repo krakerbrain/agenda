@@ -2,19 +2,21 @@
 
 require_once dirname(__DIR__, 2) . '/configs/init.php';
 require_once dirname(__DIR__, 2) . '/classes/ConfigUrl.php';
+require_once dirname(__DIR__, 2) . '/classes/Database.php';
 require_once dirname(__DIR__, 2) . '/classes/Appointments.php';
 require_once dirname(__DIR__, 2) . '/classes/Customers.php';
 require_once dirname(__DIR__, 2) . '/classes/EmailTemplate.php';
 
+$database = new Database();
 // Crear instancia de la clase Appointments
-$appointments = new Appointments();
+$appointments = new Appointments($database);
 
 // Crear instancia de la clase Customers
 $customers = new Customers();
 
 try {
     // Iniciar la transacción
-    $appointments->beginTransaction();
+    $database->beginTransaction();
 
     // Verificar si se recibieron datos POST
     if (empty($_POST)) {
@@ -100,18 +102,18 @@ try {
         }
     } else {
         // Confirmar la transacción si todo fue exitoso
-        $appointments->endTransaction();
+        $database->endTransaction();
         echo json_encode(['success' => true, 'message' => 'Cita reservada exitosamente. Recibirás una confirmación en breve.']);
         http_response_code(200); // OK
     }
 } catch (Exception $e) {
     // Revertir la transacción en caso de error
-    $appointments->cancelTransaction();
+    $database->cancelTransaction();
     echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
     http_response_code(500); // Internal Server Error
 } finally {
     // Cerrar la conexión
-    $appointments = null;
+    $database = null;
 }
 
 function formatPhoneNumber($telefono)

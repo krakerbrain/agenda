@@ -153,7 +153,7 @@ class Appointments
 
 
         // Consulta base
-        $querySql = 'SELECT a.*, s.name AS service, c.*,
+        $querySql = 'SELECT a.id as id_appointment,a.*, s.name AS service, c.*,
                         DATE_FORMAT(a.date, "%d-%m-%Y") as date 
                  FROM appointments a 
                  INNER JOIN services s ON a.id_service = s.id

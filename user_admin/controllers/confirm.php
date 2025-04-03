@@ -1,22 +1,29 @@
 <?php
 date_default_timezone_set('UTC');
-require_once dirname(__DIR__) . '/classes/ConfigUrl.php';
-require_once dirname(__DIR__) . '/classes/Appointments.php';
-require_once dirname(__DIR__) . '/classes/Integrations/GoogleIntegrationManager.php';
-require_once dirname(__DIR__) . '/classes/IntegrationManager.php';
-require_once dirname(__DIR__) . '/access-token/seguridad/JWTAuth.php';
+require_once dirname(__DIR__, 2) . '/classes/ConfigUrl.php';
+require_once dirname(__DIR__, 2) . '/classes/Database.php';
+require_once dirname(__DIR__, 2) . '/classes/Appointments.php';
+require_once dirname(__DIR__, 2) . '/classes/Integrations/GoogleIntegrationManager.php';
+require_once dirname(__DIR__, 2) . '/classes/IntegrationManager.php';
+require_once dirname(__DIR__, 2) . '/access-token/seguridad/JWTAuth.php';
 
 $auth = new JWTAuth();
 $datosUsuario = $auth->validarTokenUsuario();
 $company_id = $datosUsuario['company_id'];
 
-$appointments = new Appointments();
+$database = new Database();
+$appointments = new Appointments($database);
 $data = json_decode(file_get_contents('php://input'), true);
+// Validación robusta
+if ($data === null || !isset($data['id'])) {
+    http_response_code(400);
+    die(json_encode(['error' => 'Datos JSON inválidos o falta el ID']));
+}
 $id = $data['id'];
 
 try {
     // Iniciar una transacción
-    $appointments->beginTransaction();
+    $database->beginTransaction();
 
     // Obtener la cita desde la base de datos
     $appointment = $appointments->get_appointment($id);
@@ -60,7 +67,7 @@ try {
 
     // Confirmar la transacción
     header('Content-Type: application/json');
-    $appointments->endTransaction();
+    $database->endTransaction();
     echo json_encode(['message' => 'Cita confirmada exitosamente', 'success' => true]);
     http_response_code(200);
 } catch (Exception $e) {
@@ -115,7 +122,7 @@ try {
         }
     }
 } finally {
-    $appointments = null;
+    $database = null;
 }
 
 /**
