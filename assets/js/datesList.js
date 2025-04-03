@@ -208,7 +208,7 @@ export async function confirmReservation(id, type = null) {
 
     // Mostrar spinner
     addSpinner(id, true, "confirmar");
-    let url = type == "event" ? "eventos/controller/confirmar_inscripcion.php" : "user_admin/confirm.php";
+    let url = type == "event" ? "eventos/controller/confirmar_inscripcion.php" : "user_admin/controllers/confirm.php";
     const response = await fetch(`${baseUrl}${url}`, {
       method: "POST",
       headers: {
