@@ -89,6 +89,7 @@ include dirname(__DIR__) . '/partials/head.php';
     <div id="main-content" class="container mt-5"></div>
     <!-- Usado en configuracion de eventos únicos para múltiples fechas -->
     <script src="<?php echo $baseUrl; ?>assets/vendors/js/flatpickr/flatpickr.min.js"></script>
+    <script src="<?php echo $baseUrl; ?>assets/vendors/js/flatpickr/es.js"></script>
     <script src="<?php echo $baseUrl; ?>assets/vendors/js/bootstrap/bootstrap.bundle.min.js"></script>
     <!-- JavaScript de Cropper.js -->
     <script src="<?php echo $baseUrl; ?>assets/vendors/js/jquery/cropperjs/cropper.min.js"></script>

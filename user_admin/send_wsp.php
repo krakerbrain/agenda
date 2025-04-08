@@ -7,7 +7,7 @@ function sendWspReserva($template_name, $telefono, $nombre_cliente,  $fecha_cita
     //URL A DONDE SE MANDARA EL MENSAJE
     $url = $_ENV['WSP_URL'];
 
-    $fecha_cita = date('d/m/Y', strtotime($fecha_cita));
+    // $fecha_cita = date('d/m/Y', strtotime($fecha_cita));
     try {
         //CONFIGURACION DEL MENSAJE CON PARÁMETROS
         $mensaje = json_encode([
