@@ -176,6 +176,7 @@ function getAvailableDays() {
         const availableDates = data.available_days;
 
         flatpickr("#date", {
+          locale: "es",
           enableTime: false,
           altInput: true,
           dateFormat: "Y-m-d",

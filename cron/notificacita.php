@@ -9,7 +9,7 @@ require_once dirname(__DIR__) . '/user_admin/send_wsp.php';
 $appointments = new Appointments();
 $emailTemplateBuilder = new EmailTemplate();
 $notificationLog = new NotificationLog();
-
+date_default_timezone_set('UTC');
 try {
     error_log("INFO: Inicio cron notificación cita " . date('Y-m-d H:i:s') . PHP_EOL, 3, __DIR__ . '/log/avisoreserva.log');
 
@@ -61,7 +61,7 @@ try {
                         $templateName,
                         $appointment['customer_phone'],
                         $appointment['customer_name'],
-                        $appointment['date'],
+                        formatearFecha($appointment['date']),
                         $appointment['start_time'],
                         $appointment['company_name'],
                         $appointment['appointment_token'],
@@ -127,4 +127,49 @@ function handleNotificationRegister($notificationLog, $appointment_id, $method, 
             'last_attempt' => date('Y-m-d H:i:s'),
         ]);
     }
+}
+
+function formatearFecha($fecha)
+{
+    // Definir los días de la semana y los meses en español
+    $dias = [
+        'domingo',
+        'lunes',
+        'martes',
+        'miércoles',
+        'jueves',
+        'viernes',
+        'sábado',
+    ];
+
+    $meses = [
+        'enero',
+        'febrero',
+        'marzo',
+        'abril',
+        'mayo',
+        'junio',
+        'julio',
+        'agosto',
+        'septiembre',
+        'octubre',
+        'noviembre',
+        'diciembre'
+    ];
+
+    // Convertir la fecha en formato 'Y-m-d' a un objeto DateTime
+    $fecha_obj = new DateTime($fecha);
+
+    // Obtener el día de la semana (0=domingo, 1=lunes, ..., 6=sábado)
+    $dia_semana = $fecha_obj->format('w');
+
+    // Obtener el día, mes y año de la fecha
+    $dia = $fecha_obj->format('d');
+    $mes = $fecha_obj->format('m'); // Mes en formato numérico (01-12)
+    $anio = $fecha_obj->format('Y');
+
+    // Construir la fecha en el formato deseado: "viernes, 18 de abril de 2025"
+    $fecha_formateada = ucfirst($dias[$dia_semana]) . ', ' . $dia . ' de ' . $meses[$mes - 1] . ' de ' . $anio;
+
+    return $fecha_formateada;
 }
