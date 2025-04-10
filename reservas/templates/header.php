@@ -75,7 +75,7 @@
             </div>
             <div class="row">
                 <!-- Columna 1: Logo y redes sociales -->
-                <div class="col-6 text-center text-md-start align-self-center">
+                <div class="col-6 text-md-start pt-3 pt-md-0">
                     <?php if ($company && $company['logo']) : ?>
                         <img src="<?php echo $baseUrl . $company['logo']; ?>" alt="Logo de la Empresa" class="img-fluid">
                     <?php endif; ?>

@@ -7,10 +7,11 @@ export function initDatosEmpresa() {
       const response = await fetch(`${baseUrl}user_admin/controllers/datosEmpresa.php`, {
         method: "GET",
       });
+
       const { success, data, savedBanner } = await response.json();
 
       if (success) {
-        const { name, phone, address, description, logo, selected_banner, saved_banner } = data[0];
+        const { name, phone, address, description, logo, selected_banner } = data[0];
         const logoUrl = logo !== "" ? logo : "assets/images/logo.png";
         const company_id = document.querySelector("#companyId").value;
 
@@ -41,6 +42,7 @@ export function initDatosEmpresa() {
         document.querySelector("#description").textContent = description;
         document.querySelector("#companyName").value = name;
         document.querySelector("#logoUrl").value = logoUrl;
+        document.querySelector("#banner-custom").value = savedBanner;
 
         // Marcar el radio correspondiente
         const bannerRadio = document.querySelector(`input[value="${selected_banner}"]`);

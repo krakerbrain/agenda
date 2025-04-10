@@ -97,7 +97,7 @@ class EmailTemplate
 
             // Construir cuerpo del correo
             $placeholders = [
-                '{nombre_cliente}' => $data['name'],
+                '{nombre_cliente}' => $data['customer_name'],
                 '{fecha_reserva}' => date('d/m/Y', strtotime($data['date'])),
                 '{hora_reserva}' => date('h:i a', strtotime($data['start_time'])),
                 '{servicio_reservado}' => $serviceData['name'],
@@ -113,7 +113,8 @@ class EmailTemplate
 
             if ($templateType == 'reserva') {
                 $alertEmailContent = $this->buildAppointmentAlert($data, $companyData, $serviceData);
-                $this->emailSender->sendEmail($data['customer_mail'], $alertEmailContent, null);
+                $alertSubject = $alertEmailContent['subject'];
+                $this->emailSender->sendEmail($alertSubject, $alertEmailContent, null);
             }
             $success = $this->emailSender->sendEmail($data['customer_mail'], ['subject' => $subject, 'body' => $body, 'company_name' => $companyData['name']], ucfirst($templateType));
 
@@ -150,13 +151,13 @@ class EmailTemplate
             $userData = $this->dataLoader->getUserData($data['company_id']);
             // Construir placeholders para el correo de alerta
             $placeholders = [
-                '{nombre_cliente}' => $userData['name'],
+                '{nombre_cliente}' => $data['customer_name'],
                 '{fecha}' => date('d/m/Y', strtotime($data['date'])),
                 '{hora}' => date('h:i a', strtotime($data['start_time'])),
                 '{nombre_servicio}' => $serviceData['name'],
-                '{telefono_cliente}' => $data['phone'],
+                '{telefono_cliente}' => $data['customer_phone'],
                 '{ruta_logo}' => $companyData['logo'],
-                '{nombre_usuario}' => $data['name'],
+                '{nombre_usuario}' => $userData['name'],
             ];
 
             // Construir contenido del correo usando plantilla de alerta
@@ -168,7 +169,8 @@ class EmailTemplate
             // Devolver los datos del correo de alerta
             return [
                 'subject' => $alertSubject,
-                'body' => $alertBody
+                'body' => $alertBody,
+                'subject' => $userData['email'],
             ];
         } catch (Exception $e) {
             error_log("Error al construir correo de alerta: " . $e->getMessage());
