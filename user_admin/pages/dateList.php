@@ -75,6 +75,7 @@ $auth->validarTokenUsuario();
             <thead>
                 <tr class="head-table">
                     <th>Servicio</th>
+                    <th>Categoria</th>
                     <th>Nombre</th>
                     <th>Teléfono</th>
                     <th>Correo</th>

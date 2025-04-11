@@ -69,6 +69,7 @@ function fillTable(data) {
     html += `
           <tr class="body-table">
               <td data-cell="servicio" class="data">${appointment.service}</td>
+              <td data-cell="categoria" class="data">${appointment.category}</td>
               <td data-cell="nombre" class="data">${appointment.name}</td>
                <td data-cell="telefono" class="data"><i class="fab fa-whatsapp pe-1" style="font-size:0.85rem"></i><a href="https://wa.me/${appointment.phone}" target="_blank">+${
       appointment.phone

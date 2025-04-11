@@ -85,7 +85,8 @@ try {
         'date' => $data['date'],
         'start_time' => $formattedStartTime,
         'end_time' => $formattedEndTime,
-        'id_service' => $data['service']
+        'id_service' => $data['service'],
+        'service_category_id' => isset($data['category']) && !empty($data['category']) ? $data['category'] : null
     ];
 
     // Insertar la cita en la base de datos
