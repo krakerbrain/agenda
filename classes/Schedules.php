@@ -5,22 +5,31 @@ class Schedules
 {
     private $db;
     private $company_id;
+    private $user_id;
 
-    public function __construct($company_id)
+    public function __construct($company_id, $user_id)
     {
         $this->db = new Database(); // Usa la clase Database
         $this->company_id = $company_id;
+        $this->user_id = $user_id;
     }
 
     public function getSchedules()
     {
-        $this->db->query("SELECT s.id AS schedule_id, s.day_id, d.day_name as day, s.work_start, s.work_end, s.break_start, s.break_end, s.is_enabled
+        try {
+            $this->db->query("SELECT s.id AS schedule_id, s.day_id, d.day_name as day, s.work_start, s.work_end, s.break_start, s.break_end, s.is_enabled
             FROM company_schedules s
             JOIN days_of_week d ON s.day_id = d.id
+            JOIN users u ON s.user_id = u.id
             WHERE s.company_id = :company_id
+            AND s.user_id = :user_id
             ORDER BY s.id");
-        $this->db->bind(':company_id', $this->company_id);
-        return $this->db->resultSet();
+            $this->db->bind(':company_id', $this->company_id);
+            $this->db->bind(':user_id', $this->user_id);
+            return $this->db->resultSet();
+        } catch (PDOException $e) {
+            return "Error: " . $e->getMessage();
+        }
     }
 
     //getenabledSchedulesDays
@@ -109,6 +118,28 @@ class Schedules
         } catch (PDOException $e) {
             $this->db->cancelTransaction();
             return "Error saving schedules: " . $e->getMessage();
+        }
+    }
+
+    public function addNewSchedule()
+    {
+        try {
+            // Insertar los horarios de trabajo de la nueva compañía
+            $days = [1, 2, 3, 4, 5, 6, 7]; // Lunes a Domingo
+            foreach ($days as $day) {
+                $sql = "INSERT INTO company_schedules 
+                                (company_id, user_id, day_id, work_start, work_end, break_start, break_end, is_enabled) 
+                                VALUES (:company_id, :user_id,:day_id, NULL, NULL, NULL, NULL, 1)";
+                $this->db->query($sql);
+                $this->db->bind(':company_id', $this->company_id);
+                $this->db->bind(':user_id', $this->user_id);
+                $this->db->bind(':day_id', $day);
+                $this->db->execute();
+            }
+
+            return true;
+        } catch (PDOException $e) {
+            return "Error: " . $e->getMessage();
         }
     }
 

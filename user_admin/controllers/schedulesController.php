@@ -11,7 +11,8 @@ $datosUsuario = $auth->validarTokenUsuario();
 
 try {
     $company_id = $datosUsuario['company_id'];
-    $schedules = new Schedules($company_id);
+    $user_id = $datosUsuario['user_id'];
+    $schedules = new Schedules($company_id, $user_id);
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $postData = json_decode(file_get_contents("php://input"), true);

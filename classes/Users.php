@@ -11,58 +11,67 @@ class Users
     }
     public function add_user($data)
     {
-        $this->db->query('INSERT INTO users (company_id, name, email, password, role_id, token_sha256, created_at) 
-                    VALUES (:company_id, :username, :email, :password, :role_id, :token, NOW())');
-        $this->db->bind(':company_id', $data['company_id']);
-        $this->db->bind(':username', $data['username']);
-        $this->db->bind(':email', $data['email']);
-        $this->db->bind(':password', $data['password']);
-        $this->db->bind(':role_id', $data['role_id']);
-        $this->db->bind(':token', $data['token']);
-        $this->db->execute();
-        return $this->db->rowCount();
+        try {
+            $this->db->query('INSERT INTO users (company_id, name, email, password, role_id, token_sha256, created_at) 
+                        VALUES (:company_id, :username, :email, :password, :role_id, :token, NOW())');
+
+            $this->db->bind(':company_id', $data['company_id']);
+            $this->db->bind(':username', $data['username']);
+            $this->db->bind(':email', $data['email']);
+            $this->db->bind(':password', $data['password']);
+            $this->db->bind(':role_id', $data['role_id']);
+            $this->db->bind(':token', $data['token']);
+
+            if ($this->db->execute()) {
+                return [
+                    'success' => true,
+                    'user_id' => $this->db->lastInsertId()
+                ];
+            } else {
+                return [
+                    'success' => false,
+                    'error' => 'Error al ejecutar la inserción'
+                ];
+            }
+        } catch (PDOException $e) {
+            error_log("Error en add_user(): " . $e->getMessage());
+            return [
+                'success' => false,
+                'error' => 'Error en la base de datos'
+            ];
+        }
     }
+
 
     public function register_user($data)
     {
-        // Validaciones en el lado de PHP
+        // Validaciones básicas
         if (empty($data['username']) || empty($data['email']) || empty($data['password']) || empty($data['password2']) || empty($data['company_id'])) {
             return ["success" => false, "error" => "Todos los campos son obligatorios"];
         }
 
-        // Validar si las contraseñas coinciden
         if ($data['password'] !== $data['password2']) {
             return ["success" => false, "error" => "Las contraseñas no coinciden"];
         }
 
-        // Llamar a la función de validación usando el procedimiento almacenado
+        // Validación adicional (procedimiento almacenado)
         $validation_result = $this->validate_registration($data['username'], $data['email'], $data['password'], $data['password2']);
-
         if ($validation_result['error']) {
-            return ["success" => false, "error" => $validation_result['error']];
+            return $validation_result;
         }
 
-        // Si la validación pasa, generar hash y token
-        $hash = password_hash($data['password'], PASSWORD_BCRYPT, ['cost' => 7]);
-        $token = hash('sha256', $data['username'] . $data['email']);
-
-        // Llamar a la función para insertar al usuario
+        // Preparar datos
         $userData = [
             'username' => $data['username'],
             'email' => $data['email'],
-            'password' => $hash,
+            'password' => password_hash($data['password'], PASSWORD_BCRYPT, ['cost' => 7]),
             'company_id' => $data['company_id'],
             'role_id' => $data['role_id'],
-            'token' => $token
+            'token' => hash('sha256', $data['username'] . $data['email'])
         ];
 
-        $result = $this->add_user($userData);
-
-        if ($result) {
-            return ["success" => true];
-        } else {
-            return ["success" => false, "error" => "Error al agregar el usuario a la base de datos"];
-        }
+        // Insertar y retornar resultado completo
+        return $this->add_user($userData);
     }
 
     // Función para validar usando el procedimiento almacenado
@@ -116,7 +125,7 @@ class Users
     {
         // SELECT name, password, company_id, role_id, token_sha256 FROM users WHERE email = :usuario LIMIT 1
 
-        $this->db->query('SELECT name, password, company_id, role_id, token_sha256 FROM users WHERE email = :usuario LIMIT 1');
+        $this->db->query('SELECT id as user_id, name, password, company_id, role_id, token_sha256 FROM users WHERE email = :usuario LIMIT 1');
         $this->db->bind(':usuario', $correo);
         return $this->db->single();
     }

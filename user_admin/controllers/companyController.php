@@ -19,6 +19,8 @@ try {
             $user = new Users();
             $result = $user->delete_user_by_company($data['id']);
             echo json_encode($result);
+        } else {
+            echo json_encode($result);
         }
     } elseif ($_SERVER['REQUEST_METHOD'] === 'PATCH') {
         $data = json_decode(file_get_contents('php://input'), true);

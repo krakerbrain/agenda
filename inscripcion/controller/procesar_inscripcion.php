@@ -2,6 +2,7 @@
 require_once dirname(__DIR__, 2) . '/classes/CompanyManager.php';
 require_once dirname(__DIR__, 2) . '/classes/Users.php';
 require_once dirname(__DIR__, 2) . '/classes/EmailTemplate.php';
+require_once dirname(__DIR__, 2) . '/classes/Schedules.php';
 
 header('Content-Type: application/json'); // Asegura que la respuesta sea JSON
 
@@ -47,6 +48,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // Verificar si el registro fue exitoso
             if ($register_result['success']) {
+                $new_user_id = $register_result['user_id'];
+                $user_schedule = new Schedules($company_id, $new_user_id);
+                $user_schedule->addNewSchedule();
+
                 $emailTemplateBuilder = new EmailTemplate();
                 $emailSent = $emailTemplateBuilder->buildInscriptionAlert($userData['email']);
 
