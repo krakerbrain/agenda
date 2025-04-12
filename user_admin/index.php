@@ -1,5 +1,6 @@
 <?php
 require_once dirname(__DIR__) . '/configs/init.php';
+require_once dirname(__DIR__) . '/configs/VersionManager.php';
 require_once dirname(__DIR__) . '/access-token/seguridad/JWTAuth.php';
 require_once dirname(__DIR__) . '/classes/ConfigUrl.php';
 $title = "Configuraciones";
@@ -8,12 +9,15 @@ $baseUrl = ConfigUrl::get();
 $auth = new JWTAuth();
 $userData = $auth->validarTokenUsuario();
 $role_id = $userData['role_id'];
+// Obtener la instancia singleton
+$versionManager = VersionManager::getInstance();
 
 include dirname(__DIR__) . '/partials/head.php';
 ?>
 <script>
     const baseUrl = '<?php echo $baseUrl; ?>';
     const role_id = <?php echo $role_id; ?>;
+    window.APP_VERSION = '<?= $versionManager->getVersion() ?>';
 </script>
 
 <body>
@@ -93,7 +97,8 @@ include dirname(__DIR__) . '/partials/head.php';
     <!-- JavaScript de Cropper.js -->
     <script src="<?php echo $baseUrl; ?>assets/vendors/js/jquery/cropperjs/cropper.min.js"></script>
 
-    <script type="module" src="<?php echo $baseUrl; ?>assets/js/navbar.js?v=<?php echo time(); ?>"></script>
+    <script type="module"
+        src="<?php echo $baseUrl; ?>assets/js/navbar.js?v=<?php echo $versionManager->getVersion() ?>"></script>
 </body>
 
 </html>
