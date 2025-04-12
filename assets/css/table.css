@@ -1,8 +1,48 @@
-@media (max-width: 1000px) {
-  body {
-    font-size: 0.85rem;
-  }
+body {
+  font-size: 0.85rem;
+}
 
+.actionBtns {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+/* Estilo para los iconos de acción */
+.action-icon {
+  font-size: 1.1rem;
+  cursor: pointer;
+  position: relative; /* Necesario para posicionar el spinner encima */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.action-icon.loading::before {
+  content: "";
+  display: inline-block;
+  width: 0;
+  height: 0;
+}
+
+/* Oculta el texto cuando sea necesario */
+.button-text {
+  display: none;
+}
+
+/* Spinner centrado encima del icono */
+.spinner-border {
+  position: absolute;
+  z-index: 1;
+}
+
+/* Estado deshabilitado */
+.action-icon.disabled {
+  pointer-events: none;
+}
+
+/* Responsive: ocultar cabecera de tabla en pantallas pequeñas */
+@media (max-width: 1000px) {
   tr.head-table th {
     display: none;
   }
@@ -15,5 +55,15 @@
     content: attr(data-cell) ": ";
     font-weight: 700;
     text-transform: capitalize;
+  }
+}
+
+/* En móviles: texto más pequeño debajo del ícono */
+@media (max-width: 768px) {
+  .actionBtns i span {
+    display: flex;
+    font-size: 0.5rem;
+    flex-direction: column;
+    padding: 2px 0;
   }
 }
