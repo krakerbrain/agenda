@@ -9,14 +9,33 @@ $auth->validarTokenUsuario();
 
 ?>
 <style>
-    .actionBtns {
-        display: flex;
-        justify-content: space-evenly;
+.actionBtns {
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.actionBtns i {
+    cursor: pointer;
+}
+
+.actionBtns i span {
+    display: none;
+}
+
+/* en pantallas moviles tamaño de iconos 1.1rem */
+@media (max-width: 768px) {
+    .actionBtns i {
+        font-size: 1.1rem;
     }
 
-    .actionBtns i {
-        cursor: pointer;
+    .actionBtns i span {
+        display: flex;
+        font-size: 0.5rem;
+        flex-direction: column;
+        padding: 2px 0;
     }
+
+}
 </style>
 <div class="container mt-4">
     <ul class="nav nav-tabs" id="customerTab" role="tablist">

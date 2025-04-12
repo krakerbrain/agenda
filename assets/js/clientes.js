@@ -107,22 +107,22 @@ function getActionIcons(customerId, isBlocked) {
 
   if (status === "todos") {
     icons = `
-      <i id="agendar-${customerId}" class="fas fa-calendar-plus action-icon text-primary" title="Agendar"></i>
-      <i id="editar-${customerId}" class="fas fa-edit action-icon text-warning" title="Editar"></i>
+      <i id="agendar-${customerId}" class="fas fa-calendar-plus action-icon text-center text-primary text-center" title="Agendar"><span>AGENDAR</span></i>
+      <i id="editar-${customerId}" class="fas fa-edit action-icon text-center text-warning" title="Editar"><span>EDITAR</span></i>
         ${
           isBlocked === 1
-            ? `<i id="desbloquear-${customerId}" class="fas fa-unlock action-icon" title="Desbloquear"></i>`
-            : `<i id="bloquear-${customerId}" class="fas fa-lock action-icon" title="Bloquear"></i>`
+            ? `<i id="desbloquear-${customerId}" class="fas fa-unlock action-icon text-center" title="Desbloquear"><span>DESBLOQUEAR</span></i>`
+            : `<i id="bloquear-${customerId}" class="fas fa-lock action-icon text-center" title="Bloquear"><span>BLOQUEAR</span></i>`
         }
-      <i id="eliminar-${customerId}" class="fas fa-trash-alt action-icon text-danger" title="Eliminar"></i>
+      <i id="eliminar-${customerId}" class="fas fa-trash-alt action-icon text-center text-danger" title="Eliminar"><span>ELIMINAR</span></i>
     `;
   } else if (status === "incidencias") {
     icons = `
-      <i id="eliminar-incidencia-${customerId}" class="fas fa-trash-alt action-icon" title="Eliminar incidencia"></i>
+      <i id="eliminar-incidencia-${customerId}" class="fas fa-trash-alt action-icon text-center" title="Eliminar incidencia"><span>ELIMINAR INCIDENCIA</span></i>
     `;
   } else if (status === "blocked") {
     icons = `
-      <i id="desbloquear-${customerId}" class="fas fa-unlock action-icon" title="Desbloquear"></i>
+      <i id="desbloquear-${customerId}" class="fas fa-unlock action-icon text-center" title="Desbloquear"><span>DESBLOQUEAR</span></i>
     `;
   }
 

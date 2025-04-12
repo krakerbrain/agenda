@@ -19,14 +19,15 @@ class Appointments
                 return ['error' => 'Cita ya ha sido enviada.'];
             }
 
-            $this->db->query('INSERT INTO appointments (company_id, customer_id, date, start_time, end_time, id_service, aviso_reserva, created_at) 
-                    VALUES (:company_id, :customer_id, :date, :start_time, :end_time, :id_service, 0, now())');
+            $this->db->query('INSERT INTO appointments (company_id, customer_id, date, start_time, end_time, id_service, service_category_id, aviso_reserva, created_at) 
+                    VALUES (:company_id, :customer_id, :date, :start_time, :end_time, :id_service, :service_category_id, 0, now())');
             $this->db->bind(':company_id', $data['company_id']);
             $this->db->bind(':customer_id', $data['customer_id']);
             $this->db->bind(':date', $data['date']);
             $this->db->bind(':start_time', $data['start_time']);
             $this->db->bind(':end_time', $data['end_time']);
             $this->db->bind(':id_service', $data['id_service']);
+            $this->db->bind(':service_category_id', $data['service_category_id']);
             $this->db->execute();
 
             // Obtener el ID de la cita recién creada
@@ -210,14 +211,13 @@ class Appointments
 
     public function get_paginated_appointments($company_id, $status, $offset, $limit)
     {
-
-
-        $query = 'SELECT a.id as id_appointment, a.*, s.name AS service, c.id as id_customer, c.*,
+        $query = 'SELECT a.id as id_appointment, a.*, s.name AS service, c.id as id_customer, c.*, COALESCE(cat.category_name, "-") AS category,
                      DATE_FORMAT(a.date, "%d-%m-%Y") as date 
                      FROM appointments a 
                      INNER JOIN services s ON a.id_service = s.id
                      INNER JOIN customers c ON a.customer_id = c.id
                      INNER JOIN company_customers cc ON c.id = cc.customer_id
+                    LEFT JOIN service_categories cat ON a.service_category_id = cat.id
                      WHERE a.company_id = :company
                      AND cc.company_id = :company  
                      AND status != 2';
