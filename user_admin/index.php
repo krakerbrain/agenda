@@ -16,7 +16,6 @@ include dirname(__DIR__) . '/partials/head.php';
     const role_id = <?php echo $role_id; ?>;
 </script>
 
-
 <body>
     <header class="nav navbar sticky-top bg-dark-subtle">
         <nav class="container-xxl">
