@@ -6,6 +6,7 @@ require_once dirname(__DIR__, 2) . '/classes/ConfigUrl.php';
 $baseUrl = ConfigUrl::get();
 $auth = new JWTAuth();
 $auth->validarTokenUsuario();
+
 ?>
 
 <div class="container my-5">
@@ -15,7 +16,7 @@ $auth->validarTokenUsuario();
             Si sales sin guardar, perderás los cambios realizados.
             <button type="submit" class="btn btn-primary btn-sm">Guardar Configuración</button>
         </div>
-        <input type="hidden" name="company_id" id="company_id" value="1"> <!-- Replace with dynamic company ID -->
+
         <table class="table table-borderless table-striped table-sm">
             <thead>
                 <tr class="head-table">

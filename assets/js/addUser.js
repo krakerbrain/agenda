@@ -53,7 +53,7 @@ export function initAddUser() {
 
       if (success) {
         const roleSelect = document.querySelector("#role_id");
-        let select = "<option selected>Seleccione rol del usuario</option>";
+        let select = "<option selected value>Seleccione rol del usuario</option>";
         data.forEach((role) => {
           select += `<option value="${role.id}" data-about="${role.about_role}">${role.type}</option>`;
         });
@@ -84,32 +84,39 @@ export function initAddUser() {
 
   document.getElementById("addUserForm").addEventListener("submit", async function (event) {
     event.preventDefault();
+
     // Mostrar spinner y deshabilitar botón
     displaySpinner("addUser", true);
 
-    const formData = new FormData(this);
+    // Limpiar error previo
+    document.querySelector("#addUserForm .error").innerHTML = "";
+    document.querySelector("#addUserForm .error").classList.add("d-none");
+
     try {
+      const formData = new FormData(this);
       const response = await fetch(`${baseUrl}login/registra_usuario.php`, {
         method: "POST",
         body: formData,
       });
-      const { success, error } = await response.json();
 
-      if (success) {
-        //limpiar formulario
+      const data = await response.json();
+
+      if (data.success) {
+        // Éxito: limpiar formulario y mostrar mensaje
         this.reset();
-        alert("Usuario agregado exitosamente");
+        alert(data.message || "Usuario agregado exitosamente");
         loadUsers();
       } else {
-        document.querySelector("#addUserForm .error").innerHTML = `<span>${error}</span>`;
+        // Mostrar error (usa data.error o data.message según lo que devuelva tu backend)
+        const errorMessage = data.error || data.message || "Error al registrar usuario";
+        document.querySelector("#addUserForm .error").innerHTML = `<span>${errorMessage}</span>`;
         document.querySelector("#addUserForm .error").classList.remove("d-none");
-
-        this.reset();
       }
     } catch (error) {
       console.error("Error:", error);
+      document.querySelector("#addUserForm .error").innerHTML = "<span>Error de conexión con el servidor</span>";
+      document.querySelector("#addUserForm .error").classList.remove("d-none");
     } finally {
-      removeError();
       // Ocultar spinner y habilitar botón
       displaySpinner("addUser", false);
       document.getElementById("roleAbout").classList.add("d-none");

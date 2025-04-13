@@ -102,6 +102,7 @@ class Schedules
                     $this->db->query("
                         INSERT INTO company_schedules (company_id, day_id, work_start, work_end, break_start, break_end, is_enabled)
                         VALUES (:company_id, :day_id, :work_start, :work_end, :break_start, :break_end, :is_enabled)
+                        WHERE user_id = :user_id
                     ");
                     $this->db->bind(':company_id', $this->company_id);
                     $this->db->bind(':day_id', $dayId);
@@ -110,6 +111,7 @@ class Schedules
                     $this->db->bind(':break_start', $schedule['break_start']);
                     $this->db->bind(':break_end', $schedule['break_end']);
                     $this->db->bind(':is_enabled', $isEnabled);
+                    $this->db->bind(':user_id', $this->user_id);
                     $this->db->execute();
                 }
             }
@@ -120,7 +122,7 @@ class Schedules
             return "Error saving schedules: " . $e->getMessage();
         }
     }
-
+    // Metodo usado para crear un horario vacio para un usuario nuevo
     public function addNewSchedule()
     {
         try {
@@ -157,13 +159,14 @@ class Schedules
 
             $this->db->query("UPDATE company_schedules
             SET work_start = :work_start, work_end = :work_end, break_start = :break_start, break_end = :break_end, is_enabled = :is_enabled
-            WHERE company_id = :company_id AND day_id = :day");
+            WHERE company_id = :company_id AND user_id = :user_id AND day_id = :day");
             $this->db->bind(':work_start', $scheduleData['start']);
             $this->db->bind(':work_end', $scheduleData['end']);
-            $this->db->bind(':break_start', $scheduleData['break_start']);
-            $this->db->bind(':break_end', $scheduleData['break_end']);
+            $this->db->bind(':break_start', $scheduleData['break_start'] ?? null);
+            $this->db->bind(':break_end', $scheduleData['break_end'] ?? null);
             $this->db->bind(':is_enabled', $scheduleData['is_enabled']);
             $this->db->bind(':company_id', $this->company_id);
+            $this->db->bind(':user_id', $this->user_id);
             $this->db->bind(':day', $day);
             $this->db->execute();
         }

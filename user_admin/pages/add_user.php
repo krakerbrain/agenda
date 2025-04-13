@@ -30,14 +30,15 @@ $auth->validarTokenUsuario();
                     <div class="input-group-text bg-secondary text-light">
                         <i class="fa-solid fa-envelope"></i>
                     </div>
-                    <input type="mail" name="correo" id="correo" class="form-control" placeholder="Ingrese un correo">
+                    <input type="mail" name="correo" id="correo" class="form-control" placeholder="Ingrese un correo"
+                        autocomplete="nope">
                 </div>
                 <div class="input-group mt-2">
                     <div class="input-group-text bg-secondary text-light">
                         <i class="fa-solid fa-key"></i>
                     </div>
                     <input type="password" name="password" id="password" class="form-control"
-                        placeholder="Ingrese una clave">
+                        placeholder="Ingrese una clave" autocomplete="new-password">
                     <div class="input-group-text bg-light" id="seePass">
                         <a href="#" class="pe-auto text-secondary">
                             <i class="fa-solid fa-eye"></i>
