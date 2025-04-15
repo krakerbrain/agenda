@@ -1,6 +1,10 @@
 document.addEventListener("DOMContentLoaded", function () {
   const links = document.querySelectorAll(".nav-link");
   const mainContent = document.getElementById("main-content");
+
+  // Usar la versión definida en el layout o fallback a timestamp
+  const APP_VERSION = window.APP_VERSION;
+
   // Cargar la última pestaña seleccionada, o usar la predeterminada
   const lastPage = sessionStorage.getItem("lastPage");
   if (lastPage) {
@@ -40,55 +44,55 @@ document.addEventListener("DOMContentLoaded", function () {
       hideCanvas();
       switch (page) {
         case "dateList":
-          const { initDateList } = await import("./datesList.js?v=2.0.0");
+          const { initDateList } = await import(`./datesList.js?v=${APP_VERSION}`);
           initDateList();
           break;
         case "clientes":
-          const { initClientes } = await import("./clientes.js?v=2.0.0");
+          const { initClientes } = await import(`./clientes.js?v=${APP_VERSION}`);
           initClientes();
           break;
         case "horarios":
-          const { initHorarios } = await import("./horarios.js?v=2.0.0");
+          const { initHorarios } = await import(`./horarios.js?v=${APP_VERSION}`);
           initHorarios();
           break;
         case "servicios":
-          const { initServicios } = await import("./servicios.js?v=2.0.0");
+          const { initServicios } = await import(`./servicios.js?v=${APP_VERSION}`);
           initServicios();
           break;
         case "configuraciones":
-          const { initConfiguraciones } = await import("./configuraciones.js?v=2.0.0");
+          const { initConfiguraciones } = await import(`./configuraciones.js?v=${APP_VERSION}`);
           initConfiguraciones();
           break;
         case "correos":
-          const { initCorreos } = await import("./correos.js?v=2.0.0");
+          const { initCorreos } = await import(`./correos.js?v=${APP_VERSION}`);
           initCorreos();
           break;
         case "datos_empresa":
-          const { initDatosEmpresa } = await import("./datosEmpresa.js?v=2.0.0");
+          const { initDatosEmpresa } = await import(`./datosEmpresa.js?v=${APP_VERSION}`);
           initDatosEmpresa();
           break;
         case "add_user":
-          const { initAddUser } = await import("./addUser.js?v=2.0.0");
+          const { initAddUser } = await import(`./addUser.js?v=${APP_VERSION}`);
           initAddUser();
           break;
         case "master_add_company":
-          const { initAddCompany } = await import("./master_admin/master_add_company.js?v=2.0.0");
+          const { initAddCompany } = await import(`./master_admin/master_add_company.js?v=${APP_VERSION}`);
           initAddCompany();
           break;
         case "master_company_list":
-          const { initCompanyList } = await import("./master_admin/master_company_list.js?v=2.0.0");
+          const { initCompanyList } = await import(`./master_admin/master_company_list.js?v=${APP_VERSION}`);
           initCompanyList();
           break;
         case "integrations":
-          const { initIntegrations } = await import("./integrations.js?v=2.0.0");
+          const { initIntegrations } = await import(`./integrations.js?v=${APP_VERSION}`);
           initIntegrations();
           break;
         case "eventos_unicos":
-          const { initEventosUnicos } = await import("./eventos_unicos.js?v=2.0.0");
+          const { initEventosUnicos } = await import(`./eventos_unicos.js?v=${APP_VERSION}`);
           initEventosUnicos();
           break;
         case "block_hour":
-          const { initBloqueoHoras } = await import("./bloqueoHoras.js?v=2.0.0");
+          const { initBloqueoHoras } = await import(`./bloqueoHoras.js?v=${APP_VERSION}`);
           initBloqueoHoras();
           break;
         default:

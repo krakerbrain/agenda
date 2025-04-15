@@ -69,6 +69,7 @@ function fillTable(data) {
     html += `
           <tr class="body-table">
               <td data-cell="servicio" class="data">${appointment.service}</td>
+              <td data-cell="categoria" class="data">${appointment.category}</td>
               <td data-cell="nombre" class="data">${appointment.name}</td>
                <td data-cell="telefono" class="data"><i class="fab fa-whatsapp pe-1" style="font-size:0.85rem"></i><a href="https://wa.me/${appointment.phone}" target="_blank">+${
       appointment.phone
@@ -77,28 +78,29 @@ function fillTable(data) {
               <td data-cell="fecha" class="data">${appointment.date}</td>
               <td data-cell="hora" class="data">${appointment.start_time}</td>
               <td data-cell="estado" class="data">${appointment.status ? "Confirmada" : "Pendiente"}</td>
-              <td class="d-flex justify-content-around">
-              ${
-                !appointment.status
-                  ? `
-                <button id="confirmarBtn${appointment.id_appointment}" 
-                        class="btn btn-success btn-sm confirm" 
-                        title="Confirmar reserva"
-                        data-id="${appointment.id_appointment}">
-                  <i class="fas fa-check"></i>
-                  <span class="spinner-border spinner-border-sm d-none" aria-hidden="true"></span>
-                  <span class="button-text"></span>
-                </button>`
-                  : ""
-              }
-              <button id="eliminarBtn${appointment.id_appointment}" 
-                      class="btn btn-danger btn-sm eliminarReserva" 
-                      title="Eliminar reserva"
-                      data-id="${appointment.id_appointment}">
-                <i class="fas fa-trash"></i>
-                <span class="spinner-border spinner-border-sm d-none" aria-hidden="true"></span>
-                <span class="button-text"></span>
-              </button>
+              <td >
+               <div class="actionBtns">
+                  ${
+                    !appointment.status
+                      ? `
+                    <i id="confirmarBtn${appointment.id_appointment}" 
+                       class="fa-solid fa-square-check action-icon text-success text-center confirm" 
+                       title="Confirmar reserva"
+                       data-id="${appointment.id_appointment}">
+                       <span class="button-text">CONFIRMAR</span>
+                       <span class="spinner-border spinner-border-sm d-none text-success"></span>
+                    </i>
+                    `
+                      : ""
+                  }
+                  <i id="eliminarBtn${appointment.id_appointment}" 
+                     class="fas fa-trash action-icon text-danger text-center eliminarReserva" 
+                     title="Eliminar reserva"
+                     data-id="${appointment.id_appointment}">
+                     <span class="button-text">ELIMINAR</span>
+                     <span class="spinner-border spinner-border-sm d-none text-danger"></span>
+                  </i>
+                </div>
               </td>
           </tr>
       `;
@@ -140,26 +142,24 @@ function fillEventTable(data) {
               ${
                 !event.status
                   ? `
-                <button id="confirmarBtn${event.inscription_id}" 
-                        class="btn btn-success btn-sm confirm" 
-                        title="Confirmar reserva"
-                        data-id="${event.inscription_id}"
-                        data-type="event">
-                  <i class="fas fa-check"></i>
-                  <span class="spinner-border spinner-border-sm d-none" aria-hidden="true"></span>
-                  <span class="button-text"></span>
-                </button>`
+                <i id="confirmarBtn${event.inscription_id}" 
+                   class="fas fa-check action-icon text-success text-center confirm" 
+                   title="Confirmar reserva"
+                   data-id="${event.inscription_id}"
+                   data-type="event">
+                   <span class="button-text">CONFIRMAR</span>
+                   <span class="spinner-border spinner-border-sm d-none" aria-hidden="true"></span>
+                </i>`
                   : ""
               }
-              <button id="eliminarBtn${event.inscription_id}" 
-                      class="btn btn-danger btn-sm eliminarReserva" 
-                      title="Eliminar reserva"
-                      data-id="${event.inscription_id}"
-                      data-type="evento">
-                <i class="fas fa-trash"></i>
-                <span class="spinner-border spinner-border-sm d-none" aria-hidden="true"></span>
-                <span class="button-text"></span>
-              </button>
+                <i id="eliminarBtn${event.inscription_id}" 
+                   class="fas fa-trash action-icon text-danger text-center eliminarReserva" 
+                   title="Eliminar reserva"
+                   data-id="${event.inscription_id}"
+                   data-type="evento">
+                   <span class="button-text">ELIMINAR</span>
+                   <span class="spinner-border spinner-border-sm d-none" aria-hidden="true"></span>
+                </i>
               </td>
           </tr>
       `;
@@ -307,6 +307,8 @@ function logAction(message) {
 
 // Función para abrir el modal
 function openDeleteModal(appointment) {
+  let appointmentId = appointment.id_appointment;
+  addSpinner(appointmentId, true, "eliminar");
   const modal = new bootstrap.Modal(document.getElementById("deleteModal"));
 
   // Mostrar el modal
@@ -345,16 +347,17 @@ function openDeleteModal(appointment) {
 
   // Evento para "Cancelar" en el modal de eliminación
   document.querySelector("#deleteModal .btn-secondary").addEventListener("click", () => {
-    resetDeleteModal(); // Restablecer el modal al cancelar
+    resetDeleteModal(appointmentId); // Restablecer el modal al cancelar
   });
 
   // Evento para cerrar el modal de eliminación con la "X"
   document.querySelector("#deleteModal .btn-close").addEventListener("click", () => {
-    resetDeleteModal(); // Restablecer el modal al cerrar
+    resetDeleteModal(appointmentId); // Restablecer el modal al cerrar
   });
 }
 
-function resetDeleteModal() {
+function resetDeleteModal(appointmentId) {
+  addSpinner(appointmentId, false, "eliminar"); // Ocultar el spinner de eliminación
   // Desmarcar todas las opciones de razón
   const reasonInputs = document.querySelectorAll('input[name="reason"]');
   reasonInputs.forEach((input) => (input.checked = false));
@@ -363,7 +366,7 @@ function resetDeleteModal() {
   document.getElementById("notes").value = "";
 }
 export async function deleteAppointment(appointment, reason, notes, generateIncident) {
-  addSpinner(appointment.id_appointment, true, "eliminar");
+  addSpinner(appointment.id_appointment, false, "eliminar");
 
   try {
     const response = await fetch(`${baseUrl}user_admin/delete_calendar_event.php`, {
@@ -410,6 +413,7 @@ export async function deleteAppointment(appointment, reason, notes, generateInci
 }
 
 async function deleteEvent(eventID) {
+  //
   addSpinner(eventID, true, "eliminar");
 
   try {
@@ -455,19 +459,23 @@ export function handleInfoModal(id, title = null, message = null) {
 }
 
 export function addSpinner(appointmentID, activar, btn) {
-  const button = document.getElementById(btn + "Btn" + appointmentID);
-  const spinner = button.querySelector(".spinner-border");
-  const buttonText = button.querySelector(".button-text");
-  const icon = button.querySelector(".fas");
-  // Mostrar spinner y deshabilitar botón
+  const elementId = `${btn}Btn${appointmentID}`; // "confirmarBtn123" o "eliminarBtn123"
+  const icon = document.getElementById(elementId);
+  if (!icon) return;
+
+  const spinner = icon.querySelector(".spinner-border");
+  const text = icon.querySelector(".button-text");
+
   if (activar) {
     spinner.classList.remove("d-none");
-    icon.classList.add("d-none");
-    button.disabled = true;
+    text.classList.add("d-none"); // solo ocultás el texto
+    icon.classList.add("disabled");
+    icon.classList.add("loading");
   } else {
     spinner.classList.add("d-none");
-    icon.classList.remove("d-none");
-    button.disabled = false;
+    text.classList.remove("d-none");
+    icon.classList.remove("disabled");
+    icon.classList.remove("loading");
   }
 }
 

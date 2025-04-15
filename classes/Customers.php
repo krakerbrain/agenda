@@ -49,14 +49,33 @@ class Customers
 
 
     // Verifica si el cliente existe por teléfono o email
-    private function checkCustomerExists($phone, $email)
+    private function checkCustomerExists($inputName, $phone, $email)
     {
-        $sql = "SELECT id FROM customers WHERE phone = :phone OR mail = :email";
+        $sql = "SELECT id, name FROM customers WHERE phone = :phone AND mail = :email";
         $this->db->query($sql);
         $this->db->bind(':phone', $phone);
         $this->db->bind(':email', $email);
-        return $this->db->single();
+        $results = $this->db->resultSet();
+
+        if (empty($results)) return false;
+        if (count($results) === 1) return $results[0];
+
+        // Si hay más de uno, buscar el nombre más parecido
+        $maxSimilarity = 0;
+        $bestMatch = null;
+
+        foreach ($results as $customer) {
+            similar_text($inputName, $customer['name'], $percent);
+            if ($percent > $maxSimilarity) {
+                $maxSimilarity = $percent;
+                $bestMatch = $customer;
+            }
+        }
+
+        return $bestMatch;
     }
+
+
 
     // Verifica si el cliente está asociado a una compañía específica
     private function isCustomerAssociatedWithCompany($customerId, $companyId)
@@ -89,11 +108,11 @@ class Customers
     }
 
     // Método principal para verificar y asociar un cliente
-    public function checkAndAssociateCustomer($phone, $email, $companyId)
+    public function checkAndAssociateCustomer($name, $phone, $email, $companyId)
     {
         try {
             // Verifica si el cliente existe
-            $customer = $this->checkCustomerExists($phone, $email);
+            $customer = $this->checkCustomerExists($name, $phone, $email);
 
             if ($customer) {
                 $customerId = $customer['id'];

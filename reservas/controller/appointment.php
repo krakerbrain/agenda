@@ -50,7 +50,7 @@ try {
     $phone = formatPhoneNumber($data['phone']);
 
     // Verificar si el cliente ya existe o si esta bloqueado
-    $customer_id = $customers->checkAndAssociateCustomer($phone, $data['mail'], $data['company_id']);
+    $customer_id = $customers->checkAndAssociateCustomer($data['name'], $phone, $data['mail'], $data['company_id']);
 
     if (is_array($customer_id) && isset($customer_id['error'])) {
         // Si hay un error, devolver el mensaje de error
@@ -86,7 +86,8 @@ try {
         'date' => $data['date'],
         'start_time' => $formattedStartTime,
         'end_time' => $formattedEndTime,
-        'id_service' => $data['service']
+        'id_service' => $data['service'],
+        'service_category_id' => isset($data['category']) && !empty($data['category']) ? $data['category'] : null
     ];
 
     // Insertar la cita en la base de datos
