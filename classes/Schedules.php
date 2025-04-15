@@ -41,9 +41,11 @@ class Schedules
                                 break_start, 
                                 break_end 
                         FROM company_schedules 
-                        WHERE company_id = :company_id 
+                        WHERE company_id = :company_id
+                        AND user_id = :user_id 
                         AND is_enabled = 1");
         $this->db->bind(':company_id', $this->company_id);
+        $this->db->bind(':user_id', $this->user_id);
         return $this->db->resultSet();
     }
 
@@ -52,9 +54,11 @@ class Schedules
     {
         $this->db->query("SELECT work_start, work_end, break_start, break_end 
                         FROM company_schedules 
-                        WHERE company_id = :company_id 
+                        WHERE company_id = :company_id
+                        AND user_id = :user_id
                         AND day_id = :day_id");
         $this->db->bind(':company_id', $this->company_id);
+        $this->db->bind(':user_id', $this->user_id);
         $this->db->bind(':day_id', $day_id);
         return $this->db->single();
     }

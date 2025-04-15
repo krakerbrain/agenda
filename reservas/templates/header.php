@@ -67,6 +67,7 @@
     <div class="container mt-3">
         <!-- Tarjeta de Información de la Empresa -->
         <!-- Banner -->
+
         <div class="company-card mb-3">
             <div class="banner mb-md-3">
                 <div class="banner-text">

@@ -49,4 +49,48 @@ SELECT 1 FROM `user_services` us
 WHERE us.`user_id` = u.`id` AND us.`service_id` = s.`id`
 );
 
+-- actualizamos appointment para que created_At no tenga null o valores en 0
+UPDATE `appointments`
+SET `created_at` = '2023-01-01 00:00:00'
+WHERE `created_at` = '0000-00-00' OR `created_at` IS NULL;
+
+-- Paso 1: Agregar la columna user_id permitiendo valores nulos temporalmente
+ALTER TABLE `appointments`
+ADD COLUMN `user_id` BIGINT(20) NULL AFTER `company_id`;
+
+-- Paso 2: Asignar usuarios con role_id = 2 de la misma compañía
+UPDATE `appointments` a
+JOIN (
+SELECT u.id, u.company_id
+FROM `users` u
+WHERE u.role_id = 2
+) u ON a.company_id = u.company_id
+SET a.user_id = u.id
+WHERE a.user_id IS NULL;
+
+-- Paso 3: Para compañías que no tengan usuarios con role_id = 2, asignar cualquier usuario de la compañía
+UPDATE `appointments` a
+JOIN (
+SELECT u.id, u.company_id
+FROM `users` u
+WHERE u.company_id = a.company_id
+LIMIT 1
+) u ON 1=1
+SET a.user_id = u.id
+WHERE a.user_id IS NULL;
+
+-- Paso 4: Hacer que la columna sea NOT NULL
+ALTER TABLE `appointments`
+MODIFY COLUMN `user_id` BIGINT(20) NOT NULL;
+
+-- Paso 5: Agregar la restricción de clave foránea
+ALTER TABLE `appointments`
+ADD CONSTRAINT `fk_appointments_user`
+FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
 hay que cmabiar la clave foranea de company_integrations para que sea on cascade
+
+la clase Schedules se modifico para que reciba como segundo parametro el user_id, en el backend se toma del token,
+en el frontend se tomara del usuario seleccionado.
+
+me quede en getAvailableServiceDays de Services, tengo que modificarlo hacer un join con user_services para que tome los serviicos de x usuario

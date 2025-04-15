@@ -27,7 +27,7 @@ try {
     $data = $_POST;
 
     // Validar campos requeridos
-    $requiredFields = ['date', 'time', 'service_duration', 'phone', 'mail', 'company_id', 'service', 'name'];
+    $requiredFields = ['date', 'time', 'service_duration', 'phone', 'mail', 'company_id', 'service', 'name', 'provider'];
     foreach ($requiredFields as $field) {
         if (empty($data[$field])) {
             throw new Exception("El campo '$field' es requerido.");
@@ -81,6 +81,7 @@ try {
     // Preparar los datos para insertar la cita
     $appointmentData = [
         'company_id' => $data['company_id'],
+        'user_id' => $data['provider'],
         'customer_id' => $customer_id,
         'date' => $data['date'],
         'start_time' => $formattedStartTime,

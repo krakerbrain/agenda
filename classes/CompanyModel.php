@@ -18,10 +18,16 @@ class CompanyModel
         return $this->db->single();
     }
 
-    public function getServicesByCompanyId($companyId)
+    public function getServicesByCompanyAndUser($companyId, $userId)
     {
-        $this->db->query("SELECT id, observations, name, duration FROM services WHERE company_id = :company_id AND is_enabled = 1");
+        $this->db->query("SELECT s.id, s.observations as service_description, s.name as service_name, s.duration FROM services s
+        JOIN user_services us ON s.id = us.service_id
+        JOIN users u ON us.user_id = u.id
+        WHERE u.company_id = :company_id
+        AND us.user_id = :userId
+        AND us.is_active = 1");
         $this->db->bind(':company_id', $companyId);
+        $this->db->bind(':userId', $userId);
         return $this->db->resultSet();
     }
 
@@ -55,5 +61,18 @@ class CompanyModel
         $this->db->query("SELECT custom_url FROM companies WHERE id = :company_id AND is_active = 1");
         $this->db->bind(':company_id', $companyId);
         return $this->db->singleValue();
+    }
+
+    public function getServiceProvidersByCompanyId($companyId)
+    {
+        try {
+            $this->db->query("SELECT id, name FROM users WHERE company_id = :company_id");
+            $this->db->bind(':company_id', $companyId);
+            return $this->db->resultSet();
+        } catch (PDOException $e) {
+            // Aquí puedes manejar el error, por ejemplo, registrarlo en un log
+            error_log("Error al obtener los proveedores de usuario: " . $e->getMessage());
+            return []; // O lanzar una excepción, dependiendo de tu manejo de errores
+        }
     }
 }

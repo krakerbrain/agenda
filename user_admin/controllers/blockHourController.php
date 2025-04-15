@@ -13,6 +13,7 @@ try {
     // Validar token del usuario
     $datosUsuario = $auth->validarTokenUsuario();
     $company_id = $datosUsuario['company_id'];
+    $user_id = $datosUsuario['user_id'];
 
     // Obtener datos enviados desde el frontend
     $data = json_decode(file_get_contents('php://input'), true);
@@ -37,7 +38,7 @@ try {
     }
 
     // Instanciar clases necesarias
-    $schedules = new Schedules($company_id);
+    $schedules = new Schedules($company_id, $user_id);
     $appointments = new Appointments();
     $customers = new Customers();
 

@@ -28,6 +28,15 @@ function showStep(step) {
   }
 }
 
+if (document.getElementById("provider_owner") && document.getElementById("provider_owner").value === "true") {
+  getServices();
+}
+
+// crear change para prestador de servicio
+document.getElementById("provider").addEventListener("change", function () {
+  getServices();
+});
+
 document.getElementById("service").addEventListener("change", function (event) {
   updateServiceDuration();
   getObservation("service");
@@ -89,6 +98,36 @@ function getObservation(id) {
   }
 }
 
+async function getServices() {
+  try {
+    let url = `${baseUrl}reservas/controller/getServices.php`;
+    let data = {
+      company_id: document.getElementById("company_id").value,
+      provider_id: document.getElementById("provider").value,
+    };
+    const response = await fetch(url, {
+      method: "POST",
+      body: JSON.stringify(data),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const { success, services } = await response.json();
+
+    let select = document.getElementById("service");
+    if (success) {
+      let serviceOption = '<option value="" selected>Selecciona un servicio</option>';
+      services.forEach(function (service) {
+        serviceOption += `<option value="${service.id}" data-observation="${service.service_description}" data-duration="${service.duration}">${service.service_name}</option>`;
+      });
+      select.innerHTML = serviceOption;
+    }
+  } catch (error) {
+    console.error("Error:", error);
+  }
+}
+
 async function getServiceCategory(serviceId) {
   try {
     let url = `${baseUrl}reservas/controller/getCategories.php`;
@@ -130,12 +169,13 @@ function getAvailableDays() {
   const calendarDaysAvailable = company_days_available;
   const serviceId = document.getElementById("service").value;
   const companyId = document.getElementById("company_id").value;
+  const providerId = document.getElementById("provider").value;
   const url = BASE_URL + "get_days_availability.php";
 
   const data = {
     service_id: serviceId,
-    // calendar_days_available: calendarDaysAvailable,
     company_id: companyId,
+    provider: providerId,
   };
 
   // Función anidada para registrar eventos en fechas deshabilitadas
@@ -215,6 +255,7 @@ async function fetchAvailableTimes() {
   const BASE_URL = `${baseUrl}reservas/controller/`;
   const timeInput = document.getElementById("time");
   const companyID = document.getElementById("company_id").value;
+  const providerID = document.getElementById("provider").value;
 
   const date = document.getElementById("date").value;
   const serviceId = document.getElementById("service").value;
@@ -231,6 +272,7 @@ async function fetchAvailableTimes() {
           date: date,
           service_id: serviceId,
           company_id: companyID,
+          provider: providerID,
         }),
       });
 
@@ -293,6 +335,7 @@ document.getElementById("appointmentForm").addEventListener("submit", function (
 function showConfirmationModal(formData) {
   // Extraer los datos del formulario
 
+  const provider = document.getElementById("provider").selectedOptions != undefined ? document.getElementById("provider").selectedOptions[0].text : null;
   const service = document.getElementById("service").selectedOptions[0].text;
   const dateRaw = document.getElementById("date").value;
   const date = formatDate(dateRaw);
@@ -304,7 +347,8 @@ function showConfirmationModal(formData) {
   // Crear el contenido del modal
   const confirmationContent = `
        <p style="margin-bottom: 0.5rem;">Hola <strong>${name}</strong>,</p>
-        <p style="margin-bottom: 0.5rem;">Estos son los detalles de tu reserva:</p>
+        <p style="margin-bottom: 0.5rem;">Estos son los detalles de tu reserva</p>
+       <p style="margin-bottom: 0.5rem;">${provider !== null ? `<strong>Profesional:</strong> ${provider}` : ""}</p>
         <p style="margin-bottom: 0.5rem;"><strong>Servicio:</strong> ${service}</p>
         <p style="margin-bottom: 0.5rem;"><strong>Fecha:</strong> ${date}</p>
         <p style="margin-bottom: 0.5rem;"><strong>Hora:</strong> ${time}</p>

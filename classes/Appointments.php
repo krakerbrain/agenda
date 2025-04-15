@@ -19,9 +19,10 @@ class Appointments
                 return ['error' => 'Cita ya ha sido enviada.'];
             }
 
-            $this->db->query('INSERT INTO appointments (company_id, customer_id, date, start_time, end_time, id_service, aviso_reserva, created_at) 
-                    VALUES (:company_id, :customer_id, :date, :start_time, :end_time, :id_service, 0, now())');
+            $this->db->query('INSERT INTO appointments (company_id, user_id, customer_id, date, start_time, end_time, id_service, aviso_reserva, created_at) 
+                    VALUES (:company_id, :user_id, :customer_id, :date, :start_time, :end_time, :id_service, 0, now())');
             $this->db->bind(':company_id', $data['company_id']);
+            $this->db->bind(':user_id', $data['user_id']);
             $this->db->bind(':customer_id', $data['customer_id']);
             $this->db->bind(':date', $data['date']);
             $this->db->bind(':start_time', $data['start_time']);
@@ -314,11 +315,12 @@ class Appointments
 
     //obtener citas por fecha
 
-    public function getAppointmentsByDate($company_id, $date)
+    public function getAppointmentsByDate($company_id, $user_id, $date)
     {
 
-        $this->db->query('SELECT * FROM appointments WHERE company_id = :company_id AND date = :date');
+        $this->db->query('SELECT * FROM appointments WHERE company_id = :company_id AND user_id = :user_id AND date = :date');
         $this->db->bind(':company_id', $company_id);
+        $this->db->bind(':user_id', $user_id);
         $this->db->bind(':date', $date);
 
         return $this->db->resultSet();

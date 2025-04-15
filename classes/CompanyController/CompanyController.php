@@ -22,13 +22,13 @@ class CompanyController
             exit();
         }
 
-        $services = $this->companyModel->getServicesByCompanyId($company['id']);
+        $userProviders = $this->companyModel->getServiceProvidersByCompanyId($company['id']);
         $socialNetworks = $this->companyModel->getSocialNetworksByCompanyId($company['id']);
 
         return [
             "company" => $company,
-            "services" => $services,
             "socialNetworks" => $socialNetworks,
+            "userProviders" => $userProviders,
             "style" => [
                 "primary_color" =>      $company['font_color'] ?? '#525252',
                 "secondary_color" =>    $company['btn2'] ?? '#9b80ff',

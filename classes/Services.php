@@ -5,24 +5,41 @@ class Services
 {
     private $db;
     private $company_id;
+    private $user_id;
 
-    public function __construct($company_id)
+    public function __construct($company_id, $user_id)
     {
         $this->db = new Database(); // Usa la clase Database
         $this->company_id = $company_id;
+        $this->user_id = $user_id;
     }
 
     public function getServices()
     {
         $this->db->query("
-        SELECT s.id AS service_id, s.name AS service_name, s.duration, s.observations, s.is_enabled, s.available_days,
-               sc.id AS category_id, sc.category_name, sc.category_description
-        FROM services s
-        LEFT JOIN service_categories sc ON s.id = sc.service_id
-        WHERE s.company_id = :company_id
-        ORDER BY s.id, sc.id
+        SELECT 
+                s.id AS service_id,
+                s.name AS service_name,
+                s.duration,
+                s.observations,
+                us.is_active AS is_enabled,
+                us.available_days,
+                sc.id AS category_id,
+                sc.category_name,
+                sc.category_description
+            FROM 
+                services s
+            LEFT JOIN 
+                user_services us ON s.id = us.service_id AND us.user_id = :user_id
+            LEFT JOIN 
+                service_categories sc ON s.id = sc.service_id
+            WHERE 
+                s.company_id = :company_id
+            ORDER BY 
+                s.name, sc.category_name
     ");
         $this->db->bind(':company_id', $this->company_id);
+        $this->db->bind(':user_id', $this->user_id);
         $servicesData = $this->db->resultSet();
 
         $organizedData = [];
@@ -61,9 +78,38 @@ class Services
     //getavailableservicedays
     public function getAvailableServiceDays($serviceId)
     {
-        $this->db->query("SELECT duration, available_days FROM services WHERE id = :service_id");
-        $this->db->bind(':service_id', $serviceId);
-        return $this->db->single();
+        try {
+            $sql = "SELECT 
+                        s.duration, 
+                        COALESCE(us.available_days, s.available_days) AS available_days,
+                        us.is_active AS user_service_active,
+                        s.is_enabled AS service_enabled
+                    FROM services s
+                    LEFT JOIN user_services us ON us.service_id = s.id AND us.user_id = :user_id
+                    WHERE s.id = :service_id";
+
+            $this->db->query($sql);
+            $this->db->bind(':service_id', $serviceId);
+            $this->db->bind(':user_id', $this->user_id);
+            $result = $this->db->single();
+
+            if (!$result) {
+                throw new Exception("Service not found");
+            }
+
+            // Verificar si el servicio está habilitado tanto a nivel general como para el usuario
+            if ((isset($result->user_service_active) && $result->user_service_active === 0) ||
+                (isset($result->service_enabled) && $result->service_enabled === 0)
+            ) {
+                throw new Exception("Service is not available");
+            }
+
+            return $result;
+        } catch (Exception $e) {
+            // Puedes loggear el error aquí si es necesario
+            error_log("Error in getAvailableServiceDays: " . $e->getMessage());
+            return false;
+        }
     }
 
 

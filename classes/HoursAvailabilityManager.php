@@ -11,25 +11,29 @@ class HoursAvailabilityManager
     private $services;
     private $schedules;
     private $appointments;
+    // DEBUG MODE PARA USARLO EN CONSULTAS DESDE THUNDERBIRD O POSTMAN
     private $debugMode;
+    private $user_id;
 
-    public function __construct($company_id, $debugMode = false)
+    public function __construct($company_id, $user_id, $debugMode = false)
     {
         $this->companyManager = new CompanyManager();
-        $this->services = new Services($company_id);
-        $this->schedules = new Schedules($company_id);
+        $this->services = new Services($company_id, $user_id);
+        $this->schedules = new Schedules($company_id, $user_id);
         $this->appointments = new Appointments();
+        $this->company_id = $company_id;
+        $this->user_id = $user_id;
         $this->debugMode = $debugMode;
     }
 
-    public function getAvailableHours($date, $service_id, $company_id)
+    public function getAvailableHours($date, $service_id)
     {
         // Validar que la empresa exista
         // if (!$this->companyManager->companyExists($company_id)) {
         //     return ['success' => false, 'message' => 'Empresa no encontrada o inactiva.'];
         // }
 
-        $companyData = $this->companyManager->getCompanyTimeStep($company_id);
+        $companyData = $this->companyManager->getCompanyTimeStep($this->company_id);
 
         if ($companyData) {
             $time_step = $companyData['time_step']; // Puede ser null o un valor definido
@@ -61,7 +65,7 @@ class HoursAvailabilityManager
         $available_slots = $this->generateTimeSlots($work_start, $work_end, $service_duration, $break_start, $break_end, $time_step);
 
         // Filtrar citas reservadas
-        $reserved_appointments = $this->appointments->getAppointmentsByDate($company_id, $date);
+        $reserved_appointments = $this->appointments->getAppointmentsByDate($this->company_id, $this->user_id, $date);
         $filtered_slots = $this->filterReservedSlots($available_slots, $reserved_appointments);
 
         if ($this->debugMode) {

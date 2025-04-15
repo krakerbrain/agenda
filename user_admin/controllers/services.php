@@ -11,8 +11,9 @@ $datosUsuario = $auth->validarTokenUsuario();
 
 try {
     $company_id = $datosUsuario['company_id'];
-    $services = new Services($company_id);
-    $schedules = new Schedules($company_id); // Instanciar la clase Schedules
+    $user_id = $datosUsuario['user_id'];
+    $services = new Services($company_id, $user_id);
+    $schedules = new Schedules($company_id, $user_id); // Instanciar la clase Schedules
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Procesar la data del formulario
