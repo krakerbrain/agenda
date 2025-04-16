@@ -90,7 +90,6 @@ FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 hay que cmabiar la clave foranea de company_integrations para que sea on cascade
 
-la clase Schedules se modifico para que reciba como segundo parametro el user_id, en el backend se toma del token,
-en el frontend se tomara del usuario seleccionado.
-
-me quede en getAvailableServiceDays de Services, tengo que modificarlo hacer un join con user_services para que tome los serviicos de x usuario
+se agrega select de usuarios para el admin quien al hacer change permitira que se muestren los distintos horarios y pueda modificarlos
+se haa lo mismo con los servicios
+luego hacer que usarios normales no puedan modificar sus horarios ni servicios (definir si puede verlos o se bloquean)

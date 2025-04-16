@@ -95,6 +95,12 @@ class Users
 
         return ["error" => null];
     }
+    public function get_user_role($user_id)
+    {
+        $this->db->query('SELECT role_id FROM users WHERE id = :user_id');
+        $this->db->bind(':user_id', $user_id);
+        return $this->db->singleValue(); // Devuelve directamente el role_id o null
+    }
     public function getAboutRoles()
     {
 
@@ -109,6 +115,16 @@ class Users
                             ON u.role_id = ur.id
                             WHERE u.company_id = :company
                             AND ur.id > 2 
+                            ORDER BY u.role_id ASC');
+        $this->db->bind(':company', $company_id);
+        return $this->db->resultSet();
+    }
+
+    public function get_all_users($company_id)
+    {
+
+        $this->db->query('SELECT u.id, u.name FROM users u
+                            WHERE u.company_id = :company
                             ORDER BY u.role_id ASC');
         $this->db->bind(':company', $company_id);
         return $this->db->resultSet();
@@ -206,5 +222,12 @@ class Users
         $this->db->bind(':user_id', $userId);
         $this->db->bind(':token', $token);
         return $this->db->single();
+    }
+
+    public function count_company_users($company_id)
+    {
+        $this->db->query('SELECT COUNT(*) FROM users WHERE company_id = :company_id AND role_id != 2');
+        $this->db->bind(':company_id', $company_id);
+        return (int)$this->db->singleValue(); // Convertimos a entero el conteo
     }
 }

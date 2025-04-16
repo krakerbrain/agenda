@@ -41,13 +41,13 @@ async function loadAppointments(status, page = 1) {
     }
 
     const response = await fetch(url, { method: "GET" });
-    const { success, data, totalPages: total } = await response.json();
+    const { success, data, show_provider_column, is_owner } = await response.json();
 
     if (success) {
       if (status === "events") {
         fillEventTable(data); // Nueva función para llenar la tabla de eventos
       } else {
-        fillTable(data);
+        fillTable(data, show_provider_column, is_owner);
         currentPage = page;
         // Si el número de citas recibidas es menor que el límite, no hay más páginas
         const hasMoreData = data.length === limit;
@@ -60,68 +60,95 @@ async function loadAppointments(status, page = 1) {
 }
 
 // Función para rellenar la tabla con las citas obtenidas
-function fillTable(data) {
-  console.log(data);
+function fillTable(data, showProviderColumn, isOwner) {
   const tableContent = document.getElementById("tableContent");
-  let html = "";
+  tableContent.innerHTML = "";
+  console.log(data);
+  data.forEach((item) => {
+    const row = document.createElement("tr");
+    row.classList.add("body-table");
 
-  data.forEach((appointment) => {
-    html += `
-          <tr class="body-table">
-              <td data-cell="servicio" class="data">${appointment.service}</td>
-              <td data-cell="categoria" class="data">${appointment.category}</td>
-              <td data-cell="nombre" class="data">${appointment.name}</td>
-               <td data-cell="telefono" class="data"><i class="fab fa-whatsapp pe-1" style="font-size:0.85rem"></i><a href="https://wa.me/${appointment.phone}" target="_blank">+${
-      appointment.phone
-    }</a></td>
-              <td data-cell="correo" class="data">${appointment.mail}</td>
-              <td data-cell="fecha" class="data">${appointment.date}</td>
-              <td data-cell="hora" class="data">${appointment.start_time}</td>
-              <td data-cell="estado" class="data">${appointment.status ? "Confirmada" : "Pendiente"}</td>
-              <td >
-               <div class="actionBtns">
-                  ${
-                    !appointment.status
-                      ? `
-                    <i id="confirmarBtn${appointment.id_appointment}" 
-                       class="fa-solid fa-square-check action-icon text-success text-center confirm" 
-                       title="Confirmar reserva"
-                       data-id="${appointment.id_appointment}">
-                       <span class="button-text">CONFIRMAR</span>
-                       <span class="spinner-border spinner-border-sm d-none text-success"></span>
-                    </i>
-                    `
-                      : ""
-                  }
-                  <i id="eliminarBtn${appointment.id_appointment}" 
-                     class="fas fa-trash action-icon text-danger text-center eliminarReserva" 
-                     title="Eliminar reserva"
-                     data-id="${appointment.id_appointment}">
-                     <span class="button-text">ELIMINAR</span>
-                     <span class="spinner-border spinner-border-sm d-none text-danger"></span>
-                  </i>
-                </div>
-              </td>
-          </tr>
-      `;
+    row.innerHTML = `
+      <td data-cell='servicio' class='data'>${item.service}</td>
+      <td data-cell='categoria' class='data'>${item.category}</td>
+      <td data-cell='nombre' class='data'>${item.name}</td>
+      <td data-cell='telefono' class='data'>
+        <i class="fab fa-whatsapp pe-1" style="font-size:0.85rem"></i>
+        <a href="https://wa.me/${item.phone}" target="_blank">+${item.phone}</a>
+      </td>
+      <td data-cell='correo' class='data'>${item.mail}</td>
+      ${showProviderColumn ? `<td data-cell='prestador' class='data'>${item.provider_name}</td>` : ""}
+      <td data-cell='fecha' class='data'>${item.date}</td>
+      <td data-cell='hora' class='data'>${item.start_time}</td>
+      <td data-cell='estado' class='data'>${getStatusBadge(item.status)}</td>
+      <td><div class="actionBtns d-flex justify-content-evenly">${getActionButtons(item)}</div></td>
+    `;
+
+    tableContent.appendChild(row);
   });
-  tableContent.innerHTML = html;
 
-  // Añadir listeners para los botones de confirmación y eliminación después de actualizar el contenido
-  data.forEach((appointment) => {
-    const confirmarBtn = document.getElementById(`confirmarBtn${appointment.id_appointment}`);
-    const eliminarBtn = document.getElementById(`eliminarBtn${appointment.id_appointment}`);
+  updateTableHeaders(showProviderColumn);
+}
 
-    if (confirmarBtn) {
-      confirmarBtn.addEventListener("click", function () {
-        confirmReservation(appointment.id_appointment);
-      });
+function updateTableHeaders(showProviderColumn = false) {
+  const headers = `
+    <th>Servicio</th>
+    <th>Categoria</th>
+    <th>Nombre</th>
+    <th>Teléfono</th>
+    <th>Correo</th>
+    ${showProviderColumn ? "<th>Prestador</th>" : ""}
+    <th>Fecha</th>
+    <th>Hora</th>
+    <th>Estado</th>
+    <th>Acción</th>
+  `;
+
+  document.querySelector(".head-table").innerHTML = headers;
+}
+
+function getStatusBadge(status) {
+  const statusMap = {
+    0: { text: "Pendiente", class: "badge-primary text-primary" },
+    1: { text: "Confirmada", class: "badge-success text-success" },
+    // Agrega más estados si es necesario
+  };
+
+  const statusInfo = statusMap[status] || { text: "Desconocido", class: "badge-secondary" };
+
+  return `<span class="badge ${statusInfo.class}">${statusInfo.text}</span>`;
+}
+
+function getActionButtons(data) {
+  let buttons = "";
+
+  // Botón de confirmar (solo para citas pendientes)
+  if (data.status === 0) {
+    buttons += `
+                <i id="confirmarBtn${data.id_appointment}" class="fa-solid fa-square-check action-icon text-success text-center confirm" title="Confirmar reserva" data-id="${data.id_appointment}">
+                      <span class="button-text">CONFIRMAR</span>
+                      <span class="spinner-border spinner-border-sm d-none text-success"></span>
+                </i>
+              `;
+  }
+  // Botón de eliminar (siempre visible)
+  buttons += `
+             <i id="eliminarBtn${data.id_appointment}" class="fas fa-trash action-icon text-danger text-center eliminarReserva" title="Eliminar reserva" data-id="${data.id_appointment}">
+                <span class="button-text">ELIMINAR</span>
+                <span class="spinner-border spinner-border-sm d-none text-danger"></span>
+             </i>`;
+
+  document.addEventListener("click", function (e) {
+    if (e.target.closest(`#confirmarBtn${data.id_appointment}`)) {
+      confirmReservation(data.id_appointment);
     }
 
-    eliminarBtn.addEventListener("click", function () {
-      openDeleteModal(appointment); // Abrir el modal antes de eliminar
-    });
+    if (e.target.closest(`#eliminarBtn${data.id_appointment}`)) {
+      openDeleteModal(data);
+    }
   });
+
+  return buttons;
 }
 
 function fillEventTable(data) {

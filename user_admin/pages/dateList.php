@@ -74,15 +74,7 @@ $auth->validarTokenUsuario();
         <table class="table table-striped table-hover">
             <thead>
                 <tr class="head-table">
-                    <th>Servicio</th>
-                    <th>Categoria</th>
-                    <th>Nombre</th>
-                    <th>Teléfono</th>
-                    <th>Correo</th>
-                    <th>Fecha</th>
-                    <th>Hora</th>
-                    <th>Estado</th>
-                    <th>Acción</th>
+
                 </tr>
             </thead>
             <tbody id="tableContent">

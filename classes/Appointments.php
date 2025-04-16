@@ -210,18 +210,22 @@ class Appointments
         return $this->db->resultSet();
     }
 
-    public function get_paginated_appointments($company_id, $status, $offset, $limit)
+    public function get_paginated_appointments($company_id, $user_id, $user_role, $status, $offset, $limit)
     {
-        $query = 'SELECT a.id as id_appointment, a.*, s.name AS service, c.id as id_customer, c.*, COALESCE(cat.category_name, "-") AS category,
-                     DATE_FORMAT(a.date, "%d-%m-%Y") as date 
-                     FROM appointments a 
-                     INNER JOIN services s ON a.id_service = s.id
-                     INNER JOIN customers c ON a.customer_id = c.id
-                     INNER JOIN company_customers cc ON c.id = cc.customer_id
-                    LEFT JOIN service_categories cat ON a.service_category_id = cat.id
-                     WHERE a.company_id = :company
-                     AND cc.company_id = :company  
-                     AND status != 2';
+        $query = 'SELECT a.id as id_appointment, a.*, s.name AS service, c.id as id_customer, c.*, 
+              COALESCE(cat.category_name, "-") AS category,
+              DATE_FORMAT(a.date, "%d-%m-%Y") as date,
+              u.name as provider_name,
+              u.role_id as provider_role
+              FROM appointments a 
+              INNER JOIN services s ON a.id_service = s.id
+              INNER JOIN customers c ON a.customer_id = c.id
+              INNER JOIN company_customers cc ON c.id = cc.customer_id
+              LEFT JOIN service_categories cat ON a.service_category_id = cat.id
+              LEFT JOIN users u ON a.user_id = u.id
+              WHERE a.company_id = :company
+              AND cc.company_id = :company  
+              AND status != 2';
 
         if ($status === 'unconfirmed') {
             $query .= ' AND status = 0 AND a.date >= CURDATE()';
@@ -231,10 +235,16 @@ class Appointments
             $query .= ' AND date < CURDATE()';
         }
 
+        // Filtro por usuario solo si NO es dueño (rol 2)
+        if ($user_role != 2) {
+            $query .= ' AND a.user_id = :user_id';
+        }
+
         $query .= ' ORDER BY a.date DESC LIMIT :offset, :limit';
 
         $this->db->query($query);
         $this->db->bind(':company', $company_id);
+        $this->db->bind(':user_id', $user_id);
         $this->db->bind(':offset', $offset, PDO::PARAM_INT);
         $this->db->bind(':limit', $limit, PDO::PARAM_INT);
 
