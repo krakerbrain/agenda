@@ -9,9 +9,10 @@ $auth = new JWTAuth();
 $datosUsuario = $auth->validarTokenUsuario();
 
 
+
 try {
     $company_id = $datosUsuario['company_id'];
-    $user_id = $datosUsuario['user_id'];
+    $user_id = $_GET['user_id'] ?? $datosUsuario['user_id'];
     $schedules = new Schedules($company_id, $user_id);
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -28,6 +29,7 @@ try {
         } else {
             // Procesar la data del formulario
             $schedulesData = $_POST; // Asume que estás enviando los datos como application/x-www-form-urlencoded
+            // 
             $schedules->saveSchedules($schedulesData);
             echo json_encode(['success' => true, 'message' => 'Horarios guardados exitosamente.']);
         }

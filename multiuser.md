@@ -91,5 +91,5 @@ FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 hay que cmabiar la clave foranea de company_integrations para que sea on cascade
 
 se agrega select de usuarios para el admin quien al hacer change permitira que se muestren los distintos horarios y pueda modificarlos
-se haa lo mismo con los servicios
+se hara lo mismo con los servicios
 luego hacer que usarios normales no puedan modificar sus horarios ni servicios (definir si puede verlos o se bloquean)

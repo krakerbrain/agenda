@@ -123,7 +123,7 @@ class Users
     public function get_all_users($company_id)
     {
 
-        $this->db->query('SELECT u.id, u.name FROM users u
+        $this->db->query('SELECT u.id, u.name, u.role_id FROM users u
                             WHERE u.company_id = :company
                             ORDER BY u.role_id ASC');
         $this->db->bind(':company', $company_id);

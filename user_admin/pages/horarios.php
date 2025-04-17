@@ -24,8 +24,12 @@ if ($user_count > 1) {
                 <label for="userSelect" class="form-label">Selecciona el usuario</label>
                 <select id="userSelect" class="form-select">
                     <?php foreach ($users as $user) : ?>
-                        <option value="<?= $user['id'] ?>"><?= $user['name'] ?></option>
+                        <!-- si datosUsuario['id'] == $user['id'] entonces se selecciona -->
+                        <option value="<?= $user['id'] ?>"
+                            <?= $datosUsuario['role_id'] == $user['role_id'] ? 'selected' : '' ?>>
+                            <?= $user['name'] ?></option>
                     <?php endforeach; ?>
+
                 </select>
             </div>
         </div>
