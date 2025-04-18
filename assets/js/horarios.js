@@ -7,7 +7,7 @@ export function initHorarios() {
 
   async function getHorarios(user_id = null) {
     let userIdUrl = user_id !== null ? `?user_id=${user_id}` : "";
-    console.log("getHorarios", user_id);
+
     const response = await fetch(`${baseUrl}user_admin/controllers/schedulesController.php${userIdUrl}`, {
       method: "GET",
     });

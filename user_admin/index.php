@@ -3,14 +3,22 @@ require_once dirname(__DIR__) . '/configs/init.php';
 require_once dirname(__DIR__) . '/configs/VersionManager.php';
 require_once dirname(__DIR__) . '/access-token/seguridad/JWTAuth.php';
 require_once dirname(__DIR__) . '/classes/ConfigUrl.php';
+require_once dirname(__DIR__) . '/classes/Users.php';
+
 $title = "Configuraciones";
 
 $baseUrl = ConfigUrl::get();
 $auth = new JWTAuth();
-$userData = $auth->validarTokenUsuario();
-$role_id = $userData['role_id'];
+$datosUsuario = $auth->validarTokenUsuario();
+$role_id = $datosUsuario['role_id'];
 // Obtener la instancia singleton
 $versionManager = VersionManager::getInstance();
+
+$userData = new Users();
+$user_count = $userData->count_company_users($datosUsuario['company_id']);
+if ($user_count > 1) {
+    $users = $userData->get_all_users($datosUsuario['company_id']);
+}
 
 include dirname(__DIR__) . '/partials/head.php';
 ?>
@@ -54,6 +62,11 @@ include dirname(__DIR__) . '/partials/head.php';
                     <li class="nav-item">
                         <a class="nav-link" href="#" id="servicios">Servicios</a>
                     </li>
+                    <?php if ($user_count > 1 && $datosUsuario['role_id'] == 2) : ?>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" id="services_assign">Asignar Servicios</a>
+                        </li>
+                    <?php endif; ?>
                     <li class="nav-item">
                         <a class="nav-link" href="#" id="correos">Correos</a>
                     </li>

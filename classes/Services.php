@@ -22,14 +22,14 @@ class Services
                 s.name AS service_name,
                 s.duration,
                 s.observations,
-                us.is_active AS is_enabled,
+                s.is_enabled,
                 us.available_days,
                 sc.id AS category_id,
                 sc.category_name,
                 sc.category_description
             FROM 
                 services s
-            LEFT JOIN 
+            INNER JOIN 
                 user_services us ON s.id = us.service_id AND us.user_id = :user_id
             LEFT JOIN 
                 service_categories sc ON s.id = sc.service_id
@@ -110,6 +110,50 @@ class Services
             error_log("Error in getAvailableServiceDays: " . $e->getMessage());
             return false;
         }
+    }
+
+    public function getCompanyServices()
+    {
+        $sql = "SELECT id, name FROM services 
+                WHERE company_id = :company_id 
+                AND is_enabled = 1
+                ORDER BY name";
+
+        $this->db->query($sql);
+        $this->db->bind(':company_id', $this->company_id);
+        return $this->db->resultSet();
+    }
+
+    public function getUserAssignedServices()
+    {
+        $sql = "SELECT service_id, available_days, is_active 
+                FROM user_services 
+                WHERE user_id = :user_id";
+
+        $this->db->query($sql);
+        $this->db->bind(':user_id', $this->user_id);
+        $result = $this->db->resultSet();
+
+
+        $formatted = [];
+        foreach ($result as $row) {
+            // Convertir los días disponibles (string "1,2,3" a array)
+            $daysArray = explode(',', $row['available_days']);
+            $daysStatus = [];
+
+            foreach ($daysArray as $day) {
+                if (is_numeric($day)) {
+                    $daysStatus[$day] = true;
+                }
+            }
+
+            $formatted[$row['service_id']] = [
+                'checked' => (bool)$row['is_active'],
+                'days' => $daysStatus
+            ];
+        }
+
+        return $formatted;
     }
 
 
@@ -268,6 +312,98 @@ class Services
 
             // Luego, puedes lanzar una excepción o devolver un mensaje de error
             throw new Exception('No se pudo actualizar la categoría.');
+        }
+    }
+
+    public function saveUserAssignments($assignments)
+    {
+        $this->db->beginTransaction();
+
+        try {
+            // 1. Eliminar asignaciones no presentes en los nuevos datos
+            $sqlDelete = "DELETE FROM user_services WHERE user_id = :user_id";
+
+            if (!empty($assignments)) {
+                $serviceIds = array_keys($assignments);
+                $namedParams = [];
+
+                // Crear parámetros nombrados dinámicamente
+                foreach ($serviceIds as $i => $id) {
+                    $paramName = ":service_id_" . $i;
+                    $namedParams[$paramName] = $id;
+                }
+
+                $placeholders = implode(',', array_keys($namedParams));
+                $sqlDelete .= " AND service_id NOT IN ($placeholders)";
+            }
+
+            // Preparar la consulta
+            $this->db->query($sqlDelete);
+
+            // Bind del user_id
+            $this->db->bind(':user_id', $this->user_id, PDO::PARAM_INT);
+
+            // Bind de los service_ids usando los nombres de parámetros creados
+            if (!empty($assignments)) {
+                foreach ($namedParams as $param => $value) {
+                    $this->db->bind($param, $value, PDO::PARAM_INT);
+                }
+            }
+
+            // Ejecutar la consulta
+            $this->db->execute();
+
+            // 2. Insertar o actualizar asignaciones
+            foreach ($assignments as $serviceId => $data) {
+                // Verificar si ya existe la asignación
+                $sqlCheck = "SELECT COUNT(*) as count FROM user_services 
+                             WHERE user_id = :user_id AND service_id = :service_id";
+                $this->db->query($sqlCheck);
+                $this->db->bind(':user_id', $this->user_id);
+                $this->db->bind(':service_id', $serviceId, PDO::PARAM_INT);
+                $this->db->execute();
+                $exists = $this->db->single()['count'] > 0;
+                // $stmtCheck->bindParam(':user_id', $userId, PDO::PARAM_INT);
+                // $stmtCheck->bindParam(':service_id', $serviceId, PDO::PARAM_INT);
+                // $stmtCheck->execute();
+                // $exists = $stmtCheck->fetch(PDO::FETCH_ASSOC)['count'] > 0;
+
+                if ($exists) {
+                    // Actualizar asignación existente
+                    $sql = "UPDATE user_services SET
+                            available_days = :available_days,
+                            is_active = :is_active,
+                            updated_at = NOW()
+                            WHERE user_id = :user_id AND service_id = :service_id";
+                } else {
+                    // Nueva asignación
+                    $sql = "INSERT INTO user_services (
+                            user_id, service_id, available_days, is_active, created_at
+                            ) VALUES (
+                            :user_id, :service_id, :available_days, :is_active, NOW()
+                            )";
+                }
+
+                $this->db->query($sql);
+                $this->db->bind(':user_id', $this->user_id, PDO::PARAM_INT);
+                $this->db->bind(':service_id', $serviceId, PDO::PARAM_INT);
+                $this->db->bind(':available_days', $data['available_days']);
+                $this->db->bind(':is_active', $data['is_active'], PDO::PARAM_INT);
+                $this->db->execute();
+                // $stmt = $this->db->prepare($sql);
+                // $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+                // $stmt->bindParam(':service_id', $serviceId, PDO::PARAM_INT);
+                // $stmt->bindParam(':available_days', $data['available_days']);
+                // $stmt->bindParam(':is_active', $data['is_active'], PDO::PARAM_INT);
+                // $stmt->execute();
+            }
+
+            $this->db->endTransaction();
+            return true;
+        } catch (Exception $e) {
+            $this->db->cancelTransaction();
+            error_log("Error saving assignments: " . $e->getMessage());
+            return false;
         }
     }
 

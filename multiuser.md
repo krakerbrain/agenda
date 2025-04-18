@@ -88,6 +88,10 @@ ALTER TABLE `appointments`
 ADD CONSTRAINT `fk_appointments_user`
 FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
+ALTER TABLE user_services
+ADD COLUMN created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ADD COLUMN updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+
 hay que cmabiar la clave foranea de company_integrations para que sea on cascade
 
 se agrega select de usuarios para el admin quien al hacer change permitira que se muestren los distintos horarios y pueda modificarlos

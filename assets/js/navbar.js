@@ -95,6 +95,10 @@ document.addEventListener("DOMContentLoaded", function () {
           const { initBloqueoHoras } = await import(`./bloqueoHoras.js?v=${APP_VERSION}`);
           initBloqueoHoras();
           break;
+        case "services_assign":
+          const { initServicesAssign } = await import(`./services_assign.js?v=${APP_VERSION}`);
+          initServicesAssign();
+          break;
         default:
           console.error("No hay un módulo para la página:", page);
       }
