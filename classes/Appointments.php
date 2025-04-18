@@ -138,11 +138,12 @@ class Appointments
     public function checkExistingAppointment($data)
     {
 
-        $this->db->query('SELECT COUNT(*) as total FROM appointments WHERE company_id = :company_id AND date = :date AND start_time = :start_time AND end_time = :end_time');
+        $this->db->query('SELECT COUNT(*) as total FROM appointments WHERE company_id = :company_id AND date = :date AND start_time = :start_time AND end_time = :end_time AND user_id = :user_id');
         $this->db->bind(':company_id', $data['company_id']);
         $this->db->bind(':date', $data['date']);
         $this->db->bind(':start_time', $data['start_time']);
         $this->db->bind(':end_time', $data['end_time']);
+        $this->db->bind(':user_id', $data['user_id']);
         // Obtener el resultado y acceder a la propiedad 'total'
         $countResult = $this->db->single();
 

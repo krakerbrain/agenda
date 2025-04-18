@@ -59,9 +59,6 @@ export function initServicesAssign() {
     try {
       const response = await fetch(`${baseUrl}user_admin/controllers/services_assign_controller.php?action=get_services&user_id=${userId}`, {
         method: "GET",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
       });
 
       if (!response.ok) {
@@ -74,20 +71,15 @@ export function initServicesAssign() {
         throw new Error(data.message || "Error al cargar servicios");
       }
 
-      // Procesar los datos recibidos
-      const services = data.services;
-      const assignedServices = data.assignedServices || {};
-
-      // Crear daysStatus basado en los días disponibles de cada servicio
-      // (Aquí asumimos que todos los días están habilitados por defecto)
-      const daysStatus = {};
-      for (let i = 1; i <= 7; i++) {
-        daysStatus[i] = { enabled: true };
-      }
-
-      renderServicesTable(services, assignedServices, daysStatus);
+      // Usar daysStatus del backend en lugar del objeto generado
+      renderServicesTable(
+        data.services,
+        data.assignedServices || {},
+        data.daysStatus || {} // Usamos los días del backend
+      );
     } catch (error) {
       console.error("Error al cargar servicios:", error);
+      handleInfoModal("infoAppointment", "Error", error.message);
     }
   }
 
@@ -131,16 +123,18 @@ export function initServicesAssign() {
     });
   }
 
-  // Versión modificada de tu función para incluir los días ya asignados
   function generateDaysCheckboxes(daysStatus, serviceId, assignedDays = {}) {
     const daysOfWeek = ["L", "M", "M", "J", "V", "S", "D"];
 
     return daysOfWeek
       .map((day, index) => {
-        const dayId = index + 1; // Los días empiezan desde 1
-        const { enabled = true } = daysStatus[dayId] || {}; // Si no hay datos en daysStatus, habilitado por defecto
-        const checked = assignedDays[dayId] || false; // Verificar si el día está asignado
-        const disabledClass = !enabled ? "disabled-day" : ""; // Clase para días deshabilitados
+        const dayId = index + 1;
+        const { enabled = true } = daysStatus[dayId] || {};
+
+        // Forzar desmarcado si el día está deshabilitado, independientemente de assignedDays
+        const shouldBeChecked = enabled && (assignedDays[dayId] || false);
+
+        const disabledClass = !enabled ? "disabled-day" : "";
         const tooltipAttributes = !enabled ? `tabindex="0" data-bs-toggle="tooltip" title="Día no disponible. Habilitarlo en Horarios"` : "";
 
         return `
@@ -149,7 +143,7 @@ export function initServicesAssign() {
                     data-service-id="${serviceId}" 
                     name="available_service_day[${serviceId}][]" 
                     value="${dayId}" 
-                    ${checked ? "checked" : ""} 
+                    ${shouldBeChecked ? "checked" : ""} 
                     ${!enabled ? "disabled" : ""}>
               <label class="mt-1">${day}</label>
             </div>`;

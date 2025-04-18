@@ -4,6 +4,7 @@ require_once dirname(__DIR__, 2) . '/access-token/seguridad/JWTAuth.php';
 require_once dirname(__DIR__, 2) . '/classes/ConfigUrl.php';
 require_once dirname(__DIR__, 2) . '/classes/Services.php';
 require_once dirname(__DIR__, 2) . '/classes/Users.php';
+require_once dirname(__DIR__, 2) . '/classes/Schedules.php'; // Incluir la clase Schedules
 
 $baseUrl = ConfigUrl::get();
 $auth = new JWTAuth();
@@ -28,7 +29,7 @@ try {
                     'users' => $usersList
                 ]);
             } elseif ($action === 'get_services') {
-
+                $schedules = new Schedules($datosUsuario['company_id'], $user_id);
 
                 // 2. Obtener todos los servicios de la compañía
                 $allServices = $services->getCompanyServices();
@@ -36,10 +37,14 @@ try {
                 // 3. Obtener servicios asignados al usuario
                 $assignedServices = $services->getUserAssignedServices();
 
+                // Obtener días habilitados desde horarios
+                $daysStatus = $schedules->getEnabledDays();
+
                 echo json_encode([
                     'status' => 'success',
                     'services' => $allServices,
-                    'assignedServices' => $assignedServices
+                    'assignedServices' => $assignedServices,
+                    'daysStatus' => $daysStatus // Agregar esta línea
                 ]);
             } else {
                 throw new Exception('Acción no válida');

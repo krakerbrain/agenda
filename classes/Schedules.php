@@ -63,6 +63,38 @@ class Schedules
         return $this->db->single();
     }
 
+    public function getEnabledDays()
+    {
+        // Consulta para obtener días habilitados según horario del admin (user_id = 2)
+        $sql = "SELECT cs.day_id, cs.is_enabled 
+                FROM company_schedules cs
+                JOIN users u ON cs.user_id = u.id
+                WHERE cs.company_id = :company_id 
+                AND u.role_id = 2"; // Horario del admin como referencia
+
+        $this->db->query($sql);
+        $this->db->bind(':company_id', $this->company_id);
+        $this->db->execute();
+
+        $result = $this->db->resultSet();
+
+        $daysStatus = [];
+        // Inicializar todos los días como no habilitados por defecto
+        for ($i = 1; $i <= 7; $i++) {
+            $daysStatus[$i] = ['enabled' => false];
+        }
+
+        // Actualizar según configuración del admin
+        foreach ($result as $row) {
+            $day = $row['day_id']; // Usamos day_id que corresponde a 1=Lunes, 2=Martes, etc.
+            if ($day >= 1 && $day <= 7) {
+                $daysStatus[$day]['enabled'] = (bool)$row['is_enabled'];
+            }
+        }
+
+        return $daysStatus;
+    }
+
     public function saveSchedules($schedulesData)
     {
         $schedulesData = $schedulesData['schedule'];
