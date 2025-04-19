@@ -77,42 +77,54 @@ export function initServicesAssign() {
     const tbody = document.getElementById("servicesTable").querySelector("tbody");
     tbody.innerHTML = "";
 
+    // Nombres de columnas para data-cell
+    const columnNames = ["asignar", "servicio", "días disponibles"];
+
+    // Generar HTML como string
+    let tableHTML = "";
+
     servicesData.forEach((service) => {
-      const row = document.createElement("tr");
+      // Fila principal
+      let rowHTML = `<tr class="body-table">`;
 
-      // Checkbox principal del servicio
-      const assignCell = document.createElement("td");
-      const assignCheckbox = document.createElement("input");
-      assignCheckbox.type = "checkbox";
-      assignCheckbox.className = "form-check-input service-checkbox";
-      assignCheckbox.dataset.serviceId = service.id;
-      assignCheckbox.checked = service.user_assignment?.is_active || false;
-      assignCheckbox.disabled = !service.is_enabled;
-      assignCell.appendChild(assignCheckbox);
+      // Columnas
+      columnNames.forEach((colName, index) => {
+        rowHTML += `<td data-cell="${colName}" class="data">`;
 
-      // Nombre del servicio
-      const nameCell = document.createElement("td");
-      nameCell.textContent = service.name;
-      if (!service.is_enabled) {
-        nameCell.classList.add("text-muted");
-      }
+        if (index === 0) {
+          // Columna de checkbox
+          rowHTML += `
+                <input type="checkbox" 
+                       class="form-check-input service-checkbox" 
+                       data-service-id="${service.id}"
+                       ${service.user_assignment?.is_active ? "checked" : ""}
+                       ${!service.is_enabled ? "disabled" : ""}>`;
+        } else if (index === 1) {
+          // Columna de nombre
+          rowHTML += `<span ${!service.is_enabled ? 'class="text-muted"' : ""}>
+                           ${service.name}
+                           </span>`;
+        } else if (index === 2) {
+          // Columna de días
+          rowHTML += `
+                <div class="days-container d-flex gap-1">
+                    ${generateDaysCheckboxes(service.available_days, service.id)}
+                </div>`;
+        }
 
-      // Días disponibles
-      const daysCell = document.createElement("td");
-      const daysContainer = document.createElement("div");
-      daysContainer.className = "days-container d-flex gap-1";
+        rowHTML += `</td>`;
+      });
 
-      // Generar checkboxes de días
-      daysContainer.innerHTML = generateDaysCheckboxes(service.available_days, service.id);
-      daysCell.appendChild(daysContainer);
-
-      row.append(assignCell, nameCell, daysCell);
-      tbody.appendChild(row);
+      rowHTML += `</tr>`;
+      tableHTML += rowHTML;
     });
 
-    // Inicializar tooltips para los días deshabilitados
+    // Insertar todo el HTML de una vez
+    tbody.innerHTML = tableHTML;
+
+    // Inicializar tooltips
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-    [...tooltipTriggerList].map((tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl));
+    [...tooltipTriggerList].forEach((el) => new bootstrap.Tooltip(el));
   }
 
   function generateDaysCheckboxes(availableDays, serviceId) {

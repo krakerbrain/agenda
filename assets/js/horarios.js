@@ -28,10 +28,12 @@ export function initHorarios() {
   }
 
   // evento chaange para userSelect
-  document.getElementById("userSelect").addEventListener("change", async function () {
-    const userId = this.value;
-    await getHorarios(userId);
-  });
+  if (document.getElementById("userSelect")) {
+    document.getElementById("userSelect").addEventListener("change", async function () {
+      const userId = this.value;
+      await getHorarios(userId);
+    });
+  }
 
   function getCurrentSchedules() {
     const rows = Array.from(tableBody.querySelectorAll("tr.work-day")); // Filas de la tabla

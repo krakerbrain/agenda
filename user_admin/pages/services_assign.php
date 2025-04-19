@@ -1,3 +1,18 @@
+<!-- Estilos adicionales -->
+<style>
+.disabled-day {
+    opacity: 0.5;
+}
+
+.day {
+    padding: 5px;
+    border-radius: 4px;
+}
+
+.day:hover:not(.disabled-day) {
+    background-color: #f8f9fa;
+}
+</style>
 <div class="container mt-4">
     <!-- Selector de Usuario -->
     <div class="row mb-4">
@@ -16,9 +31,9 @@
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table id="servicesTable" class="table table-hover">
+                <table id="servicesTable" class="table table-hover table-striped">
                     <thead>
-                        <tr>
+                        <tr class="head-table">
                             <th width="5%">Asignar</th>
                             <th width="35%">Servicio</th>
                             <th width="60%">Días Disponibles</th>
@@ -38,19 +53,3 @@
 
 <?php include dirname(__DIR__, 2) . '/includes/modal-info.php';
 ?>
-
-<!-- Estilos adicionales -->
-<style>
-.disabled-day {
-    opacity: 0.5;
-}
-
-.day {
-    padding: 5px;
-    border-radius: 4px;
-}
-
-.day:hover:not(.disabled-day) {
-    background-color: #f8f9fa;
-}
-</style>
