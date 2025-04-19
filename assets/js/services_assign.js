@@ -1,10 +1,4 @@
 export function initServicesAssign() {
-  // Inicializar tooltips de Bootstrap
-  const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-  tooltipTriggerList.map(function (tooltipTriggerEl) {
-    return new bootstrap.Tooltip(tooltipTriggerEl);
-  });
-
   // Cargar usuarios
   loadUsers();
 
@@ -65,88 +59,91 @@ export function initServicesAssign() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data = await response.json();
+      const { status, data } = await response.json();
 
-      if (data.status !== "success") {
+      if (status !== "success") {
         throw new Error(data.message || "Error al cargar servicios");
       }
 
       // Usar daysStatus del backend en lugar del objeto generado
-      renderServicesTable(
-        data.services,
-        data.assignedServices || {},
-        data.daysStatus || {} // Usamos los días del backend
-      );
+      renderServicesTable(data);
     } catch (error) {
       console.error("Error al cargar servicios:", error);
       handleInfoModal("infoAppointment", "Error", error.message);
     }
   }
 
-  function renderServicesTable(services, assignedServices, daysStatus) {
+  function renderServicesTable(servicesData) {
     const tbody = document.getElementById("servicesTable").querySelector("tbody");
     tbody.innerHTML = "";
 
-    services.forEach((service) => {
+    servicesData.forEach((service) => {
       const row = document.createElement("tr");
-      const isAssigned = assignedServices && assignedServices[service.id];
 
-      // Columna de checkbox para asignar servicio
+      // Checkbox principal del servicio
       const assignCell = document.createElement("td");
       const assignCheckbox = document.createElement("input");
       assignCheckbox.type = "checkbox";
       assignCheckbox.className = "form-check-input service-checkbox";
       assignCheckbox.dataset.serviceId = service.id;
-      assignCheckbox.checked = isAssigned ? true : false;
+      assignCheckbox.checked = service.user_assignment?.is_active || false;
+      assignCheckbox.disabled = !service.is_enabled;
       assignCell.appendChild(assignCheckbox);
 
-      // Columna de nombre de servicio
+      // Nombre del servicio
       const nameCell = document.createElement("td");
       nameCell.textContent = service.name;
+      if (!service.is_enabled) {
+        nameCell.classList.add("text-muted");
+      }
 
-      // Columna de días disponibles
+      // Días disponibles
       const daysCell = document.createElement("td");
       const daysContainer = document.createElement("div");
-      daysContainer.className = "days-container";
+      daysContainer.className = "days-container d-flex gap-1";
 
-      // Generar checkboxes de días (similar a tu función)
-      daysContainer.innerHTML = generateDaysCheckboxes(daysStatus, service.id, isAssigned ? assignedServices[service.id].days : {});
-
+      // Generar checkboxes de días
+      daysContainer.innerHTML = generateDaysCheckboxes(service.available_days, service.id);
       daysCell.appendChild(daysContainer);
 
-      // Construir fila
-      row.appendChild(assignCell);
-      row.appendChild(nameCell);
-      row.appendChild(daysCell);
-
+      row.append(assignCell, nameCell, daysCell);
       tbody.appendChild(row);
     });
+
+    // Inicializar tooltips para los días deshabilitados
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    [...tooltipTriggerList].map((tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl));
   }
 
-  function generateDaysCheckboxes(daysStatus, serviceId, assignedDays = {}) {
+  function generateDaysCheckboxes(availableDays, serviceId) {
     const daysOfWeek = ["L", "M", "M", "J", "V", "S", "D"];
 
     return daysOfWeek
       .map((day, index) => {
         const dayId = index + 1;
-        const { enabled = true } = daysStatus[dayId] || {};
+        const dayData = availableDays[dayId] || {};
 
-        // Forzar desmarcado si el día está deshabilitado, independientemente de assignedDays
-        const shouldBeChecked = enabled && (assignedDays[dayId] || false);
+        // Verificar disponibilidad completa
+        const isAvailable = dayData.company_available && dayData.service_available && dayData.user_working;
 
-        const disabledClass = !enabled ? "disabled-day" : "";
-        const tooltipAttributes = !enabled ? `tabindex="0" data-bs-toggle="tooltip" title="Día no disponible. Habilitarlo en Horarios"` : "";
+        const tooltipReasons = [];
+        if (!dayData.company_available) tooltipReasons.push("no disponible para la compañía");
+        if (!dayData.service_available) tooltipReasons.push("no ofrecido para este servicio");
+        if (!dayData.user_working) tooltipReasons.push("fuera del horario laboral");
+
+        const tooltipText = tooltipReasons.length > 0 ? `Día ${tooltipReasons.join(", ")}` : "";
 
         return `
-            <div class="day align-items-center d-flex flex-column text-center ${disabledClass}" ${tooltipAttributes}>
-             <input type="checkbox" class="form-check-input day-checkbox" 
-                    data-service-id="${serviceId}" 
-                    name="available_service_day[${serviceId}][]" 
-                    value="${dayId}" 
-                    ${shouldBeChecked ? "checked" : ""} 
-                    ${!enabled ? "disabled" : ""}>
-              <label class="mt-1">${day}</label>
-            </div>`;
+        <div class="day position-relative d-inline-block ${!isAvailable ? "disabled-day" : ""}" 
+             ${!isAvailable ? `tabindex="0" data-bs-toggle="tooltip" title="${tooltipText}"` : ""}>
+            <input type="checkbox" 
+                   class="form-check-input day-checkbox" 
+                   data-service-id="${serviceId}" 
+                   value="${dayId}"
+                   ${dayData.user_assigned ? "checked" : ""}
+                   ${!isAvailable ? 'disabled aria-disabled="true"' : ""}>
+            <label class="d-block text-center mt-1">${day}</label>
+        </div>`;
       })
       .join("");
   }

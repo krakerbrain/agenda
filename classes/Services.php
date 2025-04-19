@@ -23,14 +23,12 @@ class Services
                 s.duration,
                 s.observations,
                 s.is_enabled,
-                us.available_days,
+                s.available_days,
                 sc.id AS category_id,
                 sc.category_name,
                 sc.category_description
             FROM 
                 services s
-            INNER JOIN 
-                user_services us ON s.id = us.service_id AND us.user_id = :user_id
             LEFT JOIN 
                 service_categories sc ON s.id = sc.service_id
             WHERE 
@@ -39,7 +37,6 @@ class Services
                 s.name, sc.category_name
     ");
         $this->db->bind(':company_id', $this->company_id);
-        $this->db->bind(':user_id', $this->user_id);
         $servicesData = $this->db->resultSet();
 
         $organizedData = [];
@@ -112,49 +109,118 @@ class Services
         }
     }
 
-    public function getCompanyServices()
+    public function getServicesWithUserAvailability($companyAvailableDays, $userWorkingDays)
     {
-        $sql = "SELECT id, name FROM services 
-                WHERE company_id = :company_id 
-                AND is_enabled = 1
-                ORDER BY name";
+        // 1. Obtener todos los servicios activos de la compañía
+        $sql = "SELECT s.id, s.name, s.is_enabled, s.available_days 
+                FROM services s
+                WHERE s.company_id = :company_id 
+                AND s.is_enabled = 1
+                ORDER BY s.name";
 
         $this->db->query($sql);
         $this->db->bind(':company_id', $this->company_id);
-        return $this->db->resultSet();
-    }
+        $services = $this->db->resultSet();
 
-    public function getUserAssignedServices()
-    {
-        $sql = "SELECT service_id, available_days, is_active 
-                FROM user_services 
-                WHERE user_id = :user_id";
+        // 2. Obtener asignaciones del usuario
+        $sqlAssignments = "SELECT service_id, available_days, is_active 
+                          FROM user_services 
+                          WHERE user_id = :user_id";
 
-        $this->db->query($sql);
+        $this->db->query($sqlAssignments);
         $this->db->bind(':user_id', $this->user_id);
-        $result = $this->db->resultSet();
+        $assignments = $this->db->resultSet();
 
-
-        $formatted = [];
-        foreach ($result as $row) {
-            // Convertir los días disponibles (string "1,2,3" a array)
-            $daysArray = explode(',', $row['available_days']);
-            $daysStatus = [];
-
-            foreach ($daysArray as $day) {
-                if (is_numeric($day)) {
-                    $daysStatus[$day] = true;
-                }
-            }
-
-            $formatted[$row['service_id']] = [
-                'checked' => (bool)$row['is_active'],
-                'days' => $daysStatus
+        // Procesar asignaciones
+        $userAssignments = [];
+        foreach ($assignments as $assignment) {
+            $days = array_fill_keys(explode(',', $assignment['available_days']), true);
+            $userAssignments[$assignment['service_id']] = [
+                'is_active' => (bool)$assignment['is_active'],
+                'days' => $days
             ];
         }
 
-        return $formatted;
+        // 3. Combinar toda la información
+        $result = [];
+        foreach ($services as $service) {
+            $serviceId = $service['id'];
+
+            // Días que el servicio ofrece
+            $serviceDays = array_fill_keys(explode(',', $service['available_days']), true);
+
+            // Días disponibles combinados
+            $availableDays = [];
+            for ($dayId = 1; $dayId <= 7; $dayId++) {
+                // Jerarquía de disponibilidad:
+                $isAvailable = $companyAvailableDays[$dayId]['enabled'] &&      // 1. Compañía
+                    isset($serviceDays[$dayId]) &&                   // 2. Servicio
+                    (!empty($userWorkingDays[$dayId]['enabled']));     // 3. Usuario
+
+                $availableDays[$dayId] = [
+                    'company_available' => $companyAvailableDays[$dayId]['enabled'],
+                    'service_available' => isset($serviceDays[$dayId]),
+                    'user_working' => !empty($userWorkingDays[$dayId]['enabled']),
+                    'user_assigned' => $isAvailable &&
+                        isset($userAssignments[$serviceId]['days'][$dayId]) &&
+                        $userAssignments[$serviceId]['days'][$dayId]
+                ];
+            }
+
+            $result[] = [
+                'id' => $serviceId,
+                'name' => $service['name'],
+                'is_enabled' => (bool)$service['is_enabled'],
+                'user_assignment' => $userAssignments[$serviceId] ?? null,
+                'available_days' => $availableDays
+            ];
+        }
+
+        return $result;
     }
+    // public function getCompanyServices()
+    // {
+    //     $sql = "SELECT id, name, available_days FROM services 
+    //             WHERE company_id = :company_id 
+    //             AND is_enabled = 1
+    //             ORDER BY name";
+
+    //     $this->db->query($sql);
+    //     $this->db->bind(':company_id', $this->company_id);
+    //     return $this->db->resultSet();
+    // }
+
+    // public function getUserAssignedServices()
+    // {
+    //     $sql = "SELECT service_id, available_days, is_active 
+    //             FROM user_services 
+    //             WHERE user_id = :user_id";
+
+    //     $this->db->query($sql);
+    //     $this->db->bind(':user_id', $this->user_id);
+    //     $result = $this->db->resultSet();
+
+
+    //     $formatted = [];
+    //     foreach ($result as $row) {
+    //         // Convertir los días disponibles (string "1,2,3" a array)
+    //         $daysArray = explode(',', $row['available_days']);
+    //         $daysStatus = [];
+
+    //         foreach ($daysArray as $day) {
+    //             if (is_numeric($day)) {
+    //                 $daysStatus[$day] = true;
+    //             }
+    //         }
+
+    //         $formatted[$row['service_id']] = [
+    //             'checked' => (bool)$row['is_active'],
+    //             'days' => $daysStatus
+    //         ];
+    //     }
+
+    //     return $formatted;
+    // }
 
 
     public function saveServices($servicesData)
@@ -363,10 +429,6 @@ class Services
                 $this->db->bind(':service_id', $serviceId, PDO::PARAM_INT);
                 $this->db->execute();
                 $exists = $this->db->single()['count'] > 0;
-                // $stmtCheck->bindParam(':user_id', $userId, PDO::PARAM_INT);
-                // $stmtCheck->bindParam(':service_id', $serviceId, PDO::PARAM_INT);
-                // $stmtCheck->execute();
-                // $exists = $stmtCheck->fetch(PDO::FETCH_ASSOC)['count'] > 0;
 
                 if ($exists) {
                     // Actualizar asignación existente
@@ -390,12 +452,6 @@ class Services
                 $this->db->bind(':available_days', $data['available_days']);
                 $this->db->bind(':is_active', $data['is_active'], PDO::PARAM_INT);
                 $this->db->execute();
-                // $stmt = $this->db->prepare($sql);
-                // $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
-                // $stmt->bindParam(':service_id', $serviceId, PDO::PARAM_INT);
-                // $stmt->bindParam(':available_days', $data['available_days']);
-                // $stmt->bindParam(':is_active', $data['is_active'], PDO::PARAM_INT);
-                // $stmt->execute();
             }
 
             $this->db->endTransaction();

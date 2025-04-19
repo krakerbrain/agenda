@@ -41,22 +41,16 @@
 
 <!-- Estilos adicionales -->
 <style>
-    .disabled-day {
-        opacity: 0.5;
-        pointer-events: none;
-    }
+.disabled-day {
+    opacity: 0.5;
+}
 
-    .day {
-        padding: 5px;
-        border-radius: 4px;
-    }
+.day {
+    padding: 5px;
+    border-radius: 4px;
+}
 
-    .day:hover:not(.disabled-day) {
-        background-color: #f8f9fa;
-    }
-
-    .days-container {
-        display: flex;
-        gap: 10px;
-    }
+.day:hover:not(.disabled-day) {
+    background-color: #f8f9fa;
+}
 </style>

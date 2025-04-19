@@ -31,20 +31,21 @@ try {
             } elseif ($action === 'get_services') {
                 $schedules = new Schedules($datosUsuario['company_id'], $user_id);
 
-                // 2. Obtener todos los servicios de la compañía
-                $allServices = $services->getCompanyServices();
+                // 1. Obtener días habilitados por la compañía (configuración global)
+                $companyAvailableDays = $schedules->getCompanyAvailableDays();
 
-                // 3. Obtener servicios asignados al usuario
-                $assignedServices = $services->getUserAssignedServices();
+                // 2. Obtener días de trabajo del usuario específico
+                $userWorkingDays = $schedules->getUserWorkingDays();
 
-                // Obtener días habilitados desde horarios
-                $daysStatus = $schedules->getEnabledDays();
+                // 3. Obtener servicios con disponibilidad combinada
+                $servicesData = $services->getServicesWithUserAvailability(
+                    $companyAvailableDays,
+                    $userWorkingDays
+                );
 
                 echo json_encode([
                     'status' => 'success',
-                    'services' => $allServices,
-                    'assignedServices' => $assignedServices,
-                    'daysStatus' => $daysStatus // Agregar esta línea
+                    'data' => $servicesData
                 ]);
             } else {
                 throw new Exception('Acción no válida');
