@@ -50,18 +50,18 @@ class Schedules
     }
 
     // //getschedulebyday
-    // public function getScheduleByDay($day_id)
-    // {
-    //     $this->db->query("SELECT work_start, work_end, break_start, break_end 
-    //                     FROM company_schedules 
-    //                     WHERE company_id = :company_id
-    //                     AND user_id = :user_id
-    //                     AND day_id = :day_id");
-    //     $this->db->bind(':company_id', $this->company_id);
-    //     $this->db->bind(':user_id', $this->user_id);
-    //     $this->db->bind(':day_id', $day_id);
-    //     return $this->db->single();
-    // }
+    public function getScheduleByDay($day_id)
+    {
+        $this->db->query("SELECT work_start, work_end, break_start, break_end 
+                        FROM company_schedules 
+                        WHERE company_id = :company_id
+                        AND user_id = :user_id
+                        AND day_id = :day_id");
+        $this->db->bind(':company_id', $this->company_id);
+        $this->db->bind(':user_id', $this->user_id);
+        $this->db->bind(':day_id', $day_id);
+        return $this->db->single();
+    }
 
     public function getCompanyAvailableDays()
     {
@@ -230,10 +230,12 @@ class Schedules
         SELECT work_start, work_end 
         FROM company_schedules 
         WHERE company_id = :company_id 
+          AND user_id = :user_id
           AND day_id = :day_of_week 
           AND is_enabled = 1
     ");
         $db->bind(':company_id', $this->company_id);
+        $db->bind(':user_id', $this->user_id);
         $db->bind(':day_of_week', $day_of_week);
 
         $schedule = $db->single();
@@ -241,7 +243,7 @@ class Schedules
         if (!$schedule) {
             return [
                 'success' => false,
-                'message' => 'El día seleccionado no esta habilitado en el horario de la empresa.',
+                'message' => 'El día seleccionado no esta habilitado en el horario de la usuario.',
             ];
         }
 

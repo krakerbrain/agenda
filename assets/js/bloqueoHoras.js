@@ -21,6 +21,7 @@ export function initBloqueoHoras() {
     const allDay = document.getElementById("all-day").checked;
     const startHour = document.getElementById("start-hour").value;
     const endHour = document.getElementById("end-hour").value;
+    const user_id = e.target.form.user_id.value;
 
     if (!blockDate) {
       handleModal("Por favor, seleccione una fecha.");
@@ -32,6 +33,7 @@ export function initBloqueoHoras() {
       all_day: allDay,
       start_hour: allDay ? null : startHour,
       end_hour: allDay ? null : endHour,
+      user_id: user_id,
     };
 
     try {
@@ -48,7 +50,7 @@ export function initBloqueoHoras() {
         // Limpiar formulario
         hourRange.style.display = "none";
         document.getElementById("block-date-form").reset();
-        fetchBlockedDays();
+        fetchBlockedDays(user_id);
       } else {
         handleModal(result.message);
       }
@@ -57,17 +59,24 @@ export function initBloqueoHoras() {
     }
   });
 
-  async function fetchBlockedDays() {
-    const response = await fetch(`${baseUrl}user_admin/controllers/getDeleteBlockedHours.php`);
-    const result = await response.json();
+  async function fetchBlockedDays(user_id = null) {
+    let userIdUrl = user_id !== null ? `?user_id=${user_id}` : "";
+    const response = await fetch(`${baseUrl}user_admin/controllers/getDeleteBlockedHours.php${userIdUrl}`);
+    const { success, data } = await response.json();
 
-    if (result.success) {
-      updateBlockedDatesTable(result.data);
+    if (success) {
+      updateBlockedDatesTable(data);
     } else {
       handleModal(result.message || "Error al obtener los días bloqueados.");
     }
   }
 
+  if (document.getElementById("userSelect")) {
+    document.getElementById("userSelect").addEventListener("change", async function () {
+      const userId = this.value;
+      await fetchBlockedDays(userId);
+    });
+  }
   function updateBlockedDatesTable(blockedDays) {
     const tbody = document.getElementById("blocked-dates-list");
     tbody.innerHTML = ""; // Limpiar la tabla
@@ -95,7 +104,7 @@ export function initBloqueoHoras() {
       tbody.innerHTML += row;
     });
     document.querySelectorAll(".deleteBlockedDay").forEach((button) => {
-      button.addEventListener("click", function () {
+      button.addEventListener("click", function (event) {
         const token = this.getAttribute("data-token");
         deleteBlockedDay(token);
       });
@@ -118,7 +127,8 @@ export function initBloqueoHoras() {
 
       if (result.success) {
         handleModal("Fecha desbloqueada correctamente.");
-        fetchBlockedDays();
+        let user_id = document.querySelector("#userSelect").value;
+        fetchBlockedDays(user_id);
       } else {
         handleModal(result.message);
       }

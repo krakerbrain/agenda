@@ -63,10 +63,10 @@ class Appointments
             // Consulta SQL para insertar un "día bloqueado" como cita especial
             $query = "
             INSERT INTO appointments (
-                company_id,customer_id, date, start_time, end_time, 
+                company_id, user_id, customer_id, date, start_time, end_time, 
                 id_service, status, aviso_reserva, aviso_confirmada, created_at
             ) VALUES (
-                :company_id, :customer_id, :date, :start_time, :end_time, 
+                :company_id, :user_id, :customer_id, :date, :start_time, :end_time, 
                 :id_service, :status, :aviso_reserva, :aviso_confirmada, NOW()
             )
         ";
@@ -76,6 +76,7 @@ class Appointments
 
             // Asignar valores a los parámetros
             $this->db->bind(':company_id', $data['company_id']);
+            $this->db->bind(':user_id', $data['user_id']);
             $this->db->bind(':customer_id', $data['customer_id']);
             $this->db->bind(':date', $data['date']);
             $this->db->bind(':start_time', $data['start_time']);
@@ -114,7 +115,7 @@ class Appointments
     }
 
     // getBlockedDays
-    public function getBlockedDays($company_id)
+    public function getBlockedDays($company_id, $user_id)
     {
 
         $this->db->query('
@@ -126,11 +127,13 @@ class Appointments
         FROM 
             appointments 
         WHERE 
-            company_id = :company_id 
+            company_id = :company_id
+            AND user_id = :user_id  
             AND id_service = 0
             AND (date > CURDATE() OR (date = CURDATE() AND end_time >= NOW()))
     ');
         $this->db->bind(':company_id', $company_id);
+        $this->db->bind(':user_id', $user_id);
         return $this->db->resultSet();
     }
 
@@ -337,7 +340,7 @@ class Appointments
         return $this->db->resultSet();
     }
 
-    public function checkAppointments($company_id, $date, $start_hour, $end_hour)
+    public function checkAppointments($company_id, $user_id, $date, $start_hour, $end_hour)
     {
 
 
@@ -346,6 +349,7 @@ class Appointments
                     SELECT * 
                     FROM appointments 
                     WHERE company_id = :company_id 
+                      AND user_id = :user_id
                       AND DATE(date) = :date
                       AND (
                           (:start_hour BETWEEN start_time AND end_time) OR 
@@ -354,6 +358,7 @@ class Appointments
                       )
         ");
         $this->db->bind(':company_id', $company_id);
+        $this->db->bind(':user_id', $user_id);
         $this->db->bind(':date', $date);
         $this->db->bind(':start_hour', $start_hour);
         $this->db->bind(':end_hour', $end_hour);

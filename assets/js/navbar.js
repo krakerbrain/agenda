@@ -7,12 +7,28 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Cargar la última pestaña seleccionada, o usar la predeterminada
   const lastPage = sessionStorage.getItem("lastPage");
+
   if (lastPage) {
     loadContent(lastPage);
-  } else if (role_id == 1) {
-    loadContent("master_add_company");
   } else {
-    loadContent("dateList");
+    // Buscar el primer link que no sea #logout
+    let defaultLink = null;
+    for (let link of links) {
+      const href = link.id;
+      if (href !== "logout") {
+        defaultLink = href;
+        break;
+      }
+    }
+
+    // Cargar esa pestaña
+    if (defaultLink) {
+      loadContent(defaultLink);
+    } else if (role_id == 1) {
+      loadContent("master_add_company");
+    } else {
+      loadContent("dateList");
+    }
   }
 
   // Configurar los listeners para cada pestaña
@@ -108,6 +124,8 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function logout() {
+    sessionStorage.removeItem("lastPage"); // Limpiar la pestaña guardada
+
     fetch(`${baseUrl}login/logout.php`)
       .then((response) => {
         if (!response.ok) {

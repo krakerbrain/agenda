@@ -2,11 +2,18 @@
 require_once dirname(__DIR__, 2) . '/access-token/seguridad/JWTAuth.php';
 require_once dirname(__DIR__, 2) . '/classes/CompanyManager.php';
 require_once dirname(__DIR__, 2) . '/classes/ConfigUrl.php';
+require_once dirname(__DIR__, 2) . '/classes/Users.php';
 
 $baseUrl = ConfigUrl::get();
 $company = new CompanyManager();
 $auth = new JWTAuth();
 $datosUsuario = $auth->validarTokenUsuario();
+
+$userData = new Users();
+$user_count = $userData->count_company_users($datosUsuario['company_id']);
+if ($user_count > 1) {
+    $users = $userData->get_all_users($datosUsuario['company_id']);
+}
 ?>
 
 <!-- Fechas bloqueadas -->
@@ -18,7 +25,22 @@ $datosUsuario = $auth->validarTokenUsuario();
             <i class="fa fa-circle-question text-primary" style="font-size: 1.5rem;"></i>
         </a>
     </div>
+    <?php if ($user_count > 1 && $datosUsuario['role_id'] == 2) : ?>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="userSelect" class="form-label">Selecciona el usuario</label>
+                <select name="user_id" id="userSelect" class="form-select">
+                    <?php foreach ($users as $user) : ?>
+                        <!-- si datosUsuario['id'] == $user['id'] entonces se selecciona -->
+                        <option value="<?= $user['id'] ?>"
+                            <?= $datosUsuario['role_id'] == $user['role_id'] ? 'selected' : '' ?>>
+                            <?= $user['name'] ?></option>
+                    <?php endforeach; ?>
 
+                </select>
+            </div>
+        </div>
+    <?php endif; ?>
     <!-- Selección de fecha y horas -->
     <div class="mb-3">
         <label for="block-date" class="form-label">Seleccionar Fecha</label>

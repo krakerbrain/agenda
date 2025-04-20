@@ -17,7 +17,6 @@ if ($user_count > 1) {
 ?>
 
 <div class="container my-5">
-    <!-- creamos un select con un label que estara al lado del selct que diga selecicone al ussuario este select solo estara disponible para el admin -->
     <?php if ($user_count > 1 && $datosUsuario['role_id'] == 2) : ?>
         <div class="row mb-3">
             <div class="col-md-6">

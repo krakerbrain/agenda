@@ -15,12 +15,13 @@ try {
     // Validar token del usuario
     $datosUsuario = $auth->validarTokenUsuario();
     $company_id = $datosUsuario['company_id'];
+    $user_id = $_GET['user_id'] ?? $datosUsuario['user_id'];
 
     $appointments = new Appointments();
 
     if ($method === 'GET') {
         // Obtener los días bloqueados desde la base de datos
-        $blockedDays = $appointments->getBlockedDays($company_id);
+        $blockedDays = $appointments->getBlockedDays($company_id, $user_id);
 
         // Retornar los datos al frontend
         echo json_encode(['success' => true, 'data' => $blockedDays]);
