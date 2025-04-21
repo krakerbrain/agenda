@@ -10,26 +10,16 @@
     <!-- PASO 1 -->
     <div id="step1" class="step">
         <h4 class="text-center mb-4 pass-title">Paso 1: Escoge el Servicio</h4>
-        <!-- crear select para prestador de servicio -->
-        <?php if (count($userProviders) > 1) : ?>
-            <div class="mb-3">
-                <label for="provider" class="form-label">Prestador de servicio:</label>
-                <select id="provider" name="provider" class="form-select" required>
-                    <option value="" selected>Selecciona un prestador de servicio</option>
-                    <?php foreach ($userProviders as $provider) : ?>
-                        <option value="<?php echo htmlspecialchars($provider['id']); ?>">
-                            <?php echo htmlspecialchars($provider['name']); ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-        <?php else :  ?>
-            <input type="hidden" name="provider_owner" id="provider_owner" value="true">
-            <input type="hidden" name="provider" id="provider"
-                value="<?php echo htmlspecialchars($userProviders[0]['id']); ?>">
-        <?php endif; ?>
         <div class="mb-3">
             <label for="service" class="form-label">Servicio:</label>
             <select id="service" name="service" class="form-select" required>
+                <option value="" selected>Selecciona un servicio</option>
+                <?php foreach ($services as $service) : ?>
+                    <option value="<?php echo htmlspecialchars($service['id']); ?>"
+                        data-observation="<?php echo htmlspecialchars($service['observations']); ?>"
+                        data-duration="<?php echo htmlspecialchars($service['duration']); ?>">
+                        <?php echo htmlspecialchars($service['name']); ?></option>
+                <?php endforeach; ?>
             </select>
             <input type="hidden" name="service_duration" id="service_duration" value>
         </div>
@@ -53,23 +43,12 @@
     <!-- PASO 2 -->
     <div id="step2" class="step d-none">
         <h4 class="text-center mb-4 pass-title">Paso 2: Escoge Fecha y Hora</h4>
-        <div class="mb-3">
-            <label for="date" class="form-label">Selecciona la fecha:</label>
-            <input type="date" id="date" name="date" class="form-control" required>
-        </div>
-        <div class="mb-3">
-            <label for="time" class="form-label">Selecciona el horario:</label>
-            <input type="hidden" name="schedule_mode" id="schedule_mode"
-                value="<?php echo htmlspecialchars($company['schedule_mode']); ?>">
 
-            <!-- Contenedor para los botones de hora -->
-            <div id="time" class="time-buttons">
-                <!-- Los botones se generarán dinámicamente aquí -->
-            </div>
-
-            <!-- Campo oculto para almacenar la hora seleccionada -->
-            <input type="hidden" id="selected_time" name="time">
-        </div>
+        <div id="providers-dates-container"></div>
+        <!-- Campo oculto para almacenar la hora seleccionada -->
+        <input type="hidden" id="selected_time" name="time">
+        <input type="hidden" name="schedule_mode" id="schedule_mode"
+            value="<?php echo htmlspecialchars($company['schedule_mode']); ?>">
         <button type="button" class="btn btn-anterior" onclick="showStep(1)">Anterior</button>
         <button type="button" class="btn btn-siguiente" onclick="showStep(3)">Siguiente</button>
     </div>
@@ -79,6 +58,7 @@
         <input type="hidden" name="company_id" id="company_id" value="<?php echo htmlspecialchars($company['id']); ?>">
         <input type="hidden" name="authenticated" id="authenticated"
             value="<?php echo $authenticated ? 'true' : 'false'; ?>">
+        <input type="hidden" id="auto_time_selected" value="0">
         <!-- Checkbox para editar (solo visible si $customerData existe) -->
         <?php if ($customerData): ?>
             <div class="mb-3 form-check">

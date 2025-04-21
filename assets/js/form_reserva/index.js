@@ -28,29 +28,85 @@ function showStep(step) {
   }
 }
 
-if (document.getElementById("provider_owner") && document.getElementById("provider_owner").value === "true") {
-  getServices();
-}
-
-// crear change para prestador de servicio
-document.getElementById("provider").addEventListener("change", function () {
-  getServices();
-});
-
 document.getElementById("service").addEventListener("change", function (event) {
   updateServiceDuration();
   getObservation("service");
   getServiceCategory(event.target.value);
-  getAvailableDays();
+  // getAvailableDays();
+  getProvidersForService(event.target.value); // Nueva función para obtener proveedores
 });
 
 document.getElementById("category").addEventListener("change", function () {
   getObservation("category");
 });
 
-document.getElementById("date").addEventListener("change", function () {
-  fetchAvailableTimes();
-});
+// document.getElementById("date").addEventListener("change", function () {
+//   fetchAvailableTimes();
+// });
+
+function getProvidersForService(serviceId) {
+  const BASE_URL = `${baseUrl}reservas/controller/`;
+  const url = BASE_URL + "get_service_providers.php"; // Necesitarás crear este endpoint
+  const companyId = document.getElementById("company_id").value;
+
+  fetch(url, {
+    method: "POST",
+    body: JSON.stringify({ service_id: serviceId, company_id: companyId }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.success) {
+        const providers = data.providers;
+        renderProviderDateInputs(providers);
+      } else {
+        console.error("Error:", data.message);
+      }
+    })
+    .catch((error) => console.error("Error:", error));
+}
+
+function renderProviderDateInputs(providers) {
+  const container = document.getElementById("providers-dates-container");
+
+  // Limpiar contenedor primero
+  container.innerHTML = "";
+
+  providers.forEach((provider) => {
+    // Crear el HTML string para cada proveedor
+    const providerHTML = `
+      <div class="provider-section mb-4">
+        <div class="d-flex align-items-center mb-2">
+          <div class="d-flex align-items-center me-3">
+            <img src="${provider.photo || "https://randomuser.me/api/portraits/men/33.jpg"}" 
+                 alt="${provider.name}" 
+                 class="rounded-circle me-2" 
+                 width="50" 
+                 height="50">
+            <strong>${provider.name}</strong>
+          </div>
+          <input type="text" 
+                 id="date-${provider.id}" 
+                 name="date-${provider.id}" 
+                 class="form-control provider-date-input" 
+                 placeholder="Selecciona fecha" 
+                 required>
+        </div>
+        <div class="time-buttons mb-3" id="time-buttons-${provider.id}">
+          <!-- Los botones de horarios se llenarán dinámicamente después de seleccionar fecha -->
+        </div>
+      </div>
+    `;
+
+    // Insertar el HTML en el contenedor
+    container.insertAdjacentHTML("beforeend", providerHTML);
+
+    // Llamar a getAvailableDays para este proveedor
+    getAvailableDays(provider.id, `date-${provider.id}`);
+  });
+}
 
 function updateServiceDuration() {
   const serviceSelect = document.getElementById("service");
@@ -98,36 +154,6 @@ function getObservation(id) {
   }
 }
 
-async function getServices() {
-  try {
-    let url = `${baseUrl}reservas/controller/getServices.php`;
-    let data = {
-      company_id: document.getElementById("company_id").value,
-      provider_id: document.getElementById("provider").value,
-    };
-    const response = await fetch(url, {
-      method: "POST",
-      body: JSON.stringify(data),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    const { success, services } = await response.json();
-
-    let select = document.getElementById("service");
-    if (success) {
-      let serviceOption = '<option value="" selected>Selecciona un servicio</option>';
-      services.forEach(function (service) {
-        serviceOption += `<option value="${service.id}" data-observation="${service.service_description}" data-duration="${service.duration}">${service.service_name}</option>`;
-      });
-      select.innerHTML = serviceOption;
-    }
-  } catch (error) {
-    console.error("Error:", error);
-  }
-}
-
 async function getServiceCategory(serviceId) {
   try {
     let url = `${baseUrl}reservas/controller/getCategories.php`;
@@ -164,18 +190,18 @@ async function getServiceCategory(serviceId) {
   }
 }
 
-function getAvailableDays() {
+function getAvailableDays(user_id, dateDomId) {
   const BASE_URL = `${baseUrl}reservas/controller/`;
   const calendarDaysAvailable = company_days_available;
   const serviceId = document.getElementById("service").value;
   const companyId = document.getElementById("company_id").value;
-  const providerId = document.getElementById("provider").value;
   const url = BASE_URL + "get_days_availability.php";
 
   const data = {
     service_id: serviceId,
+    // calendar_days_available: calendarDaysAvailable,
     company_id: companyId,
-    provider: providerId,
+    provider: user_id,
   };
 
   // Función anidada para registrar eventos en fechas deshabilitadas
@@ -215,7 +241,7 @@ function getAvailableDays() {
       if (data.success) {
         const availableDates = data.available_days;
 
-        flatpickr("#date", {
+        flatpickr(`#${dateDomId}`, {
           locale: "es",
           enableTime: false,
           altInput: true,
@@ -244,6 +270,10 @@ function getAvailableDays() {
             },
           ],
         });
+
+        document.getElementById(dateDomId).addEventListener("change", function () {
+          fetchAvailableTimes(user_id, this.value); // Pasamos user_id y la fecha seleccionada
+        });
       } else {
         console.error("Error:", data.message);
       }
@@ -251,13 +281,12 @@ function getAvailableDays() {
     .catch((error) => console.error("Error:", error));
 }
 
-async function fetchAvailableTimes() {
+async function fetchAvailableTimes(user_id, date) {
   const BASE_URL = `${baseUrl}reservas/controller/`;
-  const timeInput = document.getElementById("time");
+  const timeInput = document.getElementById("time-buttons-" + user_id);
   const companyID = document.getElementById("company_id").value;
-  const providerID = document.getElementById("provider").value;
 
-  const date = document.getElementById("date").value;
+  // const date = document.getElementById("date").value;
   const serviceId = document.getElementById("service").value;
   const scheduleMode = document.getElementById("schedule_mode").value === "blocks" ? "get_available_hours_blocks.php" : "get_available_hours_free.php";
 
@@ -272,7 +301,7 @@ async function fetchAvailableTimes() {
           date: date,
           service_id: serviceId,
           company_id: companyID,
-          provider: providerID,
+          provider: user_id,
         }),
       });
 
@@ -283,13 +312,17 @@ async function fetchAvailableTimes() {
       if (success) {
         if (available_times.length > 0) {
           let availableTimesButtons = "";
+          const autoSelectedFlag = document.getElementById("auto_time_selected");
 
           available_times.forEach((time, index) => {
-            if (index === 0) {
+            // Solo marcar como selected-time si es el primer elemento Y no se ha marcado antes
+            const shouldMark = index === 0 && autoSelectedFlag.value === "0";
+            if (shouldMark) {
               document.getElementById("selected_time").value = time;
+              autoSelectedFlag.value = "1";
             }
             //si solo hay uno agregar al boton la  clase selected_time
-            availableTimesButtons += `<button type="button" class="btn btn-outline-dark btn-light mb-2 me-2 available-time ${index === 0 ? "selected-time" : ""}" data-time="${time}">${time}</button>`;
+            availableTimesButtons += `<button type="button" class="btn btn-outline-dark btn-light mb-2 me-2 available-time ${shouldMark ? "selected-time" : ""}" data-time="${time}">${time}</button>`;
           });
 
           // Insert the buttons into the DOM
@@ -335,7 +368,6 @@ document.getElementById("appointmentForm").addEventListener("submit", function (
 function showConfirmationModal(formData) {
   // Extraer los datos del formulario
 
-  const provider = document.getElementById("provider").selectedOptions != undefined ? document.getElementById("provider").selectedOptions[0].text : null;
   const service = document.getElementById("service").selectedOptions[0].text;
   const dateRaw = document.getElementById("date").value;
   const date = formatDate(dateRaw);
@@ -347,8 +379,7 @@ function showConfirmationModal(formData) {
   // Crear el contenido del modal
   const confirmationContent = `
        <p style="margin-bottom: 0.5rem;">Hola <strong>${name}</strong>,</p>
-        <p style="margin-bottom: 0.5rem;">Estos son los detalles de tu reserva</p>
-       <p style="margin-bottom: 0.5rem;">${provider !== null ? `<strong>Profesional:</strong> ${provider}` : ""}</p>
+        <p style="margin-bottom: 0.5rem;">Estos son los detalles de tu reserva:</p>
         <p style="margin-bottom: 0.5rem;"><strong>Servicio:</strong> ${service}</p>
         <p style="margin-bottom: 0.5rem;"><strong>Fecha:</strong> ${date}</p>
         <p style="margin-bottom: 0.5rem;"><strong>Hora:</strong> ${time}</p>

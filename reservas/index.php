@@ -32,8 +32,8 @@ $controller = new CompanyController();
 // Obtener los datos de la empresa
 $data = $controller->getCompanyData($url);
 $company = $data['company'];
-$userProviders = $data['userProviders'];
 $socialNetworks = $data['socialNetworks'];
+$services = $data['services'];
 $style = $data['style'];
 
 // Si se proporciona un customer_id, obtener los datos del cliente

@@ -18,6 +18,13 @@ class CompanyModel
         return $this->db->single();
     }
 
+    public function getServicesByCompanyId($companyId)
+    {
+        $this->db->query("SELECT id, observations, name, duration FROM services WHERE company_id = :company_id AND is_enabled = 1");
+        $this->db->bind(':company_id', $companyId);
+        return $this->db->resultSet();
+    }
+
     public function getServicesByCompanyAndUser($companyId, $userId)
     {
         $this->db->query("SELECT s.id, s.observations as service_description, s.name as service_name, s.duration FROM services s

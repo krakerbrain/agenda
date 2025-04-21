@@ -531,4 +531,19 @@ class Services
             'minutes' => $remainingMinutes
         ];
     }
+
+    // para get_service_providers.php
+    public function getServiceWithDays($serviceId)
+    {
+        $sql = "SELECT id, name, available_days 
+            FROM services 
+            WHERE id = :service_id 
+            AND company_id = :company_id";
+
+        $this->db->query($sql);
+        $this->db->bind(':service_id', $serviceId);
+        $this->db->bind(':company_id', $this->company_id);
+
+        return $this->db->single();
+    }
 }

@@ -230,4 +230,23 @@ class Users
         $this->db->bind(':company_id', $company_id);
         return (int)$this->db->singleValue(); // Convertimos a entero el conteo
     }
+
+    // para get_service_providers.php
+    public function getProvidersByService($serviceId, $companyId)
+    {
+        $sql = "SELECT u.id, u.name, u.email, 
+                     us.available_days as provider_days, 
+                     us.is_active as provider_active
+              FROM users u
+              JOIN user_services us ON u.id = us.user_id
+              WHERE us.service_id = :service_id
+              AND u.company_id = :company_id
+              ORDER BY u.name";
+
+        $this->db->query($sql);
+        $this->db->bind(':service_id', $serviceId);
+        $this->db->bind(':company_id', $companyId);
+
+        return $this->db->resultSet();
+    }
 }
