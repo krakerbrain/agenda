@@ -55,7 +55,6 @@ class CompanyModel
         return $this->db->resultSet();
     }
 
-    // $sql = $conn->prepare("SELECT calendar_mode, fixed_start_date FROM companies WHERE id = :company_id AND is_active = 1"); crear funcion para query
     public function getCompanyCalendarData($companyId)
     {
         $this->db->query("SELECT calendar_mode, fixed_start_date, calendar_days_available, fixed_duration FROM companies WHERE id = :company_id AND is_active = 1");
@@ -70,12 +69,12 @@ class CompanyModel
         return $this->db->singleValue();
     }
 
-    public function getServiceProvidersByCompanyId($companyId)
+    public function getServiceProvidersByCompanyIdCount($companyId)
     {
         try {
-            $this->db->query("SELECT id, name FROM users WHERE company_id = :company_id");
+            $this->db->query("SELECT count(*) FROM users WHERE company_id = :company_id");
             $this->db->bind(':company_id', $companyId);
-            return $this->db->resultSet();
+            return $this->db->singleValue();
         } catch (PDOException $e) {
             // Aquí puedes manejar el error, por ejemplo, registrarlo en un log
             error_log("Error al obtener los proveedores de usuario: " . $e->getMessage());

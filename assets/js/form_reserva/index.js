@@ -9,7 +9,8 @@ function validarPaso(step) {
     }
     return service !== "";
   } else if (step === 3) {
-    const date = document.getElementById("date").value;
+    const user_id = document.getElementById("selected_user_id").value;
+    const date = document.getElementById("date-" + user_id).value;
     const time = document.getElementById("selected_time").value;
     return date !== "" && time !== "";
   }
@@ -70,6 +71,7 @@ function getProvidersForService(serviceId) {
 
 function renderProviderDateInputs(providers) {
   const container = document.getElementById("providers-dates-container");
+  const providers_count = document.getElementById("providers_count").value;
 
   // Limpiar contenedor primero
   container.innerHTML = "";
@@ -77,25 +79,27 @@ function renderProviderDateInputs(providers) {
   providers.forEach((provider) => {
     // Crear el HTML string para cada proveedor
     const providerHTML = `
-      <div class="provider-section mb-4">
-        <div class="d-flex align-items-center mb-2">
-          <div class="d-flex align-items-center me-3">
+      <div class="provider-section provider-${provider.id}} " data-provider-name="${provider.name}">
+        <div class="provider-container d-flex">
+          <div class="${providers_count === "1" ? "d-none" : "d-flex col-4 col-md-3 flex-column align-items-center pointer"}">
             <img src="${provider.photo || "https://randomuser.me/api/portraits/men/33.jpg"}" 
                  alt="${provider.name}" 
-                 class="rounded-circle me-2" 
-                 width="50" 
-                 height="50">
-            <strong>${provider.name}</strong>
+                 class="rounded-circle mb-1" 
+                 width="60" 
+                 height="60">
+            <span class="provider-name text-center text-decoration-underline">${provider.name}</span>
           </div>
-          <input type="text" 
-                 id="date-${provider.id}" 
-                 name="date-${provider.id}" 
-                 class="form-control provider-date-input" 
-                 placeholder="Selecciona fecha" 
-                 required>
-        </div>
-        <div class="time-buttons mb-3" id="time-buttons-${provider.id}">
-          <!-- Los botones de horarios se llenarán dinámicamente después de seleccionar fecha -->
+          <div class="${providers_count === "1" ? "col-12" : "col-8 col-md-9"}">
+            <input type="text" 
+                  id="date-${provider.id}" 
+                  name="date-${provider.id}" 
+                  class="form-control provider-date-input mb-2" 
+                  placeholder="Selecciona la fecha" 
+                  required>
+                  <!-- Los botones de horarios se llenarán dinámicamente después de seleccionar fecha -->
+                  <label for="time-buttons" class="time-btns-label-${provider.id} form-label d-none">Selecciona una hora:</label>
+            <div class="time-buttons d-md-flex" id="time-buttons-${provider.id}"></div>
+          </div>
         </div>
       </div>
     `;
@@ -311,6 +315,7 @@ async function fetchAvailableTimes(user_id, date) {
 
       if (success) {
         if (available_times.length > 0) {
+          document.querySelector(".time-btns-label-" + user_id).classList.remove("d-none");
           let availableTimesButtons = "";
           const autoSelectedFlag = document.getElementById("auto_time_selected");
 
@@ -322,7 +327,9 @@ async function fetchAvailableTimes(user_id, date) {
               autoSelectedFlag.value = "1";
             }
             //si solo hay uno agregar al boton la  clase selected_time
-            availableTimesButtons += `<button type="button" class="btn btn-outline-dark btn-light mb-2 me-2 available-time ${shouldMark ? "selected-time" : ""}" data-time="${time}">${time}</button>`;
+            availableTimesButtons += `<button type="button" class="btn btn-outline-dark btn-light mb-2 me-1 available-time ${
+              shouldMark ? "selected-time" : ""
+            }" data-time="${time}" data-user-id="${user_id}">${time}</button>`;
           });
 
           // Insert the buttons into the DOM
@@ -337,6 +344,8 @@ async function fetchAvailableTimes(user_id, date) {
               button.classList.add("selected-time");
               // Update hidden input field with selected time value (for form submission)
               document.getElementById("selected_time").value = button.getAttribute("data-time");
+              document.getElementById("selected_user_id").value = button.getAttribute("data-user-id");
+              document.getElementById("selected_date").value = document.querySelector("#date-" + user_id).value;
             });
           });
         } else {
@@ -367,19 +376,22 @@ document.getElementById("appointmentForm").addEventListener("submit", function (
 
 function showConfirmationModal(formData) {
   // Extraer los datos del formulario
-
   const service = document.getElementById("service").selectedOptions[0].text;
-  const dateRaw = document.getElementById("date").value;
+  const user_id = document.getElementById("selected_user_id").value;
+  const userName = document.querySelector(".provider-" + user_id).getAttribute("data-provider-name");
+  const dateRaw = document.getElementById("date-" + user_id).value;
   const date = formatDate(dateRaw);
   const time = document.getElementById("selected_time").value;
   const name = document.getElementById("name").value;
   const phone = document.getElementById("phone").value;
   const mail = document.getElementById("mail").value;
+  const providers_count = document.getElementById("providers_count").value;
 
   // Crear el contenido del modal
   const confirmationContent = `
        <p style="margin-bottom: 0.5rem;">Hola <strong>${name}</strong>,</p>
-        <p style="margin-bottom: 0.5rem;">Estos son los detalles de tu reserva:</p>
+        <p style="margin-bottom: 0.5rem;">Estos son los detalles de tu reserva ${providers_count > 1 ? "con:" : ":"}</p>
+        ${providers_count > 1 ? `<p style="margin-bottom: 0.5rem;">${userName}</p>` : ""}
         <p style="margin-bottom: 0.5rem;"><strong>Servicio:</strong> ${service}</p>
         <p style="margin-bottom: 0.5rem;"><strong>Fecha:</strong> ${date}</p>
         <p style="margin-bottom: 0.5rem;"><strong>Hora:</strong> ${time}</p>

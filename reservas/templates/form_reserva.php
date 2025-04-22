@@ -44,11 +44,15 @@
     <div id="step2" class="step d-none">
         <h4 class="text-center mb-4 pass-title">Paso 2: Escoge Fecha y Hora</h4>
 
-        <div id="providers-dates-container"></div>
+        <div id="providers-dates-container" class="mb-3"></div>
         <!-- Campo oculto para almacenar la hora seleccionada -->
+        <input type="hidden" id="selected_date" name="date">
         <input type="hidden" id="selected_time" name="time">
         <input type="hidden" name="schedule_mode" id="schedule_mode"
             value="<?php echo htmlspecialchars($company['schedule_mode']); ?>">
+        <!-- input user_id -->
+        <input type="hidden" name="providers_count" id="providers_count" value="<?php echo $servicesProvidersCount; ?>">
+        <input type="hidden" name="provider" id="selected_user_id">
         <button type="button" class="btn btn-anterior" onclick="showStep(1)">Anterior</button>
         <button type="button" class="btn btn-siguiente" onclick="showStep(3)">Siguiente</button>
     </div>

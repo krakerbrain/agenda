@@ -97,3 +97,17 @@ hay que cmabiar la clave foranea de company_integrations para que sea on cascade
 se agrega select de usuarios para el admin quien al hacer change permitira que se muestren los distintos horarios y pueda modificarlos
 se hara lo mismo con los servicios
 luego hacer que usarios normales no puedan modificar sus horarios ni servicios (definir si puede verlos o se bloquean)
+
+cuando se escoja el usaurio, la fecha y hora, determinar que usario se selecciona ✔
+agregar ver mas info del provider y mejorar estilos ✔
+se mejoraron los estilos pero hay que agregar el modal con la info y definir como y que se va a mostrar
+revisar por que el calendario se abre de nuevo cuando cambio de pagina a veces
+agregar en creacion de usaurio que se agregue foto
+mas info del usuario deberia agregarse un modal para que lo muestre
+quiza sea buena idea ir mostrando el proceso de llenado del formulario, es decir, en el paso 2 mostrar el servicio que se escogio
+en el 3 mostrar el provider y la hora y la fecha y ya al final mostrar el modal con toda la data
+definir que se puede mostrar a un usuario empleado, por ahora solo tengo la lista de citas y los clientes y nada mas
+
+en la lista de citas confirmadas creo que es mejor ordenarlas en orden ascendente
+si elimino una incidencia y el cliente no tiene mas no se actualiza la tabla
+cuando cambio la fecha el estiulo de selected time no esta funcionando
