@@ -155,11 +155,12 @@ class Users
     {
         // Consulta base
         $query = 'UPDATE users SET 
-                  name = :name, 
-                  email = :email, 
+        name = :name, 
+        email = :email, 
                   role_id = :role_id, 
                   description = :description, 
-                  updated_at = NOW()';
+                  updated_at = NOW(),
+                  token_sha256 = :token';
 
         // Agregar foto si está presente
         if (!empty($data['url_pic'])) {
@@ -169,7 +170,6 @@ class Users
         $query .= ' WHERE id = :id AND company_id = :company_id';
 
         $this->db->query($query);
-
         // Bind de parámetros obligatorios
         $this->db->bind(':id', $data['id']);
         $this->db->bind(':company_id', $data['company_id']);
@@ -177,6 +177,9 @@ class Users
         $this->db->bind(':email', $data['email']);
         $this->db->bind(':role_id', $data['role_id']);
         $this->db->bind(':description', $data['description'] ?? null);
+
+        $token = hash('sha256', $data['username'] . $data['email']);
+        $this->db->bind(':token', $token);
 
         // Bind opcional de la foto
         if (!empty($data['url_pic'])) {

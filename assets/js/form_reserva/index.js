@@ -79,7 +79,7 @@ function renderProviderDateInputs(providers) {
   providers.forEach((provider) => {
     // Crear el HTML string para cada proveedor
     const providerHTML = `
-      <div class="provider-section provider-${provider.id}} " data-provider-name="${provider.name}">
+      <div class="provider-section provider-${provider.id}" data-provider-name="${provider.name}">
         <div class="provider-container d-flex">
           <div class="${providers_count === "1" ? "d-none" : "d-flex col-4 col-md-3 flex-column align-items-center pointer"}">
             <img src="${baseUrl}${provider.url_pic || "assets/img/empty_user.png"}" 
