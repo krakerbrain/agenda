@@ -19,28 +19,74 @@ export function initAddUser() {
   loadUsers();
 
   function getUsers(users) {
-    const usersTable = document.getElementById("usersTable");
-    usersTable.innerHTML = "";
+    const usersContainer = document.getElementById("usersContainer");
+    usersContainer.innerHTML = "";
+
     users.forEach((user) => {
-      usersTable.innerHTML += `
-        <tr>
-          <td>${user.name}</td>
-          <td>${user.email}</td>
-          <td>${user.role_type}</td>
-          <td>
-            <button class="btn btn-danger remove-user" data-id="${user.id}">Eliminar</button>
-          </td>
-        </tr>
-      `;
+      const userPhoto = user.url_pic || "assets/img/empty_user.png";
+
+      usersContainer.innerHTML += `
+        <div class="col-12 mb-4">
+            <div class="card shadow-sm">
+                <div class="row g-0">
+                    <!-- Foto -->
+                    <div class="col-md-2 d-flex align-items-center justify-content-center p-3 bg-light">
+                        <img src="${baseUrl}${userPhoto}" class="img-fluid rounded-circle" style="width: 80px; height: 80px; object-fit: cover;" alt="User photo">
+                    </div>
+                    
+                    <!-- Datos -->
+                    <div class="col-md-10">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h5 class="card-title mb-1">${user.name}</h5>
+                                    <p class="text-muted small mb-1">
+                                        <i class="fas fa-envelope me-2"></i>${user.email}
+                                    </p>
+                                    <p class="text-muted small">
+                                        <i class="fas fa-user-tag me-2"></i>${user.role_type}
+                                    </p>
+                                </div>
+                                <div>
+                                    <button class="btn btn-sm btn-outline-primary edit-user me-2" data-id="${user.id}">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger remove-user" data-id="${user.id}">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            ${
+                              user.description
+                                ? `
+                            <div class="mt-2 pt-2 border-top">
+                                <p class="card-text">${user.description}</p>
+                            </div>
+                            `
+                                : ""
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        `;
     });
-    if (users.length > 0) {
-      document.querySelectorAll(".remove-user").forEach((button) => {
-        button.addEventListener("click", (e) => {
-          const userId = e.target.dataset.id;
-          deleteUser(userId);
-        });
+
+    // Event listeners para botones
+    document.querySelectorAll(".remove-user").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        deleteUser(e.target.closest("button").dataset.id);
       });
-    }
+    });
+
+    document.querySelectorAll(".edit-user").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        const userId = e.target.closest("button").dataset.id;
+        loadUserForEdit(userId);
+      });
+    });
   }
 
   async function get_role_select() {
@@ -62,6 +108,99 @@ export function initAddUser() {
     } catch (error) {
       console.error(error);
     }
+  }
+
+  // fetch(`${baseUrl}api/getUserById.php?id=${userId}`)
+  // .then((response) => response.json())
+  // .then((user) => {
+  //   // Llenar el formulario
+  //   document.getElementById("user_id").value = user.id;
+  //   document.getElementById("username").value = user.name;
+  //   document.getElementById("correo").value = user.email;
+  //   document.getElementById("descripcion").value = user.description || "";
+
+  //   // Seleccionar el rol
+  //   const roleSelect = document.getElementById("role_id");
+  //   if (roleSelect) {
+  //     for (let i = 0; i < roleSelect.options.length; i++) {
+  //       if (roleSelect.options[i].value == user.role_id) {
+  //         roleSelect.selectedIndex = i;
+  //         break;
+  //       }
+  //     }
+  //   }
+
+  //   // Cambiar el texto del botón
+  //   document.getElementById("saveUser").querySelector(".button-text").textContent = "Actualizar Usuario";
+
+  //   // Mostrar botón de cancelar
+  //   document.getElementById("cancelEdit").classList.remove("d-none");
+
+  //   // Desplazar al formulario
+  //   document.getElementById("addUserForm").scrollIntoView({ behavior: "smooth" });
+  // })
+  // .catch((error) => {
+  //   console.error("Error:", error);
+  //   alert("Error al cargar usuario para edición");
+  // });
+
+  async function loadUserForEdit(userId) {
+    try {
+      const response = await fetch(`${baseUrl}user_admin/controllers/users.php?id=${userId}&action=getUserForEdit`, {
+        method: "GET",
+      });
+
+      const { success, data } = await response.json();
+
+      if (success) {
+        const user = data;
+        const userForm = document.getElementById("addUserForm");
+        const profileImg = user.url_pic || "assets/img/empty_user.png";
+        userForm.querySelector("#profilePreview").src = `${baseUrl}${profileImg}`;
+        userForm.querySelector("#username").value = user.name;
+        userForm.querySelector("#correo").value = user.email;
+        document.querySelector("#passwordGroup").classList.add("d-none");
+        document.querySelector("#confirmPasswordGroup").classList.add("d-none");
+        userForm.querySelector("#descripcion").value = user.description || "";
+        userForm.querySelector("#user_id").value = user.id;
+        userForm.querySelector("#role_id").value = user.role_id;
+        const roleSelect = document.getElementById("role_id");
+        if (roleSelect) {
+          for (let i = 0; i < roleSelect.options.length; i++) {
+            if (roleSelect.options[i].value == user.role_id) {
+              roleSelect.selectedIndex = i;
+              break;
+            }
+          }
+        }
+        // Cambiar el texto del botón
+        document.getElementById("addUser").querySelector(".button-text-spinner").textContent = "Actualizar Usuario";
+
+        // Mostrar botón de cancelar
+        document.getElementById("cancelEdit").classList.remove("d-none");
+
+        // Desplazar al formulario
+        document.getElementById("addUserForm").scrollIntoView({ behavior: "smooth" });
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Error al cargar usuario para edición");
+    }
+  }
+
+  document.getElementById("cancelEdit").addEventListener("click", function () {
+    resetUserForm();
+  });
+
+  function resetUserForm() {
+    document.getElementById("addUserForm").reset();
+    document.getElementById("user_id").value = "";
+    document.querySelector("#profilePreview").src = `${baseUrl}assets/img/empty_user.png`;
+    document.querySelector("#passwordGroup").classList.remove("d-none");
+    document.querySelector("#confirmPasswordGroup").classList.remove("d-none");
+    document.getElementById("addUser").querySelector(".button-text-spinner").textContent = "Agregar Usuario";
+    document.getElementById("cancelEdit").classList.add("d-none");
+    // También puedes limpiar la previsualización de la foto si es necesario
   }
 
   async function deleteUser(id) {
@@ -94,7 +233,9 @@ export function initAddUser() {
 
     try {
       const formData = new FormData(this);
-      const response = await fetch(`${baseUrl}login/registra_usuario.php`, {
+      const userId = document.getElementById("user_id").value;
+      const controller = userId ? `updateUser.php` : `add_user_controller.php`;
+      const response = await fetch(`${baseUrl}user_admin/controllers/${controller}`, {
         method: "POST",
         body: formData,
       });
@@ -103,7 +244,7 @@ export function initAddUser() {
 
       if (data.success) {
         // Éxito: limpiar formulario y mostrar mensaje
-        this.reset();
+        resetUserForm();
         alert(data.message || "Usuario agregado exitosamente");
         loadUsers();
       } else {
@@ -166,7 +307,7 @@ export function initAddUser() {
   function displaySpinner(id, show) {
     const button = document.getElementById(id);
     const spinner = button.querySelector(".spinner-border");
-    const buttonText = button.querySelector(".button-text");
+    const buttonText = button.querySelector(".button-text-spinner");
     const textBtn = id === "addCompany" ? "Agregar Empresa" : "Agregar Usuario";
     if (!show) {
       spinner.classList.add("d-none");
@@ -179,6 +320,16 @@ export function initAddUser() {
     }
   }
 
+  document.getElementById("profile_picture").addEventListener("change", function (event) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        document.getElementById("profilePreview").src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  });
   const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
   const popoverList = [...popoverTriggerList].map((popoverTriggerEl) => new bootstrap.Popover(popoverTriggerEl));
 }

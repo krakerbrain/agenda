@@ -12,8 +12,8 @@ class Users
     public function add_user($data)
     {
         try {
-            $this->db->query('INSERT INTO users (company_id, name, email, password, role_id, token_sha256, created_at) 
-                        VALUES (:company_id, :username, :email, :password, :role_id, :token, NOW())');
+            $this->db->query('INSERT INTO users (company_id, name, email, password, role_id, token_sha256, created_at, url_pic, description) 
+                        VALUES (:company_id, :username, :email, :password, :role_id, :token, NOW(), :url_pic, :description)');
 
             $this->db->bind(':company_id', $data['company_id']);
             $this->db->bind(':username', $data['username']);
@@ -21,6 +21,8 @@ class Users
             $this->db->bind(':password', $data['password']);
             $this->db->bind(':role_id', $data['role_id']);
             $this->db->bind(':token', $data['token']);
+            $this->db->bind(':url_pic', $data['url_pic']);
+            $this->db->bind(':description', $data['description']);
 
             if ($this->db->execute()) {
                 return [
@@ -67,7 +69,9 @@ class Users
             'password' => password_hash($data['password'], PASSWORD_BCRYPT, ['cost' => 7]),
             'company_id' => $data['company_id'],
             'role_id' => $data['role_id'],
-            'token' => hash('sha256', $data['username'] . $data['email'])
+            'token' => hash('sha256', $data['username'] . $data['email']),
+            'url_pic' => $data['url_pic'] ?? null,
+            'description' => $data['description'] ?? null
         ];
 
         // Insertar y retornar resultado completo
@@ -110,11 +114,10 @@ class Users
     public function get_users($company_id)
     {
 
-        $this->db->query('SELECT u.id, u.name, u.email, ur.type as role_type FROM users u
+        $this->db->query('SELECT u.id, u.name, u.email, u.url_pic, u.description, ur.type as role_type FROM users u
                             JOIN user_role ur 
                             ON u.role_id = ur.id
                             WHERE u.company_id = :company
-                            AND ur.id > 2 
                             ORDER BY u.role_id ASC');
         $this->db->bind(':company', $company_id);
         return $this->db->resultSet();
@@ -129,13 +132,16 @@ class Users
         $this->db->bind(':company', $company_id);
         return $this->db->resultSet();
     }
-    public function get_user($id)
+    public function getUserForEdit($user_id, $company_id)
     {
-
-        $this->db->query('SELECT * FROM users WHERE id = :id');
-        $this->db->bind(':id', $id);
+        $this->db->query('SELECT u.id, u.name, u.email, u.url_pic, u.description, u.role_id  
+                            FROM users u
+                            WHERE u.company_id = :company_id AND u.id = :user_id');
+        $this->db->bind(':company_id', $company_id);
+        $this->db->bind(':user_id', $user_id);
         return $this->db->single();
     }
+
 
     public function get_user_for_login($correo)
     {
@@ -147,14 +153,44 @@ class Users
     }
     public function update_user($data)
     {
+        // Consulta base
+        $query = 'UPDATE users SET 
+                  name = :name, 
+                  email = :email, 
+                  role_id = :role_id, 
+                  description = :description, 
+                  updated_at = NOW()';
 
-        $this->db->query('UPDATE users SET username = :username, email = :email, role_id = :role_id WHERE id = :id');
+        // Agregar foto si está presente
+        if (!empty($data['url_pic'])) {
+            $query .= ', url_pic = :url_pic';
+        }
+
+        $query .= ' WHERE id = :id AND company_id = :company_id';
+
+        $this->db->query($query);
+
+        // Bind de parámetros obligatorios
         $this->db->bind(':id', $data['id']);
-        $this->db->bind(':username', $data['username']);
+        $this->db->bind(':company_id', $data['company_id']);
+        $this->db->bind(':name', $data['username']);
         $this->db->bind(':email', $data['email']);
         $this->db->bind(':role_id', $data['role_id']);
+        $this->db->bind(':description', $data['description'] ?? null);
+
+        // Bind opcional de la foto
+        if (!empty($data['url_pic'])) {
+            $this->db->bind(':url_pic', $data['url_pic']);
+        }
+
         $this->db->execute();
-        return $this->db->rowCount();
+
+        // Verificar si se actualizó algún registro
+        if ($this->db->rowCount() === 0) {
+            throw new Exception('No se actualizó el usuario o no tienes permisos');
+        }
+
+        return true;
     }
     public function delete_user($id)
     {
@@ -208,6 +244,14 @@ class Users
         return $this->db->execute();
     }
 
+    public function updateUrlPic($userId, $url_pic)
+    {
+        $this->db->query("UPDATE users SET url_pic = :url_pic WHERE id = :id");
+        $this->db->bind(':url_pic', $url_pic);
+        $this->db->bind(':id', $userId);
+        return $this->db->execute();
+    }
+
     public function invalidate_reset_token($token)
     {
         $this->db->query("UPDATE password_resets SET used = 1 WHERE token = :token");
@@ -234,7 +278,7 @@ class Users
     // para get_service_providers.php
     public function getProvidersByService($serviceId, $companyId)
     {
-        $sql = "SELECT u.id, u.name, u.email, 
+        $sql = "SELECT u.id, u.name, u.email, u.url_pic, u.description,
                      us.available_days as provider_days, 
                      us.is_active as provider_active
               FROM users u

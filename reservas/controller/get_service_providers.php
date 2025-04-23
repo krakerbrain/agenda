@@ -40,7 +40,7 @@ try {
             'id' => $provider['id'],
             'name' => $provider['name'],
             'email' => $provider['email'],
-            'photo' => getUserPhotoUrl($provider['id']), // Método ficticio
+            'url_pic' => $provider['url_pic'], // Método ficticio
             'is_active' => (bool)$provider['provider_active'],
             'available_days' => $combinedDays
         ];

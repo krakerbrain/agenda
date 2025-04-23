@@ -70,4 +70,9 @@ class UserRegistrationService
             'user_id' => $new_user_id
         ];
     }
+
+    public function updateUrlPic($user_id, $url_pic)
+    {
+        return $this->users->updateUrlPic($user_id, $url_pic);
+    }
 }

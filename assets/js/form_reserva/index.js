@@ -82,11 +82,12 @@ function renderProviderDateInputs(providers) {
       <div class="provider-section provider-${provider.id}} " data-provider-name="${provider.name}">
         <div class="provider-container d-flex">
           <div class="${providers_count === "1" ? "d-none" : "d-flex col-4 col-md-3 flex-column align-items-center pointer"}">
-            <img src="${provider.photo || "https://randomuser.me/api/portraits/men/33.jpg"}" 
+            <img src="${baseUrl}${provider.url_pic || "assets/img/empty_user.png"}" 
                  alt="${provider.name}" 
                  class="rounded-circle mb-1" 
                  width="60" 
-                 height="60">
+                 height="60" 
+                 style="object-fit: cover;">
             <span class="provider-name text-center text-decoration-underline">${provider.name}</span>
           </div>
           <div class="${providers_count === "1" ? "col-12" : "col-8 col-md-9"}">

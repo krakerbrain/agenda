@@ -23,7 +23,12 @@ class FileManager
         return $this->uploadImage($_FILES['banner'], $company_id, 'banner');
     }
 
-    private function uploadImage($file, $company_id, $type, $name = '')
+    public function uploadProfilePicture($file, $company_id, $username, $user_id = null)
+    {
+        return $this->uploadImage($file, $company_id, 'profile', $username, $user_id);
+    }
+
+    private function uploadImage($file, $company_id, $type, $name = '',  $user_id = null)
     {
         if (empty($file['name'])) {
             throw new Exception("No se seleccionó ningún archivo.");
@@ -34,19 +39,28 @@ class FileManager
         if (!in_array($extension, $this->allowed_extensions)) {
             throw new Exception('Formato de archivo no permitido. Solo se permiten: ' . implode(', ', $this->allowed_extensions));
         }
-
-        // Definir carpeta base
-        if ($type === 'logo') {
-            $folder = "logo-" . $company_id;
-            $prefix = 'logo-' . preg_replace('/[^a-zA-Z0-9]/', '_', $name) . '-' . date('dmY') . '-' . uniqid();
-        } elseif ($type === 'banner') {
-            $folder = "user_" . $company_id;
-            $prefix = 'banner-' . date('dmY') . '-' . uniqid();
-        } else {
-            throw new Exception('Tipo de imagen no reconocido.');
+        // Configuración según el tipo de imagen
+        switch ($type) {
+            case 'logo':
+                $folder = "logo-" . $company_id;
+                $prefix = 'logo-' . preg_replace('/[^a-zA-Z0-9]/', '_', $name) . '-' . date('dmY') . '-' . uniqid();
+                $subfolder = "uploads/";
+                break;
+            case 'banner':
+                $folder = "user_" . $company_id;
+                $prefix = 'banner-' . date('dmY') . '-' . uniqid();
+                $subfolder = "banners/";
+                break;
+            case 'profile':
+                $folder = "company_" . $company_id . "/user_" . $user_id;
+                $prefix = 'profile-' . date('dmY') . '-' . uniqid();
+                $subfolder = "profiles/";
+                break;
+            default:
+                throw new Exception('Tipo de imagen no reconocido.');
         }
 
-        $upload_dir = dirname(__DIR__) . "/assets/img/" . ($type === 'logo' ? "uploads/" : "banners/") . $folder . "/";
+        $upload_dir = dirname(__DIR__) . "/assets/img/" . $subfolder . $folder . "/";
         $this->deleteExistingFiles($upload_dir);
 
         if (!is_dir($upload_dir)) {
@@ -64,8 +78,10 @@ class FileManager
         // $this->imageHandler->optimize($destination);
 
         // Ruta relativa que puedes guardar en la BD
-        return ($type === 'logo' ? "assets/img/uploads/" : "assets/img/banners/") . $folder . "/" . $new_filename;
+        return "assets/img/" . $subfolder . $folder . "/" . $new_filename;
     }
+
+
 
     private function deleteExistingFiles($dir)
     {
