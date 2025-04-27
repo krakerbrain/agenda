@@ -175,14 +175,36 @@ export function initConfiguraciones() {
   fixedIntervalsRadio.addEventListener("change", toggleOptions);
   serviceDurationRadio.addEventListener("change", toggleOptions);
 
+  // const blockUsersSwitch = document.getElementById("blockUsersSwitch");
+  // const incidentsThresholdContainer = document.getElementById("incidentsThresholdContainer");
+
+  // blockUsersSwitch.addEventListener("change", function () {
+  //   if (this.checked) {
+  //     incidentsThresholdContainer.style.display = "inline-block";
+  //   } else {
+  //     incidentsThresholdContainer.style.display = "none";
+  //   }
+  // });
+
   const blockUsersSwitch = document.getElementById("blockUsersSwitch");
   const incidentsThresholdContainer = document.getElementById("incidentsThresholdContainer");
 
   blockUsersSwitch.addEventListener("change", function () {
-    if (this.checked) {
-      incidentsThresholdContainer.style.display = "inline-block";
+    // Si el checkbox está marcado, mostramos el input
+    if (blockUsersSwitch.checked) {
+      // Verifica si el input ya existe, si no, lo creamos
+      if (!document.getElementById("blockAfterIncidents")) {
+        const inputHTML = `
+        <input type="number" class="form-control form-control-sm d-inline-block" 
+               style="width: 60px;" id="blockAfterIncidents" name="incidents_threshold" 
+               min="1" value="2">
+        <label for="blockAfterIncidents" class="ms-1">Incidencias</label>
+      `;
+        incidentsThresholdContainer.innerHTML = inputHTML;
+      }
     } else {
-      incidentsThresholdContainer.style.display = "none";
+      // Si el checkbox no está marcado, eliminamos el input
+      incidentsThresholdContainer.innerHTML = "";
     }
   });
 }

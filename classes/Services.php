@@ -226,69 +226,66 @@ class Services
     public function saveServices($servicesData)
     {
         try {
-            foreach ($servicesData['service_name'] as $serviceId => $serviceName) {
-                $isEnabled = isset($servicesData['service_enabled'][$serviceId]) ? 1 : 0;
+            $newServiceIds = []; // Solo para almacenar nuevos IDs (temporal => real)
 
-                // Convertimos el array de días a una cadena "1,2,3"
+            foreach ($servicesData['service_name'] as $serviceId => $serviceName) {
+                // Configuración común para todos los servicios
+                $isEnabled = isset($servicesData['service_enabled'][$serviceId]) ? 1 : 0;
                 $availableDays = isset($servicesData['available_service_day'][$serviceId])
                     ? implode(',', $servicesData['available_service_day'][$serviceId])
                     : '';
 
-                // Convertir horas y minutos a minutos totales
-                $hours = isset($servicesData['service_duration_hours'][$serviceId])
-                    ? (int)$servicesData['service_duration_hours'][$serviceId]
-                    : 0;
-                $minutes = isset($servicesData['service_duration_minutes'][$serviceId])
-                    ? (int)$servicesData['service_duration_minutes'][$serviceId]
-                    : 0;
-
-                $totalDuration = ($hours * 60) + $minutes; // Total de minutos
+                // Calcular duración
+                $hours = (int)($servicesData['service_duration_hours'][$serviceId] ?? 0);
+                $minutes = (int)($servicesData['service_duration_minutes'][$serviceId] ?? 0);
+                $totalDuration = ($hours * 60) + $minutes;
 
                 if (strpos($serviceId, 'new-service') !== false) {
                     // Nuevo servicio
                     $newServiceId = $this->addService(
                         $serviceName,
-                        $totalDuration, // Guardar la duración como minutos
-                        $servicesData['service_observations'][$serviceId],
+                        $totalDuration,
+                        $servicesData['service_observations'][$serviceId] ?? '',
                         $isEnabled,
                         $availableDays
                     );
+                    $newServiceIds[$serviceId] = $newServiceId; // Mapeo ID temporal => real
 
-                    // Agregar categorías si están presentes
+                    // Procesar categorías si existen
                     if (isset($servicesData['category_name'][$serviceId])) {
                         foreach ($servicesData['category_name'][$serviceId] as $index => $categoryName) {
                             $this->addCategory(
                                 $newServiceId,
                                 $categoryName,
-                                $servicesData['category_description'][$serviceId][$index]
+                                $servicesData['category_description'][$serviceId][$index] ?? ''
                             );
                         }
                     }
                 } else {
-                    // Actualizar servicio existente
+                    // Servicio existente
                     $this->updateService(
                         $serviceId,
                         $serviceName,
-                        $totalDuration, // Guardar la duración como minutos
-                        $servicesData['service_observations'][$serviceId],
+                        $totalDuration,
+                        $servicesData['service_observations'][$serviceId] ?? '',
                         $isEnabled,
                         $availableDays
                     );
 
-                    // Actualizar categorías si están presentes
+                    // Procesar categorías
                     if (isset($servicesData['category_name'][$serviceId])) {
                         foreach ($servicesData['category_name'][$serviceId] as $index => $categoryName) {
                             if (strpos($index, 'new-category') !== false) {
                                 $this->addCategory(
                                     $serviceId,
                                     $categoryName,
-                                    $servicesData['category_description'][$serviceId][$index]
+                                    $servicesData['category_description'][$serviceId][$index] ?? ''
                                 );
                             } else {
                                 $this->updateCategory(
                                     $index,
                                     $categoryName,
-                                    $servicesData['category_description'][$serviceId][$index]
+                                    $servicesData['category_description'][$serviceId][$index] ?? ''
                                 );
                             }
                         }
@@ -296,9 +293,23 @@ class Services
                 }
             }
 
-            return json_encode(['success' => true, 'message' => 'Servicios guardados exitosamente.']);
+            // Respuesta limpia
+            $response = [
+                'success' => true,
+                'message' => 'Servicios procesados correctamente'
+            ];
+
+            // Solo agregamos new_service_ids si hay servicios nuevos
+            if (!empty($newServiceIds)) {
+                $response['new_service_ids'] = $newServiceIds;
+            }
+
+            return json_encode($response);
         } catch (Exception $e) {
-            return json_encode(['success' => false, 'message' => 'Error al guardar los servicios: ' . $e->getMessage()]);
+            return json_encode([
+                'success' => false,
+                'message' => 'Error al procesar servicios: ' . $e->getMessage()
+            ]);
         }
     }
 
@@ -430,28 +441,18 @@ class Services
                 $this->db->execute();
                 $exists = $this->db->single()['count'] > 0;
 
+                $assignmentData = [
+                    'service_id' => $serviceId,
+                    'available_days' => $data['available_days'],
+                    'is_active' => $data['is_active']
+                ];
                 if ($exists) {
                     // Actualizar asignación existente
-                    $sql = "UPDATE user_services SET
-                            available_days = :available_days,
-                            is_active = :is_active,
-                            updated_at = NOW()
-                            WHERE user_id = :user_id AND service_id = :service_id";
+                    $this->updateUserAssignment($assignmentData);
                 } else {
-                    // Nueva asignación
-                    $sql = "INSERT INTO user_services (
-                            user_id, service_id, available_days, is_active, created_at
-                            ) VALUES (
-                            :user_id, :service_id, :available_days, :is_active, NOW()
-                            )";
+                    // Insertar nueva asignación
+                    $this->assignUserToService($assignmentData);
                 }
-
-                $this->db->query($sql);
-                $this->db->bind(':user_id', $this->user_id, PDO::PARAM_INT);
-                $this->db->bind(':service_id', $serviceId, PDO::PARAM_INT);
-                $this->db->bind(':available_days', $data['available_days']);
-                $this->db->bind(':is_active', $data['is_active'], PDO::PARAM_INT);
-                $this->db->execute();
             }
 
             $this->db->endTransaction();
@@ -460,6 +461,50 @@ class Services
             $this->db->cancelTransaction();
             error_log("Error saving assignments: " . $e->getMessage());
             return false;
+        }
+    }
+
+    public function assignUserToService($data)
+    {
+
+        try {
+            $this->db->query("
+                INSERT INTO user_services (user_id, service_id, available_days, is_active, created_at) 
+                VALUES (:user_id, :service_id, :available_days, :is_active, NOW())
+            ");
+            $this->db->bind(':user_id', $this->user_id);
+            $this->db->bind(':service_id', $data['service_id']);
+            $this->db->bind(':available_days', $data['available_days']);
+            $this->db->bind(':is_active', $data['is_active']);
+            $this->db->execute();
+        } catch (Exception $e) {
+            // Aquí puedes manejar el error, por ejemplo, registrarlo en un log
+            error_log("Error al asignar el usuario al servicio: " . $e->getMessage());
+
+            // Luego, puedes lanzar una excepción o devolver un mensaje de error
+            throw new Exception('No se pudo asignar el usuario al servicio.');
+        }
+    }
+
+    public function updateUserAssignment($data)
+    {
+        try {
+            $this->db->query("
+                UPDATE user_services 
+                SET available_days = :available_days, is_active = :is_active, updated_at = NOW() 
+                WHERE user_id = :user_id AND service_id = :service_id
+            ");
+            $this->db->bind(':user_id', $this->user_id);
+            $this->db->bind(':service_id', $data['service_id']);
+            $this->db->bind(':available_days', $data['available_days']);
+            $this->db->bind(':is_active', $data['is_active']);
+            $this->db->execute();
+        } catch (Exception $e) {
+            // Aquí puedes manejar el error, por ejemplo, registrarlo en un log
+            error_log("Error al actualizar la asignación del usuario: " . $e->getMessage());
+
+            // Luego, puedes lanzar una excepción o devolver un mensaje de error
+            throw new Exception('No se pudo actualizar la asignación del usuario.');
         }
     }
 

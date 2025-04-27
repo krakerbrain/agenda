@@ -63,7 +63,7 @@ try {
         'password2' => $_POST['password2'],
         'role_id' => (int)$_POST['role_id'],
         'company_id' => $company_id
-    ], $company_id);
+    ], $company_id, true);
 
     if ($result['success']) {
         echo json_encode([

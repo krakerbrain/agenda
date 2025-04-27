@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'company_id' => $companyResult['company_id']
         ];
 
-        $userResult = $userRegistration->registerUser($userData, $companyResult['company_id']);
+        $userResult = $userRegistration->registerUser($userData, $companyResult['company_id'], true);
 
         if ($userResult['success']) {
             echo json_encode([
