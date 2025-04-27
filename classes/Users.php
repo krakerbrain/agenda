@@ -47,57 +47,66 @@ class Users
 
     public function register_user($data)
     {
-        // Validaciones básicas
-        if (empty($data['username']) || empty($data['email']) || empty($data['password']) || empty($data['password2']) || empty($data['company_id'])) {
-            return ["success" => false, "error" => "Todos los campos son obligatorios"];
+        try {
+            // Validaciones básicas
+            if (empty($data['username']) || empty($data['email']) || empty($data['password']) || empty($data['password2']) || empty($data['company_id'])) {
+                return ["success" => false, "error" => "Todos los campos son obligatorios"];
+            }
+
+            if ($data['password'] !== $data['password2']) {
+                return ["success" => false, "error" => "Las contraseñas no coinciden"];
+            }
+
+            // Validación adicional (procedimiento almacenado)
+            $validation_result = $this->validate_registration($data['username'], $data['email'], $data['password'], $data['password2']);
+            if ($validation_result['error']) {
+                return $validation_result;
+            }
+
+            // Preparar datos
+            $userData = [
+                'username' => $data['username'],
+                'email' => $data['email'],
+                'password' => password_hash($data['password'], PASSWORD_BCRYPT, ['cost' => 7]),
+                'company_id' => $data['company_id'],
+                'role_id' => $data['role_id'],
+                'token' => hash('sha256', $data['username'] . $data['email']),
+                'url_pic' => $data['url_pic'] ?? null,
+                'description' => $data['description'] ?? null
+            ];
+
+            // Insertar y retornar resultado completo
+            return $this->add_user($userData);
+        } catch (Exception $e) {
+            return ["success" => false, "error" => "Error en el registro: " . $e->getMessage()];
         }
-
-        if ($data['password'] !== $data['password2']) {
-            return ["success" => false, "error" => "Las contraseñas no coinciden"];
-        }
-
-        // Validación adicional (procedimiento almacenado)
-        $validation_result = $this->validate_registration($data['username'], $data['email'], $data['password'], $data['password2']);
-        if ($validation_result['error']) {
-            return $validation_result;
-        }
-
-        // Preparar datos
-        $userData = [
-            'username' => $data['username'],
-            'email' => $data['email'],
-            'password' => password_hash($data['password'], PASSWORD_BCRYPT, ['cost' => 7]),
-            'company_id' => $data['company_id'],
-            'role_id' => $data['role_id'],
-            'token' => hash('sha256', $data['username'] . $data['email']),
-            'url_pic' => $data['url_pic'] ?? null,
-            'description' => $data['description'] ?? null
-        ];
-
-        // Insertar y retornar resultado completo
-        return $this->add_user($userData);
     }
 
     // Función para validar usando el procedimiento almacenado
     public function validate_registration($username, $email, $password, $password2)
     {
+        try {
+            $this->db->query("CALL validar_registro(:usuario, :correo, :pass, :pass2, @error)");
+            $this->db->bind(':usuario', $username);
+            $this->db->bind(':correo', $email);
+            $this->db->bind(':pass', $password);
+            $this->db->bind(':pass2', $password2);
+            $this->db->execute();
 
-        $this->db->query("CALL validar_registro(:usuario, :correo, :pass, :pass2, @error)");
-        $this->db->bind(':usuario', $username);
-        $this->db->bind(':correo', $email);
-        $this->db->bind(':pass', $password);
-        $this->db->bind(':pass2', $password2);
-        $this->db->execute();
+            // Obtener el mensaje de error desde la variable de sesión de MySQL
+            $this->db->query("SELECT @error AS error");
+            $error = $this->db->single();
 
-        // Obtener el mensaje de error desde la variable de sesión de MySQL
-        $this->db->query("SELECT @error AS error");
-        $error = $this->db->single();
-
-        if (!empty($error['error'])) {
-            return ["error" => $error['error']];
+            return [
+                'success' => empty($error['error']),
+                'error' => $error['error'] ?? null
+            ];
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'error' => "Error en validación: " . $e->getMessage()
+            ];
         }
-
-        return ["error" => null];
     }
     public function get_user_role($user_id)
     {
@@ -108,7 +117,7 @@ class Users
     public function getAboutRoles()
     {
 
-        $this->db->query('SELECT id, type, about_role FROM user_role WHERE id > 2');
+        $this->db->query('SELECT id, type, about_role FROM user_role WHERE id >= 2');
         return $this->db->resultSet();
     }
     public function get_users($company_id)
@@ -273,7 +282,7 @@ class Users
 
     public function count_company_users($company_id)
     {
-        $this->db->query('SELECT COUNT(*) FROM users WHERE company_id = :company_id AND role_id != 2');
+        $this->db->query('SELECT COUNT(*) FROM users WHERE company_id = :company_id');
         $this->db->bind(':company_id', $company_id);
         return (int)$this->db->singleValue(); // Convertimos a entero el conteo
     }

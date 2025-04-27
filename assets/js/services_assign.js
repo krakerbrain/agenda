@@ -69,7 +69,7 @@ export function initServicesAssign() {
       renderServicesTable(data);
     } catch (error) {
       console.error("Error al cargar servicios:", error);
-      handleInfoModal("infoAppointment", "Error", error.message);
+      handleInfoModal("Error", error.message);
     }
   }
 
@@ -208,7 +208,7 @@ export function initServicesAssign() {
 
       if (status === "success") {
         // Recargar los datos para reflejar cambios
-        handleInfoModal("infoAppointment", "Éxito", message);
+        handleInfoModal("Éxito", message);
         loadServicesForUser(userId);
       } else {
         throw new Error(message || "Error al guardar");
@@ -218,12 +218,12 @@ export function initServicesAssign() {
     }
   }
 
-  function handleInfoModal(id, title = null, message = null) {
-    let titulo = document.getElementById(id + "Label");
-    let mensaje = document.getElementById(id + "Message");
+  function handleInfoModal(title = null, message = null) {
+    let titulo = document.getElementById("infoModalLabel");
+    let mensaje = document.getElementById("infoModalMessage");
     titulo.textContent = title;
     mensaje.textContent = message;
-    const modal = new bootstrap.Modal(document.getElementById(id));
+    const modal = new bootstrap.Modal(document.getElementById("infoModal"));
     modal.show();
   }
 }

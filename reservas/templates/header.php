@@ -61,6 +61,55 @@
 
     }
 
+    .photo-container {
+        position: relative;
+        cursor: pointer;
+    }
+
+    .photo-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.3);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        display: flex;
+        align-items: flex-end;
+        justify-content: flex-end;
+        padding: 10px;
+    }
+
+    .photo-overlay:hover {
+        opacity: 1;
+    }
+
+    .overlay-icon {
+        color: white;
+        font-size: 1.5rem;
+        text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Estilos para el icono en móvil */
+    .mobile-icon {
+        position: absolute;
+        bottom: 0;
+        right: 15px;
+        background: white;
+        border-radius: 50%;
+        padding: 3px;
+        font-size: 0.8rem;
+        color: var(--bs-primary);
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Ajustes para el modal */
+    .modal-content {
+        border-radius: 0.5rem;
+        overflow: hidden;
+    }
+
     /* si $servicesProvidersCount es mayor a 1 */
 
     <?php if ($servicesProvidersCount > 1) : ?>.provider-section:nth-child(odd) {

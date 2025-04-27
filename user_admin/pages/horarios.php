@@ -32,6 +32,8 @@ if ($user_count > 1) {
                 </select>
             </div>
         </div>
+    <?php else : ?>
+        <input type="hidden" id="userSelect" value="<?= $datosUsuario['user_id'] ?>">
     <?php endif; ?>
     <form id="workScheduleForm" method="POST" class="border p-4 rounded">
         <div id="unsavedChangesAlert" class="alert alert-warning d-none" role="alert">

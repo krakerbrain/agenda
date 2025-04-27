@@ -122,4 +122,5 @@ si no selecciono una fecha aunque este selected-time y doy siguiente no toma la 
 agregar al select de rol de agregar usaurio el usuario superadmin
 un detalle en la configuracion de horario, si el admin es el que marca el horario de la compañia, un usuario no deberia poder tener un horario antes de la hora o si? PROBAR
 
-al cambiar correo del usuario el token deja de ser valido por lo cual si se cambia el correo hay que cambiar la clave o actualizar el token
+al cambiar correo del usuario el token deja de ser valido por lo cual si se cambia el correo hay que cambiar la clave o actualizar el token ✔
+mejorar el modal se ve muy grande en mobiles, y quitar el icono i del nombre

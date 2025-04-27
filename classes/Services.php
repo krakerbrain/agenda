@@ -546,4 +546,16 @@ class Services
 
         return $this->db->single();
     }
+
+    public function getServicesByProvider($userId)
+    {
+        $sql = "SELECT s.id, s.name 
+                FROM services s
+                JOIN user_services us ON s.id = us.service_id
+                WHERE us.user_id = :user_id
+                LIMIT 5";
+        $this->db->query($sql);
+        $this->db->bind(':user_id', $userId);
+        return $this->db->resultSet();
+    }
 }

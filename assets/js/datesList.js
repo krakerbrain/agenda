@@ -63,7 +63,6 @@ async function loadAppointments(status, page = 1) {
 function fillTable(data, showProviderColumn, isOwner) {
   const tableContent = document.getElementById("tableContent");
   tableContent.innerHTML = "";
-  console.log(data);
   data.forEach((item) => {
     const row = document.createElement("tr");
     row.classList.add("body-table");

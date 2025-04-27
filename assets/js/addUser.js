@@ -110,40 +110,6 @@ export function initAddUser() {
     }
   }
 
-  // fetch(`${baseUrl}api/getUserById.php?id=${userId}`)
-  // .then((response) => response.json())
-  // .then((user) => {
-  //   // Llenar el formulario
-  //   document.getElementById("user_id").value = user.id;
-  //   document.getElementById("username").value = user.name;
-  //   document.getElementById("correo").value = user.email;
-  //   document.getElementById("descripcion").value = user.description || "";
-
-  //   // Seleccionar el rol
-  //   const roleSelect = document.getElementById("role_id");
-  //   if (roleSelect) {
-  //     for (let i = 0; i < roleSelect.options.length; i++) {
-  //       if (roleSelect.options[i].value == user.role_id) {
-  //         roleSelect.selectedIndex = i;
-  //         break;
-  //       }
-  //     }
-  //   }
-
-  //   // Cambiar el texto del botón
-  //   document.getElementById("saveUser").querySelector(".button-text").textContent = "Actualizar Usuario";
-
-  //   // Mostrar botón de cancelar
-  //   document.getElementById("cancelEdit").classList.remove("d-none");
-
-  //   // Desplazar al formulario
-  //   document.getElementById("addUserForm").scrollIntoView({ behavior: "smooth" });
-  // })
-  // .catch((error) => {
-  //   console.error("Error:", error);
-  //   alert("Error al cargar usuario para edición");
-  // });
-
   async function loadUserForEdit(userId) {
     try {
       const response = await fetch(`${baseUrl}user_admin/controllers/users.php?id=${userId}&action=getUserForEdit`, {
@@ -164,6 +130,7 @@ export function initAddUser() {
         userForm.querySelector("#descripcion").value = user.description || "";
         userForm.querySelector("#user_id").value = user.id;
         userForm.querySelector("#role_id").value = user.role_id;
+        document.querySelector("#roleGroup").classList.remove("d-none");
         const roleSelect = document.getElementById("role_id");
         if (roleSelect) {
           for (let i = 0; i < roleSelect.options.length; i++) {
@@ -172,6 +139,9 @@ export function initAddUser() {
               break;
             }
           }
+        }
+        if (user.role_id == 2) {
+          document.querySelector("#roleGroup").classList.add("d-none");
         }
         // Cambiar el texto del botón
         document.getElementById("addUser").querySelector(".button-text-spinner").textContent = "Actualizar Usuario";
@@ -227,10 +197,6 @@ export function initAddUser() {
     // Mostrar spinner y deshabilitar botón
     displaySpinner("addUser", true);
 
-    // Limpiar error previo
-    document.querySelector("#addUserForm .error").innerHTML = "";
-    document.querySelector("#addUserForm .error").classList.add("d-none");
-
     try {
       const formData = new FormData(this);
       const userId = document.getElementById("user_id").value;
@@ -240,34 +206,36 @@ export function initAddUser() {
         body: formData,
       });
 
-      const data = await response.json();
+      const { success, title, message, errors } = await response.json();
 
-      if (data.success) {
+      if (success) {
         // Éxito: limpiar formulario y mostrar mensaje
         resetUserForm();
-        alert(data.message || "Usuario agregado exitosamente");
-        loadUsers();
+        // alert(data.message || "Usuario agregado exitosamente");
+        handleInfoModal("Éxito" || title, message || "Usuario agregado exitosamente");
+        // crear setitmeout para que se reinicie la página después de 2 segundos
+        setTimeout(() => {
+          location.reload();
+        }, 2000);
       } else {
-        // Mostrar error (usa data.error o data.message según lo que devuelva tu backend)
-        const errorMessage = data.error || data.message || "Error al registrar usuario";
-        document.querySelector("#addUserForm .error").innerHTML = `<span>${errorMessage}</span>`;
-        document.querySelector("#addUserForm .error").classList.remove("d-none");
+        console.log(errors || message);
+        let errorMessage = message || "Ocurrió un error";
+        if (errors && typeof errors === "object") {
+          // Convertir objeto de errores a string legible
+          errorMessage += ":\n - " + Object.values(errors).join("\n - ");
+        }
+        // Manejar errores
+        handleInfoModal("Error" || title, errorMessage || "Error al agregar usuario");
       }
     } catch (error) {
-      console.error("Error:", error);
-      document.querySelector("#addUserForm .error").innerHTML = "<span>Error de conexión con el servidor</span>";
-      document.querySelector("#addUserForm .error").classList.remove("d-none");
+      console.error("Error:", error.message);
+      handleInfoModal("Error" || title, error.message || "Error de conexión. Por favor, inténtelo más tarde.");
     } finally {
       // Ocultar spinner y habilitar botón
       displaySpinner("addUser", false);
       document.getElementById("roleAbout").classList.add("d-none");
     }
   });
-  function removeError() {
-    setTimeout(() => {
-      document.querySelector("#addUserForm .error").classList.add("d-none");
-    }, 5000);
-  }
 
   document.getElementById("role_id").addEventListener("change", function () {
     getAboutRole();
@@ -332,4 +300,12 @@ export function initAddUser() {
   });
   const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
   const popoverList = [...popoverTriggerList].map((popoverTriggerEl) => new bootstrap.Popover(popoverTriggerEl));
+}
+function handleInfoModal(title = null, message = null) {
+  let titulo = document.getElementById("infoModalLabel");
+  let mensaje = document.getElementById("infoModalMessage");
+  titulo.textContent = title;
+  mensaje.textContent = message;
+  const modal = new bootstrap.Modal(document.getElementById("infoModal"));
+  modal.show();
 }

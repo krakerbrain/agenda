@@ -25,6 +25,15 @@ try {
         throw new Exception('Servicio no encontrado');
     }
 
+    // Obtener todos los servicios que ofrece cada proveedor
+    $providerServices = [];
+    foreach ($providers as $provider) {
+        $services = $servicesModel->getServicesByProvider($provider['id']);
+        $providerServices[$provider['id']] = array_map(function ($service) {
+            return $service['name'];
+        }, $services);
+    }
+
     // Procesar resultados
     $result = [];
     foreach ($providers as $provider) {
@@ -41,8 +50,10 @@ try {
             'name' => $provider['name'],
             'email' => $provider['email'],
             'url_pic' => $provider['url_pic'], // Método ficticio
+            'description' => $provider['description'],
             'is_active' => (bool)$provider['provider_active'],
-            'available_days' => $combinedDays
+            'available_days' => $combinedDays,
+            'services' => $providerServices[$provider['id']] ?? []
         ];
     }
 

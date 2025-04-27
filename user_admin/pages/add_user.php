@@ -19,7 +19,6 @@ $auth->validarTokenUsuario();
         <div class="justify-content-center">
             <form action="" method="post" class="form-group" id="addUserForm">
                 <input type="hidden" id="user_id" name="user_id" value="">
-                <div class="alert alert-secondary error d-none mb-2" role="alert"></div>
                 <!-- Campo para la foto de perfil -->
                 <div class="mb-3 text-center">
                     <div class="d-flex justify-content-center mb-2">
@@ -85,7 +84,7 @@ $auth->validarTokenUsuario();
                         </a>
                     </div>
                 </div>
-                <div class="input-group mt-2">
+                <div class="input-group mt-2" id="roleGroup">
                     <div class="input-group-text bg-secondary text-light">
                         <i class="fa-solid fa-user"></i>
                     </div>
@@ -116,3 +115,5 @@ $auth->validarTokenUsuario();
     </div>
 
 </div>
+<?php include dirname(__DIR__, 2) . '/includes/modal-info.php';
+?>

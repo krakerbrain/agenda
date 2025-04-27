@@ -21,7 +21,7 @@ class UserRegistrationService
      * @param int $company_id ID de la compañía
      * @return array Resultado de la operación
      */
-    public function registerUser(array $userData, int $company_id): array
+    public function registerUser(array $userData, int $company_id, bool $sendEmail): array
     {
         // Validar datos requeridos
         if (empty($userData['username'])) {
@@ -55,18 +55,20 @@ class UserRegistrationService
         }
 
         // Enviar email de activación
-        $emailSent = $this->emailTemplate->buildInscriptionAlert($userData['email']);
+        if ($sendEmail) {
+            $emailSent = $this->emailTemplate->buildInscriptionAlert($userData['email']);
 
-        if (!$emailSent) {
-            return [
-                'success' => true,
-                'warning' => 'Usuario registrado pero falló el envío del email'
-            ];
+            if (!$emailSent) {
+                return [
+                    'success' => true,
+                    'warning' => 'Usuario registrado pero falló el envío del email'
+                ];
+            }
         }
 
         return [
             'success' => true,
-            'message' => 'Usuario registrado con éxito. Se ha enviado un correo para activar la cuenta.',
+            'message' => 'Usuario registrado con éxito',
             'user_id' => $new_user_id
         ];
     }

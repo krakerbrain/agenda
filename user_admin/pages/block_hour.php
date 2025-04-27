@@ -40,6 +40,8 @@ if ($user_count > 1) {
                 </select>
             </div>
         </div>
+    <?php else : ?>
+        <input type="hidden" name="user_id" id="userSelect" value="<?= $datosUsuario['user_id'] ?>">
     <?php endif; ?>
     <!-- Selección de fecha y horas -->
     <div class="mb-3">
