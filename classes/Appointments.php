@@ -19,9 +19,10 @@ class Appointments
                 return ['error' => 'Cita ya ha sido enviada.'];
             }
 
-            $this->db->query('INSERT INTO appointments (company_id, customer_id, date, start_time, end_time, id_service, service_category_id, aviso_reserva, created_at) 
-                    VALUES (:company_id, :customer_id, :date, :start_time, :end_time, :id_service, :service_category_id, 0, now())');
+            $this->db->query('INSERT INTO appointments (company_id, user_id, customer_id, date, start_time, end_time, id_service, service_category_id, aviso_reserva, created_at) 
+                    VALUES (:company_id, :user_id, :customer_id, :date, :start_time, :end_time, :id_service, :service_category_id,  0, now())');
             $this->db->bind(':company_id', $data['company_id']);
+            $this->db->bind(':user_id', $data['user_id']);
             $this->db->bind(':customer_id', $data['customer_id']);
             $this->db->bind(':date', $data['date']);
             $this->db->bind(':start_time', $data['start_time']);
@@ -62,10 +63,10 @@ class Appointments
             // Consulta SQL para insertar un "día bloqueado" como cita especial
             $query = "
             INSERT INTO appointments (
-                company_id,customer_id, date, start_time, end_time, 
+                company_id, user_id, customer_id, date, start_time, end_time, 
                 id_service, status, aviso_reserva, aviso_confirmada, created_at
             ) VALUES (
-                :company_id, :customer_id, :date, :start_time, :end_time, 
+                :company_id, :user_id, :customer_id, :date, :start_time, :end_time, 
                 :id_service, :status, :aviso_reserva, :aviso_confirmada, NOW()
             )
         ";
@@ -75,6 +76,7 @@ class Appointments
 
             // Asignar valores a los parámetros
             $this->db->bind(':company_id', $data['company_id']);
+            $this->db->bind(':user_id', $data['user_id']);
             $this->db->bind(':customer_id', $data['customer_id']);
             $this->db->bind(':date', $data['date']);
             $this->db->bind(':start_time', $data['start_time']);
@@ -113,7 +115,7 @@ class Appointments
     }
 
     // getBlockedDays
-    public function getBlockedDays($company_id)
+    public function getBlockedDays($company_id, $user_id)
     {
 
         $this->db->query('
@@ -125,11 +127,13 @@ class Appointments
         FROM 
             appointments 
         WHERE 
-            company_id = :company_id 
+            company_id = :company_id
+            AND user_id = :user_id  
             AND id_service = 0
             AND (date > CURDATE() OR (date = CURDATE() AND end_time >= NOW()))
     ');
         $this->db->bind(':company_id', $company_id);
+        $this->db->bind(':user_id', $user_id);
         return $this->db->resultSet();
     }
 
@@ -137,11 +141,12 @@ class Appointments
     public function checkExistingAppointment($data)
     {
 
-        $this->db->query('SELECT COUNT(*) as total FROM appointments WHERE company_id = :company_id AND date = :date AND start_time = :start_time AND end_time = :end_time');
+        $this->db->query('SELECT COUNT(*) as total FROM appointments WHERE company_id = :company_id AND date = :date AND start_time = :start_time AND end_time = :end_time AND user_id = :user_id');
         $this->db->bind(':company_id', $data['company_id']);
         $this->db->bind(':date', $data['date']);
         $this->db->bind(':start_time', $data['start_time']);
         $this->db->bind(':end_time', $data['end_time']);
+        $this->db->bind(':user_id', $data['user_id']);
         // Obtener el resultado y acceder a la propiedad 'total'
         $countResult = $this->db->single();
 
@@ -209,18 +214,22 @@ class Appointments
         return $this->db->resultSet();
     }
 
-    public function get_paginated_appointments($company_id, $status, $offset, $limit)
+    public function get_paginated_appointments($company_id, $user_id, $user_role, $status, $offset, $limit)
     {
-        $query = 'SELECT a.id as id_appointment, a.*, s.name AS service, c.id as id_customer, c.*, COALESCE(cat.category_name, "-") AS category,
-                     DATE_FORMAT(a.date, "%d-%m-%Y") as date 
-                     FROM appointments a 
-                     INNER JOIN services s ON a.id_service = s.id
-                     INNER JOIN customers c ON a.customer_id = c.id
-                     INNER JOIN company_customers cc ON c.id = cc.customer_id
-                    LEFT JOIN service_categories cat ON a.service_category_id = cat.id
-                     WHERE a.company_id = :company
-                     AND cc.company_id = :company  
-                     AND status != 2';
+        $query = 'SELECT a.id as id_appointment, a.*, s.name AS service, c.id as id_customer, c.*, 
+              COALESCE(cat.category_name, "-") AS category,
+              DATE_FORMAT(a.date, "%d-%m-%Y") as date,
+              u.name as provider_name,
+              u.role_id as provider_role
+              FROM appointments a 
+              INNER JOIN services s ON a.id_service = s.id
+              INNER JOIN customers c ON a.customer_id = c.id
+              INNER JOIN company_customers cc ON c.id = cc.customer_id
+              LEFT JOIN service_categories cat ON a.service_category_id = cat.id
+              LEFT JOIN users u ON a.user_id = u.id
+              WHERE a.company_id = :company
+              AND cc.company_id = :company  
+              AND status != 2';
 
         if ($status === 'unconfirmed') {
             $query .= ' AND status = 0 AND a.date >= CURDATE()';
@@ -230,10 +239,16 @@ class Appointments
             $query .= ' AND date < CURDATE()';
         }
 
+        // Filtro por usuario solo si NO es dueño (rol 2)
+        if ($user_role != 2) {
+            $query .= ' AND a.user_id = :user_id';
+        }
+
         $query .= ' ORDER BY a.date DESC LIMIT :offset, :limit';
 
         $this->db->query($query);
         $this->db->bind(':company', $company_id);
+        $this->db->bind(':user_id', $user_id);
         $this->db->bind(':offset', $offset, PDO::PARAM_INT);
         $this->db->bind(':limit', $limit, PDO::PARAM_INT);
 
@@ -314,17 +329,18 @@ class Appointments
 
     //obtener citas por fecha
 
-    public function getAppointmentsByDate($company_id, $date)
+    public function getAppointmentsByDate($company_id, $user_id, $date)
     {
 
-        $this->db->query('SELECT * FROM appointments WHERE company_id = :company_id AND date = :date');
+        $this->db->query('SELECT * FROM appointments WHERE company_id = :company_id AND user_id = :user_id AND date = :date');
         $this->db->bind(':company_id', $company_id);
+        $this->db->bind(':user_id', $user_id);
         $this->db->bind(':date', $date);
 
         return $this->db->resultSet();
     }
 
-    public function checkAppointments($company_id, $date, $start_hour, $end_hour)
+    public function checkAppointments($company_id, $user_id, $date, $start_hour, $end_hour)
     {
 
 
@@ -333,6 +349,7 @@ class Appointments
                     SELECT * 
                     FROM appointments 
                     WHERE company_id = :company_id 
+                      AND user_id = :user_id
                       AND DATE(date) = :date
                       AND (
                           (:start_hour BETWEEN start_time AND end_time) OR 
@@ -341,6 +358,7 @@ class Appointments
                       )
         ");
         $this->db->bind(':company_id', $company_id);
+        $this->db->bind(':user_id', $user_id);
         $this->db->bind(':date', $date);
         $this->db->bind(':start_hour', $start_hour);
         $this->db->bind(':end_hour', $end_hour);

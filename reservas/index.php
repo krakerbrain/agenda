@@ -34,6 +34,7 @@ $data = $controller->getCompanyData($url);
 $company = $data['company'];
 $socialNetworks = $data['socialNetworks'];
 $services = $data['services'];
+$servicesProvidersCount = $data['servicesProvidersCount'];
 $style = $data['style'];
 
 // Si se proporciona un customer_id, obtener los datos del cliente

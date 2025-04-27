@@ -3,21 +3,29 @@ require_once dirname(__DIR__) . '/configs/init.php';
 require_once dirname(__DIR__) . '/configs/VersionManager.php';
 require_once dirname(__DIR__) . '/access-token/seguridad/JWTAuth.php';
 require_once dirname(__DIR__) . '/classes/ConfigUrl.php';
+require_once dirname(__DIR__) . '/classes/Users.php';
+
 $title = "Configuraciones";
 
 $baseUrl = ConfigUrl::get();
 $auth = new JWTAuth();
-$userData = $auth->validarTokenUsuario();
-$role_id = $userData['role_id'];
+$datosUsuario = $auth->validarTokenUsuario();
+$role_id = $datosUsuario['role_id'];
 // Obtener la instancia singleton
 $versionManager = VersionManager::getInstance();
+
+$userData = new Users();
+$user_count = $userData->count_company_users($datosUsuario['company_id']);
+if ($user_count > 1) {
+    $users = $userData->get_all_users($datosUsuario['company_id']);
+}
 
 include dirname(__DIR__) . '/partials/head.php';
 ?>
 <script>
-    const baseUrl = '<?php echo $baseUrl; ?>';
-    const role_id = <?php echo $role_id; ?>;
-    window.APP_VERSION = '<?= $versionManager->getVersion() ?>';
+const baseUrl = '<?php echo $baseUrl; ?>';
+const role_id = <?php echo $role_id; ?>;
+window.APP_VERSION = '<?= $versionManager->getVersion() ?>';
 </script>
 
 <body>
@@ -42,46 +50,53 @@ include dirname(__DIR__) . '/partials/head.php';
         <div class="offcanvas-body">
             <ul class="nav nav-underline flex-column">
                 <?php if ($role_id != 1) { ?>
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="#" id="dateList">Lista de citas</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" id="clientes">Clientes</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" id="horarios">Horarios</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" id="servicios">Servicios</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" id="correos">Correos</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" id="datos_empresa">Datos Empresa</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" id="add_user">Agregar Usuario</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" id="configuraciones">Otras configuraciones</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" id="integrations">Servicios Integrados</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" id="eventos_unicos">Eventos Únicos</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" id="block_hour">Bloqueo de horas</a>
-                    </li>
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="#" id="dateList">Lista de citas</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="clientes">Clientes</a>
+                </li>
+                <?php if ($datosUsuario['role_id'] == 2) : ?>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="horarios">Horarios</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="servicios">Servicios</a>
+                </li>
+                <?php if ($user_count >= 2) : ?>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="services_assign">Asignar Servicios</a>
+                </li>
+                <?php endif; ?>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="correos">Correos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="datos_empresa">Datos Empresa</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="add_user">Agregar Usuario</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="configuraciones">Otras configuraciones</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="integrations">Servicios Integrados</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="eventos_unicos">Eventos Únicos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="block_hour">Bloqueo de horas</a>
+                </li>
+                <?php endif; ?>
                 <?php } else { ?>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" id="master_add_company">Agrega Empresa</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" id="master_company_list">Lista de Empresas</a>
-                    </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="master_add_company">Agrega Empresa</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="master_company_list">Lista de Empresas</a>
+                </li>
                 <?php } ?>
                 <li class="nav-item">
                     <a class="nav-link" href="#" id="logout">Cerrar sesión</a>

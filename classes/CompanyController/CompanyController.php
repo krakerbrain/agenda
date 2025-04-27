@@ -24,10 +24,12 @@ class CompanyController
 
         $services = $this->companyModel->getServicesByCompanyId($company['id']);
         $socialNetworks = $this->companyModel->getSocialNetworksByCompanyId($company['id']);
+        $servicesProvidersCount = $this->companyModel->getServiceProvidersByCompanyIdCount($company['id']);
 
         return [
             "company" => $company,
             "services" => $services,
+            "servicesProvidersCount" => $servicesProvidersCount,
             "socialNetworks" => $socialNetworks,
             "style" => [
                 "primary_color" =>      $company['font_color'] ?? '#525252',

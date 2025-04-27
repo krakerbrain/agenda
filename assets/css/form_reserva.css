@@ -63,7 +63,8 @@ body {
 .company-name,
 .company-info,
 .social-icons a,
-.description {
+.description,
+.provider-name {
   color: var(--primary-color);
 }
 

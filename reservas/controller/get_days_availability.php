@@ -9,11 +9,12 @@ require_once dirname(__DIR__, 2) . '/classes/Appointments.php';
 $data = json_decode(file_get_contents('php://input'), true);
 $service_id = $data['service_id'];
 $company_id = $data['company_id'];
+$user_id = $data['provider'];
 $today = new DateTime();
 
 $companyModel = new CompanyModel();
-$services = new Services($company_id);
-$schedules = new Schedules($company_id);
+$services = new Services($company_id, $user_id);
+$schedules = new Schedules($company_id, $user_id);
 $appointmentsData = new Appointments();
 
 $company = $companyModel->getCompanyCalendarData($company_id);

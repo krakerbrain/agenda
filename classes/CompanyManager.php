@@ -129,21 +129,6 @@ class CompanyManager
 
             $this->urlConverter($company_id, $name);
 
-            // Insertar los horarios de trabajo de la nueva compañía
-            $days = [1, 2, 3, 4, 5, 6, 7]; // Lunes a Domingo
-            foreach ($days as $day) {
-                $sql = "INSERT INTO company_schedules 
-                        (company_id, day_id, work_start, work_end, break_start, break_end, is_enabled) 
-                        VALUES (:company_id, :day_id, NULL, NULL, NULL, NULL, 1)";
-                $this->db->query($sql);
-                $this->db->bind(':company_id', $company_id);
-                $this->db->bind(':day_id', $day);
-                $this->db->execute();
-            }
-
-            // Aquí no detenemos la transacción, solo registramos los errores si ocurren
-
-
             $this->db->endTransaction(); // Commit de la transacción
 
             $integrationResult = $this->integrationManager->createDefaultIntegrationsForCompany($company_id);

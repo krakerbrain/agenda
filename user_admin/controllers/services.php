@@ -11,14 +11,30 @@ $datosUsuario = $auth->validarTokenUsuario();
 
 try {
     $company_id = $datosUsuario['company_id'];
-    $services = new Services($company_id);
-    $schedules = new Schedules($company_id); // Instanciar la clase Schedules
+    $user_id = $datosUsuario['user_id'];
+    $services = new Services($company_id, $user_id);
+    $schedules = new Schedules($company_id, $user_id); // Instanciar la clase Schedules
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        // Procesar la data del formulario
-        $servicesData = $_POST; // Asume que estás enviando los datos como application/x-www-form-urlencoded
-        $services->saveServices($servicesData);
-        echo json_encode(['success' => true, 'message' => 'Servicios guardados exitosamente.']);
+        $servicesData = $_POST;
+
+        $result = $services->saveServices($servicesData);
+        $result = json_decode($result, true);
+
+        if ($result['success'] && isset($result['new_service_ids'])) {
+            // Asignar usuario solo a servicios nuevos
+            foreach ($result['new_service_ids'] as $tempId => $realId) {
+                $services->assignUserToService([
+                    'service_id' => $realId,
+                    'available_days' => implode(',', $servicesData['available_service_day'][$tempId] ?? []),
+                    'is_active' => isset($servicesData['service_enabled'][$tempId]) ? 1 : 0
+                ], true);
+            }
+        }
+
+        // Respuesta uniforme (éxito/error lo maneja saveServices)
+        header('Content-Type: application/json');
+        echo json_encode($result);
     } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
         parse_str(file_get_contents("php://input"), $deleteData);
 

@@ -251,12 +251,8 @@ $current_date->setTime(0, 0, 0);
                         <label class="form-check-label ms-2" for="blockUsersSwitch">Bloquear usuarios con más de:
                         </label>
 
-                        <div id="incidentsThresholdContainer" class="ms-2"
-                            style="display: <?php echo isset($company['block_by_incidents']) && $company['block_by_incidents'] > 0 ? 'inline-block' : 'none'; ?>;">
-                            <input type="number" class="form-control form-control-sm d-inline-block"
-                                style="width: 60px;" id="blockAfterIncidents" name="incidents_threshold" min="1"
-                                value="<?php echo isset($company['block_by_incidents']) ? $company['incidents_threshold'] : 2; ?>">
-                            <label for="blockAfterIncidents" class="ms-1">incidencias</label>
+                        <div id="incidentsThresholdContainer" class="ms-2">
+                            <!-- El input se añadirá dinámicamente aquí -->
                         </div>
                     </div>
                 </div>

@@ -1,11 +1,14 @@
 export function initHorarios() {
   const form = document.getElementById("workScheduleForm");
   const tableBody = document.getElementById("scheduleTableBody");
+  // obtener value de usario selected
 
   let initialSchedules = [];
 
-  async function getHorarios() {
-    const response = await fetch(`${baseUrl}user_admin/controllers/schedulesController.php`, {
+  async function getHorarios(user_id = null) {
+    let userIdUrl = user_id !== null ? `?user_id=${user_id}` : "";
+
+    const response = await fetch(`${baseUrl}user_admin/controllers/schedulesController.php${userIdUrl}`, {
       method: "GET",
     });
     const { success, data } = await response.json();
@@ -22,6 +25,14 @@ export function initHorarios() {
         });
       }
     }
+  }
+
+  // evento chaange para userSelect
+  if (document.getElementById("userSelect")) {
+    document.getElementById("userSelect").addEventListener("change", async function () {
+      const userId = this.value;
+      await getHorarios(userId);
+    });
   }
 
   function getCurrentSchedules() {
@@ -246,8 +257,10 @@ export function initHorarios() {
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const formData = new FormData(form);
+    let userId = document.getElementById("userSelect").value;
+
     try {
-      const response = await fetch(`${baseUrl}user_admin/controllers/schedulesController.php`, {
+      const response = await fetch(`${baseUrl}user_admin/controllers/schedulesController.php?user_id=${userId}`, {
         method: "POST",
         body: formData,
       });
@@ -258,7 +271,7 @@ export function initHorarios() {
         const modal = new bootstrap.Modal(document.getElementById("saveSchedules"));
         modal.show();
         showSaveAlert(false);
-        getHorarios();
+        getHorarios(userId);
       }
     } catch (error) {
       console.error(error);
@@ -268,8 +281,10 @@ export function initHorarios() {
   async function copiarEnTodos() {
     const formData = new FormData(form);
     formData.append("copy_from_monday", true);
+    let userId = document.getElementById("userSelect").value;
+
     try {
-      const response = await fetch(`${baseUrl}user_admin/controllers/schedulesController.php`, {
+      const response = await fetch(`${baseUrl}user_admin/controllers/schedulesController.php?user_id=${userId}`, {
         method: "POST",
         body: formData,
       });
@@ -278,7 +293,7 @@ export function initHorarios() {
 
       if (success) {
         alert(message);
-        getHorarios();
+        getHorarios(userId);
       } else {
         alert("Error al copiar los horarios: " + message);
       }

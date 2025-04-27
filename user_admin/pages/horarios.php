@@ -2,20 +2,46 @@
 require_once dirname(__DIR__, 2) . '/configs/init.php';
 require_once dirname(__DIR__, 2) . '/access-token/seguridad/JWTAuth.php';
 require_once dirname(__DIR__, 2) . '/classes/ConfigUrl.php';
+require_once dirname(__DIR__, 2) . '/classes/Users.php';
 
 $baseUrl = ConfigUrl::get();
 $auth = new JWTAuth();
-$auth->validarTokenUsuario();
+$datosUsuario = $auth->validarTokenUsuario();
+
+$userData = new Users();
+$user_count = $userData->count_company_users($datosUsuario['company_id']);
+if ($user_count > 1) {
+    $users = $userData->get_all_users($datosUsuario['company_id']);
+}
+
 ?>
 
 <div class="container my-5">
+    <?php if ($user_count > 1 && $datosUsuario['role_id'] == 2) : ?>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="userSelect" class="form-label">Selecciona el usuario</label>
+                <select id="userSelect" class="form-select">
+                    <?php foreach ($users as $user) : ?>
+                        <!-- si datosUsuario['id'] == $user['id'] entonces se selecciona -->
+                        <option value="<?= $user['id'] ?>"
+                            <?= $datosUsuario['role_id'] == $user['role_id'] ? 'selected' : '' ?>>
+                            <?= $user['name'] ?></option>
+                    <?php endforeach; ?>
+
+                </select>
+            </div>
+        </div>
+    <?php else : ?>
+        <input type="hidden" id="userSelect" value="<?= $datosUsuario['user_id'] ?>">
+    <?php endif; ?>
     <form id="workScheduleForm" method="POST" class="border p-4 rounded">
         <div id="unsavedChangesAlert" class="alert alert-warning d-none" role="alert">
             <strong>Recuerda guardar los cambios antes de salir.</strong>
             Si sales sin guardar, perderás los cambios realizados.
             <button type="submit" class="btn btn-primary btn-sm">Guardar Configuración</button>
         </div>
-        <input type="hidden" name="company_id" id="company_id" value="1"> <!-- Replace with dynamic company ID -->
+
         <table class="table table-borderless table-striped table-sm">
             <thead>
                 <tr class="head-table">

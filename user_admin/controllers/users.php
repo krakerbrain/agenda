@@ -12,8 +12,10 @@ $datosUsuario = $auth->validarTokenUsuario();
 try {
     $company_id = $datosUsuario['company_id'];
     $users = new Users;
+    $requestMethod = $_SERVER['REQUEST_METHOD'];
+    $action = $_GET['action'] ?? null;
 
-    if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+    if ($requestMethod === 'DELETE') {
         $data = json_decode(file_get_contents("php://input"), true);
         if (isset($data['id'])) {
             $result = $users->delete_user($data['id']);
@@ -30,13 +32,39 @@ try {
         }
     } else {
 
-        if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action']) && $_GET['action'] === 'getRoles') {
-            header('Content-Type: application/json');
-            echo json_encode(['success' => true, 'data' => $users->getAboutRoles()]);
-        } else {
+        if ($requestMethod === 'GET') {
+            if ($action === 'getRoles') {
+                // Obtener roles disponibles
+                echo json_encode([
+                    'success' => true,
+                    'data' => $users->getAboutRoles()
+                ]);
+            } elseif ($action === 'getUserForEdit' && isset($_GET['id'])) {
+                // Obtener datos de usuario para edición
+                $userId = (int)$_GET['id'];
 
-            header('Content-Type: application/json');
-            echo json_encode(['success' => true, 'data' => $users->get_users($company_id)]);
+                // Validar permisos (opcional)
+                if ($datosUsuario['role_id'] > 2) { // Ajusta según tus roles
+                    throw new Exception('No tienes permisos para esta acción');
+                }
+
+                $userData = $users->getUserForEdit($userId, $company_id);
+
+                if (!$userData) {
+                    throw new Exception('Usuario no encontrado o no pertenece a esta compañía');
+                }
+
+                echo json_encode([
+                    'success' => true,
+                    'data' => $userData
+                ]);
+            } else {
+                // Listado general de usuarios
+                echo json_encode([
+                    'success' => true,
+                    'data' => $users->get_users($company_id)
+                ]);
+            }
         }
     }
 } catch (Exception $e) {

@@ -8,27 +8,27 @@ $auth = new JWTAuth();
 $auth->validarTokenUsuario();
 ?>
 <style>
-    */ .time-field {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
+*/ .time-field {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
 
-    .time-label {
-        font-size: 0.75rem;
-        /* Tamaño pequeño para el texto */
-        margin-bottom: 0.25rem;
-        /* Separación entre la etiqueta y el input */
-        color: #6c757d;
-        /* Color neutro */
-    }
+.time-label {
+    font-size: 0.75rem;
+    /* Tamaño pequeño para el texto */
+    margin-bottom: 0.25rem;
+    /* Separación entre la etiqueta y el input */
+    color: #6c757d;
+    /* Color neutro */
+}
 
-    .time-box {
-        width: 50px;
-        /* Ancho del campo */
-        text-align: center;
-        padding: 0.25rem;
-    }
+.time-box {
+    width: 50px;
+    /* Ancho del campo */
+    text-align: center;
+    padding: 0.25rem;
+}
 </style>
 <div class="container text-end">
     <a tabindex="0" role="button" data-bs-trigger="focus" class="btn" data-bs-placement="left" data-bs-toggle="popover"
@@ -43,7 +43,9 @@ $auth->validarTokenUsuario();
         <table class="table table-borderless table-striped table-sm">
             <thead>
                 <tr class="head-table">
-                    <th>Habilitado</th>
+                    <!-- agegrar tooltip con icono i de información y el texto define si el servicio esta disponible o no para todos los usaurios -->
+                    <th>Habilitado<i class="fa fa-info-circle ps-1" data-bs-toggle="tooltip" data-bs-placement="top"
+                            title="Define si el servicio está disponible para todos los usuarios"></i></th>
                     <th>Nombre del Servicio</th>
                     <th class="text-center">Duración</th>
                     <th>Observaciones</th>

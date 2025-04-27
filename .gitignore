@@ -18,11 +18,12 @@ jest.config.js
 babel.config.js
 /node_modules
 /assets/img/uploads
+/assets/img/profiles
+/assets/img/banners/user*
 /trash
 __documentacion__
 /utils
 *copy.*
-/assets/img/banners/user*
 .prettierignore
 phpunit.xml
 .phpunit.cache

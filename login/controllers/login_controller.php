@@ -26,7 +26,7 @@ if (isset($_POST['usuario']) && isset($_POST['contrasenia'])) {
                     if (hash_equals($datos['token_sha256'], $tokenVerificacion)) {
                         if (password_verify($pass, $datos['password'])) {
                             $auth = new JWTAuth();
-                            $auth->generarToken($datos['company_id'], $datos['role_id']);
+                            $auth->generarToken($datos['company_id'], $datos['role_id'], $datos['user_id']);
                             $response['success'] = true;
                             $response['redirect'] = $_ENV['URL_LOGIN'];
                         } else {

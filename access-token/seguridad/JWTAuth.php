@@ -17,11 +17,12 @@ class JWTAuth
     }
 
     // Función para generar token JWT
-    public function generarToken($company_id, $role_id)
+    public function generarToken($company_id, $role_id, $user_id)
     {
         $payload = [
             "company_id" => $company_id,
             "role_id" => $role_id, // Incluimos el rol en el payload
+            "user_id" => $user_id, // Incluimos el ID de usuario en el payload
             "last_activity" => time()
         ];
 
@@ -47,6 +48,7 @@ class JWTAuth
                 if (is_object($decoded)) {
                     $company_id = $decoded->company_id;
                     $role_id = $decoded->role_id;
+                    $user_id = $decoded->user_id; // Obtener el ID de usuario
                     $last_activity = $decoded->last_activity;
 
                     // Verificar la inactividad
@@ -54,8 +56,8 @@ class JWTAuth
                         $this->invalidarSesion();
                     } else {
                         // Regenerar el token para extender la sesión
-                        $this->generarToken($company_id, $role_id);
-                        return ['company_id' => $company_id, 'role_id' => $role_id];
+                        $this->generarToken($company_id, $role_id, $user_id);
+                        return ['company_id' => $company_id, 'role_id' => $role_id, 'user_id' => $user_id];
                     }
                 }
             } catch (Exception $e) {

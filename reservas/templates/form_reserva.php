@@ -1,4 +1,5 @@
 <form id="appointmentForm" style="max-width: 600px; margin: 0 auto;">
+    <input type="hidden" name="company_id" id="company_id" value="<?php echo htmlspecialchars($company['id']); ?>">
     <?php if ($customerData): ?>
     <!-- Botón para volver a user_admin/index.php -->
     <div class="text-end mb-3">
@@ -10,7 +11,6 @@
     <div id="step1" class="step">
         <h4 class="text-center mb-4 pass-title">Paso 1: Escoge el Servicio</h4>
         <div class="mb-3">
-            <label for="service" class="form-label">Servicio:</label>
             <select id="service" name="service" class="form-select" required>
                 <option value="" selected>Selecciona un servicio</option>
                 <?php foreach ($services as $service) : ?>
@@ -42,23 +42,16 @@
     <!-- PASO 2 -->
     <div id="step2" class="step d-none">
         <h4 class="text-center mb-4 pass-title">Paso 2: Escoge Fecha y Hora</h4>
-        <div class="mb-3">
-            <label for="date" class="form-label">Selecciona la fecha:</label>
-            <input type="date" id="date" name="date" class="form-control" required>
-        </div>
-        <div class="mb-3">
-            <label for="time" class="form-label">Selecciona el horario:</label>
-            <input type="hidden" name="schedule_mode" id="schedule_mode"
-                value="<?php echo htmlspecialchars($company['schedule_mode']); ?>">
 
-            <!-- Contenedor para los botones de hora -->
-            <div id="time" class="time-buttons">
-                <!-- Los botones se generarán dinámicamente aquí -->
-            </div>
-
-            <!-- Campo oculto para almacenar la hora seleccionada -->
-            <input type="hidden" id="selected_time" name="time">
-        </div>
+        <div id="providers-dates-container" class="mb-3"></div>
+        <!-- Campo oculto para almacenar la hora seleccionada -->
+        <input type="hidden" id="selected_date" name="date">
+        <input type="hidden" id="selected_time" name="time">
+        <input type="hidden" name="schedule_mode" id="schedule_mode"
+            value="<?php echo htmlspecialchars($company['schedule_mode']); ?>">
+        <!-- input user_id -->
+        <input type="hidden" name="providers_count" id="providers_count" value="<?php echo $servicesProvidersCount; ?>">
+        <input type="hidden" name="provider" id="selected_user_id">
         <button type="button" class="btn btn-anterior" onclick="showStep(1)">Anterior</button>
         <button type="button" class="btn btn-siguiente" onclick="showStep(3)">Siguiente</button>
     </div>
@@ -68,6 +61,7 @@
         <input type="hidden" name="company_id" id="company_id" value="<?php echo htmlspecialchars($company['id']); ?>">
         <input type="hidden" name="authenticated" id="authenticated"
             value="<?php echo $authenticated ? 'true' : 'false'; ?>">
+        <!-- <input type="hidden" id="auto_time_selected" value="0"> -->
         <!-- Checkbox para editar (solo visible si $customerData existe) -->
         <?php if ($customerData): ?>
         <div class="mb-3 form-check">
@@ -139,6 +133,36 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-siguiente" id="acceptButton"
                     data-bs-dismiss="modal">Aceptar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de información del proveedor -->
+<div class="modal fade" id="providerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0">
+            <div class="modal-body p-0">
+                <div class="row g-0">
+                    <!-- Foto grande -->
+                    <div class="col-md-5">
+                        <img src="" class="img-fluid w-100 h-100" style="object-fit: cover; min-height: 400px;"
+                            alt="Imagen del proveedor" id="providerModalImage">
+                    </div>
+
+                    <!-- Información -->
+                    <div class="col-md-7 p-4">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <h4 class="modal-title" id="providerModalName"></h4>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+
+                        <div class="mb-4" id="providerModalDescription"></div>
+
+                        <h6 class="border-top pt-3">Servicios realizados</h6>
+                        <ul class="list-unstyled" id="providerModalServices"></ul>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
