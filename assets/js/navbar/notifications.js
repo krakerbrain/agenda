@@ -46,7 +46,7 @@ async function loadAllNotifications() {
                                 <h6 class="mb-1">${notification.title}</h6>
                                 ${readBadge}
                             </div>
-                            <p class="mb-1">${notification.description}</p>
+                            <p class="mb-1">${notification.description.replace(/\n/g, "<br>")}</p>
                             <div class="d-flex justify-content-between">
                                 <small class="text-muted">Versión ${notification.version}</small>
                                 <small class="text-muted">${timeAgo}</small>
