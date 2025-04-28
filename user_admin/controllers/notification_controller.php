@@ -31,7 +31,7 @@ try {
             $notificationId = $notifications->createNotification(
                 $data['title'],
                 $data['description'],
-                $data['version'] ?? null,
+                $data['version'] ?? "1.0.0",
                 $data['type'],
             );
 

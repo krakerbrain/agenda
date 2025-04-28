@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const item = e.target.closest(".notification-item");
         const notificationId = item.dataset.notificationId;
         markAsRead(notificationId, item);
+        goToNotificationPage(); // Redirigir a la página de notificaciones
       }
     });
   }
@@ -22,11 +23,16 @@ document.addEventListener("DOMContentLoaded", function () {
     viewAllBtn.addEventListener("click", function (e) {
       e.preventDefault();
       // Aquí puedes redirigir a una página de todas las notificaciones
-      sessionStorage.setItem("lastPage", "notificaciones");
-      location.reload();
+      goToNotificationPage();
     });
   }
 });
+
+function goToNotificationPage() {
+  // Redirigir a la página de notificaciones
+  sessionStorage.setItem("lastPage", "notificaciones");
+  location.reload();
+}
 
 async function loadNotifications() {
   const notificationList = document.getElementById("notification-list");
@@ -61,12 +67,11 @@ async function loadNotifications() {
         const timeAgo = getTimeAgo(notification.created_at);
 
         html += `
-            <li class="notification-item px-3 py-2" data-notification-id="${notification.user_notification_id}">
+            <li class="notification-item px-3 py-2" data-notification-id="${notification.user_notification_id}" style="cursor: pointer;">
               <div class="d-flex gap-2">
                 <div class="flex-shrink-0 text-primary">${icon}</div>
                 <div class="flex-grow-1">
                   <h6 class="mb-1">${notification.title}</h6>
-                  <p class="mb-0 small text-muted">${notification.description}</p>
                   <div class="d-flex justify-content-between align-items-center mt-1">
                     <small class="text-muted">${timeAgo}</small>
                     <small class="badge bg-${getNotificationBadgeClass(notification.notification_type)}">

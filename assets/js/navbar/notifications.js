@@ -111,7 +111,7 @@ async function markAllAsRead() {
 
       // Actualizar contador
       await updateNotificationCount();
-
+      loadAllNotifications();
       // Mostrar feedback
       showToast(data.message);
       return true;
@@ -173,7 +173,7 @@ function showToast(message, type = "success") {
             <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
         </div>`;
 
-  document.body.appendChild(toast);
+  document.getElementById("toast-container").appendChild(toast);
   const bsToast = new bootstrap.Toast(toast);
   bsToast.show();
 

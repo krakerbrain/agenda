@@ -39,16 +39,18 @@ include dirname(__DIR__) . '/partials/head.php';
             <div class="d-flex align-items-center">
                 <!-- Botón de notificaciones -->
                 <div class="dropdown me-3">
-                    <button class="btn btn-link text-dark position-relative p-0" type="button" id="notificationDropdown"
+                    <button class="btn btn-link text-dark p-0" type="button" id="notificationDropdown"
                         data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-envelope fs-4"></i>
+                        <i class="fa fa-envelope fs-6 position-relative"></i>
                         <?php if ($unread_count > 0): ?>
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            <span
+                                class="position-absolute start-100 translate-middle badge rounded-pill bg-danger local-badge-style">
                                 <?php echo $unread_count; ?>
                                 <span class="visually-hidden">notificaciones no leídas</span>
                             </span>
                         <?php endif; ?>
                     </button>
+
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationDropdown"
                         style="min-width: 300px; max-height: 400px; overflow-y: auto;">
                         <li>
@@ -126,7 +128,7 @@ include dirname(__DIR__) . '/partials/head.php';
                             <a class="nav-link" href="#" id="block_hour">Bloqueo de horas</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#" id="notificaciones">Notificaciones</a>
+                            <a class="nav-link" href="#" id="notificaciones">Notificaciones del sistema</a>
                         </li>
                     <?php endif; ?>
                 <?php } else { ?>
