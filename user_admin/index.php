@@ -4,6 +4,7 @@ require_once dirname(__DIR__) . '/configs/VersionManager.php';
 require_once dirname(__DIR__) . '/access-token/seguridad/JWTAuth.php';
 require_once dirname(__DIR__) . '/classes/ConfigUrl.php';
 require_once dirname(__DIR__) . '/classes/Users.php';
+require_once dirname(__DIR__) . '/classes/Notifications.php';
 
 $title = "Configuraciones";
 
@@ -20,24 +21,59 @@ if ($user_count > 1) {
     $users = $userData->get_all_users($datosUsuario['company_id']);
 }
 
+$notificationData = new Notifications(); // Asume que tienes esta clase
+$unread_count = $notificationData->getUnreadCount($datosUsuario['user_id']);
+
 include dirname(__DIR__) . '/partials/head.php';
 ?>
 <script>
-const baseUrl = '<?php echo $baseUrl; ?>';
-const role_id = <?php echo $role_id; ?>;
-window.APP_VERSION = '<?= $versionManager->getVersion() ?>';
+    const baseUrl = '<?php echo $baseUrl; ?>';
+    const role_id = <?php echo $role_id; ?>;
+    window.APP_VERSION = '<?= $versionManager->getVersion() ?>';
 </script>
 
 <body>
     <header class="nav navbar sticky-top bg-dark-subtle">
         <nav class="container-xxl">
             <a class="navbar-brand titulo" href="#"></a>
-            <!-- Botón para abrir el offcanvas -->
-
-            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasMenu"
-                aria-controls="offcanvasMenu" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+            <div class="d-flex align-items-center">
+                <!-- Botón de notificaciones -->
+                <div class="dropdown me-3">
+                    <button class="btn btn-link text-dark position-relative p-0" type="button" id="notificationDropdown"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-envelope fs-4"></i>
+                        <?php if ($unread_count > 0): ?>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                <?php echo $unread_count; ?>
+                                <span class="visually-hidden">notificaciones no leídas</span>
+                            </span>
+                        <?php endif; ?>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationDropdown"
+                        style="min-width: 300px; max-height: 400px; overflow-y: auto;">
+                        <li>
+                            <h6 class="dropdown-header">Notificaciones</h6>
+                        </li>
+                        <div id="notification-list">
+                            <!-- Las notificaciones se cargarán aquí dinámicamente -->
+                            <li class="px-3 py-2 text-center">
+                                <div class="spinner-border spinner-border-sm" role="status">
+                                    <span class="visually-hidden">Cargando...</span>
+                                </div>
+                            </li>
+                        </div>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item text-center small" href="#" id="view-all-notifications">Ver
+                                todas</a></li>
+                    </ul>
+                </div>
+                <!-- Botón para abrir el offcanvas -->
+                <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasMenu"
+                    aria-controls="offcanvasMenu" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
         </nav>
     </header>
     <!-- Offcanvas -->
@@ -50,53 +86,59 @@ window.APP_VERSION = '<?= $versionManager->getVersion() ?>';
         <div class="offcanvas-body">
             <ul class="nav nav-underline flex-column">
                 <?php if ($role_id != 1) { ?>
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="#" id="dateList">Lista de citas</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="clientes">Clientes</a>
-                </li>
-                <?php if ($datosUsuario['role_id'] == 2) : ?>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="horarios">Horarios</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="servicios">Servicios</a>
-                </li>
-                <?php if ($user_count >= 2) : ?>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="services_assign">Asignar Servicios</a>
-                </li>
-                <?php endif; ?>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="correos">Correos</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="datos_empresa">Datos Empresa</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="add_user">Agregar Usuario</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="configuraciones">Otras configuraciones</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="integrations">Servicios Integrados</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="eventos_unicos">Eventos Únicos</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="block_hour">Bloqueo de horas</a>
-                </li>
-                <?php endif; ?>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#" id="dateList">Lista de citas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="clientes">Clientes</a>
+                    </li>
+                    <?php if ($datosUsuario['role_id'] == 2) : ?>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" id="horarios">Horarios</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" id="servicios">Servicios</a>
+                        </li>
+                        <?php if ($user_count >= 2) : ?>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" id="services_assign">Asignar Servicios</a>
+                            </li>
+                        <?php endif; ?>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" id="correos">Correos</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" id="datos_empresa">Datos Empresa</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" id="add_user">Agregar Usuario</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" id="configuraciones">Otras configuraciones</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" id="integrations">Servicios Integrados</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" id="eventos_unicos">Eventos Únicos</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" id="block_hour">Bloqueo de horas</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" id="notificaciones">Notificaciones</a>
+                        </li>
+                    <?php endif; ?>
                 <?php } else { ?>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="master_add_company">Agrega Empresa</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="master_company_list">Lista de Empresas</a>
-                </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="master_add_company">Agrega Empresa</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="master_company_list">Lista de Empresas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="master_add_notification">Notificaciones</a>
+                    </li>
                 <?php } ?>
                 <li class="nav-item">
                     <a class="nav-link" href="#" id="logout">Cerrar sesión</a>
@@ -114,6 +156,9 @@ window.APP_VERSION = '<?= $versionManager->getVersion() ?>';
 
     <script type="module"
         src="<?php echo $baseUrl; ?>assets/js/navbar.js?v=<?php echo $versionManager->getVersion() ?>"></script>
+    <script type="module"
+        src="<?php echo $baseUrl; ?>assets/js/navbar/notification_badge.js?v=<?php echo $versionManager->getVersion() ?>">
+    </script>
 </body>
 
 </html>
