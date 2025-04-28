@@ -99,6 +99,14 @@ document.addEventListener("DOMContentLoaded", function () {
           const { initCompanyList } = await import(`./master_admin/master_company_list.js?v=${APP_VERSION}`);
           initCompanyList();
           break;
+        case "master_add_notification":
+          const { initAddNotification } = await import(`./master_admin/master_add_notification.js?v=${APP_VERSION}`);
+          initAddNotification();
+          break;
+        case "notificaciones":
+          const { initNotificaciones } = await import(`./navbar/notifications.js?v=${APP_VERSION}`);
+          initNotificaciones();
+          break;
         case "integrations":
           const { initIntegrations } = await import(`./integrations.js?v=${APP_VERSION}`);
           initIntegrations();

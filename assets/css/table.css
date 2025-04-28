@@ -41,6 +41,11 @@ body {
   pointer-events: none;
 }
 
+.local-badge-style {
+  font-size: 0.6rem;
+  top: 5px !important;
+}
+
 /* Responsive: ocultar cabecera de tabla en pantallas pequeñas */
 @media (max-width: 1000px) {
   tr.head-table th {
