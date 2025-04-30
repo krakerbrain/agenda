@@ -5,20 +5,20 @@ $baseUrl = ConfigUrl::get();
 include_once __DIR__ . '/landing/partials/head.php';
 ?>
 
-<body class="bg-custom-light font-sans text-gray-800">
+<body class="bg-custom-light text-gray-800">
     <?php
     include_once __DIR__ . '/landing/partials/navbar.php';
     ?>
 
     <!-- Sección Hero con Logo Destacado -->
     <section id="home" class="min-h-screen flex items-center bg-gradient-to-b from-white to-[#249373]/5">
-        <div class="container mx-auto px-4 py-12">
+        <div class="container mx-auto px-4 py-10">
             <!-- Logo Superior Centrado (Mobile) -->
             <div class="lg:hidden flex justify-center mb-8">
-                <div class="flex items-center">
-                    <img src="<?php echo $baseUrl; ?>assets/img/landing/logo_agendarium.png" alt="Logo Agendarium"
-                        class="h-24 w-auto">
-                    <span class="text-4xl font-bold text-[#1B637F] ml-3">AGENDARIUM</span>
+                <div class="flex items-center ">
+                    <img src="<?php echo $baseUrl; ?>assets\img\landing\logo\Isotipo-Agendarium.svg"
+                        alt="Logo Agendarium" class="h-24 w-auto">
+                    <span class="text-4xl font-bold text-[#1B637F] ml-3">Agendarium</span>
                 </div>
             </div>
 
@@ -26,17 +26,17 @@ include_once __DIR__ . '/landing/partials/head.php';
                 <!-- Contenido Textual -->
                 <div class="order-2 lg:order-1 text-center lg:text-left">
                     <!-- Logo + Nombre (Desktop) -->
-                    <div class="hidden lg:flex items-center mb-8">
-                        <img src="<?php echo $baseUrl; ?>assets/img/landing/logo_agendarium.png" alt="Logo Agendarium"
-                            class="h-28 w-auto mr-4">
-                        <span class="text-5xl font-bold text-[#1B637F]">AGENDARIUM</span>
+                    <div class="hidden lg:flex items-end mb-8">
+                        <img src="<?php echo $baseUrl; ?>assets\img\landing\logo\Isotipo-Agendarium.svg"
+                            alt="Logo Agendarium" class="h-28 w-auto mr-2">
+                        <span class="text-3xl font-bold text-[#1B637F]">Agendarium</span>
                     </div>
 
                     <!-- Título -->
-                    <h1 class="text-4xl sm:text-5xl xl:text-6xl font-bold mb-6 leading-tight text-[#1B637F]">
-                        Controla tu agenda <br>
-                        <span class="text-[#249373]">como un profesional</span>
-                    </h1>
+                    <h1 class="text-4xl sm:text-5xl xl:text-6xl font-bold mb-2 leading-tight text-[#1B637F]">Controla tu
+                        agenda</h1>
+                    <h1 class="text-4xl sm:text-5xl xl:text-6xl font-bold mb-6 leading-tight text-[#249373]">como un
+                        profesional</h1>
 
                     <!-- Subtítulo -->
                     <p class="text-xl md:text-2xl text-[#2B819F] mb-10 max-w-lg mx-auto lg:mx-0">
@@ -182,55 +182,31 @@ include_once __DIR__ . '/landing/partials/head.php';
             <div class="swiper-button-prev !text-[#FFBF2F] !left-8"></div>
         </div>
 
-        <!-- Miniaturas (Opcional) -->
-        <div class="container px-4 mt-8 hidden md:block">
-            <div class="swiper howItWorks-thumbs">
-                <div class="swiper-wrapper">
-                    <div class="swiper-slide !w-auto !mr-4">
-                        <button
-                            class="text-[#1B637F] bg-white/80 hover:bg-white px-6 py-2 rounded-full font-medium transition-colors">
-                            Registro express
-                        </button>
-                    </div>
-                    <div class="swiper-slide !w-auto !mr-4">
-                        <button
-                            class="text-[#249373] bg-white/80 hover:bg-white px-6 py-2 rounded-full font-medium transition-colors">
-                            Configuración
-                        </button>
-                    </div>
-                    <div class="swiper-slide !w-auto">
-                        <button
-                            class="text-[#2B819F] bg-white/80 hover:bg-white px-6 py-2 rounded-full font-medium transition-colors">
-                            Compartir agenda
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+
     </section>
 
     <!-- Scripts de Swiper -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
-    // Inicialización del slider
-    const howItWorksSlider = new Swiper('.howItWorks-slider', {
-        effect: 'fade',
-        speed: 800,
-        pagination: {
-            el: '.swiper-pagination',
-            clickable: true,
-        },
-        navigation: {
-            nextEl: '.swiper-button-next',
-            prevEl: '.swiper-button-prev',
-        },
-        thumbs: {
-            swiper: {
-                el: '.howItWorks-thumbs',
-                slidesPerView: 'auto',
+        // Inicialización del slider
+        const howItWorksSlider = new Swiper('.howItWorks-slider', {
+            effect: 'fade',
+            speed: 800,
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            },
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            },
+            thumbs: {
+                swiper: {
+                    el: '.howItWorks-thumbs',
+                    slidesPerView: 'auto',
+                }
             }
-        }
-    });
+        });
     </script>
 
     <!-- Sección ¿Cómo Funciona? - Versión Mejorada -->
@@ -400,15 +376,7 @@ include_once __DIR__ . '/landing/partials/head.php';
                             </li>
                         </ul>
                     </div>
-                    <div
-                        class="bg-white p-6 rounded-xl border-l-4 border-[#249373] shadow-sm hover:shadow-[0_4px_12px_rgba(43,129,159,0.1)]">
-                        <div
-                            class="w-10 h-10 bg-[#1B637F]/10 text-[#1B637F] rounded-full flex items-center justify-center mb-4">
-                            <span class="material-icons">notifications</span>
-                        </div>
-                        <h3 class="text-[#1B637F] font-semibold mb-2">Recordatorios automáticos</h3>
-                        <p class="text-gray-600">Notificaciones inteligentes para reducir inasistencias</p>
-                    </div>
+
                 </div>
 
                 <div class="text-center mt-8">
@@ -430,96 +398,96 @@ include_once __DIR__ . '/landing/partials/head.php';
 
     <!-- JavaScript -->
     <script>
-    // const baseUrl = '<?php echo $baseUrl; ?>';
+        // const baseUrl = '<?php echo $baseUrl; ?>';
 
-    // // Scroll suave para los enlaces del navbar
-    // document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    //     anchor.addEventListener('click', function(e) {
-    //         e.preventDefault();
+        // // Scroll suave para los enlaces del navbar
+        // document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        //     anchor.addEventListener('click', function(e) {
+        //         e.preventDefault();
 
-    //         const targetId = this.getAttribute('href');
-    //         if (targetId === '#inscriptionModal') return;
+        //         const targetId = this.getAttribute('href');
+        //         if (targetId === '#inscriptionModal') return;
 
-    //         const targetElement = document.querySelector(targetId);
-    //         if (targetElement) {
-    //             window.scrollTo({
-    //                 top: targetElement.offsetTop - 80,
-    //                 behavior: 'smooth'
-    //             });
+        //         const targetElement = document.querySelector(targetId);
+        //         if (targetElement) {
+        //             window.scrollTo({
+        //                 top: targetElement.offsetTop - 80,
+        //                 behavior: 'smooth'
+        //             });
 
-    //             // Actualizar el item activo del navbar
-    //             document.querySelectorAll('.nav-item').forEach(item => {
-    //                 item.classList.remove('text-primary', 'font-medium');
-    //                 item.classList.add('text-gray-600');
-    //             });
+        //             // Actualizar el item activo del navbar
+        //             document.querySelectorAll('.nav-item').forEach(item => {
+        //                 item.classList.remove('text-primary', 'font-medium');
+        //                 item.classList.add('text-gray-600');
+        //             });
 
-    //             this.classList.add('text-primary', 'font-medium');
-    //             this.classList.remove('text-gray-600');
-    //         }
-    //     });
-    // });
+        //             this.classList.add('text-primary', 'font-medium');
+        //             this.classList.remove('text-gray-600');
+        //         }
+        //     });
+        // });
 
-    // // Cambiar el navbar al hacer scroll
-    // window.addEventListener('scroll', function() {
-    //     const sections = document.querySelectorAll('section');
-    //     const scrollPosition = window.scrollY + 100;
+        // // Cambiar el navbar al hacer scroll
+        // window.addEventListener('scroll', function() {
+        //     const sections = document.querySelectorAll('section');
+        //     const scrollPosition = window.scrollY + 100;
 
-    //     sections.forEach(section => {
-    //         const sectionTop = section.offsetTop;
-    //         const sectionHeight = section.offsetHeight;
-    //         const sectionId = section.getAttribute('id');
+        //     sections.forEach(section => {
+        //         const sectionTop = section.offsetTop;
+        //         const sectionHeight = section.offsetHeight;
+        //         const sectionId = section.getAttribute('id');
 
-    //         if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
-    //             document.querySelectorAll('.nav-item').forEach(item => {
-    //                 item.classList.remove('text-primary', 'font-medium');
-    //                 item.classList.add('text-gray-600');
-    //             });
+        //         if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
+        //             document.querySelectorAll('.nav-item').forEach(item => {
+        //                 item.classList.remove('text-primary', 'font-medium');
+        //                 item.classList.add('text-gray-600');
+        //             });
 
-    //             document.querySelector(`.nav-item[href="#${sectionId}"]`).classList.add('text-primary',
-    //                 'font-medium');
-    //             document.querySelector(`.nav-item[href="#${sectionId}"]`).classList.remove(
-    //                 'text-gray-600');
-    //         }
-    //     });
-    // });
+        //             document.querySelector(`.nav-item[href="#${sectionId}"]`).classList.add('text-primary',
+        //                 'font-medium');
+        //             document.querySelector(`.nav-item[href="#${sectionId}"]`).classList.remove(
+        //                 'text-gray-600');
+        //         }
+        //     });
+        // });
 
-    // // Manejar el formulario de inscripción (similar al anterior)
-    // document.querySelector("#companyForm")?.addEventListener("submit", async function(e) {
-    //     e.preventDefault();
-    //     const formData = new FormData(this);
+        // // Manejar el formulario de inscripción (similar al anterior)
+        // document.querySelector("#companyForm")?.addEventListener("submit", async function(e) {
+        //     e.preventDefault();
+        //     const formData = new FormData(this);
 
-    //     try {
-    //         const response = await fetch(`${baseUrl}inscripcion/controller/procesar_inscripcion.php`, {
-    //             method: "POST",
-    //             body: formData,
-    //         });
+        //     try {
+        //         const response = await fetch(`${baseUrl}inscripcion/controller/procesar_inscripcion.php`, {
+        //             method: "POST",
+        //             body: formData,
+        //         });
 
-    //         const {
-    //             success,
-    //             message,
-    //             error
-    //         } = await response.json();
+        //         const {
+        //             success,
+        //             message,
+        //             error
+        //         } = await response.json();
 
-    //         if (success) {
-    //             // Cerrar modal de inscripción si está abierto
-    //             const inscriptionModal = bootstrap.Modal.getInstance(document.getElementById(
-    //                 "inscriptionModal"));
-    //             if (inscriptionModal) inscriptionModal.hide();
+        //         if (success) {
+        //             // Cerrar modal de inscripción si está abierto
+        //             const inscriptionModal = bootstrap.Modal.getInstance(document.getElementById(
+        //                 "inscriptionModal"));
+        //             if (inscriptionModal) inscriptionModal.hide();
 
-    //             // Mostrar modal de éxito
-    //             document.getElementById("responseMessage").innerText = message;
-    //             new bootstrap.Modal(document.getElementById("responseModal")).show();
-    //         } else {
-    //             document.getElementById("responseMessage").innerText = message || error;
-    //             new bootstrap.Modal(document.getElementById("responseModal")).show();
-    //         }
-    //     } catch (error) {
-    //         console.error("Error:", error);
-    //         document.getElementById("responseMessage").innerText =
-    //             "Hubo un error al procesar la solicitud.";
-    //         new bootstrap.Modal(document.getElementById("responseModal")).show();
-    //     }
-    // });
+        //             // Mostrar modal de éxito
+        //             document.getElementById("responseMessage").innerText = message;
+        //             new bootstrap.Modal(document.getElementById("responseModal")).show();
+        //         } else {
+        //             document.getElementById("responseMessage").innerText = message || error;
+        //             new bootstrap.Modal(document.getElementById("responseModal")).show();
+        //         }
+        //     } catch (error) {
+        //         console.error("Error:", error);
+        //         document.getElementById("responseMessage").innerText =
+        //             "Hubo un error al procesar la solicitud.";
+        //         new bootstrap.Modal(document.getElementById("responseModal")).show();
+        //     }
+        // });
     </script>
 </body>
 

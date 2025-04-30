@@ -4,16 +4,16 @@
           <div class="flex justify-between items-center h-16">
 
               <!-- Contenedor Logo + Nombre -->
-              <div class="flex items-center space-x-3">
+              <div class="flex items-end">
                   <!-- ESPACIO PARA LOGO -->
                   <div class="w-10">
                       <!-- Icono temporal (reemplazar por tu logo) -->
-                      <img src="<?php echo $baseUrl; ?>assets/img/landing/logo_agendarium.png" alt="Logo Agendarium"
-                          class="h-16 w-auto mr-3">
+                      <img src="<?php echo $baseUrl; ?>assets/img/landing/logo/Isotipo-Agendarium.svg"
+                          alt="Logo Agendarium" class="h-16 w-auto mr-3">
                   </div>
 
                   <!-- Nombre de la app - Puedes usar texto o incluir logo con texto -->
-                  <a href="#" class="text-xl font-bold text-[#1B637F] hover:text-[#2B819F] transition-colors">
+                  <a href="#" class="text-xl font-bold text-[#1B637F] hover:text-[#2B819F] transition-colors mb-2 ml-2">
                       Agendarium
                   </a>
               </div>

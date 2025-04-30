@@ -7,7 +7,7 @@
     <title>Agendarium - Gestión de Citas</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet"> -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
@@ -30,6 +30,19 @@
         }
     </script>
     <style>
+        @font-face {
+            font-family: 'CarrigPro-Regular';
+            src: url(assets/fonts/CarrigPro-Regular.woff2) format('woff2');
+        }
+
+        :root {
+            font-family: 'CarrigPro-Regular', sans-serif;
+        }
+
+        body {
+            font-family: 'CarrigPro-Regular', sans-serif;
+        }
+
         .bg-custom-light {
             background-color: #FAFAFA;
         }
