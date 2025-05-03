@@ -33,14 +33,15 @@ include_once __DIR__ . '/landing/partials/head.php';
                     </div>
 
                     <!-- Título -->
-                    <h1 class="text-4xl sm:text-5xl xl:text-6xl font-bold mb-2 leading-tight text-[#1B637F]">Controla tu
+                    <h1 class="text-4xl sm:text-5xl xl:text-6xl font-bold md:mb-2 leading-tight text-[#1B637F]">Controla
+                        tu
                         agenda</h1>
                     <h1 class="text-4xl sm:text-5xl xl:text-6xl font-bold mb-6 leading-tight text-[#249373]">como un
                         profesional</h1>
 
                     <!-- Subtítulo -->
-                    <p class="text-xl md:text-2xl text-[#2B819F] mb-10 max-w-lg mx-auto lg:mx-0">
-                        La solución todo-en-uno para gestionar citas, clientes y pagos
+                    <p class="text-xl text-[#2B819F] mb-10 max-w-lg mx-auto lg:mx-0">
+                        La herramienta de gestión de citas que necesitas para organizar tu tiempo de manera eficiente.
                     </p>
 
                     <!-- CTA Buttons -->
@@ -60,8 +61,8 @@ include_once __DIR__ . '/landing/partials/head.php';
                 <div class="order-1 lg:order-2 flex justify-center relative">
                     <!-- Badge sobre imagen -->
                     <div
-                        class="absolute -top-5 -right-5 lg:right-0 bg-[#FFBF2F] text-[#1B637F] font-bold py-2 px-4 rounded-full shadow-lg z-10 text-sm rotate-6">
-                        ¡Más de 5.000 profesionales!
+                        class="absolute -top-5 -right-5 lg:right-0 bg-[#1B637F] text-white font-bold py-2 px-4 rounded-full shadow-lg z-10 text-sm rotate-3">
+                        ¡Estrenamos nueva versión!
                     </div>
                     <img src="<?php echo $baseUrl; ?>assets/img/landing/hero_section.png"
                         alt="Profesionales usando Agendarium"
@@ -71,106 +72,154 @@ include_once __DIR__ . '/landing/partials/head.php';
         </div>
     </section>
 
-    <!-- Sección ¿Cómo Funciona? - Versión Slider Fullscreen -->
+    <!-- Sección ¿Cómo Funciona? - Versión Actualizada -->
     <section id="how" class="relative min-h-screen py-16 overflow-hidden">
         <!-- Slider Principal -->
         <div class="swiper howItWorks-slider h-screen w-full">
             <div class="swiper-wrapper">
-                <!-- Slide 1 - Registro -->
+                <!-- Slide 1 - Sincronización -->
                 <div class="swiper-slide relative">
                     <div class="absolute inset-0 bg-[#1B637F]/90 z-10"></div>
-                    <img src="<?php echo $baseUrl; ?>assets/img/landing/slides/slider_1.jpg"
-                        alt="Registro en Agendarium" class="absolute inset-0 w-full h-full object-cover">
+                    <img src="<?php echo $baseUrl; ?>assets/img/landing/slides/calendar-sync.jpg"
+                        alt="Sincronización con Google Calendar" class="absolute inset-0 w-full h-full object-cover">
 
-                    <div class="container relative z-20 h-full flex items-center px-20">
+                    <div class="container relative z-20 h-full flex items-center px-4 lg:px-20">
                         <div class="max-w-2xl text-white">
                             <span
                                 class="inline-block bg-white/20 text-sm font-semibold px-4 py-1 rounded-full mb-6 backdrop-blur-sm">
-                                Paso 1 de 3
+                                Integración Perfecta
                             </span>
-                            <h2 class="text-4xl md:text-6xl font-bold mb-6">Registro en <span class="text-[#FFBF2F]">2
-                                    minutos</span></h2>
-                            <p class="text-xl md:text-2xl opacity-90 mb-8">
-                                Solo necesitas tu email y datos básicos. Sin configuraciones complicadas.
+                            <h2 class="text-4xl md:text-5xl font-bold mb-6">Sincronización automática con <span
+                                    class="text-[#FFBF2F]">Google Calendar</span></h2>
+                            <p class="text-xl opacity-90 mb-8">
+                                Todas tus citas se reflejan automáticamente en tu calendario personal, manteniendo el
+                                control total de tu agenda.
                             </p>
-                            <ul class="space-y-3 mb-10">
-                                <li class="flex items-center">
-                                    <span class="material-icons text-[#FFBF2F] mr-2">check</span>
-                                    <span>Sin requisitos técnicos</span>
+                            <ul class="space-y-4 mb-10">
+                                <li class="flex items-start">
+                                    <span class="material-icons text-[#FFBF2F] mr-2">sync</span>
+                                    <span>Actualización en tiempo real</span>
                                 </li>
-                                <li class="flex items-center">
-                                    <span class="material-icons text-[#FFBF2F] mr-2">check</span>
-                                    <span>Guía paso a paso incluida</span>
+                                <li class="flex items-start">
+                                    <span class="material-icons text-[#FFBF2F] mr-2">visibility</span>
+                                    <span>Acceso desde cualquier dispositivo</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="material-icons text-[#FFBF2F] mr-2">security</span>
+                                    <span>Tus datos siempre en tus plataformas</span>
                                 </li>
                             </ul>
-                            <a href="<?php echo $baseUrl; ?>landing/inscripcion/inscripcion.php"
-                                class="inline-flex items-center bg-[#FFBF2F] hover:bg-[#FD9B19] text-[#1B637F] font-bold py-3 px-8 rounded-full transition-colors">
-                                Comenzar ahora
-                                <span class="material-icons ml-2">arrow_forward</span>
-                            </a>
                         </div>
                     </div>
                 </div>
 
-                <!-- Slide 2 - Configuración -->
+                <!-- Slide 2 - Gestión de Clientes -->
                 <div class="swiper-slide relative">
                     <div class="absolute inset-0 bg-[#249373]/90 z-10"></div>
-                    <img src="<?php echo $baseUrl; ?>assets/img/landing/slides/slider_2.jpg"
-                        alt="Configuración de agenda" class="absolute inset-0 w-full h-full object-cover">
+                    <img src="<?php echo $baseUrl; ?>assets/img/landing/slides/client-management.jpg"
+                        alt="Gestión de clientes" class="absolute inset-0 w-full h-full object-cover">
 
-                    <div class="container relative z-20 h-full flex items-center px-20">
+                    <div class="container relative z-20 h-full flex items-center px-4 lg:px-20">
                         <div class="max-w-2xl text-white">
                             <span
                                 class="inline-block bg-white/20 text-sm font-semibold px-4 py-1 rounded-full mb-6 backdrop-blur-sm">
-                                Paso 2 de 3
+                                Organización Total
                             </span>
-                            <h2 class="text-4xl md:text-6xl font-bold mb-6">Configuración <span
-                                    class="text-[#FFBF2F]">intuitiva</span></h2>
-                            <p class="text-xl md:text-2xl opacity-90 mb-8">
-                                Define horarios, servicios y políticas en nuestra interfaz optimizada.
+                            <h2 class="text-4xl md:text-5xl font-bold mb-6">Gestión completa de <span
+                                    class="text-[#FFBF2F]">clientes</span></h2>
+                            <p class="text-xl opacity-90 mb-8">
+                                Registra historiales, incidentes y bloquear clientes problemáticos en un solo lugar.
                             </p>
                             <div class="grid grid-cols-2 gap-4 mb-10">
                                 <div class="bg-white/10 p-4 rounded-lg backdrop-blur-sm">
-                                    <span class="material-icons text-[#FFBF2F] block mb-2">schedule</span>
-                                    <p>Horarios flexibles</p>
+                                    <span class="material-icons text-[#FFBF2F] block mb-2">history</span>
+                                    <p>Historial completo</p>
                                 </div>
                                 <div class="bg-white/10 p-4 rounded-lg backdrop-blur-sm">
-                                    <span class="material-icons text-[#FFBF2F] block mb-2">paid</span>
-                                    <p>Múltiples métodos de pago</p>
+                                    <span class="material-icons text-[#FFBF2F] block mb-2">warning</span>
+                                    <p>Registro de incidentes</p>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Slide 3 - Compartir -->
+                <!-- Slide 3 - Multi-usuario -->
                 <div class="swiper-slide relative">
                     <div class="absolute inset-0 bg-[#2B819F]/90 z-10"></div>
-                    <img src="<?php echo $baseUrl; ?>assets/img/landing/slides/slider_3.jpg" alt="Compartir agenda"
+                    <img src="<?php echo $baseUrl; ?>assets/img/landing/slides/team-collab.jpg" alt="Trabajo en equipo"
                         class="absolute inset-0 w-full h-full object-cover">
 
-                    <div class="container relative z-20 h-full flex items-center px-20">
+                    <div class="container relative z-20 h-full flex items-center px-4 lg:px-20">
                         <div class="max-w-2xl text-white">
                             <span
                                 class="inline-block bg-white/20 text-sm font-semibold px-4 py-1 rounded-full mb-6 backdrop-blur-sm">
-                                Paso 3 de 3
+                                Gestión de Equipos
                             </span>
-                            <h2 class="text-4xl md:text-6xl font-bold mb-6">Comparte tu <span
-                                    class="text-[#FFBF2F]">enlace único</span></h2>
-                            <p class="text-xl md:text-2xl opacity-90 mb-8">
-                                Envíalo por WhatsApp, intégralo en tu web o muestra el QR en tu local.
+                            <h2 class="text-4xl md:text-5xl font-bold mb-6">Coordina a <span class="text-[#FFBF2F]">tu
+                                    equipo</span></h2>
+                            <p class="text-xl opacity-90 mb-8">
+                                Asigna profesionales y gestiona sus agendas desde un solo lugar. Cada miembro ve solo
+                                sus citas y disponibilidad.
                             </p>
-                            <div class="flex space-x-4 mb-10">
-                                <div class="bg-white/10 p-3 rounded-full backdrop-blur-sm">
-                                    <span class="material-icons text-[#FFBF2F]">qr_code</span>
+                            <div class="grid grid-cols-2 gap-4 mb-10">
+                                <div class="bg-white/10 p-4 rounded-lg backdrop-blur-sm text-center">
+                                    <span class="material-icons text-[#FFBF2F] block mb-2">admin_panel_settings</span>
+                                    <p class="font-medium">Control centralizado</p>
+                                    <p class="text-sm opacity-80 mt-1">Tú defines horarios y servicios</p>
                                 </div>
-                                <div class="bg-white/10 p-3 rounded-full backdrop-blur-sm">
-                                    <span class="material-icons text-[#FFBF2F]">link</span>
-                                </div>
-                                <div class="bg-white/10 p-3 rounded-full backdrop-blur-sm">
-                                    <span class="material-icons text-[#FFBF2F]">chat</span>
+                                <div class="bg-white/10 p-4 rounded-lg backdrop-blur-sm text-center">
+                                    <span class="material-icons text-[#FFBF2F] block mb-2">person</span>
+                                    <p class="font-medium">Vista individual</p>
+                                    <p class="text-sm opacity-80 mt-1">Cada profesional ve solo su agenda</p>
                                 </div>
                             </div>
+                            <!-- Nota sobre roadmap (opcional) -->
+                            <div class="bg-white/5 border-l-4 border-[#FFBF2F] px-4 py-2 text-sm italic">
+                                <span class="material-icons align-middle text-[#FFBF2F] mr-1">update</span>
+                                Próximamente: Configuración granular de permisos por usuario
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 4 - WhatsApp -->
+                <div class="swiper-slide relative">
+                    <div class="absolute inset-0 bg-[#1B637F]/90 z-10"></div>
+                    <img src="<?php echo $baseUrl; ?>assets/img/landing/slides/whatsapp-integration.jpg"
+                        alt="Integración con WhatsApp" class="absolute inset-0 w-full h-full object-cover">
+
+                    <div class="container relative z-20 h-full flex items-center px-4 lg:px-20">
+                        <div class="max-w-2xl text-white">
+                            <span
+                                class="inline-block bg-white/20 text-sm font-semibold px-4 py-1 rounded-full mb-6 backdrop-blur-sm">
+                                Comunicación Directa
+                            </span>
+                            <h2 class="text-4xl md:text-5xl font-bold mb-6">Notificaciones <span
+                                    class="text-[#FFBF2F]">automáticas</span></h2>
+                            <p class="text-xl opacity-90 mb-8">
+                                Confirmaciones y recordatorios enviados por WhatsApp <span class="block sm:inline">+
+                                    notificaciones por correo electrónico</span>
+                            </p>
+
+                            <!-- Lista de beneficios actualizada -->
+                            <ul class="space-y-4 mb-10">
+                                <li class="flex items-start">
+                                    <span class="material-icons text-[#FFBF2F] mr-2">chat</span>
+                                    <div>
+                                        <span class="font-medium">WhatsApp Instantáneo</span>
+                                        <p class="text-sm opacity-80">Confirmaciones directas al móvil de tus clientes
+                                        </p>
+                                    </div>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="material-icons text-[#FFBF2F] mr-2">email</span>
+                                    <div>
+                                        <span class="font-medium">Notificaciones por Email</span>
+                                        <p class="text-sm opacity-80">Registro formal para tu historial</p>
+                                    </div>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </div>
@@ -181,36 +230,9 @@ include_once __DIR__ . '/landing/partials/head.php';
             <div class="swiper-button-next !text-[#FFBF2F] !right-8"></div>
             <div class="swiper-button-prev !text-[#FFBF2F] !left-8"></div>
         </div>
-
-
     </section>
-
-    <!-- Scripts de Swiper -->
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-    <script>
-        // Inicialización del slider
-        const howItWorksSlider = new Swiper('.howItWorks-slider', {
-            effect: 'fade',
-            speed: 800,
-            pagination: {
-                el: '.swiper-pagination',
-                clickable: true,
-            },
-            navigation: {
-                nextEl: '.swiper-button-next',
-                prevEl: '.swiper-button-prev',
-            },
-            thumbs: {
-                swiper: {
-                    el: '.howItWorks-thumbs',
-                    slidesPerView: 'auto',
-                }
-            }
-        });
-    </script>
-
     <!-- Sección ¿Cómo Funciona? - Versión Mejorada -->
-    <section id="how" class="min-h-screen py-16 bg-gradient-to-b from-white to-[#249373]/10">
+    <section id="functions" class="min-h-screen py-16 bg-gradient-to-b from-white to-[#249373]/10">
         <div class="container mx-auto px-4">
             <!-- Encabezado -->
             <div class="text-center mb-16">
@@ -227,7 +249,7 @@ include_once __DIR__ . '/landing/partials/head.php';
 
             <!-- Pasos con ilustraciones -->
             <div class="grid md:grid-cols-3 gap-8 mb-16">
-                <!-- Paso 1 -->
+                <!-- Paso 1 - Registro con Soporte -->
                 <div
                     class="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border-t-4 border-[#1B637F]">
                     <div class="flex items-center mb-6">
@@ -235,18 +257,42 @@ include_once __DIR__ . '/landing/partials/head.php';
                             class="bg-[#1B637F] text-white text-2xl font-bold w-12 h-12 rounded-full flex items-center justify-center mr-4">
                             1
                         </div>
-                        <h3 class="text-2xl font-bold text-[#1B637F]">Registro Express</h3>
+                        <h3 class="text-2xl font-bold text-[#1B637F]">Registro con Asistencia</h3>
                     </div>
-                    <p class="text-gray-600 mb-6">
-                        Completa tu perfil en menos de 3 minutos y accede inmediatamente a tu panel de control.
-                    </p>
-                    <div class="flex justify-center">
-                        <img src="<?php echo $baseUrl; ?>assets/img/icons/registro.svg" alt="Registro"
-                            class="h-40 w-auto">
+
+                    <!-- Lista de soporte -->
+                    <ul class="space-y-4 mb-6">
+                        <li class="flex items-start">
+                            <span class="material-icons text-[#FFBF2F] mr-2">support_agent</span>
+                            <div>
+                                <span class="font-medium">Guía paso a paso</span>
+                                <p class="text-sm text-gray-500">Te acompañamos en cada campo requerido</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="material-icons text-[#FFBF2F] mr-2">videocam</span>
+                            <div>
+                                <span class="font-medium">Tutoriales interactivos</span>
+                                <p class="text-sm text-gray-500">Videos cortos explicando cada sección</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="material-icons text-[#FFBF2F] mr-2">schedule</span>
+                            <div>
+                                <span class="font-medium">Asistencia rápida</span>
+                                <p class="text-sm text-gray-500">Soporte técnico en menos de 1 hora</p>
+                            </div>
+                        </li>
+                    </ul>
+
+                    <!-- Imagen con estilo consistente -->
+                    <div class="flex justify-center mt-4">
+                        <img src="<?php echo $baseUrl; ?>assets/img/landing/card_funciones/registro.png"
+                            alt="Registro asistido" class="h-32 w-auto">
                     </div>
                 </div>
 
-                <!-- Paso 2 -->
+                <!-- Paso 2 - Configuración -->
                 <div
                     class="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border-t-4 border-[#249373]">
                     <div class="flex items-center mb-6">
@@ -254,19 +300,29 @@ include_once __DIR__ . '/landing/partials/head.php';
                             class="bg-[#249373] text-white text-2xl font-bold w-12 h-12 rounded-full flex items-center justify-center mr-4">
                             2
                         </div>
-                        <h3 class="text-2xl font-bold text-[#1B637F]">Configuración Inteligente</h3>
+                        <h3 class="text-2xl font-bold text-[#1B637F]">Configura tu Estructura</h3>
                     </div>
                     <p class="text-gray-600 mb-6">
-                        Define horarios, servicios y políticas con nuestra interfaz intuitiva que aprende de tus
-                        preferencias.
+                        Define cuidadosamente tus servicios, horarios disponibles y equipo de trabajo. Esta
+                        configuración es fundamental para tu operación.
                     </p>
+                    <ul class="space-y-3 mb-6">
+                        <li class="flex items-start">
+                            <span class="material-icons text-[#249373] mr-2">schedule</span>
+                            <span>Bloques horarios personalizados</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="material-icons text-[#249373] mr-2">groups</span>
+                            <span>Asignación de profesionales</span>
+                        </li>
+                    </ul>
                     <div class="flex justify-center">
-                        <img src="<?php echo $baseUrl; ?>assets/img/icons/configuracion.svg" alt="Configuración"
-                            class="h-40 w-auto">
+                        <img src="<?php echo $baseUrl; ?>assets/img/landing/card_funciones/configuracion.png"
+                            alt="Configuración" class="h-40 w-auto">
                     </div>
                 </div>
 
-                <!-- Paso 3 -->
+                <!-- Paso 3 - Operación -->
                 <div
                     class="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border-t-4 border-[#2B819F]">
                     <div class="flex items-center mb-6">
@@ -274,118 +330,239 @@ include_once __DIR__ . '/landing/partials/head.php';
                             class="bg-[#2B819F] text-white text-2xl font-bold w-12 h-12 rounded-full flex items-center justify-center mr-4">
                             3
                         </div>
-                        <h3 class="text-2xl font-bold text-[#1B637F]">Comparte y Gestiona</h3>
+                        <h3 class="text-2xl font-bold text-[#1B637F]">Operación Diaria</h3>
                     </div>
                     <p class="text-gray-600 mb-6">
-                        Envía tu enlace personalizado o integra directamente en tu web. Recibe pagos y confirmaciones
-                        automáticas.
+                        Gestiona citas, clientes y eventos con herramientas diseñadas para simplificar tu día a día.
                     </p>
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div class="bg-[#F8FAFC] p-3 rounded-lg text-center">
+                            <span class="material-icons text-[#2B819F] block mb-1">chat</span>
+                            <p class="text-sm">Confirmaciones por WhatsApp</p>
+                        </div>
+                        <div class="bg-[#F8FAFC] p-3 rounded-lg text-center">
+                            <span class="material-icons text-[#2B819F] block mb-1">history</span>
+                            <p class="text-sm">Historial de clientes</p>
+                        </div>
+                    </div>
                     <div class="flex justify-center">
-                        <img src="<?php echo $baseUrl; ?>assets/img/icons/compartir.svg" alt="Compartir"
-                            class="h-40 w-auto">
+                        <img src="<?php echo $baseUrl; ?>assets/img/landing/card_funciones/operacion.png"
+                            alt="Operación" class="h-40 w-auto">
                     </div>
                 </div>
             </div>
 
-            <!-- Demo integrada -->
-            <div class="bg-white rounded-2xl shadow-2xl overflow-hidden">
-                <div class="grid lg:grid-cols-2 gap-8 items-center">
-                    <div class="p-8 md:p-12">
-                        <h3 class="text-3xl font-bold text-[#1B637F] mb-4">Vista previa interactiva</h3>
+            <!-- Sección Demo Mejorada -->
+            <div id="demo" class="bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-100">
+                <div class="grid lg:grid-cols-2 gap-0 items-stretch">
+                    <!-- Texto descriptivo -->
+                    <div class="p-8 md:p-12 flex flex-col justify-center">
+                        <h3 class="text-3xl font-bold text-[#1B637F] mb-4">Conoce Agendarium en acción</h3>
                         <p class="text-xl text-[#2B819F] mb-6">
-                            Así de simple es tu nuevo panel de control
+                            Descubre cómo organizamos tu agenda profesional
                         </p>
+
+                        <!-- Lista con iconos mejorados -->
                         <ul class="space-y-4 mb-8">
                             <li class="flex items-start">
-                                <span class="material-icons text-[#249373] mr-2">check_circle</span>
-                                <span>Visualización de citas en calendario</span>
+                                <div class="bg-[#249373]/10 p-1 rounded-full mr-3">
+                                    <span class="material-icons text-[#249373] text-lg">calendar_view_month</span>
+                                </div>
+                                <div>
+                                    <span class="font-medium">Vista de calendario inteligente</span>
+                                    <p class="text-sm text-gray-500 mt-1">Agrupado por profesional o servicio</p>
+                                </div>
                             </li>
                             <li class="flex items-start">
-                                <span class="material-icons text-[#249373] mr-2">check_circle</span>
-                                <span>Recordatorios automáticos</span>
+                                <div class="bg-[#249373]/10 p-1 rounded-full mr-3">
+                                    <span class="material-icons text-[#249373] text-lg">chat</span>
+                                </div>
+                                <div>
+                                    <span class="font-medium">WhatsApp integrado</span>
+                                    <p class="text-sm text-gray-500 mt-1">Confirmaciones automáticas</p>
+                                </div>
                             </li>
                             <li class="flex items-start">
-                                <span class="material-icons text-[#249373] mr-2">check_circle</span>
-                                <span>Reportes de productividad</span>
+                                <div class="bg-[#249373]/10 p-1 rounded-full mr-3">
+                                    <span class="material-icons text-[#249373] text-lg">groups</span>
+                                </div>
+                                <div>
+                                    <span class="font-medium">Equipos organizados</span>
+                                    <p class="text-sm text-gray-500 mt-1">Cada profesional ve solo sus citas</p>
+                                </div>
                             </li>
                         </ul>
-                        <a href="<?php echo $baseUrl; ?>landing/inscripcion/inscripcion.php"
-                            class="inline-block bg-[#1B637F] hover:bg-[#2B819F] text-white font-semibold py-3 px-8 rounded-lg transition-all transform hover:scale-105">
-                            Probar ahora
-                        </a>
+
+                        <!-- CTA mejorado -->
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <a href="<?php echo $baseUrl; ?>landing/inscripcion/inscripcion.php"
+                                class="flex-1 bg-[#1B637F] hover:bg-[#2B819F] text-white font-semibold py-3 px-6 rounded-lg text-center transition-colors flex items-center justify-center">
+                                <span class="material-icons mr-2">play_circle</span>
+                                Ver demo completa
+                            </a>
+                            <a href="#contacto"
+                                class="flex-1 border border-[#1B637F] text-[#1B637F] hover:bg-[#1B637F]/5 font-medium py-3 px-6 rounded-lg text-center transition-colors">
+                                Solicitar tour guiado
+                            </a>
+                        </div>
                     </div>
-                    <div class="bg-gray-50 p-4 flex justify-center">
-                        <img src="<?php echo $baseUrl; ?>assets/img/demo-panel.png" alt="Panel de control Agendarium"
-                            class="rounded-lg shadow-md w-full max-w-lg border-8 border-white">
+
+                    <!-- Contenedor multimedia -->
+                    <div
+                        class="bg-gradient-to-br from-[#1B637F]/5 to-[#249373]/5 p-8 flex items-center justify-center relative min-h-[400px]">
+                        <!-- GIF animado de la interfaz -->
+                        <img src="<?php echo $baseUrl; ?>assets/img/demo-interactivo.gif" alt="Demo Agendarium"
+                            class="rounded-lg shadow-md w-full h-auto max-w-md border-4 border-white" loading="lazy">
+
+                        <!-- Badge de "Interactivo" -->
+                        <div
+                            class="absolute bottom-6 right-6 bg-[#FFBF2F] text-[#1B637F] text-xs font-bold px-3 py-1 rounded-full animate-pulse">
+                            INTERACTIVO
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Sección Precios -->
+    <!-- Sección Precios Actualizada -->
     <section id="pricing" class="min-h-screen py-16 bg-white relative overflow-hidden">
-        <div class="absolute inset-0 opacity-10">
-            <img src="<?php echo $baseUrl; ?>assets/img/gratis.png" alt="Fondo" class="w-full h-full object-cover">
-        </div>
-        <div class="container mx-auto px-4 relative">
+        <div class="absolute inset-0 bg-gradient-to-br from-[#1B637F]/5 to-[#249373]/5 z-0"></div>
+        <div class="container mx-auto px-4 relative z-10">
             <div class="text-center mb-16">
-                <h2 class="text-3xl md:text-4xl font-bold text-darkbg mb-4">Nuestros Planes</h2>
-                <p class="text-xl text-accent max-w-2xl mx-auto">Prueba todas las funcionalidades gratis por 15 días</p>
+                <h2 class="text-3xl md:text-4xl font-bold text-[#1B637F] mb-4">Planes para Todo Tipo de Negocios</h2>
+                <p class="text-xl text-[#2B819F] max-w-2xl mx-auto">
+                    Prueba 7 días gratis + 23 días adicionales al completar tu configuración
+                </p>
             </div>
 
-            <div
-                class="max-w-4xl mx-auto bg-white/90 backdrop-blur-sm rounded-xl shadow-lg p-8 md:p-12 border border-gray-100">
-                <div class="grid md:grid-cols-2 gap-8">
-                    <div class="border-r border-gray-200 pr-8">
-                        <h3 class="text-2xl font-bold text-primary mb-4">Prueba Gratis</h3>
-                        <div class="text-5xl font-bold text-darkbg mb-6">$0<span
-                                class="text-lg font-normal text-gray-500">/15 días</span></div>
-                        <ul class="space-y-3 mb-8">
-                            <li class="flex items-center">
-                                <span class="material-icons text-green-500 mr-2">check_circle</span>
-                                <span>Acceso a todas las funciones</span>
-                            </li>
-                            <li class="flex items-center">
-                                <span class="material-icons text-green-500 mr-2">check_circle</span>
-                                <span>Hasta 50 citas mensuales</span>
-                            </li>
-                            <li class="flex items-center">
-                                <span class="material-icons text-green-500 mr-2">check_circle</span>
-                                <span>Soporte por correo</span>
-                            </li>
-                        </ul>
-                    </div>
+            <!-- Grid de Planes -->
+            <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
 
-                    <div>
-                        <h3 class="text-2xl font-bold text-primary mb-4">Plan Premium</h3>
-                        <div class="text-5xl font-bold text-darkbg mb-6">$9.000<span
+                <!-- Plan Básico -->
+                <div
+                    class="bg-white rounded-2xl shadow-lg overflow-hidden border border-[#1B637F]/20 hover:shadow-xl transition-all">
+                    <div class="p-6 border-b border-[#1B637F]/10">
+                        <h3 class="text-2xl font-bold text-[#1B637F]">Básico</h3>
+                        <div class="text-4xl font-bold my-4">$5,000 <span
                                 class="text-lg font-normal text-gray-500">/mes</span></div>
-                        <ul class="space-y-3 mb-8">
-                            <li class="flex items-center">
-                                <span class="material-icons text-green-500 mr-2">check_circle</span>
+                        <p class="text-gray-600">Perfecto para profesionales independientes</p>
+                    </div>
+                    <div class="p-6">
+                        <ul class="space-y-4 mb-6">
+                            <li class="flex items-start">
+                                <span class="material-icons text-[#249373] mr-2">person</span>
+                                <span>1 usuario (administrador)</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="material-icons text-[#249373] mr-2">email</span>
+                                <span>Notificaciones por correo</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="material-icons text-[#249373] mr-2">event</span>
                                 <span>Citas ilimitadas</span>
                             </li>
-                            <li class="flex items-center">
-                                <span class="material-icons text-green-500 mr-2">check_circle</span>
-                                <span>Recordatorios automáticos</span>
+                            <li class="flex items-start">
+                                <span class="material-icons text-[#249373] mr-2">sync</span>
+                                <span>Sincronización con Google Calendar</span>
                             </li>
-                            <li class="flex items-center">
-                                <span class="material-icons text-green-500 mr-2">check_circle</span>
+                        </ul>
+                        <a href="<?php echo $baseUrl; ?>landing/inscripcion/inscripcion.php"
+                            class="block w-full bg-[#1B637F] hover:bg-[#2B819F] text-white text-center font-medium py-3 px-4 rounded-lg transition-colors">
+                            Comenzar prueba
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Plan Profesional (Destacado) -->
+                <div
+                    class="bg-white rounded-2xl shadow-2xl overflow-hidden border-2 border-[#FFBF2F] transform hover:-translate-y-2 transition-all">
+                    <div class="bg-[#FFBF2F] text-[#1B637F] text-center py-2 font-bold">
+                        MÁS POPULAR
+                    </div>
+                    <div class="p-6 border-b border-[#1B637F]/10">
+                        <h3 class="text-2xl font-bold text-[#1B637F]">Profesional</h3>
+                        <div class="text-4xl font-bold my-4">$10,000 <span
+                                class="text-lg font-normal text-gray-500">/mes</span></div>
+                        <p class="text-gray-600">Ideal para pequeños equipos</p>
+                    </div>
+                    <div class="p-6">
+                        <ul class="space-y-4 mb-6">
+                            <li class="flex items-start">
+                                <span class="material-icons text-[#249373] mr-2">groups</span>
+                                <span>3 usuarios (admin + 2 colaboradores)</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="material-icons text-[#249373] mr-2">chat</span>
+                                <span>WhatsApp ilimitado</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="material-icons text-[#249373] mr-2">event_available</span>
+                                <div>
+                                    <span class="font-medium">Eventos grupales</span>
+                                    <p class="text-sm text-gray-500 mt-1">Talleres, citas masivas o cursos (hasta 5/mes)
+                                    </p>
+                                </div>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="material-icons text-[#249373] mr-2">support_agent</span>
                                 <span>Soporte prioritario</span>
                             </li>
                         </ul>
+                        <a href="<?php echo $baseUrl; ?>landing/inscripcion/inscripcion.php"
+                            class="block w-full bg-[#FFBF2F] hover:bg-[#FD9B19] text-[#1B637F] text-center font-bold py-3 px-4 rounded-lg transition-colors">
+                            Elegir este plan
+                        </a>
                     </div>
-
                 </div>
 
-                <div class="text-center mt-8">
-                    <a href="<?php echo $baseUrl; ?>landing/inscripcion/inscripcion.php"
-                        class="inline-block bg-primary hover:bg-primary/90 text-white font-medium py-3 px-8 rounded-lg transition-colors">
-                        Comenzar Prueba Gratis
-                    </a>
-                    <p class="text-sm text-gray-500 mt-3">Sin tarjeta de crédito requerida</p>
+                <!-- Plan Avanzado -->
+                <div
+                    class="bg-white rounded-2xl shadow-lg overflow-hidden border border-[#1B637F]/20 hover:shadow-xl transition-all">
+                    <div class="p-6 border-b border-[#1B637F]/10">
+                        <h3 class="text-2xl font-bold text-[#1B637F]">Avanzado</h3>
+                        <div class="text-4xl font-bold my-4">$15,000 <span
+                                class="text-lg font-normal text-gray-500">/mes</span></div>
+                        <p class="text-gray-600">Para negocios establecidos</p>
+                    </div>
+                    <div class="p-6">
+                        <ul class="space-y-4 mb-6">
+                            <li class="flex items-start">
+                                <span class="material-icons text-[#249373] mr-2">group_add</span>
+                                <span>10 usuarios incluidos</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="material-icons text-[#249373] mr-2">chat</span>
+                                <span>WhatsApp + correo ilimitados</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="material-icons text-[#249373] mr-2">event_repeat</span>
+                                <div>
+                                    <span class="font-medium">Eventos ilimitados</span>
+                                    <p class="text-sm text-gray-500 mt-1">Talleres, clases o citas grupales sin límite
+                                    </p>
+                                </div>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="material-icons text-[#249373] mr-2">verified_user</span>
+                                <span>Soporte VIP</span>
+                            </li>
+                        </ul>
+                        <a href="<?php echo $baseUrl; ?>landing/inscripcion/inscripcion.php"
+                            class="block w-full bg-[#1B637F] hover:bg-[#2B819F] text-white text-center font-medium py-3 px-4 rounded-lg transition-colors">
+                            Comenzar prueba
+                        </a>
+                    </div>
                 </div>
+            </div>
+
+            <!-- Nota sobre prueba gratuita -->
+            <div class="text-center mt-12 max-w-2xl mx-auto bg-[#F8FAFC] p-4 rounded-lg border border-[#249373]/20">
+                <p class="text-gray-600">
+                    <span class="material-icons align-middle text-[#249373]">info</span>
+                    <strong>Prueba gratuita:</strong> 7 días automáticos + 23 días adicionales al completar tu
+                    configuración inicial.
+                </p>
             </div>
         </div>
     </section>
@@ -394,101 +571,9 @@ include_once __DIR__ . '/landing/partials/head.php';
     <?php
     include_once __DIR__ . '/landing/partials/footer.php';
     ?>
-
-
-    <!-- JavaScript -->
-    <script>
-        // const baseUrl = '<?php echo $baseUrl; ?>';
-
-        // // Scroll suave para los enlaces del navbar
-        // document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        //     anchor.addEventListener('click', function(e) {
-        //         e.preventDefault();
-
-        //         const targetId = this.getAttribute('href');
-        //         if (targetId === '#inscriptionModal') return;
-
-        //         const targetElement = document.querySelector(targetId);
-        //         if (targetElement) {
-        //             window.scrollTo({
-        //                 top: targetElement.offsetTop - 80,
-        //                 behavior: 'smooth'
-        //             });
-
-        //             // Actualizar el item activo del navbar
-        //             document.querySelectorAll('.nav-item').forEach(item => {
-        //                 item.classList.remove('text-primary', 'font-medium');
-        //                 item.classList.add('text-gray-600');
-        //             });
-
-        //             this.classList.add('text-primary', 'font-medium');
-        //             this.classList.remove('text-gray-600');
-        //         }
-        //     });
-        // });
-
-        // // Cambiar el navbar al hacer scroll
-        // window.addEventListener('scroll', function() {
-        //     const sections = document.querySelectorAll('section');
-        //     const scrollPosition = window.scrollY + 100;
-
-        //     sections.forEach(section => {
-        //         const sectionTop = section.offsetTop;
-        //         const sectionHeight = section.offsetHeight;
-        //         const sectionId = section.getAttribute('id');
-
-        //         if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
-        //             document.querySelectorAll('.nav-item').forEach(item => {
-        //                 item.classList.remove('text-primary', 'font-medium');
-        //                 item.classList.add('text-gray-600');
-        //             });
-
-        //             document.querySelector(`.nav-item[href="#${sectionId}"]`).classList.add('text-primary',
-        //                 'font-medium');
-        //             document.querySelector(`.nav-item[href="#${sectionId}"]`).classList.remove(
-        //                 'text-gray-600');
-        //         }
-        //     });
-        // });
-
-        // // Manejar el formulario de inscripción (similar al anterior)
-        // document.querySelector("#companyForm")?.addEventListener("submit", async function(e) {
-        //     e.preventDefault();
-        //     const formData = new FormData(this);
-
-        //     try {
-        //         const response = await fetch(`${baseUrl}inscripcion/controller/procesar_inscripcion.php`, {
-        //             method: "POST",
-        //             body: formData,
-        //         });
-
-        //         const {
-        //             success,
-        //             message,
-        //             error
-        //         } = await response.json();
-
-        //         if (success) {
-        //             // Cerrar modal de inscripción si está abierto
-        //             const inscriptionModal = bootstrap.Modal.getInstance(document.getElementById(
-        //                 "inscriptionModal"));
-        //             if (inscriptionModal) inscriptionModal.hide();
-
-        //             // Mostrar modal de éxito
-        //             document.getElementById("responseMessage").innerText = message;
-        //             new bootstrap.Modal(document.getElementById("responseModal")).show();
-        //         } else {
-        //             document.getElementById("responseMessage").innerText = message || error;
-        //             new bootstrap.Modal(document.getElementById("responseModal")).show();
-        //         }
-        //     } catch (error) {
-        //         console.error("Error:", error);
-        //         document.getElementById("responseMessage").innerText =
-        //             "Hubo un error al procesar la solicitud.";
-        //         new bootstrap.Modal(document.getElementById("responseModal")).show();
-        //     }
-        // });
-    </script>
+    <!-- Scripts de Swiper -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="<?php echo $baseUrl; ?>assets/js/landing/index.js"></script>
 </body>
 
 </html>
