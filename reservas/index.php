@@ -8,6 +8,24 @@ require_once dirname(__DIR__) . '/classes/Customers.php';
 
 $baseUrl = ConfigUrl::get();
 
+$isDemo = false;
+
+if (isset($_GET['path']) && str_contains($_GET['path'], 'empresa-demo-agendar')) {
+    if (isset($_GET['isdemo'])) {
+        $isDemo = in_array(strtolower($_GET['isdemo']), ['1', 'true', 'yes']);
+
+        // Si tiene parámetro pero no es válido, redirigir
+        if (!$isDemo) {
+            header('Location: https://agendarium.com');
+            exit;
+        }
+    } else {
+        // Si es ruta demo pero no tiene parámetro, redirigir
+        header('Location: https://agendarium.com');
+        exit;
+    }
+}
+
 $url = isset($_GET['path']) ? $_GET['path'] : null;
 $view = isset($_GET['view']) ? $_GET['view'] : 'form';
 $customerId = isset($_GET['customer_id']) ? intval($_GET['customer_id']) : null;

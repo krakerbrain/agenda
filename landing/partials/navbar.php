@@ -1,53 +1,46 @@
   <!-- Navbar Superior - Versión Desktop -->
-  <nav class="fixed top-0 left-0 right-0 bg-white shadow-sm z-50 border-b border-[#249373]/10">
+  <nav id="navbar" class="transition-all duration-500 ease-in-out fixed top-0 left-0 right-0 shadow-none z-50 pt-4">
       <div class="container mx-auto px-4">
-          <div class="flex justify-between items-center h-16">
+          <!-- Navbar Container -->
+          <div class="flex justify-between items-center h-16 w-full">
 
-              <!-- Contenedor Logo + Nombre -->
-              <div class="flex items-end">
-                  <!-- ESPACIO PARA LOGO -->
+              <!-- Logo + Nombre: oculto en móviles -->
+              <div class="hidden md:flex items-end">
                   <div class="w-10">
-                      <!-- Icono temporal (reemplazar por tu logo) -->
                       <img src="<?php echo $baseUrl; ?>assets/img/landing/logo/Isotipo-Agendarium.svg"
                           alt="Logo Agendarium" class="h-16 w-auto mr-3">
                   </div>
-
-                  <!-- Nombre de la app - Puedes usar texto o incluir logo con texto -->
-                  <a href="#" class="text-xl font-bold text-[#1B637F] hover:text-[#2B819F] transition-colors mb-2 ml-2">
+                  <a href="#" class="text-xl font-bold text-[#1c4175] hover:text-[#2B819F] transition-colors mb-2 ml-2">
                       Agendarium
                   </a>
               </div>
-              <!-- Menú de Navegación Actualizado -->
-              <div class="hidden md:flex items-center space-x-8">
+
+              <!-- Menú de Navegación: solo visible en md+ -->
+              <div class="hidden md:flex space-x-8">
                   <a href="#how"
-                      class="nav-hover-effect text-gray-600 hover:text-[#1B637F] font-medium transition-colors border-b-2 border-transparent hover:border-[#1B637F] pb-1"
-                      data-section="slider">
-                      Proceso Completo
-                      <!-- Renombrado para claridad -->
-                  </a>
+                      class="nav-hover-effect text-gray-600 hover:text-[#1c4175] font-semibold border-b-2 border-transparent hover:border-[#1c4175] transition-colors"
+                      style="text-shadow: 1px 1px 2px rgba(255,255,255,0.4);">Proceso Completo</a>
                   <a href="#functions"
-                      class="text-gray-600 hover:text-[#1B637F] font-medium transition-colors border-b-2 border-transparent hover:border-[#1B637F] pb-1"
-                      data-section="cards">
-                      Funciones Clave
-                      <!-- Enfocado en features -->
-                  </a>
+                      class="text-gray-600 hover:text-[#1c4175] font-semibold border-b-2 border-transparent hover:border-[#1c4175] transition-colors"
+                      style="text-shadow: 1px 1px 2px rgba(255,255,255,0.4);">Funciones Clave</a>
                   <a href="#demo"
-                      class="text-gray-600 hover:text-[#1B637F] font-medium transition-colors border-b-2 border-transparent hover:border-[#1B637F] pb-1">
-                      Demostración
-                  </a>
+                      class="text-gray-600 hover:text-[#1c4175] font-semibold border-b-2 border-transparent hover:border-[#1c4175] transition-colors"
+                      style="text-shadow: 1px 1px 2px rgba(255,255,255,0.4);">Demostración</a>
                   <a href="#pricing"
-                      class="text-gray-600 hover:text-[#1B637F] font-medium transition-colors border-b-2 border-transparent hover:border-[#1B637F] pb-1">
-                      Precios
-                  </a>
+                      class="text-gray-600 hover:text-[#1c4175] font-semibold border-b-2 border-transparent hover:border-[#1c4175] transition-colors"
+                      style="text-shadow: 1px 1px 2px rgba(255,255,255,0.4);">Precios</a>
               </div>
 
-              <!-- Botón Login -->
+              <!-- Login button: siempre visible -->
               <a href="<?php echo $baseUrl; ?>login/index.php"
-                  class="flex items-center text-[#1B637F] hover:text-[#2B819F] font-medium transition-colors">
-                  <span class="hidden sm:inline mr-1">Iniciar Sesión</span>
+                  class="flex items-center text-[#1c4175] hover:text-[#2B819F] font-medium transition-colors"
+                  style="text-shadow: 1px 1px 2px rgba(255,255,255,0.4);">
+                  <span class=" sm:inline mr-1 font-semibold">Login</span>
                   <span class="material-icons">login</span>
               </a>
+
           </div>
+
       </div>
   </nav>
 
@@ -74,4 +67,4 @@
   </nav>
 
   <!-- Espacio para evitar que el contenido quede detrás del navbar -->
-  <div class="h-16"></div>
+  <!-- <div class="h-16"></div> -->
