@@ -32,7 +32,7 @@ try {
 
             if ($existingLogs) {
                 foreach ($existingLogs as $log) {
-                    if ($appointment['id'] == $log['appointment_id']) {
+                    if ($appointment['id'] == $log['appointment_id'] && $type == $log['type']) {
                         if ($log['method'] === 'whatsapp') {
                             $wspNotificationId = $log['id'];
                             $wspAttempts = $log['attempts'];
