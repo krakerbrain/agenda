@@ -130,10 +130,7 @@ class EmailTemplate
             'reserva' => 'Solicitud de reserva recibida - {fecha_reserva}',
             'confirmacion' => '¡Tu reserva ha sido confirmada! - {fecha_reserva}'
         ];
-        $subject = str_replace('{fecha_reserva}', $date, $subjectTemplates[$templateType] ?? 'Notificación');
-
-        // Codificar el asunto en UTF-8
-        return mb_encode_mimeheader($subject, 'UTF-8', 'B', "\n");
+        return str_replace('{fecha_reserva}', $date, $subjectTemplates[$templateType] ?? 'Notificación');
     }
 
     private function formatNotes($notes)
