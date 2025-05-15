@@ -140,7 +140,7 @@ include_once __DIR__ . '/landing/partials/head.php';
 
                 <!-- Slide 3 - Multi-usuario -->
                 <div class="swiper-slide relative">
-                    <div class="absolute inset-0 bg-[#2B819F]/90 z-10"></div>
+                    <div class="absolute inset-0 bg-[#8d6815e6]/90 z-10"></div>
                     <img src="<?php echo $baseUrl; ?>assets/img/landing/slides/Stylis_ at_Work_simple_compose_55.png"
                         alt="Trabajo en equipo" class="absolute inset-0 w-full h-full object-cover object-top">
 
@@ -389,30 +389,19 @@ include_once __DIR__ . '/landing/partials/head.php';
 
                         <!-- CTA mejorado -->
                         <div class="flex flex-col sm:flex-row gap-4">
-                            <a href="<?php echo $baseUrl; ?>demo/"
+                            <button
                                 class="flex-1 bg-[#1B637F] hover:bg-[#2B819F] text-white font-semibold py-3 px-6 rounded-lg text-center transition-colors flex items-center justify-center"
                                 id="btn-demo">
                                 <span class="material-icons mr-2">play_circle</span>
                                 Mira como funciona
-                            </a>
+                            </button>
                             <a href="#contacto"
                                 class="flex-1 border border-[#1B637F] text-[#1B637F] hover:bg-[#1B637F]/5 font-medium py-3 px-6 rounded-lg text-center transition-colors">
                                 Solicitar prueba gratis
                             </a>
                         </div>
                         <!-- Modal de Video -->
-                        <div id="video-modal"
-                            class="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center hidden">
-                            <div class="bg-white rounded-lg overflow-hidden max-w-2xl w-full relative shadow-lg">
-                                <button id="close-modal"
-                                    class="absolute top-2 right-2 text-gray-600 hover:text-black text-xl font-bold">×</button>
-                                <video controls autoplay class="w-full h-auto" id="modal-video">
-                                    <source src="<?php echo $baseUrl; ?>assets/videos/Agendarium-Web.mp4"
-                                        type="video/mp4">
-                                    Tu navegador no soporta el video.
-                                </video>
-                            </div>
-                        </div>
+                        <div id="modal-container"></div>
 
                     </div>
 
