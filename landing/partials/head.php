@@ -25,7 +25,7 @@
     <style>
         @font-face {
             font-family: 'CarrigPro-Regular';
-            src: url(assets/fonts/CarrigPro-Regular.woff2) format('woff2');
+            src: url("<?php echo $baseUrl; ?>assets/fonts/CarrigPro-Regular.woff2") format('woff2');
             font-display: swap;
         }
 
@@ -157,6 +157,19 @@
 
         .nav-hover-effect.active::after {
             width: 100%;
+        }
+
+        /* pantallas menores a 768px */
+        @media (max-width: 767px) {
+            #home {
+                background-image:
+                    linear-gradient(to right, rgba(255, 255, 255) 0%, rgba(255, 255, 255, 0) 90%),
+                    url('assets/img/landing/hero_section_2.jpg');
+            }
+
+            #home::before {
+                background: linear-gradient(to right, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 90%);
+            }
         }
     </style>
 

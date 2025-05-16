@@ -1,81 +1,157 @@
-// landing.js
-document.addEventListener("DOMContentLoaded", function () {
-  initSwiper();
-  setupSmoothScroll();
-  setupActiveSectionDetection();
+const hero = document.getElementById("home");
+const title1 = document.getElementById("hero-title-1");
+const title2 = document.getElementById("hero-title-2");
+const subtitle = document.getElementById("hero-subtitle");
+
+const slides = [
+  {
+    background: "url('assets/img/landing/hero_section_2.jpg')",
+    title1: "Controla tu agenda",
+    title2: "como un profesional",
+    subtitle: "La herramienta de gestión de citas que necesitas para organizar tu tiempo de manera eficiente.",
+  },
+  {
+    background: "url('assets/img/landing/hero_section_3.jpg')",
+    title1: "Haz crecer tu negocio",
+    title2: "gestionando tus citas",
+    subtitle: "Tus clientes pueden reservar online sin llamadas ni mensajes.",
+  },
+  {
+    background: "url('assets/img/landing/hero_section.png')",
+    title1: "Tu agenda, tu control",
+    title2: "sin complicaciones",
+    subtitle: "Agendarium trabaja por ti mientras tú te concentras en tu servicio.",
+  },
+];
+
+let index = 0; // Esta ya está en CSS
+
+setInterval(() => {
+  index = (index + 1) % slides.length;
+  const current = slides[index];
+
+  // Fade out texto
+  [title1, title2, subtitle].forEach((el) => {
+    el.classList.remove("fade-in");
+    el.classList.add("fade-out");
+  });
+
+  // Imagen fade-in en ::after
+  hero.style.setProperty("--next-bg", handlebackGroundGradient(current.background));
+  hero.classList.add("image-fading");
+
+  // Cambiar texto
+  setTimeout(() => {
+    title1.textContent = current.title1;
+    title2.textContent = current.title2;
+    subtitle.textContent = current.subtitle;
+
+    [title1, title2, subtitle].forEach((el) => {
+      el.classList.remove("fade-out");
+      el.classList.add("fade-in");
+    });
+  }, 800);
+
+  // Al terminar el fade, reemplazamos imagen base y ocultamos ::after
+  setTimeout(() => {
+    hero.style.backgroundImage = handlebackGroundGradient(current.background);
+    hero.classList.remove("image-fading");
+  }, 1800);
+}, 6000);
+
+function handlebackGroundGradient(background) {
+  let percent = window.innerWidth < 768 ? "90%" : "70%";
+  return `linear-gradient(to right, rgba(255, 255, 255) 0%, rgba(255, 255, 255, 0) ${percent}), ${background}`;
+}
+
+const navbar = document.getElementById("navbar");
+
+window.addEventListener("scroll", () => {
+  if (window.scrollY > 10) {
+    navbar.classList.add("bg-white", "shadow-md");
+    navbar.classList.remove("bg-transparent");
+  } else {
+    navbar.classList.remove("bg-white", "shadow-md");
+    navbar.classList.add("bg-transparent");
+  }
 });
 
-function initSwiper() {
-  const howItWorksSlider = new Swiper(".howItWorks-slider", {
-    effect: "fade",
-    speed: 800,
-    pagination: {
-      el: ".swiper-pagination",
-      clickable: true,
-    },
-    navigation: {
-      nextEl: ".swiper-button-next",
-      prevEl: ".swiper-button-prev",
-    },
-  });
+const btnDemo = document.querySelector(".btn-demo");
+const modalContainer = document.getElementById("modal-container");
+
+let modalOpen = false;
+let modalVideo;
+
+// Función que genera el HTML del modal con el video correspondiente
+function getModalTemplate(videoSrc) {
+  return `
+        <div id="video-modal" class="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-2 md:p-4">
+            <div class="relative w-full h-full max-w-6xl">
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <video controls class="w-full h-full object-contain" id="modal-video" playsinline>
+                        <source src="${videoSrc}" type="video/mp4">
+                        Tu navegador no soporta el video.
+                    </video>
+                </div>
+                <button id="close-modal" class="absolute top-2 right-2 md:-top-3 md:-right-3 bg-white rounded-full w-10 h-10 flex items-center justify-center shadow-lg hover:bg-gray-100 z-50 border border-gray-200">
+                    <span class="text-2xl font-bold text-gray-600 hover:text-black">×</span>
+                </button>
+            </div>
+        </div>
+    `;
 }
 
-function setupSmoothScroll() {
-  document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
-    anchor.addEventListener("click", function (e) {
-      e.preventDefault();
+// Abrir el modal y cargar el video correcto
+btnDemo.addEventListener("click", function () {
+  if (!modalOpen) {
+    const isMobile = window.innerWidth < 768;
+    const videoSrc = isMobile ? `${baseUrl}assets/videos/Agendarium-Mobile.mp4` : `${baseUrl}assets/videos/Agendarium-Web.mp4`;
 
-      const target = document.querySelector(this.getAttribute("href"));
-      if (!target) return;
+    modalContainer.innerHTML = getModalTemplate(videoSrc);
+    modalOpen = true;
 
-      const navbarHeight = document.querySelector("nav").offsetHeight;
-      const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - navbarHeight;
+    modalVideo = document.getElementById("modal-video");
+    const closeModal = document.getElementById("close-modal");
 
-      // Desactivar scroll suave temporalmente
-      document.documentElement.style.scrollBehavior = "auto";
-
-      // Scroll preciso
-      window.scrollTo({
-        top: targetPosition,
-        behavior: "instant",
-      });
-
-      // Aplicar animación
-      target.classList.add("smooth-section");
-
-      // Limpiar animación después de completar
-      setTimeout(() => {
-        target.classList.remove("smooth-section");
-        document.documentElement.style.scrollBehavior = "smooth";
-      }, 800);
-
-      // Actualizar navegación activa
-      document.querySelectorAll('[href^="#"]').forEach((link) => {
-        link.classList.remove("active", "text-[#1B637F]", "border-[#1B637F]");
-      });
-      this.classList.add("active", "text-[#1B637F]", "border-[#1B637F]");
+    closeModal.addEventListener("click", function (e) {
+      e.stopPropagation();
+      closeVideoModal();
     });
-  });
+
+    modalVideo.currentTime = 0;
+    modalVideo.play().catch((e) => console.log("Autoplay bloqueado"));
+
+    setupFullscreenBehavior(); // Solo maneja padding para móviles
+  }
+});
+
+// Cerrar el modal y limpiar el estado
+function closeVideoModal() {
+  if (modalOpen && modalVideo) {
+    if (document.fullscreenElement) {
+      document.exitFullscreen().catch((e) => console.log(e));
+    }
+
+    modalVideo.pause();
+    modalVideo.currentTime = 0;
+    modalContainer.innerHTML = "";
+    modalOpen = false;
+  }
 }
 
-function setupActiveSectionDetection() {
-  window.addEventListener("scroll", () => {
-    const sections = document.querySelectorAll("section");
-    const navHeight = document.querySelector("nav").offsetHeight;
-    let current = "";
+// Ajustes básicos para móviles (p-0)
+function setupFullscreenBehavior() {
+  const videoModal = document.getElementById("video-modal");
+  if (!videoModal) return;
 
-    sections.forEach((section) => {
-      const sectionTop = section.offsetTop - navHeight - 100;
-      if (window.scrollY >= sectionTop) {
-        current = "#" + section.id;
-      }
-    });
+  function handleResize() {
+    if (window.innerWidth < 768) {
+      videoModal.classList.add("p-0");
+    } else {
+      videoModal.classList.remove("p-0");
+    }
+  }
 
-    document.querySelectorAll('[href^="#"]').forEach((link) => {
-      link.classList.remove("active", "text-[#1B637F]", "border-[#1B637F]");
-      if (link.getAttribute("href") === current) {
-        link.classList.add("active", "text-[#1B637F]", "border-[#1B637F]");
-      }
-    });
-  });
+  window.addEventListener("resize", handleResize);
+  handleResize();
 }

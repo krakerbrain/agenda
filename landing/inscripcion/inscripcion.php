@@ -1,7 +1,7 @@
 <?php
 require_once dirname(__DIR__, 2) . '/classes/ConfigUrl.php';
 $baseUrl = ConfigUrl::get();
-
+$section = 'inscripcion';
 include_once dirname(__DIR__, 2) . '/landing/partials/head.php';
 ?>
 
@@ -11,7 +11,14 @@ include_once dirname(__DIR__, 2) . '/landing/partials/head.php';
     ?>
     <section class="bg-gradient-to-r from-[#1B637F] to-[#249373] text-white py-12">
         <div class="container mx-auto px-4 text-center">
-            <h1 class="text-3xl md:text-4xl font-bold mb-4">Comienza tu prueba gratis</h1>
+            <div class="lg:hidden flex justify-around mb-6">
+                <div class="flex items-center">
+                    <img src="<?php echo $baseUrl; ?>assets/img/landing/logo/Isotipo-Agendarium.svg"
+                        alt="Logo Agendarium" class="h-12 w-auto">
+                    <span class="text-2xl font-bold text-[#1B637F] ml-1 mt-6">Agendarium</span>
+                </div>
+            </div>
+            <h1 class="text-2xl md:text-4xl font-bold mb-4 lg:pt-6">Comienza tu prueba gratis</h1>
             <p class="text-xl opacity-90 max-w-2xl mx-auto">14 días sin costo - Sin tarjeta requerida</p>
         </div>
     </section>
@@ -21,60 +28,64 @@ include_once dirname(__DIR__, 2) . '/landing/partials/head.php';
             <div class="bg-white rounded-xl shadow-lg p-6 md:p-8 border border-gray-100">
                 <h2 class="text-2xl font-bold text-[#1B637F] mb-6">Información básica</h2>
 
-                <form id="registrationForm" action="<?php echo $baseUrl; ?>inscripcion/procesar" method="POST">
-                    <!-- Campos esenciales -->
-                    <div class="space-y-4">
-                        <div>
-                            <label for="nombre" class="block text-sm font-medium text-gray-700 mb-1">Nombre
-                                completo*</label>
-                            <input type="text" id="nombre" name="nombre" required
-                                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-[#1B637F] focus:ring-2 focus:ring-[#1B637F]/50">
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email*</label>
-                                <input type="email" id="email" name="email" required
-                                    class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-[#1B637F] focus:ring-2 focus:ring-[#1B637F]/50">
-                            </div>
-                            <div>
-                                <label for="telefono"
-                                    class="block text-sm font-medium text-gray-700 mb-1">Teléfono*</label>
-                                <input type="tel" id="telefono" name="telefono" required
-                                    class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-[#1B637F] focus:ring-2 focus:ring-[#1B637F]/50">
-                            </div>
-                        </div>
-
-                        <div>
-                            <label for="negocio" class="block text-sm font-medium text-gray-700 mb-1">Tipo de
-                                negocio*</label>
-                            <select id="negocio" name="negocio" required
-                                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-[#1B637F] focus:ring-2 focus:ring-[#1B637F]/50">
-                                <option value="">Seleccione...</option>
-                                <option value="medico">Médico/Consultorio</option>
-                                <option value="belleza">Salón de belleza</option>
-                                <option value="estetica">Centro de estética</option>
-                                <option value="otros">Otros servicios</option>
-                            </select>
-                        </div>
-
-                        <div class="flex items-start">
-                            <input type="checkbox" id="terminos" name="terminos" required
-                                class="mt-1 h-4 w-4 text-[#1B637F] rounded border-gray-300 focus:ring-[#1B637F]">
-                            <label for="terminos" class="ml-2 block text-sm text-gray-700">
-                                Acepto los <a href="<?php echo $baseUrl; ?>terminos"
-                                    class="text-[#1B637F] hover:underline">Términos de servicio</a> y
-                                <a href="<?php echo $baseUrl; ?>privacidad"
-                                    class="text-[#1B637F] hover:underline">Política de privacidad</a>
-                            </label>
-                        </div>
+                <form id="companyForm" action="<?php echo $baseUrl; ?>inscripcion/procesar" method="POST"
+                    enctype="multipart/form-data" class="space-y-6">
+                    <!-- Nombre del Negocio -->
+                    <div>
+                        <label for="business_name" class="block text-sm font-medium text-gray-700 mb-1">Nombre del
+                            Negocio*</label>
+                        <input type="text" id="business_name" name="business_name" required
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-[#1B637F] focus:ring-2 focus:ring-[#1B637F]/50">
                     </div>
 
+                    <!-- Nombre del Dueño -->
+                    <div>
+                        <label for="owner_name" class="block text-sm font-medium text-gray-700 mb-1">Nombre del
+                            Dueño/Usuario Principal*</label>
+                        <input type="text" id="owner_name" name="owner_name" required
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-[#1B637F] focus:ring-2 focus:ring-[#1B637F]/50">
+                    </div>
+
+                    <!-- Email -->
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Correo
+                            Electrónico*</label>
+                        <input type="email" id="email" name="email" required
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-[#1B637F] focus:ring-2 focus:ring-[#1B637F]/50">
+                    </div>
+
+                    <!-- Dirección -->
+                    <div>
+                        <label for="address" class="block text-sm font-medium text-gray-700 mb-1">Dirección
+                            (Opcional)</label>
+                        <input type="text" id="address" name="address"
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-[#1B637F] focus:ring-2 focus:ring-[#1B637F]/50">
+                    </div>
+
+                    <!-- Teléfono -->
+                    <div>
+                        <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Teléfono
+                            (Opcional)</label>
+                        <input type="tel" id="phone" name="phone"
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-[#1B637F] focus:ring-2 focus:ring-[#1B637F]/50">
+                    </div>
+
+                    <!-- Descripción -->
+                    <div>
+                        <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Descripción de la
+                            Empresa (Opcional)</label>
+                        <textarea id="description" name="description" maxlength="120" rows="3"
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-[#1B637F] focus:ring-2 focus:ring-[#1B637F]/50"></textarea>
+                        <p class="text-sm text-gray-500 mt-1">Máximo 120 caracteres.</p>
+                    </div>
+
+                    <!-- Botón -->
                     <button type="submit"
                         class="mt-6 w-full bg-[#1B637F] hover:bg-[#2B819F] text-white font-bold py-3 px-4 rounded-lg transition-colors">
-                        Crear mi cuenta gratis
+                        Crear cuenta de empresa
                     </button>
                 </form>
+
             </div>
 
             <!-- Columna derecha: Beneficios -->

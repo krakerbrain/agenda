@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/classes/ConfigUrl.php';
 $baseUrl = ConfigUrl::get();
-
+$section = 'home';
 include_once __DIR__ . '/landing/partials/head.php';
 ?>
 
@@ -51,10 +51,10 @@ include_once __DIR__ . '/landing/partials/head.php';
 
                 <!-- CTA Buttons -->
                 <div class="flex flex-col sm:flex-row gap-5">
-                    <a href="#about"
-                        class="bg-[#249373] hover:bg-[#1B637F] text-white font-semibold py-4 px-8 rounded-lg shadow-lg transition-all transform hover:scale-105 text-lg text-center">
+                    <button
+                        class="btn-demo bg-[#249373] hover:bg-[#1B637F] text-white font-semibold py-4 px-8 rounded-lg shadow-lg transition-all transform hover:scale-105 text-lg text-center">
                         Ver demostración
-                    </a>
+                    </button>
                     <a href="<?php echo $baseUrl; ?>landing/inscripcion/inscripcion.php"
                         class="bg-white hover:bg-gray-50 text-[#1B637F] font-semibold py-4 px-8 rounded-lg border-2 border-[#1B637F]/30 shadow-md transition-all hover:shadow-lg text-lg text-center">
                         Probar gratis
@@ -390,12 +390,11 @@ include_once __DIR__ . '/landing/partials/head.php';
                         <!-- CTA mejorado -->
                         <div class="flex flex-col sm:flex-row gap-4">
                             <button
-                                class="flex-1 bg-[#1B637F] hover:bg-[#2B819F] text-white font-semibold py-3 px-6 rounded-lg text-center transition-colors flex items-center justify-center"
-                                id="btn-demo">
+                                class="btn-demo flex-1 bg-[#1B637F] hover:bg-[#2B819F] text-white font-semibold py-3 px-6 rounded-lg text-center transition-colors flex items-center justify-center">
                                 <span class="material-icons mr-2">play_circle</span>
                                 Mira como funciona
                             </button>
-                            <a href="#contacto"
+                            <a href="<?php echo $baseUrl; ?>landing/inscripcion/inscripcion.php"
                                 class="flex-1 border border-[#1B637F] text-[#1B637F] hover:bg-[#1B637F]/5 font-medium py-3 px-6 rounded-lg text-center transition-colors">
                                 Solicitar prueba gratis
                             </a>
@@ -579,6 +578,7 @@ include_once __DIR__ . '/landing/partials/head.php';
     ?>
     <!-- Scripts de Swiper -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="<?php echo $baseUrl; ?>assets/js/landing/swipper.js"></script>
     <script src="<?php echo $baseUrl; ?>assets/js/landing/index.js"></script>
 </body>
 
