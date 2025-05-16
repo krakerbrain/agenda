@@ -102,29 +102,30 @@ function getModalTemplate(videoSrc) {
 }
 
 // Abrir el modal y cargar el video correcto
-btnDemo.addEventListener("click", function () {
-  if (!modalOpen) {
-    const isMobile = window.innerWidth < 768;
-    const videoSrc = isMobile ? `${baseUrl}assets/videos/Agendarium-Mobile.mp4` : `${baseUrl}assets/videos/Agendarium-Web.mp4`;
+btnDemo.forEach(function (btn) {
+  btn.addEventListener("click", function () {
+    if (!modalOpen) {
+      const isMobile = window.innerWidth < 768;
+      const videoSrc = isMobile ? `${baseUrl}assets/videos/Agendarium-Mobile.mp4` : `${baseUrl}assets/videos/Agendarium-Web.mp4`;
 
-    modalContainer.innerHTML = getModalTemplate(videoSrc);
-    modalOpen = true;
+      modalContainer.innerHTML = getModalTemplate(videoSrc);
+      modalOpen = true;
 
-    modalVideo = document.getElementById("modal-video");
-    const closeModal = document.getElementById("close-modal");
+      modalVideo = document.getElementById("modal-video");
+      const closeModal = document.getElementById("close-modal");
 
-    closeModal.addEventListener("click", function (e) {
-      e.stopPropagation();
-      closeVideoModal();
-    });
+      closeModal.addEventListener("click", function (e) {
+        e.stopPropagation();
+        closeVideoModal();
+      });
 
-    modalVideo.currentTime = 0;
-    modalVideo.play().catch((e) => console.log("Autoplay bloqueado"));
+      modalVideo.currentTime = 0;
+      modalVideo.play().catch((e) => console.log("Autoplay bloqueado"));
 
-    setupFullscreenBehavior(); // Solo maneja padding para móviles
-  }
+      setupFullscreenBehavior(); // Solo maneja padding para móviles
+    }
+  });
 });
-
 // Cerrar el modal y limpiar el estado
 function closeVideoModal() {
   if (modalOpen && modalVideo) {
