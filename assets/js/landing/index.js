@@ -76,7 +76,7 @@ window.addEventListener("scroll", () => {
   }
 });
 
-const btnDemo = document.querySelector(".btn-demo");
+const btnDemo = document.querySelectorAll(".btn-demo");
 const modalContainer = document.getElementById("modal-container");
 
 let modalOpen = false;
