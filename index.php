@@ -578,8 +578,8 @@ include_once __DIR__ . '/landing/partials/head.php';
     ?>
     <!-- Scripts de Swiper -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-    <script src="<?php echo $baseUrl; ?>assets/js/landing/swipper.js"></script>
-    <script src="<?php echo $baseUrl; ?>assets/js/landing/index.js"></script>
+    <script src="<?php echo $baseUrl; ?>assets/js/landing/swipper.js?v=<?php echo time(); ?>"></script>
+    <script src="<?php echo $baseUrl; ?>assets/js/landing/index.js?v=<?php echo time(); ?>"></script>
 </body>
 
 </html>
