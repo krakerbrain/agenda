@@ -107,4 +107,45 @@ class EmailSender
             return false;
         }
     }
+
+    public function sendContactEmail($mailContent)
+    {
+        try {
+            $this->mail->setFrom('agendaroad@gmail.com', 'SOPORTE - Agendarium');
+
+            $this->mail->addReplyTo($mailContent['from'], $mailContent['from_name']);
+            $this->mail->addAddress($_ENV['CONTACT_RECIPIENT_EMAIL'] ?? 'soporte@agendarium.com');
+
+            // Opcional: CC o BCC si es necesario
+            if (!empty($_ENV['CONTACT_CC_EMAILS'])) {
+                $ccEmails = explode(',', $_ENV['CONTACT_CC_EMAILS']);
+                foreach ($ccEmails as $ccEmail) {
+                    $this->mail->addCC(trim($ccEmail));
+                }
+            }
+
+            $this->mail->isHTML(true);
+            $this->mail->Subject = mb_encode_mimeheader($mailContent['subject'], 'UTF-8');
+            $this->mail->Body = $mailContent['body'];
+            $this->mail->AltBody = $this->createTextVersion($mailContent['body']);
+
+            if (!$this->mail->send()) {
+                throw new Exception('No se pudo enviar el email: ' . $this->mail->ErrorInfo);
+            }
+
+            return true;
+        } catch (Exception $e) {
+            error_log("EmailSender Error: " . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    private function createTextVersion($htmlContent)
+    {
+        // Conversión simple de HTML a texto plano
+        $text = strip_tags($htmlContent);
+        $text = html_entity_decode($text, ENT_QUOTES, 'UTF-8');
+        $text = preg_replace('/\s+/', ' ', $text);
+        return trim($text);
+    }
 }

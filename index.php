@@ -60,6 +60,17 @@ include_once __DIR__ . '/landing/partials/head.php';
                         Probar gratis
                     </a>
                 </div>
+                <!-- Redes sociales debajo de botones -->
+                <div class="flex justify-center lg:justify-start mt-6 space-x-6 text-2xl text-[#1B637F]">
+                    <a href="https://instagram.com/agendarium" target="_blank" aria-label="Instagram"
+                        class="hover:text-[#E4405F] transition-colors">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="https://www.youtube.com/@agendarium_app" target="_blank" aria-label="YouTube"
+                        class="hover:text-[#FF0000] transition-colors">
+                        <i class="fab fa-youtube"></i>
+                    </a>
+                </div>
             </div>
         </div>
     </section>
