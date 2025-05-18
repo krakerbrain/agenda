@@ -18,9 +18,11 @@ try {
     }
 
     // Sanitizar y validar datos
-    $nombre = filter_var(trim($_POST['nombre']), FILTER_SANITIZE_STRING);
+    $nombre = trim($_POST['nombre']);
+    $nombre = htmlspecialchars($nombre, ENT_QUOTES, 'UTF-8');
     $email = filter_var(trim($_POST['email']), FILTER_SANITIZE_EMAIL);
-    $mensaje = filter_var(trim($_POST['mensaje']), FILTER_SANITIZE_STRING);
+    $mensaje = trim($_POST['mensaje']);
+    $mensaje = htmlspecialchars($mensaje, ENT_QUOTES, 'UTF-8');
 
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         throw new Exception('Email no válido', 400);

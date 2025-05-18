@@ -193,6 +193,7 @@
                 }
             }
         }
+        const baseUrl = "<?php echo $baseUrl; ?>";
     </script>
 
     <!-- Hojas de estilo externas -->

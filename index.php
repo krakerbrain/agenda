@@ -60,17 +60,7 @@ include_once __DIR__ . '/landing/partials/head.php';
                         Probar gratis
                     </a>
                 </div>
-                <!-- Redes sociales debajo de botones -->
-                <div class="flex justify-center lg:justify-start mt-6 space-x-6 text-2xl text-[#1B637F]">
-                    <a href="https://instagram.com/agendarium" target="_blank" aria-label="Instagram"
-                        class="hover:text-[#E4405F] transition-colors">
-                        <i class="fab fa-instagram"></i>
-                    </a>
-                    <a href="https://www.youtube.com/@agendarium_app" target="_blank" aria-label="YouTube"
-                        class="hover:text-[#FF0000] transition-colors">
-                        <i class="fab fa-youtube"></i>
-                    </a>
-                </div>
+
             </div>
         </div>
     </section>
@@ -420,11 +410,11 @@ include_once __DIR__ . '/landing/partials/head.php';
                         class="bg-gradient-to-br from-[#1B637F]/5 to-[#249373]/5 p-8 flex items-center justify-center relative min-h-[400px]">
 
                         <!-- Video demostrativo -->
-                        <video controls preload="none"
+                        <video id="demoVideo" controls preload="none"
                             poster="<?php echo $baseUrl; ?>assets/img/landing/video/video_poster.png"
                             class="rounded-lg shadow-md w-full h-full object-cover max-w-full border-4 border-white"
                             style="object-fit: cover;">
-                            <source src="<?php echo $baseUrl; ?>assets/videos/Agendarium-Web.mp4" type="video/mp4">
+                            <!-- El source se carga dinámicamente -->
                             Tu navegador no soporta el video.
                         </video>
 

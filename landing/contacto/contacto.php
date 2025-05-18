@@ -3,12 +3,14 @@ require_once dirname(__DIR__, 2) . '/classes/ConfigUrl.php';
 $baseUrl = ConfigUrl::get();
 $section = 'contacto';
 include_once dirname(__DIR__, 2) . '/landing/partials/head.php';
+
 ?>
 
 <body class="bg-gray-50 text-gray-800">
     <?php
     include_once dirname(__DIR__, 2) . '/landing/partials/navbar.php';
     ?>
+    <input type="hidden" name="is_contact" id="is_contact" value="true">
     <section class="min-h-screen flex items-center justify-center px-4 py-20">
         <div class="max-w-xl w-full bg-white rounded-2xl shadow-lg p-8">
             <h1 class="text-2xl font-bold text-[#1B637F] mb-4">¿Tienes dudas o necesitas ayuda?</h1>
@@ -19,9 +21,9 @@ include_once dirname(__DIR__, 2) . '/landing/partials/head.php';
                     class="text-[#249373] font-medium underline">soporte@agendarium.com</a>
                 o llenar el siguiente formulario:
             </p>
-
             <?php if (isset($_GET['success'])): ?>
-                <div class="bg-green-100 text-green-800 p-3 rounded mb-6">
+                <div id="success-message"
+                    class="p-3 rounded mb-6 text-green-800 bg-green-200 opacity-0 transition-opacity transition-colors duration-1000">
                     ¡Tu mensaje fue enviado correctamente!
                 </div>
             <?php elseif (isset($_GET['error'])): ?>
