@@ -328,4 +328,42 @@ class EmailTemplate
             return ['success' => false, 'message' => $e->getMessage()];
         }
     }
+
+    public function buildContactEmail($nombre, $email, $mensaje)
+    {
+        try {
+            // Cargar plantilla desde archivo
+            $templatePath = dirname(__DIR__) . '/correos_template/correo_contacto_email.php';
+
+            if (!file_exists($templatePath)) {
+                throw new Exception("Plantilla de email no encontrada");
+            }
+
+            $template = file_get_contents($templatePath);
+
+            // Reemplazar placeholders
+            $placeholders = [
+                '{{nombre}}' => htmlspecialchars($nombre),
+                '{{email}}' => htmlspecialchars($email),
+                '{{mensaje}}' => nl2br(htmlspecialchars($mensaje)),
+                '{{logo_url}}' => ConfigUrl::get() . 'assets/img/landing/logo/Imagotipo-Agendarium.svg',
+                '{{current_year}}' => date('Y')
+            ];
+            $template = $this->emailBuilder->buildTemplate('contacto_email', $placeholders);
+
+            // foreach ($placeholders as $key => $value) {
+            //     $template = str_replace($key, $value, $template);
+            // }
+
+            return [
+                'subject' => 'Nuevo mensaje de contacto de ' . $nombre,
+                'body' => $template,
+                'from' => $email,
+                'from_name' => $nombre
+            ];
+        } catch (Exception $e) {
+            error_log("Error al construir correo de contacto: " . $e->getMessage());
+            throw new Exception("Error al construir el correo de contacto");
+        }
+    }
 }

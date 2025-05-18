@@ -22,6 +22,7 @@
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
 
     <!-- Fuentes locales primero -->
+    <link rel="stylesheet" href="<?php echo $baseUrl; ?>assets/vendors/css/font-awesome/all.min.css">
     <style>
         @font-face {
             font-family: 'CarrigPro-Regular';
@@ -192,6 +193,7 @@
                 }
             }
         }
+        const baseUrl = "<?php echo $baseUrl; ?>";
     </script>
 
     <!-- Hojas de estilo externas -->

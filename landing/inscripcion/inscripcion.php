@@ -9,6 +9,7 @@ include_once dirname(__DIR__, 2) . '/landing/partials/head.php';
     <?php
     include_once dirname(__DIR__, 2) . '/landing/partials/navbar.php';
     ?>
+    <div class="hidden md:block bg-white py-8"></div>
     <section class="bg-gradient-to-r from-[#1B637F] to-[#249373] text-white py-12">
         <div class="container mx-auto px-4 text-center">
             <div class="lg:hidden flex justify-around mb-6">
@@ -131,3 +132,4 @@ include_once dirname(__DIR__, 2) . '/landing/partials/head.php';
     <?php
     include_once dirname(__DIR__, 2) . '/landing/partials/footer.php';
     ?>
+    <script src="<?php echo $baseUrl; ?>assets/js/landing/index.js?v=<?php echo time(); ?>"></script>

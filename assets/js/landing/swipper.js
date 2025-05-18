@@ -21,11 +21,13 @@ function initSwiper() {
 }
 
 function setupSmoothScroll() {
-  document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+  document.querySelectorAll('a[href*="#"]').forEach((anchor) => {
     anchor.addEventListener("click", function (e) {
       e.preventDefault();
-
-      const target = document.querySelector(this.getAttribute("href"));
+      const href = this.getAttribute("href");
+      // Extrae solo el #id (ej: "index.html#how" -> "#how")
+      const targetId = href.includes("#") ? "#" + href.split("#")[1] : href;
+      const target = document.querySelector(targetId);
       if (!target) return;
 
       const navbarHeight = document.querySelector("nav").offsetHeight;

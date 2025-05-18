@@ -2,68 +2,68 @@ const hero = document.getElementById("home");
 const title1 = document.getElementById("hero-title-1");
 const title2 = document.getElementById("hero-title-2");
 const subtitle = document.getElementById("hero-subtitle");
+if (hero) {
+  const slides = [
+    {
+      background: "url('assets/img/landing/hero_section_2.jpg')",
+      title1: "Controla tu agenda",
+      title2: "como un profesional",
+      subtitle: "La herramienta de gestión de citas que necesitas para organizar tu tiempo de manera eficiente.",
+    },
+    {
+      background: "url('assets/img/landing/hero_section_3.jpg')",
+      title1: "Haz crecer tu negocio",
+      title2: "gestionando tus citas",
+      subtitle: "Tus clientes pueden reservar online sin llamadas ni mensajes.",
+    },
+    {
+      background: "url('assets/img/landing/hero_section.png')",
+      title1: "Tu agenda, tu control",
+      title2: "sin complicaciones",
+      subtitle: "Agendarium trabaja por ti mientras tú te concentras en tu servicio.",
+    },
+  ];
 
-const slides = [
-  {
-    background: "url('assets/img/landing/hero_section_2.jpg')",
-    title1: "Controla tu agenda",
-    title2: "como un profesional",
-    subtitle: "La herramienta de gestión de citas que necesitas para organizar tu tiempo de manera eficiente.",
-  },
-  {
-    background: "url('assets/img/landing/hero_section_3.jpg')",
-    title1: "Haz crecer tu negocio",
-    title2: "gestionando tus citas",
-    subtitle: "Tus clientes pueden reservar online sin llamadas ni mensajes.",
-  },
-  {
-    background: "url('assets/img/landing/hero_section.png')",
-    title1: "Tu agenda, tu control",
-    title2: "sin complicaciones",
-    subtitle: "Agendarium trabaja por ti mientras tú te concentras en tu servicio.",
-  },
-];
+  let index = 0; // Esta ya está en CSS
 
-let index = 0; // Esta ya está en CSS
+  setInterval(() => {
+    index = (index + 1) % slides.length;
+    const current = slides[index];
 
-setInterval(() => {
-  index = (index + 1) % slides.length;
-  const current = slides[index];
-
-  // Fade out texto
-  [title1, title2, subtitle].forEach((el) => {
-    el.classList.remove("fade-in");
-    el.classList.add("fade-out");
-  });
-
-  // Imagen fade-in en ::after
-  hero.style.setProperty("--next-bg", handlebackGroundGradient(current.background));
-  hero.classList.add("image-fading");
-
-  // Cambiar texto
-  setTimeout(() => {
-    title1.textContent = current.title1;
-    title2.textContent = current.title2;
-    subtitle.textContent = current.subtitle;
-
+    // Fade out texto
     [title1, title2, subtitle].forEach((el) => {
-      el.classList.remove("fade-out");
-      el.classList.add("fade-in");
+      el.classList.remove("fade-in");
+      el.classList.add("fade-out");
     });
-  }, 800);
 
-  // Al terminar el fade, reemplazamos imagen base y ocultamos ::after
-  setTimeout(() => {
-    hero.style.backgroundImage = handlebackGroundGradient(current.background);
-    hero.classList.remove("image-fading");
-  }, 1800);
-}, 6000);
+    // Imagen fade-in en ::after
+    hero.style.setProperty("--next-bg", handlebackGroundGradient(current.background));
+    hero.classList.add("image-fading");
 
-function handlebackGroundGradient(background) {
-  let percent = window.innerWidth < 768 ? "90%" : "70%";
-  return `linear-gradient(to right, rgba(255, 255, 255) 0%, rgba(255, 255, 255, 0) ${percent}), ${background}`;
+    // Cambiar texto
+    setTimeout(() => {
+      title1.textContent = current.title1;
+      title2.textContent = current.title2;
+      subtitle.textContent = current.subtitle;
+
+      [title1, title2, subtitle].forEach((el) => {
+        el.classList.remove("fade-out");
+        el.classList.add("fade-in");
+      });
+    }, 800);
+
+    // Al terminar el fade, reemplazamos imagen base y ocultamos ::after
+    setTimeout(() => {
+      hero.style.backgroundImage = handlebackGroundGradient(current.background);
+      hero.classList.remove("image-fading");
+    }, 1800);
+  }, 6000);
+
+  function handlebackGroundGradient(background) {
+    let percent = window.innerWidth < 768 ? "90%" : "70%";
+    return `linear-gradient(to right, rgba(255, 255, 255) 0%, rgba(255, 255, 255, 0) ${percent}), ${background}`;
+  }
 }
-
 const navbar = document.getElementById("navbar");
 
 window.addEventListener("scroll", () => {
@@ -155,4 +155,28 @@ function setupFullscreenBehavior() {
 
   window.addEventListener("resize", handleResize);
   handleResize();
+}
+
+const mensaje = document.getElementById("success-message");
+if (mensaje) {
+  mensaje.classList.add("opacity-100");
+  mensaje.classList.replace("bg-green-200", "bg-green-100");
+  setTimeout(() => {
+    mensaje.classList.remove("opacity-100");
+    mensaje.classList.add("opacity-0");
+  }, 4000); // dura visible 4 segundos
+}
+// carga dinamica de video
+const video = document.getElementById("demoVideo");
+
+if (video) {
+  const isMobile = window.matchMedia("(max-width: 768px)").matches;
+  if (isMobile) {
+    video.innerHTML = `<source src="${baseUrl}assets/videos/Agendarium-Mobile.mp4" type="video/mp4">`;
+  } else {
+    video.innerHTML = `<source src="${baseUrl}assets/videos/Agendarium-Web.mp4" type="video/mp4">`;
+  }
+
+  // Recargar el video después de cambiar el source
+  video.load();
 }
