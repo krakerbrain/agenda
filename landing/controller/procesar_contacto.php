@@ -35,17 +35,28 @@ try {
     $emailSender = new EmailSender();
     $emailSender->sendContactEmail($mailContent);
 
-    header('Location: ' . ConfigUrl::get() . 'landing/contacto/contacto.php?success=1');
+    // Al final, devolver respuesta JSON exitosa:
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode([
+        'success' => true,
+        'message' => 'Mensaje enviado con éxito'
+    ]);
     exit;
 } catch (Exception $e) {
     error_log("Error en procesar_contacto: " . $e->getMessage());
     $errorCode = $e->getCode() ?: 500;
     $errorMessage = 'Ocurrió un error al procesar tu mensaje';
 
-    if ($e->getCode() === 400) {
+    if ($errorCode === 400) {
         $errorMessage = 'Datos del formulario no válidos';
     }
 
-    header('Location: ' . ConfigUrl::get() . 'contacto/contacto.php?error=' . urlencode($errorMessage));
+    // Respuesta JSON de error
+    header('Content-Type: application/json; charset=utf-8');
+    http_response_code($errorCode);
+    echo json_encode([
+        'success' => false,
+        'message' => $errorMessage
+    ]);
     exit;
 }
