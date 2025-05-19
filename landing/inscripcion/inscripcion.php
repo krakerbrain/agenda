@@ -20,7 +20,7 @@ include_once dirname(__DIR__, 2) . '/landing/partials/head.php';
                 </div>
             </div>
             <h1 class="text-2xl md:text-4xl font-bold mb-4 lg:pt-6">Comienza tu prueba gratis</h1>
-            <p class="text-xl opacity-90 max-w-2xl mx-auto">14 días sin costo - Sin tarjeta requerida</p>
+            <p class="text-xl opacity-90 max-w-2xl mx-auto">30 días sin costo - Sin tarjeta requerida</p>
         </div>
     </section>
     <div class="container mx-auto px-4 py-12 max-w-5xl">
@@ -54,32 +54,6 @@ include_once dirname(__DIR__, 2) . '/landing/partials/head.php';
                         <input type="email" id="email" name="email" required
                             class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-[#1B637F] focus:ring-2 focus:ring-[#1B637F]/50">
                     </div>
-
-                    <!-- Dirección -->
-                    <div>
-                        <label for="address" class="block text-sm font-medium text-gray-700 mb-1">Dirección
-                            (Opcional)</label>
-                        <input type="text" id="address" name="address"
-                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-[#1B637F] focus:ring-2 focus:ring-[#1B637F]/50">
-                    </div>
-
-                    <!-- Teléfono -->
-                    <div>
-                        <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Teléfono
-                            (Opcional)</label>
-                        <input type="tel" id="phone" name="phone"
-                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-[#1B637F] focus:ring-2 focus:ring-[#1B637F]/50">
-                    </div>
-
-                    <!-- Descripción -->
-                    <div>
-                        <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Descripción de la
-                            Empresa (Opcional)</label>
-                        <textarea id="description" name="description" maxlength="120" rows="3"
-                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-[#1B637F] focus:ring-2 focus:ring-[#1B637F]/50"></textarea>
-                        <p class="text-sm text-gray-500 mt-1">Máximo 120 caracteres.</p>
-                    </div>
-
                     <!-- Botón -->
                     <button type="submit"
                         class="mt-6 w-full bg-[#1B637F] hover:bg-[#2B819F] text-white font-bold py-3 px-4 rounded-lg transition-colors">
@@ -129,7 +103,20 @@ include_once dirname(__DIR__, 2) . '/landing/partials/head.php';
             </div>
         </div>
     </div>
+    <!-- Modal de respuesta -->
+    <div id="responseModal"
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 opacity-0 pointer-events-none transition-opacity duration-300 ease-out">
+        <div class="bg-white rounded-lg shadow-lg max-w-md w-full p-6 text-center">
+            <h2 class="text-xl font-bold text-[#1B637F] mb-4">Registro exitoso</h2>
+            <p id="responseMessage" class="text-gray-700 mb-6">Tu empresa fue creada correctamente.</p>
+            <button onclick="closeModal()"
+                class="bg-[#1B637F] hover:bg-[#2B819F] text-white font-semibold px-4 py-2 rounded">
+                Cerrar
+            </button>
+        </div>
+    </div>
     <?php
     include_once dirname(__DIR__, 2) . '/landing/partials/footer.php';
     ?>
     <script src="<?php echo $baseUrl; ?>assets/js/landing/index.js?v=<?php echo time(); ?>"></script>
+    <script src="<?php echo $baseUrl; ?>assets/js/landing/inscripcion.js?v=<?php echo time(); ?>"></script>

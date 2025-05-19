@@ -346,7 +346,7 @@ class EmailTemplate
                 '{{nombre}}' => htmlspecialchars($nombre),
                 '{{email}}' => htmlspecialchars($email),
                 '{{mensaje}}' => nl2br(htmlspecialchars($mensaje)),
-                '{{logo_url}}' => ConfigUrl::get() . 'assets/img/landing/logo/Imagotipo-Agendarium.svg',
+                '{{logo_url}}' => 'https://agendarium.com/assets/img/landing/logo/Isotipo-Agendarium.png',
                 '{{current_year}}' => date('Y')
             ];
             $template = $this->emailBuilder->buildTemplate('contacto_email', $placeholders);
@@ -364,6 +364,35 @@ class EmailTemplate
         } catch (Exception $e) {
             error_log("Error al construir correo de contacto: " . $e->getMessage());
             throw new Exception("Error al construir el correo de contacto");
+        }
+    }
+
+    public function buildActivationEmail($nombre, $token)
+    {
+        try {
+            $templatePath = dirname(__DIR__) . '/correos_template/correo_activacion.php';
+
+            if (!file_exists($templatePath)) {
+                throw new Exception("Plantilla de activación no encontrada");
+            }
+
+            $template = file_get_contents($templatePath);
+
+            $placeholders = [
+                '{{nombre}}' => htmlspecialchars($nombre),
+                '{{activation_url}}' => ConfigUrl::get() . 'landing/inscripcion/activar-cuenta.php?token=' . urlencode($token),
+                '{{logo_url}}' => 'https://agendarium.com/assets/img/landing/logo/Isotipo-Agendarium.png',
+                '{{current_year}}' => date('Y')
+            ];
+
+            $finalBody = $this->emailBuilder->buildTemplate('activacion', $placeholders);
+
+            return [
+                'subject' => 'Activa tu cuenta en Agendarium',
+                'body' => $finalBody
+            ];
+        } catch (Exception $e) {
+            throw new Exception("Error al construir el correo de activación");
         }
     }
 }

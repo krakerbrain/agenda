@@ -1,51 +1,53 @@
 <?php
 require_once dirname(__DIR__, 2) . '/classes/CompanyManager.php';
 require_once dirname(__DIR__, 2) . '/classes/UserRegistrationService.php';
+require_once dirname(__DIR__, 2) . '/access-token/seguridad/ActivationTokenService.php';
+require_once dirname(__DIR__, 2) . '/classes/EmailTemplate.php';
+require_once dirname(__DIR__, 2) . '/classes/EmailSender.php';
 
 header('Content-Type: application/json');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
-        // Recibir datos del formulario
+        // 1. Recibir datos del formulario
         $name = $_POST['business_name'];
-        $phone = $_POST['phone'];
-        $address = $_POST['address'];
-        $logo = isset($_FILES['logo']) ? $_FILES['logo'] : null;
         $owner_name = $_POST['owner_name'];
         $email = $_POST['email'];
-        $password = '1234'; // Contraseña temporal
-        $role_id = 2; // Rol predeterminado
 
-        // Crear empresa
+        // 2. Crear empresa
         $companyManager = new CompanyManager();
-        $companyResult = $companyManager->createCompany($name, $phone, $address, $logo);
+        $companyResult = $companyManager->registerNewCompanyFromWeb($name);
 
         if (!$companyResult['success']) {
-            echo json_encode($companyResult);
-            exit;
+            throw new Exception($companyResult['error']);
         }
 
-        // Registrar usuario propietario
-        $userRegistration = new UserRegistrationService();
-        $userData = [
-            'username' => $owner_name,
-            'email' => $email,
-            'password' => $password,
-            'password2' => $password,
-            'role_id' => $role_id,
-            'company_id' => $companyResult['company_id']
-        ];
+        $company_id = $companyResult['company_id'];
 
-        $userResult = $userRegistration->registerUser($userData, $companyResult['company_id'], true);
+        // 3. Crear usuario principal (puedes usar un método como registerInitialUser)
+        $userManager = new UserRegistrationService();
+        $userResult = $userManager->registerInitialUserFromWeb($owner_name, $email, $company_id);
 
-        if ($userResult['success']) {
-            echo json_encode([
-                'success' => true,
-                'message' => "Empresa y usuario creados exitosamente. Bienvenido a Agendarium."
-            ]);
-        } else {
-            echo json_encode($userResult);
+        if (!$userResult['success']) {
+            throw new Exception($userResult['error']);
         }
+
+        // 4. Generar token de activación
+        $tokenService = new ActivationTokenService();
+        $token = $tokenService->createTokenForUser($userResult['user_id']);
+
+        // 5. Construir correo con plantilla
+        $template = new EmailTemplate();
+        $emailContent = $template->buildActivationEmail($owner_name, $token);
+
+        // 6. Enviar correo
+        $emailSender = new EmailSender();
+        $emailSender->sendInscriptionMail($emailContent['subject'], $email, $emailContent['body']);
+
+        echo json_encode([
+            'success' => true,
+            'message' => 'Cuenta creada correctamente. Te enviamos un correo para activar tu cuenta.'
+        ]);
     } catch (Exception $e) {
         echo json_encode([
             'success' => false,
@@ -55,6 +57,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 } else {
     echo json_encode([
         'success' => false,
-        'message' => "Método de solicitud no permitido."
+        'message' => "Método no permitido"
     ]);
 }

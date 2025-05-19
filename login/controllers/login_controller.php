@@ -1,6 +1,7 @@
 <?php
 require_once dirname(__DIR__, 2) . '/configs/init.php';
 require_once dirname(__DIR__, 2) . '/access-token/seguridad/JWTAuth.php';
+require_once dirname(__DIR__, 2) . '/access-token/seguridad/ActivationTokenService.php';
 require_once dirname(__DIR__, 2) . '/classes/Users.php';
 require_once dirname(__DIR__, 2) . '/classes/ConfigUrl.php';
 
@@ -25,10 +26,15 @@ if (isset($_POST['usuario']) && isset($_POST['contrasenia'])) {
                     $tokenVerificacion = hash('sha256', $datos['name'] . $usuario);
                     if (hash_equals($datos['token_sha256'], $tokenVerificacion)) {
                         if (password_verify($pass, $datos['password'])) {
-                            $auth = new JWTAuth();
-                            $auth->generarToken($datos['company_id'], $datos['role_id'], $datos['user_id']);
-                            $response['success'] = true;
-                            $response['redirect'] = $_ENV['URL_LOGIN'];
+                            $tokenService = new ActivationTokenService();
+                            if ($tokenService->hasActiveToken($datos['user_id'])) {
+                                $response['message'] = "Credenciales incorrectas."; // o un mensaje más claro si quieres
+                            } else {
+                                $auth = new JWTAuth();
+                                $auth->generarToken($datos['company_id'], $datos['role_id'], $datos['user_id']);
+                                $response['success'] = true;
+                                $response['redirect'] = $_ENV['URL_LOGIN'];
+                            }
                         } else {
                             $response['message'] = "Credenciales incorrectas.";
                         }
