@@ -93,9 +93,9 @@ class CompanyManager
         $token = bin2hex(random_bytes(16));
 
         try {
-            // Formatear el número de teléfono
             $this->db->beginTransaction(); // Iniciar transacción
 
+            // Formatear el número de teléfono
             $phone = $this->formatPhoneNumber($phone);
             // Subir el logo si existe
             $logoName = null;
@@ -168,6 +168,53 @@ class CompanyManager
             ];
         }
     }
+
+    public function registerNewCompanyFromWeb($name)
+    {
+        $token = bin2hex(random_bytes(16));
+
+        try {
+            $this->db->beginTransaction();
+
+            // Insertar la empresa solo con nombre
+            $sql = "INSERT INTO companies (name, is_active, token) VALUES (:name, 1, :token)";
+            $this->db->query($sql);
+            $this->db->bind(':name', $name);
+            $this->db->bind(':token', $token);
+            $this->db->execute();
+
+            $company_id = $this->db->lastInsertId();
+
+            $this->urlConverter($company_id, $name);
+
+            $this->db->endTransaction();
+
+            // Crear integraciones por defecto (opcional)
+            $integrationResult = $this->integrationManager->createDefaultIntegrationsForCompany($company_id);
+            if (!$integrationResult['success']) {
+                $this->logger->logError('Error creando integraciones para empresa ID ' . $company_id);
+            }
+
+            return ['success' => true, 'company_id' => $company_id];
+        } catch (Exception $e) {
+            $this->db->cancelTransaction();
+
+            if ($e->getCode() == 23000 && strpos($e->getMessage(), '1062 Duplicate entry') !== false) {
+                return [
+                    'success' => false,
+                    'error' => 'Esta empresa ya ha sido creada.',
+                    'debug' => $e->getMessage()
+                ];
+            }
+
+            return [
+                'success' => false,
+                'error' => 'Error al registrar la empresa.',
+                'debug' => $e->getMessage()
+            ];
+        }
+    }
+
 
     private function formatPhoneNumber($telefono)
     {

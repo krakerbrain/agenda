@@ -73,6 +73,60 @@ class UserRegistrationService
         ];
     }
 
+    public function registerInitialUserFromWeb(string $owner_name, string $email, int $company_id): array
+    {
+        try {
+            $temporal_pass = password_hash('temporal123', PASSWORD_BCRYPT, ['cost' => 7]);
+
+            $data = [
+                'username' => $owner_name,
+                'email' => $email,
+                'password' => $temporal_pass,
+                'password2' => $temporal_pass,
+                'company_id' => $company_id,
+                'role_id' => 2, // Asignar como administrador
+                'token' => hash('sha256', $owner_name . $email),
+            ];
+
+            $result = $this->users->registerInitialUserFromInscription($data);
+
+            if (!$result['success']) {
+                return $result;
+            }
+
+            // Crear horario por defecto
+            $user_schedule = new Schedules($company_id, $result['user_id']);
+            $schedule_result = $user_schedule->addNewSchedule();
+
+            if (!$schedule_result) {
+                return [
+                    'success' => false,
+                    'error' => 'Usuario creado pero falló la asignación del horario'
+                ];
+            }
+
+            // Enviar email de activación
+
+            $emailSent = $this->emailTemplate->buildInscriptionAlert($data['email']);
+
+            if (!$emailSent) {
+                return [
+                    'success' => true,
+                    'warning' => 'Usuario registrado pero falló el envío del email'
+                ];
+            }
+
+
+            return [
+                'success' => true,
+                'user_id' => $result['user_id']
+            ];
+        } catch (Exception $e) {
+            return ['success' => false, 'error' => 'Error al registrar el usuario principal: ' . $e->getMessage()];
+        }
+    }
+
+
     public function updateUrlPic($user_id, $url_pic)
     {
         return $this->users->updateUrlPic($user_id, $url_pic);

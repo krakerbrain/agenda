@@ -82,6 +82,33 @@ class Users
         }
     }
 
+    public function registerInitialUserFromInscription(array $data)
+    {
+        try {
+            // Validación adicional (procedimiento almacenado)
+            $validation_result = $this->validate_registration($data['username'], $data['email'], $data['password'], $data['password2']);
+            if ($validation_result['error']) {
+                return $validation_result;
+            }
+
+            $userData = [
+                'username' => $data['username'],
+                'email' => $data['email'],
+                'password' => $data['password'],
+                'company_id' => $data['company_id'],
+                'role_id' => $data['role_id'],
+                'token' => $data['token'],
+                'url_pic' => null,
+                'description' => null
+            ];
+
+            return $this->add_user($userData);
+        } catch (Exception $e) {
+            return ["success" => false, "error" => "Error al registrar el usuario: " . $e->getMessage()];
+        }
+    }
+
+
     // Función para validar usando el procedimiento almacenado
     public function validate_registration($username, $email, $password, $password2)
     {
