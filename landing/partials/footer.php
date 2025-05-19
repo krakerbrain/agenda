@@ -14,9 +14,12 @@
 
             <!-- Enlaces rápidos -->
             <div class="flex justify-center space-x-6 mb-6 md:mb-0 w-full md:w-1/3 text-sm">
-                <a href="#" class="text-[#1C4175] hover:underline">Términos</a>
-                <a href="#" class="text-[#1C4175] hover:underline">Privacidad</a>
-                <a href="<?php echo $baseUrl; ?>contacto.php" class="text-[#1C4175] hover:underline">Contacto</a>
+                <a href="<?php echo $baseUrl; ?>landing/terms/terms.php"
+                    class="text-[#1C4175] hover:underline">Términos</a>
+                <a href="<?php echo $baseUrl; ?>landing/terms/privacy-policy.php"
+                    class="text-[#1C4175] hover:underline">Privacidad</a>
+                <a href="<?php echo $baseUrl; ?>landing/contacto/contacto.php"
+                    class="text-[#1C4175] hover:underline">Contacto</a>
             </div>
 
             <!-- Redes sociales -->

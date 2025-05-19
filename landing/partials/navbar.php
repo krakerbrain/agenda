@@ -6,12 +6,13 @@
 
               <!-- Logo + Nombre: oculto en móviles -->
               <a href="<?php echo $baseUrl; ?>">
-                  <div class="hidden md:flex items-center space-x-3 md:mb-6 md:mb-0">
+                  <div class="flex items-center space-x-2 md:space-x-3 md:mb-6 md:mb-0">
                       <img src="<?php echo $baseUrl; ?>assets/img/landing/logo/Isotipo-Agendarium.svg"
-                          alt="Logo Agendarium" class="h-10 w-auto">
-                      <div class="hidden md:block">
-                          <span class="text-xl font-semibold text-[#1B637F]">Agendarium</span>
-                          <p class="text-sm text-[#1C4175]/80 text-[#1B637F]">Gestión de citas simplificada</p>
+                          alt="Logo Agendarium" class="h-8 w-auto md:h-10" />
+                      <div>
+                          <span class="text-base font-semibold text-[#1B637F] md:text-xl">Agendarium</span>
+                          <p class="hidden md:block text-sm text-[#1C4175]/80 text-[#1B637F]">Gestión de citas
+                              simplificada</p>
                       </div>
                   </div>
               </a>

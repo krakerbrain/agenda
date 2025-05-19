@@ -21,18 +21,9 @@ include_once dirname(__DIR__, 2) . '/landing/partials/head.php';
                     class="text-[#249373] font-medium underline">soporte@agendarium.com</a>
                 o llenar el siguiente formulario:
             </p>
-            <?php if (isset($_GET['success'])): ?>
-                <div id="success-message"
-                    class="p-3 rounded mb-6 text-green-800 bg-green-200 opacity-0 transition-opacity transition-colors duration-1000">
-                    ¡Tu mensaje fue enviado correctamente!
-                </div>
-            <?php elseif (isset($_GET['error'])): ?>
-                <div class="bg-red-100 text-red-800 p-3 rounded mb-6">
-                    Ocurrió un error al enviar el mensaje. Inténtalo de nuevo.
-                </div>
-            <?php endif; ?>
+            <div id="alert-container" class="mb-6"></div>
 
-            <form action="procesar_contacto.php" method="POST" class="space-y-4">
+            <form action="procesar_contacto.php" method="POST" class="space-y-4" id="contactForm">
                 <div>
                     <label for="nombre" class="block text-sm font-semibold mb-1">Nombre completo</label>
                     <input type="text" name="nombre" id="nombre" required
@@ -52,8 +43,15 @@ include_once dirname(__DIR__, 2) . '/landing/partials/head.php';
                 </div>
 
                 <button type="submit"
-                    class="bg-[#249373] hover:bg-[#1B637F] text-white px-6 py-3 rounded-lg font-semibold shadow-md transition-all">
-                    Enviar mensaje
+                    class="relative bg-[#249373] hover:bg-[#1B637F] text-white px-6 py-3 rounded-lg font-semibold shadow-md transition-all flex items-center justify-center"
+                    id="submitBtn">
+                    <span id="btnText">Enviar mensaje</span>
+                    <svg id="spinner" class="hidden animate-spin ml-2 h-5 w-5 text-white"
+                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
+                        </circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                    </svg>
                 </button>
             </form>
         </div>
@@ -62,3 +60,4 @@ include_once dirname(__DIR__, 2) . '/landing/partials/head.php';
     include_once dirname(__DIR__, 2) . '/landing/partials/footer.php';
     ?>
     <script src="<?php echo $baseUrl; ?>assets/js/landing/index.js?v=<?php echo time(); ?>"></script>
+    <script src="<?php echo $baseUrl; ?>assets/js/landing/contacto.js?v=<?php echo time(); ?>"></script>
