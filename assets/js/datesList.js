@@ -274,6 +274,7 @@ export async function confirmReservation(id, type = null) {
 
 // Función para manejar el modal de autenticación
 function handleAuthenticationModal() {
+  cleanBackdrop();
   logAction("Mostrando modal de autenticación");
   const modal = new bootstrap.Modal(document.getElementById("googleAuthenticateModal"));
   modal.show();
@@ -288,6 +289,7 @@ function handleAuthenticationModal() {
 
 // Función para manejar la respuesta exitosa
 function handleSuccess(data, type) {
+  cleanBackdrop();
   logAction(`Reserva exitosa: ${data.message}`);
   handleInfoModal("infoAppointment", "Evento creado", data.message);
   if (type == "event") {
@@ -309,6 +311,7 @@ function handleSuccess(data, type) {
 
 // Función para manejar los errores según el código de respuesta
 function handleError(data) {
+  cleanBackdrop();
   logAction(`Manejando error con código: ${data.code}`);
   const errorHandlers = {
     401: () => handleAuthenticationModal(),
@@ -333,6 +336,7 @@ function logAction(message) {
 
 // Función para abrir el modal
 function openDeleteModal(appointment) {
+  cleanBackdrop();
   let appointmentId = appointment.id_appointment;
   addSpinner(appointmentId, true, "eliminar");
   const modal = new bootstrap.Modal(document.getElementById("deleteModal"));
@@ -577,4 +581,8 @@ async function autocomplete(e) {
     const savedStatus = sessionStorage.getItem("status") || "unconfirmed";
     loadAppointments(savedStatus);
   }
+}
+
+function cleanBackdrop() {
+  document.querySelectorAll(".modal-backdrop").forEach((el) => el.remove());
 }
