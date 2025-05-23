@@ -17,7 +17,7 @@ if (hero) {
       subtitle: "Tus clientes pueden reservar online sin llamadas ni mensajes.",
     },
     {
-      background: "url('assets/img/landing/hero_section.png')",
+      background: "url('assets/img/landing/hero_section.jpg')",
       title1: "Tu agenda, tu control",
       title2: "sin complicaciones",
       subtitle: "Agendarium trabaja por ti mientras tú te concentras en tu servicio.",
