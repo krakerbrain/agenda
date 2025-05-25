@@ -1,4 +1,4 @@
-export function initCompanyList() {
+export function init() {
   async function fetchCompanies() {
     try {
       const response = await fetch(baseUrl + "user_admin/controllers/companyController.php", {

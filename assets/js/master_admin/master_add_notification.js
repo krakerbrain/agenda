@@ -1,4 +1,4 @@
-export function initAddNotification() {
+export function init() {
   const form = document.getElementById("notificationForm");
 
   form.addEventListener("submit", async function (e) {

@@ -1,4 +1,4 @@
-export function initClientes() {
+export function init() {
   // Obtener el último estado guardado o usar "unconfirmed" por defecto
   const savedStatus = sessionStorage.getItem("customerStatus") || "todos";
 

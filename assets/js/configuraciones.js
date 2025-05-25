@@ -1,4 +1,4 @@
-export function initConfiguraciones() {
+export function init() {
   const form = document.getElementById("companyConfigForm");
   if (form) {
     form.addEventListener("submit", async function (event) {

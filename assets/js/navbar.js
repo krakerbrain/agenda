@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", function () {
     } else if (role_id == 1) {
       loadContent("master_add_company");
     } else {
-      loadContent("dateList");
+      loadContent("datesList");
     }
   }
 
@@ -58,76 +58,40 @@ document.addEventListener("DOMContentLoaded", function () {
       links.forEach((link) => link.classList.toggle("active", link.id === page));
 
       hideCanvas();
-      switch (page) {
-        case "dateList":
-          const { initDateList } = await import(`./datesList.js?v=${APP_VERSION}`);
-          initDateList();
-          break;
-        case "clientes":
-          const { initClientes } = await import(`./clientes.js?v=${APP_VERSION}`);
-          initClientes();
-          break;
-        case "horarios":
-          const { initHorarios } = await import(`./horarios.js?v=${APP_VERSION}`);
-          initHorarios();
-          break;
-        case "servicios":
-          const { initServicios } = await import(`./servicios.js?v=${APP_VERSION}`);
-          initServicios();
-          break;
-        case "configuraciones":
-          const { initConfiguraciones } = await import(`./configuraciones.js?v=${APP_VERSION}`);
-          initConfiguraciones();
-          break;
-        case "correos":
-          const { initCorreos } = await import(`./correos.js?v=${APP_VERSION}`);
-          initCorreos();
-          break;
-        case "datos_empresa":
-          const { initDatosEmpresa } = await import(`./datosEmpresa.js?v=${APP_VERSION}`);
-          initDatosEmpresa();
-          break;
-        case "add_user":
-          const { initAddUser } = await import(`./addUser.js?v=${APP_VERSION}`);
-          initAddUser();
-          break;
-        case "master_add_company":
-          const { initAddCompany } = await import(`./master_admin/master_add_company.js?v=${APP_VERSION}`);
-          initAddCompany();
-          break;
-        case "master_company_list":
-          const { initCompanyList } = await import(`./master_admin/master_company_list.js?v=${APP_VERSION}`);
-          initCompanyList();
-          break;
-        case "master_add_notification":
-          const { initAddNotification } = await import(`./master_admin/master_add_notification.js?v=${APP_VERSION}`);
-          initAddNotification();
-          break;
-        case "notificaciones":
-          const { initNotificaciones } = await import(`./navbar/notifications.js?v=${APP_VERSION}`);
-          initNotificaciones();
-          break;
-        case "integrations":
-          const { initIntegrations } = await import(`./integrations.js?v=${APP_VERSION}`);
-          initIntegrations();
-          break;
-        case "eventos_unicos":
-          const { initEventosUnicos } = await import(`./eventos_unicos.js?v=${APP_VERSION}`);
-          initEventosUnicos();
-          break;
-        case "block_hour":
-          const { initBloqueoHoras } = await import(`./bloqueoHoras.js?v=${APP_VERSION}`);
-          initBloqueoHoras();
-          break;
-        case "services_assign":
-          const { initServicesAssign } = await import(`./services_assign.js?v=${APP_VERSION}`);
-          initServicesAssign();
-          break;
-        default:
-          console.error("No hay un módulo para la página:", page);
+
+      try {
+        // Determinar la ruta del módulo basada en el ID de la página
+        let modulePath;
+        if (page.startsWith('master_')) {
+          // Módulos de administración
+          modulePath = `./master_admin/${page}.js`;
+        } else if (page === 'notificaciones') {
+          // Módulo de notificaciones en carpeta navbar
+          modulePath = './navbar/notifications.js';
+        } else {
+          // El ID coincide con el nombre del archivo
+          modulePath = `./${page}.js`;
+        }
+
+        // Agregar versión al path
+        modulePath = `${modulePath}?v=${APP_VERSION}`;
+
+        // Importar el módulo
+        const module = await import(modulePath);
+        
+        // Usar la función init genérica
+        if (typeof module.init === 'function') {
+          await module.init();
+        } else {
+          console.warn(`Función init no encontrada en el módulo ${modulePath}`);
+        }
+      } catch (moduleError) {
+        console.error(`Error al cargar el módulo para ${page}:`, moduleError);
+        throw moduleError;
       }
     } catch (error) {
-      mainContent.innerHTML = error.message;
+      mainContent.innerHTML = `Error: ${error.message}`;
+      console.error('Error en loadContent:', error);
     }
   }
 

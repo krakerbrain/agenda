@@ -1,4 +1,4 @@
-export function initServicesAssign() {
+export function init() {
   // Cargar usuarios
   loadUsers();
 

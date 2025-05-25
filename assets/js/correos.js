@@ -1,4 +1,4 @@
-export function initCorreos() {
+export function init() {
   const tipoCorreoSelect = document.getElementById("tipoCorreo");
   const notasContainer = document.getElementById("notasContainer");
   const agregarNotaBtn = document.getElementById("agregarNota");
