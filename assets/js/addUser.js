@@ -1,4 +1,4 @@
-export function initAddUser() {
+export function init() {
   async function loadUsers() {
     try {
       const response = await fetch(`${baseUrl}user_admin/controllers/users.php`, {

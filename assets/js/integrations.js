@@ -1,4 +1,4 @@
-export function initIntegrations() {
+export function init() {
   // Selecciona todos los botones de habilitar/deshabilitar en la tabla
   const buttons = document.querySelectorAll("#integrationsForm button");
 

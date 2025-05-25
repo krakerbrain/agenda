@@ -549,7 +549,7 @@ async function sendAppointment(formData) {
         const authenticated = document.getElementById("authenticated").value === "true";
         if (authenticated) {
           // Guardar estado en sessionStorage
-          sessionStorage.setItem("lastPage", "dateList");
+          sessionStorage.setItem("lastPage", "datesList");
           sessionStorage.setItem("status", "unconfirmed");
 
           // Redirigir a las configuraciones

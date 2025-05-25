@@ -1,4 +1,4 @@
-export function initEventosUnicos() {
+export function init() {
   getEventos();
   // Inicializa Flatpickr para seleccionar múltiples fechas
   flatpickr("#eventDates", {

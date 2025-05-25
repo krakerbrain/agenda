@@ -1,4 +1,4 @@
-export function initDatosEmpresa() {
+export function init() {
   const form = document.getElementById("datosEmpresaForm");
   const formRedes = document.getElementById("social-form");
 

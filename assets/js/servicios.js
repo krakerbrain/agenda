@@ -1,6 +1,6 @@
 let tempServiceCounter = 1;
 
-export function initServicios() {
+export function init() {
   const form = document.getElementById("servicesForm");
   const tableBody = document.getElementById("servicesTableBody");
 

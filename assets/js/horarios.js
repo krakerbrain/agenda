@@ -1,4 +1,4 @@
-export function initHorarios() {
+export function init() {
   const form = document.getElementById("workScheduleForm");
   const tableBody = document.getElementById("scheduleTableBody");
   // obtener value de usario selected

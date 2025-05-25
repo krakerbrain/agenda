@@ -1,4 +1,4 @@
-export function initNotificaciones() {
+export function init() {
   loadAllNotifications();
 
   document.getElementById("mark-all-read")?.addEventListener("click", function () {

@@ -1,4 +1,4 @@
-export function initBloqueoHoras() {
+export function init() {
   fetchBlockedDays();
   const hourRange = document.getElementById("hour-range");
 

@@ -89,7 +89,7 @@ include dirname(__DIR__) . '/partials/head.php';
             <ul class="nav nav-underline flex-column">
                 <?php if ($role_id != 1) { ?>
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="#" id="dateList">Lista de citas</a>
+                        <a class="nav-link active" aria-current="page" href="#" id="datesList">Lista de citas</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#" id="clientes">Clientes</a>
@@ -110,10 +110,10 @@ include dirname(__DIR__) . '/partials/head.php';
                             <a class="nav-link" href="#" id="correos">Correos</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#" id="datos_empresa">Datos Empresa</a>
+                            <a class="nav-link" href="#" id="datosEmpresa">Datos Empresa</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#" id="add_user">Agregar Usuario</a>
+                            <a class="nav-link" href="#" id="addUser">Agregar Usuario</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#" id="configuraciones">Otras configuraciones</a>
@@ -125,7 +125,7 @@ include dirname(__DIR__) . '/partials/head.php';
                             <a class="nav-link" href="#" id="eventos_unicos">Eventos Únicos</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#" id="block_hour">Bloqueo de horas</a>
+                            <a class="nav-link" href="#" id="bloqueoHoras">Bloqueo de horas</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#" id="notificaciones">Notificaciones del sistema</a>

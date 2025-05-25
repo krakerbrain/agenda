@@ -1,4 +1,4 @@
-export function initAddCompany() {
+export function init() {
   document.getElementById("addCompanyForm").addEventListener("submit", async function (event) {
     event.preventDefault();
     // Mostrar spinner y deshabilitar botón
