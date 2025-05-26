@@ -45,7 +45,7 @@ export class ContentLoader {
 
     const paths = {
       master: `${base}assets/js/master_admin/`,
-      notificaciones: `${base}assets/js/navbar/notifications.js`,
+      notificaciones: `${base}assets/js/navbar-notification/notifications.js`,
       default: `${base}assets/js/`,
     };
 
