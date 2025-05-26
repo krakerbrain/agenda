@@ -27,11 +27,11 @@ export class ContentLoader {
   }
 
   async loadModule(page) {
-    if (this.moduleCache[page]) return;
+    // if (this.moduleCache[page]) return;
 
     const modulePath = this.getModulePath(page);
     try {
-      const module = await import(`${modulePath}?v=${this.APP_VERSION}`);
+      const module = await import(`${modulePath}?v=${this.APP_VERSION}&t=${Date.now()}`);
       this.moduleCache[page] = module;
       if (typeof module.init === "function") await module.init();
     } catch (error) {
