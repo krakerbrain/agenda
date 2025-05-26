@@ -1,5 +1,4 @@
 export function init() {
-
   // Obtener el último estado guardado o usar "unconfirmed" por defecto
   const savedStatus = sessionStorage.getItem("status") || "unconfirmed";
 
@@ -9,23 +8,23 @@ export function init() {
   const triggerTabList = document.querySelectorAll("#myTab button");
   // Seleccionar el tab correspondiente al estado guardado
   if (triggerTabList) {
-  triggerTabList.forEach((triggerEl) => {
-    const status = triggerEl.dataset.bsTarget.substring(1); // Extraer el estado del atributo data-bs-target
-    if (status === savedStatus) {
-      const tabTrigger = new bootstrap.Tab(triggerEl);
-      tabTrigger.show(); // Mostrar el tab correspondiente al estado guardado
-    }
+    triggerTabList.forEach((triggerEl) => {
+      const status = triggerEl.dataset.bsTarget.substring(1); // Extraer el estado del atributo data-bs-target
+      if (status === savedStatus) {
+        const tabTrigger = new bootstrap.Tab(triggerEl);
+        tabTrigger.show(); // Mostrar el tab correspondiente al estado guardado
+      }
 
-    // Agregar el evento de clic para cambiar de tab y actualizar el estado en sessionStorage
-    triggerEl.addEventListener("click", (event) => {
-      event.preventDefault();
-      document.querySelector("#searchForm").reset();
-      const newStatus = event.target.dataset.bsTarget.substring(1);
-      sessionStorage.setItem("status", newStatus);
-      loadAppointments(newStatus);
+      // Agregar el evento de clic para cambiar de tab y actualizar el estado en sessionStorage
+      triggerEl.addEventListener("click", (event) => {
+        event.preventDefault();
+        document.querySelector("#searchForm").reset();
+        const newStatus = event.target.dataset.bsTarget.substring(1);
+        sessionStorage.setItem("status", newStatus);
+        loadAppointments(newStatus);
+      });
     });
-  });
-}
+  }
 }
 
 let currentPage = 1;
@@ -63,7 +62,7 @@ async function loadAppointments(status, page = 1) {
 // Función para rellenar la tabla con las citas obtenidas
 function fillTable(data, showProviderColumn, isOwner) {
   if (!Array.isArray(data)) {
-    console.warn('fillTable recibió un dato no válido:', data);
+    console.warn("fillTable recibió un dato no válido:", data);
     data = [];
   }
   const tableContent = document.getElementById("tableContent");
