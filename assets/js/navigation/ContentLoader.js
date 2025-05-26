@@ -1,3 +1,5 @@
+import { ConfigService } from "../config/ConfigService.js"; // Ajusta el path
+
 export class ContentLoader {
   constructor({ fetch = window.fetch.bind(window), APP_VERSION = "1.0.0" } = {}) {
     this.fetch = fetch;
@@ -11,7 +13,7 @@ export class ContentLoader {
     }
 
     try {
-      const response = await this.fetch(`pages/${page}.php`);
+      const response = await this.fetch(`${ConfigService.baseUrl}user_admin/pages/${page}.php`);
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
       mainContent.innerHTML = await response.text();
@@ -20,7 +22,7 @@ export class ContentLoader {
     } catch (error) {
       console.error(`Error loading ${page}:`, error);
       mainContent.innerHTML = `<div class="error">Error al cargar la página: ${page}</div>`;
-      throw error; // Propagar el error para manejo externo
+      throw error;
     }
   }
 
@@ -39,10 +41,12 @@ export class ContentLoader {
   }
 
   getModulePath(page) {
+    const base = ConfigService.baseUrl;
+
     const paths = {
-      master: "/agenda/assets/js/master_admin/",
-      notificaciones: "/agenda/assets/js/navbar/notifications.js",
-      default: "/agenda/assets/js/",
+      master: `${base}assets/js/master_admin/`,
+      notificaciones: `${base}assets/js/navbar/notifications.js`,
+      default: `${base}assets/js/`,
     };
 
     if (page.startsWith("master_")) return `${paths.master}${page}.js`;
