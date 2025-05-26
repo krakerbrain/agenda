@@ -1,8 +1,12 @@
 import { test, expect } from "@playwright/test";
+import dotenv from "dotenv";
+dotenv.config();
 
 // Configuración base
-const LOGIN_URL = "http://localhost/agenda/login/index.php";
-const JS_BASE_URL = "http://localhost/agenda/assets/js/";
+const LOGIN_URL = process.env.E2E_LOGIN_URL!;
+const JS_BASE_URL = process.env.E2E_JS_BASE_URL!;
+const USER = process.env.E2E_USER!;
+const PASS = process.env.E2E_PASS!;
 
 // Lista de módulos JS y sus IDs (links) en el menú
 const PAGES = ["datesList", "clientes", "horarios", "servicios", "notificaciones"];
@@ -12,8 +16,8 @@ test.describe("Login y verificación global de módulos JS en navegación", () =
     await page.goto(LOGIN_URL);
 
     // Login (ajusta los selectores y credenciales según tu app)
-    await page.fill("#usuario", "marioplantabaja@gmail.com");
-    await page.fill("#contrasenia", "87201640");
+    await page.fill("#usuario", USER);
+    await page.fill("#contrasenia", PASS);
     await Promise.all([page.waitForURL("**/user_admin/index.php"), page.click('input[type="submit"]')]);
 
     await page.waitForSelector('[data-bs-toggle="offcanvas"]', { state: "visible" });
