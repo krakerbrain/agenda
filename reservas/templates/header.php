@@ -17,6 +17,12 @@
         <script src="<?php echo $baseUrl ?>assets/js/form_reserva/driver.js"> </script>
     <?php endif; ?>
     <style>
+        @font-face {
+            font-family: 'CarrigPro-Regular';
+            src: url("<?php echo $baseUrl; ?>assets/fonts/CarrigPro-Regular.woff2") format('woff2');
+            font-display: swap;
+        }
+
         :root {
             --primary-color: <?php echo htmlspecialchars($primary_color);
                                 ?>;
@@ -28,6 +34,17 @@
                             ?>;
             --border-color: <?php echo htmlspecialchars($border_color);
                             ?>;
+            font-family: 'CarrigPro-Regular', sans-serif;
+        }
+
+        .nav {
+            --bs-gutter-x: 1.5rem;
+            background: #fff3;
+            max-width: 600px;
+            margin: auto;
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
         }
 
         .banner {
@@ -115,6 +132,19 @@
             overflow: hidden;
         }
 
+        .agendarium-logo-text {
+            font-family: 'CarrigPro-Regular', sans-serif;
+            color: #1b637f;
+        }
+
+        .agendarium-logo-text span {
+            font-size: 1.25rem;
+        }
+
+        .agendarium-logo-text p {
+            font-size: 0.825rem;
+        }
+
         /* si $servicesProvidersCount es mayor a 1 */
 
         <?php if ($servicesProvidersCount > 1) : ?>.provider-section:nth-child(odd) {
@@ -130,11 +160,43 @@
         }
 
         <?php endif;
+
         ?>
+        /* crear responsive para texto de agendarium-logo-text */
+        @media (max-width: 576px) {
+            .agendarium-logo-text span {
+                font-size: 1rem;
+            }
+
+            .agendarium-logo-text p {
+                font-size: 0.7rem;
+            }
+
+            .nav {
+                margin-right: 0.8rem;
+                margin-left: 0.8rem;
+            }
+
+        }
     </style>
 </head>
 
 <body>
+    <header class="nav navbar-brand">
+        <nav class="container-xxl d-flex align-items-center" style="min-height: 64px;">
+            <a href="<?php echo $baseUrl; ?>" class="text-decoration-none">
+                <div class="d-flex align-items-center gap-2 gap-md-3 mb-md-0">
+                    <img src="<?php echo $baseUrl; ?>assets/img/landing/logo/Isotipo-Agendarium.svg"
+                        alt="Logo Agendarium" class="img-fluid" style="height: 2.5rem; width: auto;" />
+
+                    <div class="agendarium-logo-text">
+                        <span class="fw-semibold">Agendarium</span>
+                        <p class="mb-0">Gestión de citas simplificada</p>
+                    </div>
+                </div>
+            </a>
+        </nav>
+    </header>
     <div class="container mt-3">
         <!-- Tarjeta de Información de la Empresa -->
         <!-- Banner -->
