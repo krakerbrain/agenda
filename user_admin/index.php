@@ -31,130 +31,177 @@ const baseUrl = '<?php echo $baseUrl; ?>';
 const role_id = <?php echo $role_id; ?>;
 window.APP_VERSION = '<?= $versionManager->getVersion() ?>';
 </script>
+<script src="https://cdn.tailwindcss.com"></script>
 
 <body data-base-url="<?php echo htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8'); ?>">
-    <header class="nav navbar sticky-top bg-dark-subtle">
-        <nav class="container-xxl">
-            <a class="navbar-brand titulo" href="#"></a>
-            <div class="d-flex align-items-center">
-                <!-- Botón de notificaciones -->
-                <div class="dropdown me-3">
-                    <button class="btn btn-link text-dark p-0" type="button" id="notificationDropdown"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fa fa-envelope fs-6 position-relative"></i>
+    <!-- Navbar -->
+    <header class="sticky top-0 z-50 bg-gray-100 shadow-sm">
+        <nav class="container mx-auto px-2 py-3 flex items-center justify-between max-w-7xl">
+            <a class="text-xl font-semibold titulo" href="#"></a>
+
+            <div class="flex items-center space-x-4">
+                <!-- Notification Dropdown -->
+                <div class="relative">
+                    <button class="relative p-1 text-gray-700 hover:text-gray-900 focus:outline-none"
+                        id="notificationDropdown" aria-expanded="false">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                        </svg>
                         <?php if ($unread_count > 0): ?>
                         <span
-                            class="position-absolute start-100 translate-middle badge rounded-pill bg-danger local-badge-style">
+                            class="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 flex items-center justify-center text-white text-xs">
                             <?php echo $unread_count; ?>
-                            <span class="visually-hidden">notificaciones no leídas</span>
                         </span>
                         <?php endif; ?>
                     </button>
 
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationDropdown"
-                        style="min-width: 300px; max-height: 400px; overflow-y: auto;">
-                        <li>
-                            <h6 class="dropdown-header">Notificaciones</h6>
-                        </li>
-                        <div id="notification-list">
-                            <!-- Las notificaciones se cargarán aquí dinámicamente -->
-                            <li class="px-3 py-2 text-center">
-                                <div class="spinner-border spinner-border-sm" role="status">
-                                    <span class="visually-hidden">Cargando...</span>
+                    <!-- Dropdown menu -->
+                    <div id="notificationMenu"
+                        class="hidden absolute right-0 mt-2 w-72 bg-white rounded-md shadow-lg overflow-hidden z-50">
+                        <div class="py-1">
+                            <div class="px-4 py-2 text-sm font-medium text-gray-700 border-b">Notificaciones</div>
+                            <div id="notification-list" class="max-h-96 overflow-y-auto">
+                                <!-- Loading spinner -->
+                                <div class="px-4 py-3 text-center">
+                                    <div class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-blue-500 border-r-transparent"
+                                        role="status">
+                                        <span class="sr-only">Cargando...</span>
+                                    </div>
                                 </div>
-                            </li>
+                            </div>
+                            <div class="border-t">
+                                <a href="#" id="view-all-notifications"
+                                    class="block px-4 py-2 text-sm text-center text-gray-700 hover:bg-gray-100">Ver
+                                    todas</a>
+                            </div>
                         </div>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-                        <li><a class="dropdown-item text-center small" href="#" id="view-all-notifications">Ver
-                                todas</a></li>
-                    </ul>
+                    </div>
                 </div>
-                <!-- Botón para abrir el offcanvas -->
-                <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasMenu"
-                    aria-controls="offcanvasMenu" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
+
+                <!-- Offcanvas toggle button -->
+                <button class="p-1 text-gray-700 hover:text-gray-900 focus:outline-none" id="offcanvasToggle"
+                    aria-label="Toggle menu">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
                 </button>
+            </div>
         </nav>
     </header>
-    <!-- Offcanvas -->
-    <div class="offcanvas offcanvas-start overflow-auto" tabindex="-1" id="offcanvasMenu"
-        aria-labelledby="offcanvasMenuLabel">
-        <div class="offcanvas-header">
-            <h5 class="offcanvas-title" id="offcanvasMenuLabel">Configuraciones</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+
+    <!-- Offcanvas Menu -->
+    <div id="offcanvasMenu"
+        class="fixed inset-y-0 left-0 z-50 w-64 bg-white transform -translate-x-full transition-transform duration-300 ease-in-out overflow-y-auto">
+        <div class="flex items-center justify-between px-4 py-3 border-b">
+            <h5 class="text-lg font-medium">Configuraciones</h5>
+            <button id="offcanvasClose" class="text-gray-500 hover:text-gray-700 focus:outline-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
         </div>
-        <div class="offcanvas-body">
-            <ul class="nav nav-underline flex-column">
+
+        <div class="p-4">
+            <ul class="space-y-1">
                 <?php if ($role_id != 1) { ?>
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="#" id="datesList">Lista de citas</a>
+                <li>
+                    <a class="nav-element block px-3 py-2 text-blue-600 font-medium rounded hover:bg-gray-100" href="#"
+                        id="datesList">Lista de citas</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="clientes">Clientes</a>
+                <li>
+                    <a class="nav-element block px-3 py-2 text-gray-700 rounded hover:bg-gray-100" href="#"
+                        id="clientes">Clientes</a>
                 </li>
                 <?php if ($datosUsuario['role_id'] == 2) : ?>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="horarios">Horarios</a>
+                <li>
+                    <a class="nav-element block px-3 py-2 text-gray-700 rounded hover:bg-gray-100" href="#"
+                        id="horarios">Horarios</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="servicios">Servicios</a>
+                <li>
+                    <a class="nav-element block px-3 py-2 text-gray-700 rounded hover:bg-gray-100" href="#"
+                        id="servicios">Servicios</a>
                 </li>
                 <?php if ($user_count >= 2) : ?>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="services_assign">Asignar Servicios</a>
+                <li>
+                    <a class="nav-element block px-3 py-2 text-gray-700 rounded hover:bg-gray-100" href="#"
+                        id="services_assign">Asignar Servicios</a>
                 </li>
                 <?php endif; ?>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="correos">Correos</a>
+                <li>
+                    <a class="nav-element block px-3 py-2 text-gray-700 rounded hover:bg-gray-100" href="#"
+                        id="correos">Correos</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="datosEmpresa">Datos Empresa</a>
+                <li>
+                    <a class="nav-element block px-3 py-2 text-gray-700 rounded hover:bg-gray-100" href="#"
+                        id="datosEmpresa">Datos
+                        Empresa</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="addUser">Agregar Usuario</a>
+                <li>
+                    <a class="nav-element block px-3 py-2 text-gray-700 rounded hover:bg-gray-100" href="#"
+                        id="addUser">Agregar
+                        Usuario</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="configuraciones">Otras configuraciones</a>
+                <li>
+                    <a class="nav-element block px-3 py-2 text-gray-700 rounded hover:bg-gray-100" href="#"
+                        id="configuraciones">Otras configuraciones</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="integrations">Servicios Integrados</a>
+                <li>
+                    <a class="nav-element block px-3 py-2 text-gray-700 rounded hover:bg-gray-100" href="#"
+                        id="integrations">Servicios Integrados</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="eventos_unicos">Eventos Únicos</a>
+                <li>
+                    <a class="nav-element block px-3 py-2 text-gray-700 rounded hover:bg-gray-100" href="#"
+                        id="eventos_unicos">Eventos Únicos</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="bloqueoHoras">Bloqueo de horas</a>
+                <li>
+                    <a class="nav-element block px-3 py-2 text-gray-700 rounded hover:bg-gray-100" href="#"
+                        id="bloqueoHoras">Bloqueo de horas</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="notificaciones">Notificaciones del sistema</a>
+                <li>
+                    <a class="nav-element block px-3 py-2 text-gray-700 rounded hover:bg-gray-100" href="#"
+                        id="notificaciones">Notificaciones del sistema</a>
                 </li>
                 <?php endif; ?>
                 <?php } else { ?>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="master_add_company">Agrega Empresa</a>
+                <li>
+                    <a class="nav-element block px-3 py-2 text-gray-700 rounded hover:bg-gray-100" href="#"
+                        id="master_add_company">Agrega Empresa</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="master_company_list">Lista de Empresas</a>
+                <li>
+                    <a class="nav-element block px-3 py-2 text-gray-700 rounded hover:bg-gray-100" href="#"
+                        id="master_company_list">Lista de Empresas</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="master_add_notification">Notificaciones</a>
+                <li>
+                    <a class="nav-element block px-3 py-2 text-gray-700 rounded hover:bg-gray-100" href="#"
+                        id="master_add_notification">Notificaciones</a>
                 </li>
                 <?php } ?>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="logout">Cerrar sesión</a>
+                <li>
+                    <a class="nav-element block px-3 py-2 text-gray-700 rounded hover:bg-gray-100" href="#"
+                        id="logout">Cerrar
+                        sesión</a>
                 </li>
             </ul>
         </div>
     </div>
-    <div id="main-content" class="container mt-5"></div>
+
+    <!-- Backdrop -->
+    <div id="offcanvasBackdrop" class="fixed inset-0 z-40 bg-black bg-opacity-50 hidden"></div>
+
+    <div id="main-content" class="container mx-auto px-4 py-6"></div>
+
     <!-- Usado en configuracion de eventos únicos para múltiples fechas -->
     <script src="<?php echo $baseUrl; ?>assets/vendors/js/flatpickr/flatpickr.min.js"></script>
     <script src="<?php echo $baseUrl; ?>assets/vendors/js/flatpickr/es.js"></script>
-    <script src="<?php echo $baseUrl; ?>assets/vendors/js/bootstrap/bootstrap.bundle.min.js"></script>
     <!-- JavaScript de Cropper.js -->
     <script src="<?php echo $baseUrl; ?>assets/vendors/js/jquery/cropperjs/cropper.min.js"></script>
+
+
 
     <script type="module"
         src="<?php echo $baseUrl; ?>assets/js/navbar.js?v=<?php echo $versionManager->getVersion() ?>"></script>
