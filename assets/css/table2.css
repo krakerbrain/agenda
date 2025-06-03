@@ -1,0 +1,98 @@
+/* --- ESTILOS ADICIONALES PARA TABLA DE HORARIOS (DESKTOP Y MOBILE) --- */
+
+/* General style for horarios table using .head-table-config and .body-table-config */
+table tr.head-table-config th {
+  background: #e0f2fe;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0e7490;
+  border-bottom: 2px solid #bae6fd;
+  padding: 0.75rem 1rem;
+}
+table tr.body-table-config td {
+  font-size: 0.97rem;
+  color: #334155;
+  border-bottom: 1px solid #f1f5f9;
+  padding: 0.75rem 1rem;
+  vertical-align: middle;
+}
+table tr.body-table-config {
+  background: #fff;
+}
+table tbody tr.body-table-config:nth-child(even) {
+  background: #f8fafc;
+}
+
+/* Responsive card style for mobile */
+@media (max-width: 900px) {
+  table tr.head-table-config th {
+    display: none;
+  }
+  table tr.body-table-config {
+    display: block;
+    width: 100%;
+    margin-bottom: 1.25rem;
+    background: #fff;
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 4px 0 rgba(16, 30, 54, 0.07);
+    border: 1px solid #e2e8f0;
+    padding: 0.5rem 0.5rem 0.75rem 0.5rem;
+    position: relative;
+  }
+  table tr.body-table-config td {
+    display: block;
+    border: none;
+    padding: 0.5rem 0.5rem 0.25rem 0.5rem;
+    font-size: 1rem;
+    position: relative;
+  }
+  /* Compacta los inputs de jornada y descanso en una sola línea */
+  .jornada-row,
+  .descanso-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+  .jornada-row input[type="time"],
+  .descanso-row input[type="time"] {
+    width: 40%;
+    min-width: 90px;
+    font-size: 0.95rem;
+  }
+  .jornada-label,
+  .descanso-label {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: #64748b;
+    margin-bottom: 0.2rem;
+    display: block;
+  }
+  .switch-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+  }
+  .switch-row label {
+    font-size: 0.95rem;
+    color: #475569;
+    font-weight: 500;
+  }
+}
+
+/* Mejorar botones en mobile */
+@media (max-width: 900px) {
+  table tr.body-table-config button {
+    width: auto;
+    min-width: 90px;
+    font-size: 0.92rem;
+    margin-top: 0.2rem;
+  }
+}
+
+/* Mejorar el foco de los inputs */
+table tr.body-table-config input:focus {
+  outline: 2px solid #06b6d4;
+  outline-offset: 1px;
+}

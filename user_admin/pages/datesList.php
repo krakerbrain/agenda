@@ -6,7 +6,9 @@ require_once dirname(__DIR__, 2) . '/classes/ConfigUrl.php';
 $baseUrl = ConfigUrl::get();
 $auth = new JWTAuth();
 $auth->validarTokenUsuario();
+
 ?>
+<link rel="stylesheet" href="<?php echo $baseUrl; ?>assets/css/table.css?v=<?php echo time(); ?>">
 <style>
     #myTab .active {
         border-bottom: 1px solid #0e7490;
@@ -99,7 +101,7 @@ $auth->validarTokenUsuario();
     </div>
     <!-- Backdrop -->
     <div id="offcanvasSearchBackdrop" class="fixed inset-0 z-40 bg-black bg-opacity-50 hidden"></div>
-    <div class="overflow-x-auto mt-2 rounded-lg shadow">
+    <div class="mt-2 rounded-lg shadow">
         <div class="flex justify-between items-center bg-white p-4 border-b">
             <!-- Botón para abrir el offcanvas de búsqueda -->
             <div class="flex justify-end mb-2">

@@ -41,31 +41,45 @@ class JWTAuth
     // Función para validar el token
     public function validarTokenUsuario()
     {
-        if (isset($_COOKIE['jwt'])) {
-            try {
-                $decoded = JWT::decode($_COOKIE['jwt'], new Key($this->key, 'HS256'));
-
-                if (is_object($decoded)) {
-                    $company_id = $decoded->company_id;
-                    $role_id = $decoded->role_id;
-                    $user_id = $decoded->user_id; // Obtener el ID de usuario
-                    $last_activity = $decoded->last_activity;
-
-                    // Verificar la inactividad
-                    if ((time() - $last_activity) > $this->timeout) {
-                        $this->invalidarSesion();
-                    } else {
-                        // Regenerar el token para extender la sesión
-                        $this->generarToken($company_id, $role_id, $user_id);
-                        return ['company_id' => $company_id, 'role_id' => $role_id, 'user_id' => $user_id];
-                    }
-                }
-            } catch (Exception $e) {
-                echo "Error JWT: " . $e->getMessage();
-            }
+        if (!isset($_COOKIE['jwt'])) {
+            $this->manejarRedireccion();
         }
 
-        header("Location: " . $this->baseUrl . "login/index.php");
+        try {
+            $decoded = JWT::decode($_COOKIE['jwt'], new Key($this->key, 'HS256'));
+
+            if (!is_object($decoded)) {
+                $this->manejarRedireccion();
+            }
+
+            // Verificar inactividad
+            if ((time() - $decoded->last_activity) > $this->timeout) {
+                $this->invalidarSesion();
+                $this->manejarRedireccion();
+            }
+
+            // Regenerar token
+            $this->generarToken($decoded->company_id, $decoded->role_id, $decoded->user_id);
+
+            return [
+                'company_id' => $decoded->company_id,
+                'role_id' => $decoded->role_id,
+                'user_id' => $decoded->user_id
+            ];
+        } catch (Exception $e) {
+            $this->invalidarSesion();
+            $this->manejarRedireccion();
+        }
+    }
+
+    private function manejarRedireccion()
+    {
+        // Siempre devolver JSON para el SPA
+        header('Content-Type: application/json');
+        echo json_encode([
+            'error' => 'SESSION_EXPIRED',
+            'redirect' => $this->baseUrl . 'login/index.php'
+        ]);
         exit();
     }
 
@@ -109,6 +123,15 @@ class JWTAuth
     private function invalidarSesion()
     {
         setcookie("jwt", "", time() - 3600, "/", "", false, true);
+        // --- Manejo de AJAX para expiración de sesión ---
+        if (
+            !empty($_SERVER['HTTP_X_REQUESTED_WITH']) &&
+            strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest'
+        ) {
+            header('Content-Type: application/json');
+            echo json_encode(['redirect' => $this->baseUrl . 'login/index.php']);
+            exit();
+        }
         header("Location: " . $this->baseUrl . "login/index.php");
         exit();
     }

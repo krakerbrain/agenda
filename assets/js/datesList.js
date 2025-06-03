@@ -1,35 +1,42 @@
 // --- Modular imports ---
-import { DatesTabManager } from "./dateLists/DatesTabManager.js";
+import { TabManager } from "./config/TabManager.js";
 // import { DateFormatter } from "./dateLists/DateFormatter.js";
 import { DatesTableRenderer } from "./dateLists/DatesTableRenderer.js";
-import { DatesPagination } from "./dateLists/DatesPagination.js";
-import { DatesSearch } from "./dateLists/DatesSearch.js";
-import { DatesUIHelpers } from "./dateLists/DatesUIHelpers.js";
+import { Pagination } from "./config/Pagination.js";
 import { OffcanvasManager } from "./config/OffcanvasManager.js";
+import { SearchManager } from "./config/SearchManager.js";
 import { SpinnerManager } from "./config/SpinnerManager.js";
 import { appointmentsStore } from "./dateLists/state.js";
+import { DatesUIHelpers } from "./dateLists/DatesUIHelpers.js";
+import { ModalManager } from "./config/ModalManager.js";
 
 // --- Modular class instances ---
 let tableRenderer, pagination, searchManager, tabManager;
 
 export function init() {
-  // Tabs
-  tabManager = new DatesTabManager("#myTab button", (status) => {
-    pagination.currentPage = 1;
-    loadAppointments(status, 1);
+  // Tabs usando TabManager
+  tabManager = new TabManager({
+    tabContainerSelector: "#myTab",
+    onTabChange: (status) => {
+      pagination.currentPage = 1;
+      loadAppointments(status, 1);
+    },
+    storageKey: "status",
+    defaultTab: sessionStorage.getItem("status") || "unconfirmed",
+    resetFormSelector: "#searchForm",
   });
 
   // Table renderer
   tableRenderer = new DatesTableRenderer("#tableContent");
 
-  // Pagination
-  pagination = new DatesPagination("prevPage", "nextPage", "currentPage", (page) => {
+  // Pagination global
+  pagination = new Pagination("prevPage", "nextPage", "currentPage", (page) => {
     const status = sessionStorage.getItem("status") || "unconfirmed";
     loadAppointments(status, page);
   });
 
-  // Search
-  searchManager = new DatesSearch("#searchForm", handleSearch, handleAutocomplete);
+  // SearchManager global para datesList
+  searchManager = new SearchManager("#searchForm", handleSearch, handleAutocomplete, ["service", "name", "phone", "mail", "date", "hour", "status"]);
 
   offCanvas();
   // Initial load
@@ -66,7 +73,7 @@ async function loadAppointments(status, page = 1) {
   }
 }
 
-function getActionButtons(status, id, btnType = "appointment") {
+function getActionButtons(status, id) {
   let buttons = "";
   const confirmId = `confirmarBtn${id}`;
   const deleteId = `eliminarBtn${id}`;
@@ -415,11 +422,11 @@ function logAction(message) {
 }
 
 function showModal(modalId) {
-  DatesUIHelpers.showModal(modalId);
+  ModalManager.show(modalId);
 }
 
 function hideModal(modalId) {
-  DatesUIHelpers.hideModal(modalId);
+  ModalManager.hide(modalId);
 }
 
 // Close modals when clicking on close buttons or outside

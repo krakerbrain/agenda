@@ -1,4 +1,3 @@
-import { ModalManager } from "./config/ModalManager.js";
 export function init() {
   const form = document.getElementById("workScheduleForm");
   const tableBody = document.getElementById("scheduleTableBody");
@@ -94,63 +93,40 @@ export function init() {
 
   function addScheduleToTable(horario) {
     const { schedule_id, day_id, day, work_start, work_end, break_start, break_end, is_enabled } = horario;
+
     const tableBody = document.getElementById("scheduleTableBody");
     const tr = document.createElement("tr");
-    tr.classList.add("work-day", "body-table-config");
-    const copiaTodo = day === "Lunes" ? "<button type='button' class='text-cyan-600 hover:text-cyan-800 text-xs underline ml-2 copy-all'>Copiar en todos</button>" : "";
+    tr.classList.add("work-day");
+    tr.classList.add("body-table");
+    const copiaTodo = day === "Lunes" ? "<button type='button' class='btn btn-link copy-all'>Copiar en todos</button>" : "";
     const checked = is_enabled === 1 ? "checked" : "";
     const disabled = is_enabled === 1 ? "" : "disabled";
 
     tr.innerHTML = `
-    <tr class="grid grid-cols-1 md:table-row py-4 px-2 gap-2 md:py-0 md:px-0">
-  <!-- Fila superior (móvil) -->
-  <td class="flex justify-between items-center md:table-cell px-2">
-    <span class="font-semibold text-gray-700 md:font-normal">${day}</span>
-    <label class='inline-flex items-center cursor-pointer md:justify-center'>
-      <span class="mr-2 md:hidden">Estado:</span>
-      <input class='form-checkbox h-5 w-5 text-cyan-600' type='checkbox' ${checked}>
-      <input type='hidden' name='schedule[${day}][is_enabled]' value='${is_enabled}'>
-    </label>
-  </td>
-  
-  <!-- Jornada (se muestra diferente en móvil) -->
-  <td class="md:table-cell px-2">
-    <div class="md:flex md:space-x-2">
-      <div class="mobile-block md:hidden">
-        <span class="block font-semibold text-gray-700 mb-1">Jornada</span>
-        <div class="flex space-x-2">
-          <input type='time' class='border rounded px-2 py-1 w-full focus:ring-cyan-500 focus:border-cyan-500' 
-                 name='schedule[${day}][start]' value='${work_start}' ${disabled}>
-          <input type='time' class='border rounded px-2 py-1 w-full focus:ring-cyan-500 focus:border-cyan-500' 
-                 name='schedule[${day}][end]' value='${work_end}' ${disabled}>
-        </div>
-      </div>
-      <div class="hidden md:block">
-        <input type='time' class='border rounded px-2 py-1 w-full focus:ring-cyan-500 focus:border-cyan-500' 
-               name='schedule[${day}][start]' value='${work_start}' ${disabled}>
-      </div>
-      <div class="hidden md:block">
-        <input type='time' class='border rounded px-2 py-1 w-full focus:ring-cyan-500 focus:border-cyan-500' 
-               name='schedule[${day}][end]' value='${work_end}' ${disabled}>
-      </div>
-    </div>
-  </td>
-  
-  <!-- Acciones -->
-  <td class="md:table-cell px-2 pt-2 md:pt-0">
-    <button type='button' class='descanso bg-cyan-50 hover:bg-cyan-100 text-cyan-700 border border-cyan-200 rounded px-3 py-1 text-xs font-medium transition w-full md:w-auto' ${disabled}>
-      + Descanso
-    </button>
-  </td>
-  
-  <td class="md:table-cell px-2">
-    ${copiaTodo}
-  </td>
-  
-  <!-- Campos ocultos -->
-  <input type='hidden' name='schedule[${day}][schedule_id]' value='${schedule_id}'>
-  <input type='hidden' name='schedule[${day}][day_id]' value='${day_id}'>
-</tr>
+      <tr class='work-day'>
+      <input type='hidden' name='schedule[${day}][schedule_id]' value='${schedule_id}'>
+        <td data-cell="día" class="data">${day}
+          <input type='hidden' name='schedule[${day}][day_id]' value='${day_id}'>
+        </td>
+        <td data-cell="estado" class="data">
+          <div class='form-check form-switch'>
+            <input class='form-check-input' type='checkbox' ${checked}>
+            <input type='hidden' name='schedule[${day}][is_enabled]' value='${is_enabled}'>
+          </div>
+        </td>
+        <td data-cell="Inicio Jornada" class="data">
+          <input type='time' class='form-control' name='schedule[${day}][start]' value='${work_start}' ${disabled}>
+        </td>
+        <td data-cell="Fin Jornada" class="data">
+          <input type='time' class='form-control' name='schedule[${day}][end]' value='${work_end}'${disabled}>
+        </td>
+        <td>
+          <button type='button' name='schedule[${day}]' class='btn btn-outline-primary btn-sm descanso' ${disabled}>+ Descanso</button>
+        </td>
+        <td data-cell="">
+          ${copiaTodo}
+        </td>
+      </tr>
     `;
 
     tableBody.appendChild(tr);
@@ -159,7 +135,7 @@ export function init() {
       addNewBreakTime(tr.querySelector(".descanso"), day);
     });
 
-    tr.querySelector(".form-checkbox").addEventListener("change", async (e) => {
+    tr.querySelector(".form-check-input").addEventListener("change", async (e) => {
       changeDayStatus(e, day);
     });
 
@@ -167,30 +143,31 @@ export function init() {
     if (break_start && break_end && is_enabled) {
       addBreakTimeElement(tr, day, break_start, break_end);
     }
-    if (tr.querySelector(".copy-all")) {
-      tr.querySelector(".copy-all").addEventListener("click", copiarEnTodos);
-    }
+    document.querySelector(".copy-all").addEventListener("click", copiarEnTodos);
   }
-
   function addNewBreakTime(button, day) {
     const tr = button.closest(".work-day");
     const breakRow = document.createElement("tr");
-    breakRow.classList.add("break-row", "body-table-config");
+    breakRow.classList.add("break-row");
+    breakRow.classList.add("body-table");
+
     breakRow.innerHTML = `
-      <td colspan="2" class="py-2 px-2 text-xs text-gray-500">Hora de descanso</td>
-      <td class='break-time py-2 px-2'>
-        <input type='time' class='border rounded px-2 py-1 w-full focus:ring-cyan-500 focus:border-cyan-500' name='schedule[${day}][break_start]' value='' required>
+      <td colspan="2">Hora de descanso</td>
+      <td class='break-time'>
+        <input type='time' class='form-control' name='schedule[${day}][break_start]' value='' required>
       </td>
-      <td class='py-2 px-2'>
-        <input type='time' class='border rounded px-2 py-1 w-full focus:ring-cyan-500 focus:border-cyan-500' name='schedule[${day}][break_end]' value='' required>
+      <td>
+        <input type='time' class='form-control' name='schedule[${day}][break_end]' value='' required>
       </td>
-      <td class='py-2 px-2'>
-        <button type='button' class='remove-break bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded px-3 py-1 text-xs font-medium transition'>Eliminar</button>
+      <td>
+        <button type='button' class='btn btn-outline-danger btn-sm remove-break'>Eliminar</button>
       </td>
       <td></td>
     `;
+
     button.disabled = true;
     tr.parentNode.insertBefore(breakRow, tr.nextSibling);
+
     breakRow.querySelector(".remove-break").addEventListener("click", () => {
       removeBreakTime(breakRow);
     });
@@ -198,24 +175,29 @@ export function init() {
 
   function addBreakTimeElement(tr, day, break_start, break_end) {
     const breakRow = document.createElement("tr");
-    breakRow.classList.add("break-row", "body-table-config");
+    breakRow.classList.add("break-row");
+    breakRow.classList.add("body-table");
+
     breakRow.innerHTML = `
-      <td colspan="2" class="py-2 px-2 text-xs text-gray-500">Hora de descanso</td>
-      <td data-cell="inicio descanso" class='break-time data py-2 px-2'>
-        <input type='time' class='border rounded px-2 py-1 w-full focus:ring-cyan-500 focus:border-cyan-500' name='schedule[${day}][break_start]' value='${break_start}' required>
+      <td colspan="2">Hora de descanso</td>
+      <td data-cell="inicio descanso" class='break-time data'>
+        <input type='time' class='form-control' name='schedule[${day}][break_start]' value='${break_start}' required>
       </td>
-      <td data-cell="fin descanso" class="data py-2 px-2">
-        <input type='time' class='border rounded px-2 py-1 w-full focus:ring-cyan-500 focus:border-cyan-500' name='schedule[${day}][break_end]' value='${break_end}' required>
+      <td data-cell="fin descanso" class="data">
+        <input type='time' class='form-control' name='schedule[${day}][break_end]' value='${break_end}' required>
       </td>
-      <td class='py-2 px-2'>
-        <button type='button' class='remove-break bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded px-3 py-1 text-xs font-medium transition'>Eliminar</button>
+      <td>
+        <button type='button' class='btn btn-outline-danger btn-sm remove-break'>Eliminar</button>
       </td>
       <td></td>
     `;
+
     tr.parentNode.insertBefore(breakRow, tr.nextSibling);
+
     breakRow.querySelector(".remove-break").addEventListener("click", () => {
       removeBreakTime(breakRow);
     });
+
     tr.querySelector(".descanso").disabled = true;
   }
 
@@ -238,15 +220,9 @@ export function init() {
         const { success, message } = await response.json();
 
         if (success) {
-          document.getElementById("responseMessage").innerHTML = `<p>${message}</p>`;
-          ModalManager.show("saveSchedules");
-        } else {
-          document.getElementById("responseMessage").innerHTML = `<p class='text-red-600'>${message || "Error al eliminar descanso"}</p>`;
-          ModalManager.show("saveSchedules");
+          alert(message);
         }
       } catch (error) {
-        document.getElementById("responseMessage").innerHTML = `<p class='text-red-600'>Ocurrió un error inesperado</p>`;
-        ModalManager.show("saveSchedules");
         console.error(error);
       }
     }
@@ -292,17 +268,12 @@ export function init() {
       const { success, message } = await response.json();
 
       if (success) {
-        document.getElementById("responseMessage").innerHTML = `<p>Horario guardado exitosamente</p>`;
-        ModalManager.show("saveSchedules");
+        const modal = new bootstrap.Modal(document.getElementById("saveSchedules"));
+        modal.show();
         showSaveAlert(false);
         getHorarios(userId);
-      } else {
-        document.getElementById("responseMessage").innerHTML = `<p class='text-red-600'>${message || "Error al guardar horarios"}</p>`;
-        ModalManager.show("saveSchedules");
       }
     } catch (error) {
-      document.getElementById("responseMessage").innerHTML = `<p class='text-red-600'>Ocurrió un error inesperado</p>`;
-      ModalManager.show("saveSchedules");
       console.error(error);
     }
   });
@@ -321,40 +292,15 @@ export function init() {
       const { success, message } = await response.json();
 
       if (success) {
-        document.getElementById("responseMessage").innerHTML = `<p>${message}</p>`;
-        ModalManager.show("saveSchedules");
+        alert(message);
         getHorarios(userId);
       } else {
-        document.getElementById("responseMessage").innerHTML = `<p class='text-red-600'>${message || "Error al copiar los horarios"}</p>`;
-        ModalManager.show("saveSchedules");
+        alert("Error al copiar los horarios: " + message);
       }
     } catch (error) {
-      document.getElementById("responseMessage").innerHTML = `<p class='text-red-600'>Ocurrió un error inesperado</p>`;
-      ModalManager.show("saveSchedules");
       console.error(error);
     }
   }
-
-  // --- Cierre de modal con ModalManager ---
-  function setupModalCloseListeners() {
-    document.querySelectorAll(".close-modal").forEach((button) => {
-      button.addEventListener("click", function () {
-        const modal = this.closest(".fixed.inset-0");
-        if (modal) {
-          ModalManager.hide(modal.id);
-        }
-      });
-    });
-    document.querySelectorAll(".fixed.inset-0").forEach((modal) => {
-      modal.addEventListener("click", function (e) {
-        if (e.target === modal) {
-          ModalManager.hide(modal.id);
-        }
-      });
-    });
-  }
-
-  setupModalCloseListeners();
 
   getHorarios();
 }

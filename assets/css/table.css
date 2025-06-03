@@ -2,14 +2,13 @@ body {
   font-size: 0.85rem;
 }
 
-.actionBtns {
+/* .actionBtns {
   display: flex;
   justify-content: space-evenly;
-}
+} */
 
 /* Estilo para los iconos de acción */
 .action-icon {
-  cursor: pointer;
   position: relative; /* Necesario para posicionar el spinner encima */
   display: inline-flex;
   align-items: center;
@@ -197,6 +196,20 @@ body {
     justify-content: flex-start !important;
     flex-wrap: wrap;
     gap: 0.5rem !important;
+  }
+
+  tr.head-table-config th {
+    display: none;
+  }
+
+  tr.body-table-config td {
+    display: block;
+  }
+
+  .body-table-config .data::before {
+    content: attr(data-cell) ": ";
+    font-weight: 700;
+    text-transform: capitalize;
   }
 }
 

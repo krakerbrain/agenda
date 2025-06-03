@@ -1,29 +1,50 @@
+import { TabManager } from "./config/TabManager.js";
+import { Pagination } from "./config/Pagination.js";
+import { OffcanvasManager } from "./config/OffcanvasManager.js";
+import { SearchManager } from "./config/SearchManager.js";
+import { DatesUIHelpers } from "./dateLists/DatesUIHelpers.js";
+import { CustomersTableRenderer } from "./config/customers/CustomersTableRenderer.js";
+import { ModalManager } from "./config/ModalManager.js";
+
+let pagination, tableRenderer;
+
 export function init() {
-  // Obtener el último estado guardado o usar "unconfirmed" por defecto
-  const savedStatus = sessionStorage.getItem("customerStatus") || "todos";
-
-  // Cargar citas para la pestaña correspondiente al último estado guardado
-  loadCustomers();
-
-  const triggerTabList = document.querySelectorAll("#customerTab button");
-
-  // Seleccionar el tab correspondiente al estado guardado
-  triggerTabList.forEach((triggerEl) => {
-    const status = triggerEl.dataset.bsTarget.substring(1); // Extraer el estado del atributo data-bs-target
-    if (status === savedStatus) {
-      const tabTrigger = new bootstrap.Tab(triggerEl);
-      tabTrigger.show(); // Mostrar el tab correspondiente al estado guardado
-    }
-
-    // Agregar el evento de clic para cambiar de tab y actualizar el estado en sessionStorage
-    triggerEl.addEventListener("click", (event) => {
-      event.preventDefault();
-      document.querySelector("#searchCustomerForm").reset();
-      const newStatus = event.target.dataset.bsTarget.substring(1);
-      sessionStorage.setItem("customerStatus", newStatus);
-      loadCustomers();
-    });
+  // Tabs usando TabManager
+  new TabManager({
+    tabContainerSelector: "#customerTab",
+    onTabChange: (status) => {
+      sessionStorage.setItem("customerStatus", status);
+      loadCustomers(1);
+    },
+    storageKey: "customerStatus",
+    defaultTab: sessionStorage.getItem("customerStatus") || "todos",
+    resetFormSelector: "#searchCustomerForm",
   });
+
+  // Pagination global
+  pagination = new Pagination("prevPage", "nextPage", "currentPage", (page) => {
+    loadCustomers(page);
+  });
+
+  // Offcanvas buscador
+  new OffcanvasManager({
+    toggleSelector: "#offcanvasToggleSearch",
+    menuSelector: "#offcanvasSearch",
+    closeSelector: "#offcanvasSearchClose",
+    backdropSelector: "#offcanvasSearchBackdrop",
+    direction: "top",
+    onOpen: () => {},
+    onClose: () => {},
+  });
+
+  // SearchManager global para clientes
+  new SearchManager("#searchCustomerForm", handleSearch, handleAutocomplete, ["name", "phone", "mail"]);
+
+  // Table renderer específico para clientes
+  tableRenderer = new CustomersTableRenderer("#tableContent");
+
+  // Cargar clientes para la pestaña correspondiente al último estado guardado
+  loadCustomers();
 }
 
 let currentPage = 1;
@@ -40,10 +61,10 @@ async function loadCustomers(page = 1) {
 
     if (success) {
       fillTableCustomers(data);
-      currentPage = page;
+      pagination.currentPage = page;
       // Si el número de cliente recibidas es menor que el límite, no hay más páginas
       const hasMoreData = data.length === limit;
-      updatePaginationControls(hasMoreData);
+      pagination.updateControls(hasMoreData);
     }
   } catch (error) {
     console.error("Error al obtener cliente:", error);
@@ -51,54 +72,58 @@ async function loadCustomers(page = 1) {
 }
 
 function fillTableCustomers(data) {
-  const tableContent = document.getElementById("tableContent");
-  let html = "";
-  const status = sessionStorage.getItem("customerStatus") || "todos";
+  tableRenderer.render(data, DatesUIHelpers.getCustomerStatusBadge, getActionIcons);
+  // Delegación de eventos para los action buttons
+  document.getElementById("tableContent").onclick = function (e) {
+    const agendarBtn = e.target.closest(".action-icon[id^='agendar-']");
+    const editarBtn = e.target.closest(".action-icon[id^='editar-']");
+    const bloquearBtn = e.target.closest(".action-icon[id^='bloquear-']");
+    const desbloquearBtn = e.target.closest(".action-icon[id^='desbloquear-']");
+    const eliminarBtn = e.target.closest(".action-icon[id^='eliminar-']");
+    const eliminarIncidenciaBtn = e.target.closest(".action-icon[id^='eliminar-incidencia-']");
 
-  data.forEach((customer) => {
-    html += `
-          <tr class="body-table">
-             <td data-cell="nombre" class="data">
-              <a id="customerDetailLink${customer.id}" data-id="${customer.id}" href="#">${customer.name}</a>
-            </td>
-               <td data-cell="telefono" class="data"><i class="fab fa-whatsapp pe-1" style="font-size:0.85rem"></i><a href="https://wa.me/${customer.phone}" target="_blank">+${customer.phone}</a></td>
-              <td data-cell="correo" class="data">${customer.mail}</td>
-              <td data-cell="estado" class="data">${getStatusIcon(customer.blocked, customer.has_incidents)}</td>
-              <td data-cell="acciones" class="data align-content-around">
-              <div class="actionBtns">
-                ${getActionIcons(customer.id, customer.blocked)}
-              </div>
-              </td>
-          </tr>
-      `;
-  });
-  tableContent.innerHTML = html;
-
-  // Añadir listeners para abrir el detalle del cliente
-  data.forEach((customer) => {
-    const customerDetailLink = document.getElementById(`customerDetailLink${customer.id}`);
-    customerDetailLink.addEventListener("click", function (event) {
-      event.preventDefault();
-      openCustomerDetail(customer.id); // Llamar a la función correcta
-    });
-  });
-
-  data.forEach((customer) => {
-    if (status === "todos") {
-      document.getElementById(`agendar-${customer.id}`).onclick = () => agendarCliente(customer);
-      document.getElementById(`editar-${customer.id}`).onclick = () => editarCliente(customer);
-      if (customer.blocked == 1) {
-        document.getElementById(`desbloquear-${customer.id}`).onclick = () => toggleBlockSubmit(customer.id);
-      } else {
-        document.getElementById(`bloquear-${customer.id}`).onclick = () => toggleBlockWithModal(customer);
-      }
-      document.getElementById(`eliminar-${customer.id}`).onclick = () => modalEliminarCliente(customer.id);
-    } else if (status === "incidencias") {
-      document.getElementById(`eliminar-incidencia-${customer.id}`).onclick = () => handleIncidentDelete(customer.id);
-    } else if (status === "blocked") {
-      document.getElementById(`desbloquear-${customer.id}`).onclick = () => toggleBlockSubmit(customer.id);
+    if (agendarBtn) {
+      const id = agendarBtn.id.replace("agendar-", "");
+      const customer = data.find((c) => c.id == id);
+      if (customer) agendarCliente(customer);
+      return;
     }
-  });
+    if (editarBtn) {
+      const id = editarBtn.id.replace("editar-", "");
+      const customer = data.find((c) => c.id == id);
+      if (customer) editarCliente(customer);
+      return;
+    }
+    if (bloquearBtn) {
+      const id = bloquearBtn.id.replace("bloquear-", "");
+      const customer = data.find((c) => c.id == id);
+      if (customer) toggleBlockWithModal(customer);
+      return;
+    }
+    if (desbloquearBtn) {
+      const id = desbloquearBtn.id.replace("desbloquear-", "");
+      toggleBlockSubmit(id);
+      return;
+    }
+    if (eliminarBtn) {
+      const id = eliminarBtn.id.replace("eliminar-", "");
+      modalEliminarCliente(id);
+      return;
+    }
+    if (eliminarIncidenciaBtn) {
+      const id = eliminarIncidenciaBtn.id.replace("eliminar-incidencia-", "");
+      handleIncidentDelete(id);
+      return;
+    }
+    // Detalle cliente
+    const detailLink = e.target.closest("a[id^='customerDetailLink']");
+    if (detailLink) {
+      e.preventDefault();
+      const id = detailLink.dataset.id;
+      openCustomerDetail(id);
+      return;
+    }
+  };
 }
 
 function getActionIcons(customerId, isBlocked) {
@@ -107,22 +132,22 @@ function getActionIcons(customerId, isBlocked) {
 
   if (status === "todos") {
     icons = `
-      <i id="agendar-${customerId}" class="fas fa-calendar-plus action-icon text-center text-primary text-center" title="Agendar"><span class="button-text">AGENDAR</span></i>
-      <i id="editar-${customerId}" class="fas fa-edit action-icon text-center text-warning" title="Editar"><span class="button-text">EDITAR</span></i>
+      <i id="agendar-${customerId}" class="fa-solid fa-calendar-plus action-icon cursor-pointer text-cyan-700 hover:text-cyan-900 text-center" title="Agendar"><span class="button-text">AGENDAR</span></i>
+      <i id="editar-${customerId}" class="fa-solid fa-edit action-icon cursor-pointer text-yellow-600 hover:text-yellow-800 text-center" title="Editar"><span class="button-text">EDITAR</span></i>
         ${
           isBlocked === 1
-            ? `<i id="desbloquear-${customerId}" class="fas fa-unlock action-icon text-center" title="Desbloquear"><span class="button-text">DESBLOQUEAR</span></i>`
-            : `<i id="bloquear-${customerId}" class="fas fa-lock action-icon text-center" title="Bloquear"><span class="button-text">BLOQUEAR</span></i>`
+            ? `<i id="desbloquear-${customerId}" class="fa-solid fa-unlock action-icon cursor-pointer text-green-700 hover:text-green-900 text-center" title="Desbloquear"><span class="button-text">DESBLOQUEAR</span></i>`
+            : `<i id="bloquear-${customerId}" class="fa-solid fa-lock action-icon cursor-pointer text-red-700 hover:text-red-900 text-center" title="Bloquear"><span class="button-text">BLOQUEAR</span></i>`
         }
-      <i id="eliminar-${customerId}" class="fas fa-trash-alt action-icon text-center text-danger" title="Eliminar"><span class="button-text">ELIMINAR</span></i>
+      <i id="eliminar-${customerId}" class="fa-solid fa-trash-alt action-icon cursor-pointer text-red-600 hover:text-red-800 text-center" title="Eliminar"><span class="button-text">ELIMINAR</span></i>
     `;
   } else if (status === "incidencias") {
     icons = `
-      <i id="eliminar-incidencia-${customerId}" class="fas fa-trash-alt action-icon text-center" title="Eliminar incidencia"><span class="button-text">ELIMINAR INCIDENCIA</span></i>
+      <i id="eliminar-incidencia-${customerId}" class="fa-solid fa-trash-alt action-icon cursor-pointer text-red-600 hover:text-red-800 text-center" title="Eliminar incidencia"><span class="button-text">ELIMINAR INCIDENCIA</span></i>
     `;
   } else if (status === "blocked") {
     icons = `
-      <i id="desbloquear-${customerId}" class="fas fa-unlock action-icon text-center" title="Desbloquear"><span class="button-text">DESBLOQUEAR</span></i>
+      <i id="desbloquear-${customerId}" class="fa-solid fa-unlock action-icon cursor-pointer text-green-700 hover:text-green-900 text-center" title="Desbloquear"><span class="button-text">DESBLOQUEAR</span></i>
     `;
   }
 
@@ -165,8 +190,7 @@ async function editarCliente(customer) {
       document.getElementById("editCustomerNotes").value = customer.notes || "";
 
       // Mostrar el modal
-      const editModal = new bootstrap.Modal(document.getElementById("editCustomerModal"));
-      editModal.show();
+      ModalManager.show("editCustomerModal");
     } else {
       console.error("Error al cargar los datos del cliente:", data.message);
     }
@@ -192,8 +216,7 @@ document.getElementById("editCustomerForm").addEventListener("submit", async (e)
     if (data.success) {
       console.log("Cliente actualizado:", data.message);
       // Cerrar el modal
-      const editModal = bootstrap.Modal.getInstance(document.getElementById("editCustomerModal"));
-      editModal.hide();
+      ModalManager.hide("editCustomerModal");
       // Recargar la lista de clientes o actualizar la interfaz
       infoModal("Éxito", "Edición exitosa.");
       loadCustomers();
@@ -244,8 +267,7 @@ async function fetchAndDisplayIncidents(customerId) {
       )
       .join("");
 
-    // Mostrar el modal
-    new bootstrap.Modal(document.getElementById("deleteIncidentsModal")).show();
+    ModalManager.show("deleteIncidentsModal");
 
     return data.data;
   } catch (error) {
@@ -269,7 +291,7 @@ function setupDeleteHandler(customerId) {
   });
 
   // Manejador de eliminación
-  confirmBtn.addEventListener("click", async () => {
+  confirmBtn.onclick = async () => {
     const selected = Array.from(document.querySelectorAll("#incidents-list .incident-checkbox:checked")).map((checkbox) => checkbox.value);
 
     if (selected.length === 0) return;
@@ -289,8 +311,7 @@ function setupDeleteHandler(customerId) {
 
       if (result.success) {
         infoModal("Éxito", "Incidencias eliminadas correctamente");
-        bootstrap.Modal.getInstance(modalElement).hide();
-        // Aquí podrías recargar datos o actualizar UI si es necesario
+        ModalManager.hide("deleteIncidentsModal");
       } else {
         throw new Error(result.message || "Error al eliminar");
       }
@@ -298,7 +319,7 @@ function setupDeleteHandler(customerId) {
       console.error("Error al eliminar:", error);
       infoModal("Error", error.message);
     }
-  });
+  };
 }
 
 // Función para bloquear un cliente
@@ -336,35 +357,25 @@ function toggleBlockWithModal(customer) {
     console.error("Modal no encontrado.");
     return;
   }
-
-  const modal = new bootstrap.Modal(modalElement);
-
-  // Limpiar el formulario cada vez que se abre el modal
-  modalElement.addEventListener("show.bs.modal", () => {
-    document.getElementById("notaBloqueo").value = "";
-  });
-
-  // Manejar el envío del formulario
+  document.getElementById("notaBloqueo").value = "";
+  ModalManager.show("modalBloquearCliente");
   const form = document.getElementById("formBloquearCliente");
   form.onsubmit = (event) => {
-    event.preventDefault(); // Evitar que el formulario se envíe de forma tradicional
-
+    event.preventDefault();
     const notaBloqueo = document.getElementById("notaBloqueo").value;
-
     if (!notaBloqueo) {
       infoModal("Atención", "Por favor, ingrese una razón para el bloqueo.");
       return;
     }
-
-    // Ocultar el modal
-    modal.hide();
-
-    // Llamar a toggleBlockSubmit con la nota
+    ModalManager.hide("modalBloquearCliente");
     toggleBlockSubmit(customer.id, notaBloqueo);
   };
+}
 
-  // Mostrar el modal
-  modal.show();
+function infoModal(label, body) {
+  document.getElementById("infoModalLabel").textContent = label;
+  document.getElementById("infoModalMessage").textContent = body;
+  ModalManager.show("infoModal");
 }
 
 function modalEliminarCliente(customerId) {
@@ -373,13 +384,10 @@ function modalEliminarCliente(customerId) {
     console.error("Modal no encontrado.");
     return;
   }
-
-  const modal = new bootstrap.Modal(modalElement);
-  modal.show();
-
+  ModalManager.show("modalEliminarCliente");
   document.querySelector("#btnEliminarCliente").onclick = () => {
     eliminarCliente(customerId);
-    modal.hide();
+    ModalManager.hide("modalEliminarCliente");
   };
 }
 
@@ -429,102 +437,101 @@ async function openCustomerDetail(customerId) {
 }
 
 function showCustomerDetailModal(customer) {
-  console.log("Detalles del cliente:", customer);
-  // Llenar la información básica
   document.getElementById("customerName").textContent = customer.name;
   document.getElementById("customerPhone").textContent = customer.phone;
   document.getElementById("customerPhone").href = `https://wa.me/${customer.phone}`;
   document.getElementById("customerEmail").textContent = customer.mail;
-  document.getElementById("customerStatus").innerHTML = customer.blocked ? `Bloqueado<br><small class="text-danger">Razón: ${customer.nota_bloqueo || "Sin razón especificada"}</small>` : "Activo";
+  document.getElementById("customerStatus").innerHTML = customer.blocked ? `Bloqueado<br><small class='text-red-600'>Razón: ${customer.nota_bloqueo || "Sin razón especificada"}</small>` : "Activo";
   document.getElementById("customerIncidents").textContent = customer.has_incidents ? "Sí" : "No";
   document.getElementById("customerNotes").textContent = customer.notes ?? "Sin notas";
 
-  // Llenar los últimos servicios
+  // Últimos servicios
   const lastServicesList = document.getElementById("customerLastServices");
   lastServicesList.innerHTML =
     customer.last_services && customer.last_services.length > 0
       ? customer.last_services
           .map(
             (service) => `
-          <li class="list-group-item">
-              <strong>${service.service_name}</strong> - ${service.appointment_date}<br>
-          </li>
+          <li><strong>${service.service_name}</strong> - ${service.appointment_date}<br></li>
       `
           )
           .join("")
-      : '<li class="list-group-item">No hay servicios registrados.</li>';
+      : "<li>No hay servicios registrados.</li>";
 
-  // Llenar las incidencias
+  // Incidencias
   const incidentsList = document.getElementById("customerIncidentsList");
   incidentsList.innerHTML =
     customer.incidents && customer.incidents.length > 0
       ? customer.incidents
           .map(
             (incident) => `
-          <li class="list-group-item">
-              <strong>${incident.description}</strong> - ${incident.incident_date}<br>
-              <small>${incident.note}</small>
-          </li>
+          <li><strong>${incident.description}</strong> - ${incident.incident_date}<br><small>${incident.note}</small></li>
       `
           )
           .join("")
-      : '<li class="list-group-item">No hay incidencias registradas.</li>';
+      : "<li>No hay incidencias registradas.</li>";
 
-  // Mostrar el modal
-  const customerDetailModal = new bootstrap.Modal(document.getElementById("customerDetailModal"));
-  customerDetailModal.show();
+  ModalManager.show("customerDetailModal");
 }
 
-function getStatusIcon(blocked, hasIncidents) {
-  if (blocked) return '<i class="fas fa-ban" style="color: red;"></i>'; // Bloqueado
-  if (hasIncidents) return '<i class="fas fa-exclamation-triangle" style="color: orange;"></i>'; // Tiene incidencias
-  return '<i class="fas fa-check-circle" style="color: green;"></i>'; // Estado normal
+// Cerrar modales al hacer click en .close-modal o fuera del modal
+function setupModalCloseListeners() {
+  document.querySelectorAll(".close-modal").forEach((button) => {
+    button.addEventListener("click", function () {
+      const modal = this.closest(".fixed.inset-0");
+      if (modal) {
+        const modalId = modal.id;
+        ModalManager.hide(modalId);
+      }
+    });
+  });
+  document.querySelectorAll(".fixed.inset-0").forEach((modal) => {
+    modal.addEventListener("click", function (e) {
+      if (e.target === modal) {
+        ModalManager.hide(modal.id);
+      }
+    });
+  });
 }
 
-function updatePaginationControls(hasMoreData) {
-  document.getElementById("currentPage").innerText = `Página ${currentPage}`;
-  document.getElementById("prevPage").disabled = currentPage === 1;
-  document.getElementById("nextPage").disabled = !hasMoreData; // Deshabilitar "Siguiente" si no hay más datos
-}
+// Llama esto al final de init
+setupModalCloseListeners();
 
-document.getElementById("prevPage").addEventListener("click", () => {
-  if (currentPage > 1) {
-    loadCustomers(currentPage - 1);
+function handleSearch(formData) {
+  const searchParams = new URLSearchParams();
+  for (let [key, value] of formData.entries()) {
+    if (value) searchParams.append(key, value);
   }
-});
+  loadCustomersWithSearch(searchParams);
+}
 
-document.getElementById("nextPage").addEventListener("click", () => {
-  loadCustomers(currentPage + 1);
-});
+async function loadCustomersWithSearch(searchParams) {
+  try {
+    const savedStatus = sessionStorage.getItem("customerStatus") || "todos";
+    searchParams.append("status", savedStatus);
+    let url = `${baseUrl}user_admin/controllers/customers.php?${searchParams.toString()}`;
+    const response = await fetch(url, { method: "GET" });
+    const { success, data } = await response.json();
+    if (success) {
+      fillTableCustomers(data);
+      // El paginador se mantiene igual, solo se actualiza la tabla
+    }
+  } catch (error) {
+    console.error("Error al realizar la búsqueda:", error);
+  }
+}
 
-// Sugerencias de autocompletado (puedes hacer una búsqueda mínima de 3 caracteres)
-
-document.getElementById("name").addEventListener("input", autocomplete);
-document.getElementById("phone").addEventListener("input", autocomplete);
-document.getElementById("mail").addEventListener("input", autocomplete);
-
-let lastQuery = "";
-
-async function autocomplete(e) {
+function handleAutocomplete(e) {
   const input = e.target.id;
   const query = e.target.value;
   const savedStatus = sessionStorage.getItem("customerStatus") || "todos";
-
-  if (query.length >= 3 || input == "status") {
-    if (query !== lastQuery) {
-      lastQuery = query;
-      const response = await fetch(`${baseUrl}user_admin/controllers/autocomplete.php?input=${input}&query=${query}&tab=customers&status=${savedStatus}`);
-      const data = await response.json();
-      fillTableCustomers(data.data);
-    }
+  if (query.length >= 3) {
+    fetch(`${baseUrl}user_admin/controllers/autocomplete.php?input=${input}&query=${query}&tab=customers&status=${savedStatus}`)
+      .then((res) => res.json())
+      .then((data) => {
+        fillTableCustomers(data.data);
+      });
   } else if (query === "") {
     loadCustomers(savedStatus);
   }
-}
-
-function infoModal(label, body) {
-  document.getElementById("infoModalLabel").textContent = label;
-  document.getElementById("infoModalMessage").textContent = body;
-  const infoModal = new bootstrap.Modal(document.getElementById("infoModal"));
-  infoModal.show();
 }

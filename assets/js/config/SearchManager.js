@@ -1,9 +1,16 @@
-// Clase para lógica de búsqueda y autocompletado
-export class DatesSearch {
-  constructor(formSelector, onSearch, onAutocomplete) {
+// Clase global para lógica de búsqueda y autocompletado reutilizable
+export class SearchManager {
+  /**
+   * @param {string} formSelector - Selector del formulario de búsqueda
+   * @param {function} onSearch - Callback al hacer submit
+   * @param {function} onAutocomplete - Callback al autocompletar
+   * @param {Array<string>} autocompleteFields - IDs de los campos a escuchar para autocompletar
+   */
+  constructor(formSelector, onSearch, onAutocomplete, autocompleteFields = []) {
     this.form = document.querySelector(formSelector);
     this.onSearch = onSearch;
     this.onAutocomplete = onAutocomplete;
+    this.autocompleteFields = autocompleteFields;
     this.init();
   }
 
@@ -16,8 +23,8 @@ export class DatesSearch {
         this.onSearch(formData);
       }
     });
-    // Autocompletado en los campos
-    ["service", "name", "phone", "mail", "date", "hour", "status"].forEach((id) => {
+    // Autocompletado en los campos indicados
+    this.autocompleteFields.forEach((id) => {
       const input = this.form.querySelector(`#${id}`);
       if (input) {
         input.addEventListener("input", (e) => {

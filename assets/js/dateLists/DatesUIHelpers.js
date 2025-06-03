@@ -9,36 +9,14 @@ export class DatesUIHelpers {
     return `<span class="${statusInfo.class}">${statusInfo.text}</span>`;
   }
 
-  static showModal(modalId) {
-    const modal = document.getElementById(modalId);
-    if (modal) {
-      modal.classList.remove("hidden");
-      void modal.offsetWidth;
-      modal.classList.remove("opacity-0");
-      const backdrop = modal.querySelector(".fixed.inset-0");
-      if (backdrop) backdrop.classList.remove("bg-opacity-0");
-      const modalContent = modal.querySelector(".transform");
-      if (modalContent) {
-        modalContent.classList.remove("opacity-0", "translate-y-4", "sm:translate-y-0", "sm:scale-95");
-      }
-      document.body.classList.add("overflow-hidden");
+  // Badge para estado de clientes
+  static getCustomerStatusBadge({ blocked, hasIncidents }) {
+    if (blocked) {
+      return '<span class="bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-semibold">Bloqueado</span>';
     }
-  }
-
-  static hideModal(modalId) {
-    const modal = document.getElementById(modalId);
-    if (modal) {
-      modal.classList.add("opacity-0");
-      const backdrop = modal.querySelector(".fixed.inset-0");
-      if (backdrop) backdrop.classList.add("bg-opacity-0");
-      const modalContent = modal.querySelector(".transform");
-      if (modalContent) {
-        modalContent.classList.add("opacity-0", "translate-y-4", "sm:translate-y-0", "sm:scale-95");
-      }
-      setTimeout(() => {
-        modal.classList.add("hidden");
-        document.body.classList.remove("overflow-hidden");
-      }, 300);
+    if (hasIncidents) {
+      return '<span class="bg-orange-100 text-orange-800 px-2 py-1 rounded text-xs font-semibold">Incidencia</span>';
     }
+    return '<span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-semibold">Activo</span>';
   }
 }
