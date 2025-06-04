@@ -56,6 +56,24 @@ export class ContentLoader {
   }
 
   handleError(mainContent, page, error) {
+    // --- Enviar log al backend ---
+    try {
+      fetch(`${ConfigService.baseUrl}error-monitor/log_js_error.php`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          page,
+          error: error.message,
+          stack: error.stack,
+          url: window.location.href,
+          userAgent: navigator.userAgent,
+          time: new Date().toISOString(),
+        }),
+      });
+    } catch (e) {
+      // No hacer nada si falla el log
+    }
+
     if (error.message.includes("SESSION_EXPIRED") || error.message.includes("401")) {
       window.location.href = `${ConfigService.baseUrl}login/index.php`;
     } else {
@@ -68,7 +86,8 @@ export class ContentLoader {
 
     const modulePath = this.getModulePath(page);
     try {
-      const module = await import(`${modulePath}?v=${this.APP_VERSION}&t=${Date.now()}`);
+      // Solo usa la versión de la app, no el timestamp
+      const module = await import(`${modulePath}?v=${this.APP_VERSION}`);
       this.moduleCache[page] = module;
       if (typeof module.init === "function") await module.init();
     } catch (error) {
