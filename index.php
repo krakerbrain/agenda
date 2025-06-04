@@ -76,7 +76,7 @@ include_once __DIR__ . '/landing/partials/head.php';
                     <div class="absolute inset-0 bg-[#1B637F]/90 z-10"></div>
                     <img src="<?php echo $baseUrl; ?>assets/img/landing/slides/Productive_Businesswoman_at_Desk_simple_compose_.png"
                         alt="Sincronización con Google Calendar"
-                        class="absolute inset-0 w-full h-full object-cover object-top object-top">
+                        class="absolute inset-0 w-full h-full object-cover object-top">
 
                     <div class="container relative z-20 h-full flex items-center px-4 lg:px-20">
                         <div class="max-w-2xl text-white">

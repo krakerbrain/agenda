@@ -13,16 +13,53 @@ export class ContentLoader {
     }
 
     try {
-      const response = await this.fetch(`${ConfigService.baseUrl}user_admin/pages/${page}.php`);
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      const response = await this.fetch(`${ConfigService.baseUrl}user_admin/pages/${page}.php`, {
+        headers: {
+          Accept: "application/json, text/html",
+        },
+      });
 
-      mainContent.innerHTML = await response.text();
+      const contentType = response.headers.get("content-type") || "";
+
+      // Manejar respuesta JSON (para errores o redirecciones)
+      if (contentType.includes("application/json")) {
+        const data = await response.json();
+        if (data.redirect) {
+          window.location.href = data.redirect;
+          return;
+        }
+        throw new Error(data.error || "Error desconocido");
+      }
+
+      // Manejar respuesta HTML
+      const html = await response.text();
+
+      // Verificar si es HTML de login
+      if (this.isLoginPage(html)) {
+        window.location.href = `${ConfigService.baseUrl}login/index.php`;
+        return;
+      }
+
+      mainContent.innerHTML = html;
       this.updateUI(page);
       await this.loadModule(page);
     } catch (error) {
       console.error(`Error loading ${page}:`, error);
-      mainContent.innerHTML = `<div class="error">Error al cargar la página: ${page}</div>`;
-      throw error;
+      this.handleError(mainContent, page, error);
+    }
+  }
+
+  isLoginPage(html) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, "text/html");
+    return !!doc.getElementById("loginForm");
+  }
+
+  handleError(mainContent, page, error) {
+    if (error.message.includes("SESSION_EXPIRED") || error.message.includes("401")) {
+      window.location.href = `${ConfigService.baseUrl}login/index.php`;
+    } else {
+      mainContent.innerHTML = `<div class="error">Error al cargar ${page}: ${error.message}</div>`;
     }
   }
 
