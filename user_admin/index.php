@@ -27,9 +27,9 @@ $unread_count = $notificationData->getUnreadCount($datosUsuario['user_id']);
 include dirname(__DIR__) . '/partials/head.php';
 ?>
 <script>
-const baseUrl = '<?php echo $baseUrl; ?>';
-const role_id = <?php echo $role_id; ?>;
-window.APP_VERSION = '<?= $versionManager->getVersion() ?>';
+    const baseUrl = '<?php echo $baseUrl; ?>';
+    const role_id = <?php echo $role_id; ?>;
+    window.APP_VERSION = '<?= $versionManager->getVersion() ?>';
 </script>
 
 <body data-base-url="<?php echo htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8'); ?>">
@@ -43,11 +43,11 @@ window.APP_VERSION = '<?= $versionManager->getVersion() ?>';
                         data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="fa fa-envelope fs-6 position-relative"></i>
                         <?php if ($unread_count > 0): ?>
-                        <span
-                            class="position-absolute start-100 translate-middle badge rounded-pill bg-danger local-badge-style">
-                            <?php echo $unread_count; ?>
-                            <span class="visually-hidden">notificaciones no leídas</span>
-                        </span>
+                            <span
+                                class="position-absolute start-100 translate-middle badge rounded-pill bg-danger local-badge-style">
+                                <?php echo $unread_count; ?>
+                                <span class="visually-hidden">notificaciones no leídas</span>
+                            </span>
                         <?php endif; ?>
                     </button>
 
@@ -88,59 +88,59 @@ window.APP_VERSION = '<?= $versionManager->getVersion() ?>';
         <div class="offcanvas-body">
             <ul class="nav nav-underline flex-column">
                 <?php if ($role_id != 1) { ?>
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="#" id="datesList">Lista de citas</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="clientes">Clientes</a>
-                </li>
-                <?php if ($datosUsuario['role_id'] == 2) : ?>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="horarios">Horarios</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="servicios">Servicios</a>
-                </li>
-                <?php if ($user_count >= 2) : ?>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="services_assign">Asignar Servicios</a>
-                </li>
-                <?php endif; ?>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="correos">Correos</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="datosEmpresa">Datos Empresa</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="addUser">Agregar Usuario</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="configuraciones">Otras configuraciones</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="integrations">Servicios Integrados</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="eventos_unicos">Eventos Únicos</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="bloqueoHoras">Bloqueo de horas</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="notificaciones">Notificaciones del sistema</a>
-                </li>
-                <?php endif; ?>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#" id="datesList">Lista de citas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="clientes">Clientes</a>
+                    </li>
+                    <?php if ($datosUsuario['role_id'] == 2) : ?>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" id="horarios">Horarios</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" id="servicios">Servicios</a>
+                        </li>
+                        <?php if ($user_count >= 2) : ?>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" id="services_assign">Asignar Servicios</a>
+                            </li>
+                        <?php endif; ?>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" id="correos">Correos</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" id="datosEmpresa">Datos Empresa</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" id="addUser">Agregar Usuario</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" id="configuraciones">Otras configuraciones</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" id="integrations">Servicios Integrados</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" id="eventos_unicos">Eventos Únicos</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" id="bloqueoHoras">Bloqueo de horas</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" id="notificaciones">Notificaciones del sistema</a>
+                        </li>
+                    <?php endif; ?>
                 <?php } else { ?>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="master_add_company">Agrega Empresa</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="master_company_list">Lista de Empresas</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="master_add_notification">Notificaciones</a>
-                </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="master_add_company">Agrega Empresa</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="master_company_list">Lista de Empresas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="master_add_notification">Notificaciones</a>
+                    </li>
                 <?php } ?>
                 <li class="nav-item">
                     <a class="nav-link" href="#" id="logout">Cerrar sesión</a>
