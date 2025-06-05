@@ -1,12 +1,3 @@
-body {
-  font-size: 0.85rem;
-}
-
-/* .actionBtns {
-  display: flex;
-  justify-content: space-evenly;
-} */
-
 /* Estilo para los iconos de acción */
 .action-icon {
   position: relative; /* Necesario para posicionar el spinner encima */

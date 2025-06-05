@@ -64,7 +64,7 @@ $auth->validarTokenUsuario();
         </div>
     </div>
     <!-- Backdrop -->
-    <div id="offcanvasSearchBackdrop" class="fixed inset-0 z-40 bg-black bg-opacity-50 hidden"></div>
+    <div id="offcanvasSearchBackdrop" class="fixed inset-0 z-40 bg-black opacity-50 hidden"></div>
     <div class="mt-2 rounded-lg shadow">
         <div class="flex justify-between items-center bg-white p-4 border-b">
             <!-- Botón para abrir el offcanvas de búsqueda -->

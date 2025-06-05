@@ -1,6 +1,6 @@
 <!-- Modal de información -->
 <div id="infoModal"
-    class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden transition-opacity duration-300 opacity-0 pointer-events-none">
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black opacity-50 hidden transition-opacity duration-300 opacity-0 pointer-events-none">
     <div
         class="bg-white rounded-lg shadow-lg w-full max-w-md mx-auto overflow-hidden transform transition-all duration-300 scale-95 translate-y-4 opacity-0">
         <div class="flex items-center justify-between px-4 py-3 border-b">
@@ -19,7 +19,7 @@
 
 <!-- Modal de detalles del cliente -->
 <div id="customerDetailModal"
-    class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden transition-opacity duration-300 opacity-0 pointer-events-none">
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black opacity-50 hidden transition-opacity duration-300 opacity-0 pointer-events-none">
     <div
         class="bg-white rounded-lg shadow-lg w-full max-w-lg mx-auto overflow-hidden transform transition-all duration-300 scale-95 translate-y-4 opacity-0">
         <div class="flex items-center justify-between px-4 py-3 border-b bg-cyan-600 text-white">
@@ -59,7 +59,7 @@
 
 <!-- Modal de edición de cliente -->
 <div id="editCustomerModal"
-    class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden transition-opacity duration-300 opacity-0 pointer-events-none">
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black opacity-50 hidden transition-opacity duration-300 opacity-0 pointer-events-none">
     <div
         class="bg-white rounded-lg shadow-lg w-full max-w-lg mx-auto overflow-hidden transform transition-all duration-300 scale-95 translate-y-4 opacity-0">
         <div class="flex items-center justify-between px-4 py-3 border-b">
@@ -108,7 +108,7 @@
 
 <!-- Modal para agregar la nota de bloqueo -->
 <div id="modalBloquearCliente"
-    class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden transition-opacity duration-300 opacity-0 pointer-events-none">
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black opacity-50 hidden transition-opacity duration-300 opacity-0 pointer-events-none">
     <div
         class="bg-white rounded-lg shadow-lg w-full max-w-md mx-auto overflow-hidden transform transition-all duration-300 scale-95 translate-y-4 opacity-0">
         <div class="flex items-center justify-between px-4 py-3 border-b">
@@ -136,7 +136,7 @@
 
 <!-- Modal eliminar cliente -->
 <div id="modalEliminarCliente"
-    class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden transition-opacity duration-300 opacity-0 pointer-events-none">
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black opacity-50 hidden transition-opacity duration-300 opacity-0 pointer-events-none">
     <div
         class="bg-white rounded-lg shadow-lg w-full max-w-md mx-auto overflow-hidden transform transition-all duration-300 scale-95 translate-y-4 opacity-0">
         <div class="flex items-center justify-between px-4 py-3 border-b">
@@ -169,7 +169,7 @@
 
 <!-- Modal eliminar incidencias -->
 <div id="deleteIncidentsModal"
-    class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden transition-opacity duration-300 opacity-0 pointer-events-none">
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black opacity-50 hidden transition-opacity duration-300 opacity-0 pointer-events-none">
     <div
         class="bg-white rounded-lg shadow-lg w-full max-w-md mx-auto overflow-hidden transform transition-all duration-300 scale-95 translate-y-4 opacity-0">
         <div class="flex items-center justify-between px-4 py-3 border-b">

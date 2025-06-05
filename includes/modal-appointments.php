@@ -1,7 +1,7 @@
 <style>
-#infoAppointment {
-    z-index: 50;
-}
+    #infoAppointment {
+        z-index: 50;
+    }
 </style>
 
 <!-- Google Authenticate Modal -->
@@ -78,7 +78,7 @@
 <div id="deleteModal"
     class="fixed inset-0 z-50 overflow-y-auto hidden opacity-0 transition-all duration-300 ease-in-out">
     <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        <div class="fixed inset-0 bg-[#6b72808c] bg-opacity-0 transition-opacity duration-300 ease-in-out"
+        <div class="fixed inset-0 bg-[#6b72808c] opacity-0 transition-opacity duration-300 ease-in-out"
             aria-hidden="true"></div>
 
         <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>

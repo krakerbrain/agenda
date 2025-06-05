@@ -33,7 +33,7 @@ include dirname(__DIR__) . '/partials/head.php';
 </script>
 <link rel="stylesheet" href="<?php echo $baseUrl; ?>assets/css/dist/output.css">
 
-<body data-base-url="<?php echo htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8'); ?>">
+<body class="text-sm" data-base-url="<?php echo htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8'); ?>">
     <!-- Navbar -->
     <header class="sticky top-0 z-50 bg-gray-100 shadow-sm">
         <nav class="container mx-auto px-2 py-3 flex items-center justify-between max-w-7xl">
@@ -191,7 +191,7 @@ include dirname(__DIR__) . '/partials/head.php';
     </div>
 
     <!-- Backdrop -->
-    <div id="offcanvasBackdrop" class="fixed inset-0 z-40 bg-black bg-opacity-50 hidden"></div>
+    <div id="offcanvasBackdrop" class="fixed inset-0 z-40 bg-black opacity-50 hidden"></div>
 
     <div id="main-content" class="container mx-auto px-4 py-6"></div>
 
