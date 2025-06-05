@@ -1,7 +1,7 @@
 import { ModalManager } from "./config/ModalManager.js";
 export function init() {
   const form = document.getElementById("workScheduleForm");
-  const tableBody = document.getElementById("scheduleTableBody");
+  // const tableBody = document.getElementById("scheduleTableBody");
   // obtener value de usario selected
 
   let initialSchedules = [];
@@ -18,7 +18,8 @@ export function init() {
       // Guardar una copia de los datos iniciales
       initialSchedules = JSON.parse(JSON.stringify(data)); // Copia profunda para evitar referencias
       // Limpiar el cuerpo de la tabla
-      tableBody.innerHTML = "";
+      // tableBody.innerHTML = "";
+      limpiarContenedoresHorario();
 
       if (data.length > 0) {
         data.forEach((horario) => {
@@ -26,6 +27,13 @@ export function init() {
         });
       }
     }
+  }
+
+  function limpiarContenedoresHorario() {
+    const containers = document.querySelectorAll(".schedule-body");
+    containers.forEach((container) => {
+      container.innerHTML = "";
+    });
   }
 
   // evento chaange para userSelect
@@ -37,27 +45,48 @@ export function init() {
   }
 
   function getCurrentSchedules() {
-    const rows = Array.from(tableBody.querySelectorAll("tr.work-day")); // Filas de la tabla
-    return rows.map((row) => {
-      const day = row.querySelector("td[data-cell='día']").textContent.trim();
-      const schedule_id = row.querySelector("input[name^='schedule[" + day + "][schedule_id]']").value;
-      const day_id = row.querySelector("input[name^='schedule[" + day + "][day_id]']").value;
-      const is_enabled = row.querySelector("input[name^='schedule[" + day + "][is_enabled]']").checked ? 1 : 0;
-      const work_start = row.querySelector("input[name^='schedule[" + day + "][start]']").value;
-      const work_end = row.querySelector("input[name^='schedule[" + day + "][end]']").value;
+    // Buscar el contenedor visible
+    const scheduleBodies = document.querySelectorAll(".schedule-body");
+    let visibleContainer = null;
 
-      const break_start = row.querySelector("input[name^='schedule[" + day + "][break_start]']") ? row.querySelector("input[name^='schedule[" + day + "][break_start]']").value : null;
-      const break_end = row.querySelector("input[name^='schedule[" + day + "][break_end]']") ? row.querySelector("input[name^='schedule[" + day + "][break_end]']").value : null;
+    scheduleBodies.forEach((container) => {
+      const style = window.getComputedStyle(container);
+      if (style.display !== "none") {
+        visibleContainer = container;
+      }
+    });
+
+    if (!visibleContainer) return [];
+
+    const rows = Array.from(visibleContainer.querySelectorAll(".work-day"));
+
+    return rows.map((row) => {
+      const isMobile = row.tagName === "DIV";
+      const dayElement = isMobile
+        ? row.querySelector("span") // Primer span es el día en mobile
+        : row.querySelector("td[data-cell='día']"); // En desktop
+
+      const day = dayElement?.textContent.trim() || "";
+
+      const getInputValue = (namePart) => {
+        const input = row.querySelector(`input[name^="schedule[${day}][${namePart}]"]`);
+        return input ? input.value : null;
+      };
+
+      const getChecked = (namePart) => {
+        const input = row.querySelector(`input[name^="schedule[${day}][${namePart}]"]`);
+        return input && input.checked ? 1 : 0;
+      };
 
       return {
-        schedule_id,
-        day_id,
+        schedule_id: getInputValue("schedule_id"),
+        day_id: getInputValue("day_id"),
         day,
-        is_enabled,
-        work_start,
-        work_end,
-        break_start,
-        break_end,
+        is_enabled: getChecked("is_enabled"),
+        work_start: getInputValue("start"),
+        work_end: getInputValue("end"),
+        break_start: getInputValue("break_start"),
+        break_end: getInputValue("break_end"),
       };
     });
   }
@@ -68,10 +97,12 @@ export function init() {
   });
 
   function showSaveAlert(haveChanges) {
+    const alertBox = document.getElementById("unsavedChangesAlert");
+
     if (haveChanges) {
-      document.getElementById("unsavedChangesAlert").classList.remove("d-none");
+      alertBox.classList.remove("hidden");
     } else {
-      document.getElementById("unsavedChangesAlert").classList.add("d-none");
+      alertBox.classList.add("hidden");
     }
   }
 
@@ -93,65 +124,43 @@ export function init() {
   }
 
   function addScheduleToTable(horario) {
+    addScheduleCardMobile(horario);
+    addScheduleRowDesktop(horario);
+  }
+
+  function addScheduleRowDesktop(horario) {
     const { schedule_id, day_id, day, work_start, work_end, break_start, break_end, is_enabled } = horario;
-    const tableBody = document.getElementById("scheduleTableBody");
+    const tableBody = document.getElementById("scheduleTableBodyDesktop");
+
     const tr = document.createElement("tr");
-    tr.classList.add("work-day", "body-table-config");
-    const copiaTodo = day === "Lunes" ? "<button type='button' class='text-cyan-600 hover:text-cyan-800 text-xs underline ml-2 copy-all'>Copiar en todos</button>" : "";
+    tr.classList.add("body-table-config", "work-day");
+
     const checked = is_enabled === 1 ? "checked" : "";
     const disabled = is_enabled === 1 ? "" : "disabled";
 
     tr.innerHTML = `
-    <tr class="grid grid-cols-1 md:table-row py-4 px-2 gap-2 md:py-0 md:px-0">
-  <!-- Fila superior (móvil) -->
-  <td class="flex justify-between items-center md:table-cell px-2">
-    <span class="font-semibold text-gray-700 md:font-normal">${day}</span>
-    <label class='inline-flex items-center cursor-pointer md:justify-center'>
-      <span class="mr-2 md:hidden">Estado:</span>
-      <input class='form-checkbox h-5 w-5 text-cyan-600' type='checkbox' ${checked}>
-      <input type='hidden' name='schedule[${day}][is_enabled]' value='${is_enabled}'>
-    </label>
-  </td>
-  
-  <!-- Jornada (se muestra diferente en móvil) -->
-  <td class="md:table-cell px-2">
-    <div class="md:flex md:space-x-2">
-      <div class="mobile-block md:hidden">
-        <span class="block font-semibold text-gray-700 mb-1">Jornada</span>
-        <div class="flex space-x-2">
-          <input type='time' class='border rounded px-2 py-1 w-full focus:ring-cyan-500 focus:border-cyan-500' 
-                 name='schedule[${day}][start]' value='${work_start}' ${disabled}>
-          <input type='time' class='border rounded px-2 py-1 w-full focus:ring-cyan-500 focus:border-cyan-500' 
-                 name='schedule[${day}][end]' value='${work_end}' ${disabled}>
-        </div>
+    <td class="px-3 py-2">
+      <input class="form-checkbox h-4 w-4 text-cyan-600" type="checkbox" ${checked}>
+      <input type="hidden" name="schedule[${day}][is_enabled]" value="${is_enabled}">
+    </td>
+    <td class="px-3 py-2 font-medium text-gray-800">${day}</td>
+    <td class="px-3 py-2">
+      <div class="flex space-x-2">
+        <input type="time" class="w-full border rounded px-2 py-1" name="schedule[${day}][start]" value="${work_start}" ${disabled}>
+        <input type="time" class="w-full border rounded px-2 py-1" name="schedule[${day}][end]" value="${work_end}" ${disabled}>
       </div>
-      <div class="hidden md:block">
-        <input type='time' class='border rounded px-2 py-1 w-full focus:ring-cyan-500 focus:border-cyan-500' 
-               name='schedule[${day}][start]' value='${work_start}' ${disabled}>
-      </div>
-      <div class="hidden md:block">
-        <input type='time' class='border rounded px-2 py-1 w-full focus:ring-cyan-500 focus:border-cyan-500' 
-               name='schedule[${day}][end]' value='${work_end}' ${disabled}>
-      </div>
-    </div>
-  </td>
-  
-  <!-- Acciones -->
-  <td class="md:table-cell px-2 pt-2 md:pt-0">
-    <button type='button' class='descanso bg-cyan-50 hover:bg-cyan-100 text-cyan-700 border border-cyan-200 rounded px-3 py-1 text-xs font-medium transition w-full md:w-auto' ${disabled}>
-      + Descanso
-    </button>
-  </td>
-  
-  <td class="md:table-cell px-2">
-    ${copiaTodo}
-  </td>
-  
-  <!-- Campos ocultos -->
-  <input type='hidden' name='schedule[${day}][schedule_id]' value='${schedule_id}'>
-  <input type='hidden' name='schedule[${day}][day_id]' value='${day_id}'>
-</tr>
-    `;
+    </td>
+    <td class="px-3 py-2 space-x-2">
+      <button type="button"
+              class="descanso bg-cyan-50 hover:bg-cyan-100 text-cyan-700 border border-cyan-200 rounded px-3 py-1 text-xs font-medium"
+              ${disabled}>
+        + Descanso
+      </button>
+      ${day === "Lunes" ? "<button type='button' class='text-cyan-600 hover:text-cyan-800 text-xs underline copy-all ml-2'>Copiar en todos</button>" : ""}
+    </td>
+    <input type="hidden" name="schedule[${day}][schedule_id]" value="${schedule_id}">
+    <input type="hidden" name="schedule[${day}][day_id]" value="${day_id}">
+  `;
 
     tableBody.appendChild(tr);
 
@@ -163,95 +172,242 @@ export function init() {
       changeDayStatus(e, day);
     });
 
-    // Si hay un horario de descanso, agregar la fila del descanso
     if (break_start && break_end && is_enabled) {
       addBreakTimeElement(tr, day, break_start, break_end);
     }
+
     if (tr.querySelector(".copy-all")) {
       tr.querySelector(".copy-all").addEventListener("click", copiarEnTodos);
     }
   }
 
+  function addScheduleCardMobile(horario) {
+    const { schedule_id, day_id, day, work_start, work_end, break_start, break_end, is_enabled } = horario;
+    const tableBody = document.getElementById("scheduleTableBodyMobile");
+
+    const card = document.createElement("div");
+    card.classList.add("p-4", "bg-white", "rounded-lg", "shadow", "space-y-3", "work-day");
+
+    const checked = is_enabled === 1 ? "checked" : "";
+    const disabled = is_enabled === 1 ? "" : "disabled";
+
+    card.innerHTML = `
+    <div class="flex items-center justify-between">
+      <span class="text-base font-semibold text-gray-800">${day}</span>
+      <label class="flex items-center space-x-2">
+        <span class="text-xs text-gray-500">Estado:</span>
+        <input class="form-checkbox h-4 w-4 text-cyan-600" type="checkbox" ${checked}>
+        <input type="hidden" name="schedule[${day}][is_enabled]" value="${is_enabled}">
+      </label>
+    </div>
+
+    <div>
+      <span class="block text-xs text-gray-500 mb-1">Jornada</span>
+      <div class="flex space-x-2">
+        <input type="time" class="w-full border rounded px-2 py-1" name="schedule[${day}][start]" value="${work_start}" ${disabled}>
+        <input type="time" class="w-full border rounded px-2 py-1" name="schedule[${day}][end]" value="${work_end}" ${disabled}>
+      </div>
+    </div>
+
+    <div class="flex justify-between items-center">
+      <button type="button"
+              class="descanso bg-cyan-50 hover:bg-cyan-100 text-cyan-700 border border-cyan-200 rounded px-3 py-1 text-xs font-medium"
+              ${disabled}>
+        + Descanso
+      </button>
+      ${day === "Lunes" ? "<button type='button' class='text-cyan-600 hover:text-cyan-800 text-xs underline copy-all'>Copiar en todos</button>" : ""}
+    </div>
+
+    <input type="hidden" name="schedule[${day}][schedule_id]" value="${schedule_id}">
+    <input type="hidden" name="schedule[${day}][day_id]" value="${day_id}">
+  `;
+
+    tableBody.appendChild(card);
+
+    card.querySelector(".descanso").addEventListener("click", () => {
+      addNewBreakTime(card.querySelector(".descanso"), day);
+    });
+
+    card.querySelector(".form-checkbox").addEventListener("change", async (e) => {
+      changeDayStatus(e, day);
+    });
+
+    if (break_start && break_end && is_enabled) {
+      addBreakTimeElement(card, day, break_start, break_end);
+    }
+
+    if (card.querySelector(".copy-all")) {
+      card.querySelector(".copy-all").addEventListener("click", copiarEnTodos);
+    }
+  }
+
   function addNewBreakTime(button, day) {
-    const tr = button.closest(".work-day");
-    const breakRow = document.createElement("tr");
-    breakRow.classList.add("break-row", "body-table-config");
-    breakRow.innerHTML = `
-      <td colspan="2" class="py-2 px-2 text-xs text-gray-500">Hora de descanso</td>
-      <td class='break-time py-2 px-2'>
-        <input type='time' class='border rounded px-2 py-1 w-full focus:ring-cyan-500 focus:border-cyan-500' name='schedule[${day}][break_start]' value='' required>
-      </td>
-      <td class='py-2 px-2'>
-        <input type='time' class='border rounded px-2 py-1 w-full focus:ring-cyan-500 focus:border-cyan-500' name='schedule[${day}][break_end]' value='' required>
-      </td>
-      <td class='py-2 px-2'>
-        <button type='button' class='remove-break bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded px-3 py-1 text-xs font-medium transition'>Eliminar</button>
-      </td>
-      <td></td>
+    const parent = button.closest(".work-day");
+
+    // Si es mobile (card)
+    if (parent.tagName === "DIV") {
+      const breakSection = document.createElement("div");
+      breakSection.classList.add("break-row", "space-y-2", "pt-2");
+
+      breakSection.innerHTML = `
+      <div class="text-xs text-gray-500">Hora de descanso</div>
+      <div class="flex space-x-2">
+        <input type='time' class='border rounded px-2 py-1 w-full' name='schedule[${day}][break_start]' required>
+        <input type='time' class='border rounded px-2 py-1 w-full' name='schedule[${day}][break_end]' required>
+      </div>
+      <div>
+        <button type='button' class='remove-break bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded px-3 py-1 text-xs font-medium'>Eliminar</button>
+      </div>
     `;
-    button.disabled = true;
-    tr.parentNode.insertBefore(breakRow, tr.nextSibling);
-    breakRow.querySelector(".remove-break").addEventListener("click", () => {
-      removeBreakTime(breakRow);
-    });
+
+      button.disabled = true;
+      parent.appendChild(breakSection);
+
+      breakSection.querySelector(".remove-break").addEventListener("click", () => {
+        removeBreakTime(breakSection);
+      });
+    } else {
+      // Es escritorio (fila de tabla)
+      const breakRow = document.createElement("tr");
+      breakRow.classList.add("break-row", "body-table-config");
+
+      breakRow.innerHTML = `
+      <td colspan="2" class="py-2 px-2 text-xs text-gray-500">Hora de descanso</td>
+      <td class='break-time py-2 px-3'>
+        <div class='flex space-x-2'>
+          <input type='time' class='border rounded px-2 py-1 w-full' name='schedule[${day}][break_start]' required>
+          <input type='time' class='border rounded px-2 py-1 w-full' name='schedule[${day}][break_end]' required>
+        </div>
+      </td>
+      </td>
+      <td class='py-2 px-2'>
+        <button type='button' class='remove-break bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded px-3 py-1 text-xs font-medium'>Eliminar</button>
+      </td>
+    `;
+
+      button.disabled = true;
+      parent.parentNode.insertBefore(breakRow, parent.nextSibling);
+
+      breakRow.querySelector(".remove-break").addEventListener("click", () => {
+        removeBreakTime(breakRow);
+      });
+    }
   }
 
-  function addBreakTimeElement(tr, day, break_start, break_end) {
-    const breakRow = document.createElement("tr");
-    breakRow.classList.add("break-row", "body-table-config");
-    breakRow.innerHTML = `
+  function addBreakTimeElement(parent, day, break_start, break_end) {
+    // Si es mobile (card)
+    if (parent.tagName === "DIV") {
+      const breakSection = document.createElement("div");
+      breakSection.classList.add("break-row", "space-y-2", "pt-2");
+
+      breakSection.innerHTML = `
+      <div class="text-xs text-gray-500">Hora de descanso</div>
+      <div class="flex space-x-2">
+        <input type='time' class='border rounded px-2 py-1 w-full' name='schedule[${day}][break_start]' value='${break_start}' required>
+        <input type='time' class='border rounded px-2 py-1 w-full' name='schedule[${day}][break_end]' value='${break_end}' required>
+      </div>
+      <div>
+        <button type='button' class='remove-break bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded px-3 py-1 text-xs font-medium'>Eliminar</button>
+      </div>
+    `;
+
+      parent.querySelector(".descanso").disabled = true;
+      parent.appendChild(breakSection);
+
+      breakSection.querySelector(".remove-break").addEventListener("click", () => {
+        removeBreakTime(breakSection);
+      });
+    } else {
+      // Es escritorio (tabla)
+      const breakRow = document.createElement("tr");
+      breakRow.classList.add("break-row", "body-table-config");
+
+      breakRow.innerHTML = `
       <td colspan="2" class="py-2 px-2 text-xs text-gray-500">Hora de descanso</td>
-      <td data-cell="inicio descanso" class='break-time data py-2 px-2'>
-        <input type='time' class='border rounded px-2 py-1 w-full focus:ring-cyan-500 focus:border-cyan-500' name='schedule[${day}][break_start]' value='${break_start}' required>
-      </td>
-      <td data-cell="fin descanso" class="data py-2 px-2">
-        <input type='time' class='border rounded px-2 py-1 w-full focus:ring-cyan-500 focus:border-cyan-500' name='schedule[${day}][break_end]' value='${break_end}' required>
+      <td class='break-time py-2 px-3'>
+        <div class='flex space-x-2'>
+          <input type='time' class='border rounded px-2 py-1 w-full' name='schedule[${day}][break_start]' value='${break_start}' required>
+          <input type='time' class='border rounded px-2 py-1 w-full' name='schedule[${day}][break_end]' value='${break_end}' required>
+        </div>
       </td>
       <td class='py-2 px-2'>
-        <button type='button' class='remove-break bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded px-3 py-1 text-xs font-medium transition'>Eliminar</button>
+        <button type='button' class='remove-break bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded px-3 py-1 text-xs font-medium'>Eliminar</button>
       </td>
-      <td></td>
     `;
-    tr.parentNode.insertBefore(breakRow, tr.nextSibling);
-    breakRow.querySelector(".remove-break").addEventListener("click", () => {
-      removeBreakTime(breakRow);
-    });
-    tr.querySelector(".descanso").disabled = true;
+
+      parent.querySelector(".descanso").disabled = true;
+      parent.parentNode.insertBefore(breakRow, parent.nextSibling);
+
+      breakRow.querySelector(".remove-break").addEventListener("click", () => {
+        removeBreakTime(breakRow);
+      });
+    }
   }
 
-  function removeBreakTime(breakRow) {
-    const tr = breakRow.previousElementSibling;
-    const scheduleId = tr.querySelector("input[name*='schedule_id']").value;
-    breakRow.remove();
-    tr.querySelector(".descanso").disabled = false;
+  function removeBreakTime(breakElement) {
+    const isMobile = breakElement.tagName === "DIV";
+    let scheduleContainer;
+    let scheduleId;
+    let descansoBtn;
 
-    async function removeBreakTimeFromDB(scheduleId) {
-      try {
-        const response = await fetch(`${baseUrl}user_admin/controllers/schedulesController.php`, {
-          method: "POST",
-          body: JSON.stringify({ action: "remove_break", scheduleId }),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+    if (isMobile) {
+      // Mobile: inputs están dentro del breakElement
+      scheduleContainer = breakElement.closest(".work-day");
 
-        const { success, message } = await response.json();
+      if (scheduleContainer) {
+        descansoBtn = scheduleContainer.querySelector(".descanso");
+        const idInput = scheduleContainer.querySelector("input[name*='schedule_id']");
+        scheduleId = idInput ? idInput.value : null;
 
-        if (success) {
-          document.getElementById("responseMessage").innerHTML = `<p>${message}</p>`;
-          ModalManager.show("saveSchedules");
-        } else {
-          document.getElementById("responseMessage").innerHTML = `<p class='text-red-600'>${message || "Error al eliminar descanso"}</p>`;
-          ModalManager.show("saveSchedules");
-        }
-      } catch (error) {
-        document.getElementById("responseMessage").innerHTML = `<p class='text-red-600'>Ocurrió un error inesperado</p>`;
-        ModalManager.show("saveSchedules");
-        console.error(error);
+        // Eliminar valores de inputs antes de eliminar el bloque
+        const inputs = breakElement.querySelectorAll("input[name*='break_start'], input[name*='break_end']");
+        inputs.forEach((input) => input.remove());
+      }
+    } else {
+      // Desktop: inputs están en el mismo breakRow
+      const breakInputs = breakElement.querySelectorAll("input[name*='break_start'], input[name*='break_end']");
+      breakInputs.forEach((input) => input.remove());
+
+      // Obtener el tr anterior (main row)
+      const tr = breakElement.previousElementSibling;
+      if (tr) {
+        descansoBtn = tr.querySelector(".descanso");
+        const idInput = tr.querySelector("input[name*='schedule_id']");
+        scheduleId = idInput ? idInput.value : null;
       }
     }
 
-    removeBreakTimeFromDB(scheduleId);
+    // Eliminar visualmente el bloque
+    breakElement.remove();
+
+    // Habilitar nuevamente el botón "+ Descanso"
+    if (descansoBtn) descansoBtn.disabled = false;
+
+    // Eliminar en la base de datos solo si hay id
+    if (scheduleId) {
+      removeBreakTimeFromDB(scheduleId);
+    }
+  }
+
+  async function removeBreakTimeFromDB(scheduleId) {
+    try {
+      const response = await fetch(`${baseUrl}user_admin/controllers/schedulesController.php`, {
+        method: "POST",
+        body: JSON.stringify({ action: "remove_break", scheduleId }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const { success, message } = await response.json();
+
+      document.getElementById("responseMessage").innerHTML = `<p class="${success ? "" : "text-red-600"}">${message}</p>`;
+      ModalManager.show("saveSchedules");
+    } catch (error) {
+      document.getElementById("responseMessage").innerHTML = `<p class='text-red-600'>Ocurrió un error inesperado</p>`;
+      ModalManager.show("saveSchedules");
+      console.error(error);
+    }
   }
 
   function changeDayStatus(e, day) {

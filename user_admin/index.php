@@ -31,7 +31,7 @@ include dirname(__DIR__) . '/partials/head.php';
     const role_id = <?php echo $role_id; ?>;
     window.APP_VERSION = '<?= $versionManager->getVersion() ?>';
 </script>
-<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="<?php echo $baseUrl; ?>assets/css/dist/output.css">
 
 <body data-base-url="<?php echo htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8'); ?>">
     <!-- Navbar -->

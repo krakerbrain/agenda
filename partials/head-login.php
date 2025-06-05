@@ -10,6 +10,7 @@
     <link rel="apple-touch-icon" sizes="180x180"
         href="<?php echo $baseUrl; ?>assets/img/landing/favicon/apple-touch-icon.png">
     <link rel="stylesheet" href="<?php echo $baseUrl; ?>assets/vendors/css/font-awesome/all.min.css">
-    <!-- Usado en configuracion de eventos únicos para múltiples fechas -->
-    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="stylesheet" href="<?php echo $baseUrl; ?>assets/css/dist/output.css">
+    <!-- <script src="https://cdn.tailwindcss.com"></script> -->
 </head>
