@@ -19,7 +19,7 @@ $auth->validarTokenUsuario();
     }
 </style>
 
-<div class="max-w-7xl mx-auto px-2 w-full">
+<div class="mx-auto px-2 w-full">
     <ul class="flex border-b border-gray-200 mb-4" id="myTab" role="tablist">
         <li class="flex-1 mr-2 text-center" role="presentation">
             <button

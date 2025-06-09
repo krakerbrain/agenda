@@ -7,69 +7,37 @@ $baseUrl = ConfigUrl::get();
 $auth = new JWTAuth();
 $auth->validarTokenUsuario();
 ?>
-<style>
-*/ .time-field {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
 
-.time-label {
-    font-size: 0.75rem;
-    /* Tamaño pequeño para el texto */
-    margin-bottom: 0.25rem;
-    /* Separación entre la etiqueta y el input */
-    color: #6c757d;
-    /* Color neutro */
-}
-
-.time-box {
-    width: 50px;
-    /* Ancho del campo */
-    text-align: center;
-    padding: 0.25rem;
-}
-</style>
-<div class="container text-end">
-    <a tabindex="0" role="button" data-bs-trigger="focus" class="btn" data-bs-placement="left" data-bs-toggle="popover"
-        data-bs-title="Servicios"
-        data-bs-content="Aquí podrá configurar todos los servicios que prestes con sus categorías, descripciones y duración de los servicios (en horas). Estos servicios más las configuraciones del calendario le permitiran a su cliente hacer correctamente la reserva">
-        <i class="fa fa-circle-question text-primary" style="font-size: 1.5rem;"></i>
-    </a>
-</div>
-<div class="container">
-    <form id="servicesForm" method="POST" class="border p-4 rounded">
-        <input type="hidden" value="" id="tempId">
-        <table class="table table-borderless table-striped table-sm">
-            <thead>
-                <tr class="head-table">
-                    <!-- agegrar tooltip con icono i de información y el texto define si el servicio esta disponible o no para todos los usaurios -->
-                    <th>Habilitado<i class="fa fa-info-circle ps-1" data-bs-toggle="tooltip" data-bs-placement="top"
-                            title="Define si el servicio está disponible para todos los usuarios"></i></th>
-                    <th>Nombre del Servicio</th>
-                    <th class="text-center">Duración</th>
-                    <th>Observaciones</th>
-                    <th>Categorías</th>
-                    <th>Días Disponible</th>
-                    <th>Acción</th>
-                </tr>
-            </thead>
-            <tbody id="servicesTableBody">
-
-
-            </tbody>
-        </table>
-        <!-- Botón para agregar servicio más cerca de la tabla -->
-        <button type="button" class="btn btn-outline-primary mb-4" id="addServiceButton">
-            <i class="fa fa-plus"></i> Agregar Nuevo Servicio
+<div class="max-w-4xl mx-auto relative">
+    <!-- Contenedor superior fijo - ahora funciona correctamente -->
+    <div class="flex justify-between items-center sticky bg-white z-50 p-3 shadow rounded"
+        style="top: calc(var(--spacing) * 14.3);">
+        <!-- Botón de agregar servicio a la izquierda -->
+        <button type="button"
+            class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors shadow-md"
+            id="addServiceButton">
+            <i class="fa fa-plus mr-2"></i> Agregar Nuevo Servicio
         </button>
-        <!-- Botón para guardar en una sección separada de acción final -->
-        <div class="d-flex justify-content-end mt-3">
-            <button type="submit" class="btn btn-success">
-                <i class="fa fa-save"></i> Guardar Configuración
-            </button>
+        <!-- Botón de ayuda a la derecha -->
+        <div class="hidden">
+            <a tabindex="0" role="button" class="btn" data-bs-trigger="focus" data-bs-placement="left"
+                data-bs-toggle="popover" data-bs-title="Servicios"
+                data-bs-content="Aquí podrá configurar todos los servicios que prestes con sus categorías, descripciones y duración de los servicios (en horas). Estos servicios más las configuraciones del calendario le permitirán a su cliente hacer correctamente la reserva">
+                <i class="fa fa-circle-question text-primary text-2xl"></i>
+            </a>
         </div>
-    </form>
-    <?php include dirname(__DIR__, 2) . '/includes/modal-servicios.php';
-    ?>
+    </div>
+
+    <!-- Contenido desplazable -->
+    <div class="pt-16">
+        <!-- Espacio para el header fijo -->
+        <form id="servicesForm" method="POST">
+            <input type="hidden" value="" id="tempId">
+            <div class="overflow-x-auto rounded-lg md:border md:border-gray-200 md:shadow-sm">
+                <div id="servicesContainer" class="pt-4"></div>
+            </div>
+        </form>
+    </div>
+
+    <?php include dirname(__DIR__, 2) . '/includes/modal-servicios.php'; ?>
 </div>

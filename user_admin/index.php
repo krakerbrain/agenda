@@ -193,7 +193,7 @@ include dirname(__DIR__) . '/partials/head.php';
     <!-- Backdrop -->
     <div id="offcanvasBackdrop" class="fixed inset-0 z-40 bg-black opacity-50 hidden"></div>
 
-    <div id="main-content" class="container mx-auto px-4 py-6"></div>
+    <div id="main-content" class="container max-w-7xl mx-auto px-4 py-6"></div>
 
     <!-- Usado en configuracion de eventos únicos para múltiples fechas -->
     <script src="<?php echo $baseUrl; ?>assets/vendors/js/flatpickr/flatpickr.min.js"></script>
