@@ -20,7 +20,7 @@
 
         <!-- Contenido con scroll -->
         <div class="flex-1 overflow-y-auto p-6">
-            <div id="servicesContainer" class="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+            <div id="servicesContainer" class="grid gap-4 sm:grid-cols-2">
                 <!-- Contenido se cargará dinámicamente -->
             </div>
 
