@@ -25,7 +25,7 @@ export function init() {
   });
 
   setupAddServiceButton();
-  setupModalCloseListeners();
+  ModalManager.setupCloseListeners();
 
   async function loadServices() {
     try {
@@ -174,31 +174,4 @@ function handleError(error, customMessage = null) {
   const errorMessage = document.getElementById("errorMessage");
   errorMessage.textContent = customMessage || error.message || "Ha ocurrido un error inesperado";
   ModalManager.show("errorModal");
-}
-
-function setupModalCloseListeners() {
-  // Cerrar con botones
-  document.querySelectorAll(".close-modal, #cancelAutoOpen").forEach((button) => {
-    button.addEventListener("click", function () {
-      const modal = this.closest(".fixed.inset-0");
-      if (modal) ModalManager.hide(modal.id);
-    });
-  });
-
-  // Cerrar haciendo clic fuera
-  document.querySelectorAll(".fixed.inset-0").forEach((modal) => {
-    modal.addEventListener("click", function (e) {
-      if (e.target === modal || e.target.classList.contains("bg-opacity-75")) {
-        ModalManager.hide(modal.id);
-      }
-    });
-  });
-
-  // Cerrar con Escape
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") {
-      const openModal = document.querySelector(".fixed.inset-0:not(.hidden)");
-      if (openModal) ModalManager.hide(openModal.id);
-    }
-  });
 }

@@ -1,8 +1,23 @@
 // Clase global para manejo de modales tipo Tailwind/JS
 export class ModalManager {
-  static show(modalId) {
+  static show(modalId, options = null) {
     const modal = document.getElementById(modalId);
     if (modal) {
+      if (options) {
+        const { title, message } = options;
+        if (title) {
+          const titleElement = modal.querySelector("#modalLabel");
+          if (titleElement) {
+            titleElement.textContent = title;
+          }
+        }
+        if (message) {
+          const messageElement = modal.querySelector("#modalMessage");
+          if (messageElement) {
+            messageElement.textContent = message;
+          }
+        }
+      }
       modal.classList.remove("hidden", "opacity-0", "pointer-events-none");
       modal.classList.add("opacity-100");
       const modalContent = modal.querySelector(".bg-white");
@@ -29,5 +44,32 @@ export class ModalManager {
         document.body.classList.remove("overflow-hidden");
       }, 300);
     }
+  }
+
+  static setupCloseListeners() {
+    // Cerrar con botones
+    document.querySelectorAll(".close-modal, #cancelAutoOpen").forEach((button) => {
+      button.addEventListener("click", function () {
+        const modal = this.closest(".fixed.inset-0");
+        if (modal) ModalManager.hide(modal.id);
+      });
+    });
+
+    // Cerrar haciendo clic fuera
+    document.querySelectorAll(".fixed.inset-0").forEach((modal) => {
+      modal.addEventListener("click", function (e) {
+        if (e.target === modal || e.target.classList.contains("bg-opacity-75")) {
+          ModalManager.hide(modal.id);
+        }
+      });
+    });
+
+    // Cerrar con Escape
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        const openModal = document.querySelector(".fixed.inset-0:not(.hidden)");
+        if (openModal) ModalManager.hide(openModal.id);
+      }
+    });
   }
 }

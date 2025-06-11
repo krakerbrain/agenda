@@ -518,3 +518,6 @@ function resetDeleteModal(appointmentId) {
   // Limpiar el campo de notas
   document.getElementById("notes").value = "";
 }
+
+// Setup centralized close listeners for modals
+ModalManager.setupCloseListeners();

@@ -99,3 +99,18 @@ export const __testing__ = {
   LogoutService,
   initializeNavbar,
 };
+
+// Lógica para resaltar la sección activa en la navbar
+const navLinks = document.querySelectorAll(".nav-element");
+navLinks.forEach((link) => {
+  link.addEventListener("click", () => {
+    // Remove active class from all links
+    navLinks.forEach((navLink) => {
+      navLink.classList.remove("bg-gray-200", "text-blue-600", "font-medium");
+    });
+
+    link.classList.remove("text-gray-700");
+    // Add active class to the clicked link
+    link.classList.add("bg-gray-200", "text-blue-600", "font-medium");
+  });
+});

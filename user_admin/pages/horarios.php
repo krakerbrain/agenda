@@ -16,21 +16,20 @@ if ($user_count > 1) {
 
 
 ?>
-<!-- <link rel="stylesheet" href="<?php echo $baseUrl; ?>assets/css/table2.css?v=<?php echo time(); ?>"> -->
 <div class="max-w-4xl mx-auto my-8 px-2 w-full">
     <?php if ($user_count > 1 && $datosUsuario['role_id'] == 2) : ?>
-    <div class="mb-6">
-        <label for="userSelect" class="block text-sm font-medium text-gray-700 mb-2">Selecciona el usuario</label>
-        <select id="userSelect"
-            class="block w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring focus:ring-cyan-200 focus:ring-opacity-50">
-            <?php foreach ($users as $user) : ?>
-            <option value="<?= $user['id'] ?>" <?= $datosUsuario['role_id'] == $user['role_id'] ? 'selected' : '' ?>>
-                <?= $user['name'] ?></option>
-            <?php endforeach; ?>
-        </select>
-    </div>
+        <div class="mb-6">
+            <label for="userSelect" class="block text-sm font-medium text-gray-700 mb-2">Selecciona el usuario</label>
+            <select id="userSelect"
+                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring focus:ring-cyan-200 focus:ring-opacity-50">
+                <?php foreach ($users as $user) : ?>
+                    <option value="<?= $user['id'] ?>" <?= $datosUsuario['role_id'] == $user['role_id'] ? 'selected' : '' ?>>
+                        <?= $user['name'] ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
     <?php else : ?>
-    <input type="hidden" id="userSelect" value="<?= $datosUsuario['user_id'] ?>">
+        <input type="hidden" id="userSelect" value="<?= $datosUsuario['user_id'] ?>">
     <?php endif; ?>
     <form id="workScheduleForm" method="POST" class="border border-gray-200 p-6 rounded-lg bg-white shadow">
         <div id="unsavedChangesAlert"

@@ -270,25 +270,7 @@ export function init() {
   }
 
   // --- Cierre de modal con ModalManager ---
-  function setupModalCloseListeners() {
-    document.querySelectorAll(".close-modal").forEach((button) => {
-      button.addEventListener("click", function () {
-        const modal = this.closest(".fixed.inset-0");
-        if (modal) {
-          ModalManager.hide(modal.id);
-        }
-      });
-    });
-    document.querySelectorAll(".fixed.inset-0").forEach((modal) => {
-      modal.addEventListener("click", function (e) {
-        if (e.target === modal) {
-          ModalManager.hide(modal.id);
-        }
-      });
-    });
-  }
-
-  setupModalCloseListeners();
+  ModalManager.setupCloseListeners();
 
   getHorarios();
 }
