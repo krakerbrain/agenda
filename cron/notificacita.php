@@ -4,11 +4,13 @@ require_once dirname(__DIR__) . '/classes/Appointments.php';
 require_once dirname(__DIR__) . '/classes/EmailTemplate.php';
 require_once dirname(__DIR__) . '/classes/NotificationLog.php';
 require_once dirname(__DIR__) . '/user_admin/send_wsp.php';
+require_once dirname(__DIR__) . '/classes/IntegrationManager.php';
 
 // Crear instancias de las clases necesarias
 $appointments = new Appointments();
 $emailTemplateBuilder = new EmailTemplate();
 $notificationLog = new NotificationLog();
+$integrationManager = new IntegrationManager();
 date_default_timezone_set('UTC');
 try {
     error_log("INFO: Inicio cron notificación cita " . date('Y-m-d H:i:s') . PHP_EOL, 3, __DIR__ . '/log/avisoreserva.log');
@@ -20,6 +22,18 @@ try {
         $unconfirmedAppointments = $appointments->getUnconfirmedAppointment($type);
 
         foreach ($unconfirmedAppointments as $appointment) {
+
+            // Verificar si WhatsApp está habilitado para esta compañía
+            $companyIntegrations = $integrationManager->getCompanyIntegrations($appointment['company_id']);
+            $whatsappEnabled = false;
+
+            foreach ($companyIntegrations as $integration) {
+                if ($integration['integration_id'] == 2 && $integration['company_enabled']) {
+                    $whatsappEnabled = true;
+                    break;
+                }
+            }
+
             $existingLogs = $notificationLog->getAllLogsForAppointment($appointment['id']);
 
             // Inicializar estados 
@@ -54,7 +68,7 @@ try {
             $shouldSendWsp = ($wspStatus !== 'sent');
             $shouldSendEmail = ($emailStatus !== 'sent');
 
-            if ($shouldSendWsp) {
+            if ($shouldSendWsp && $whatsappEnabled) {
                 try {
                     $templateName = $type === 'reserva' ? 'registro_reserva' : 'confirmar_reserva';
                     $wspStatusCode = sendWspReserva(
@@ -71,10 +85,14 @@ try {
                     $wspStatus = ($wspStatusCode == 200 || $wspStatusCode == 201) ? 'sent' : 'failed';
                     handleNotificationRegister($notificationLog, $appointment['id'], 'whatsapp', $wspNotificationId, $wspStatus, $wspAttempts, $type);
                 } catch (Exception $e) {
-                    handleNotificationRegister($notificationLog, $appointment['id'], 'whatsapp', $wspNotificationId, $wspStatus, $wspAttempts, $type);
-                    $wspStatus = 'failed';
+                    handleNotificationRegister($notificationLog, $appointment['id'], 'whatsapp', $wspNotificationId, 'failed', $wspAttempts, $type);
                     throw new Exception("Error al enviar mensaje de whatsapp: " . $e->getMessage());
                 }
+            } elseif ($shouldSendWsp && !$whatsappEnabled) {
+                // Registrar que no se envió porque está deshabilitado
+                handleNotificationRegister($notificationLog, $appointment['id'], 'whatsapp', $wspNotificationId, 'disabled', $wspAttempts, $type);
+                $wspStatus = 'sent'; // Importante para la confirmación
+                error_log("INFO: WhatsApp deshabilitado para compañía " . $appointment['company_id'] . ", cita " . $appointment['id'] . PHP_EOL, 3, __DIR__ . '/log/avisoreserva.log');
             }
 
             if ($shouldSendEmail) {
@@ -92,7 +110,8 @@ try {
             }
 
             // Verificar que ambos métodos hayan sido exitosos antes de confirmar la cita
-            if ($wspStatus === 'sent' && $emailStatus === 'sent') {
+            $whatsappOk = !$whatsappEnabled || $wspStatus === 'sent'; // true si está deshabilitado o se envió
+            if ($emailStatus === 'sent' && $whatsappOk) {
                 $appointments->markAsConfirmed($appointment['id'], $type);
                 // $notificationLog->delete($appointment['id']);
             }
