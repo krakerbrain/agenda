@@ -46,39 +46,42 @@ $integrations = $integration->getCompanyIntegrations($company_id);
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     <?php foreach ($integrations as $integration): ?>
-                        <tr class="flex flex-col sm:table-row">
-                            <!-- Celda de Servicio con Badge para móvil -->
-                            <td class="px-6 py-4 text-sm font-medium text-gray-900 sm:whitespace-nowrap">
-                                <div class="flex flex-col">
-                                    <span><?php echo htmlspecialchars($integration['name']); ?></span>
-                                    <span
-                                        class="sm:hidden mt-1 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <?php echo $integration['company_enabled'] ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'; ?>">
-                                        <?php echo $integration['company_enabled'] ? 'Habilitado' : 'Deshabilitado'; ?>
-                                    </span>
-                                </div>
-                            </td>
-
-                            <!-- Celda de Estado (solo desktop) -->
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden sm:table-cell">
+                    <tr class="flex flex-col sm:table-row">
+                        <!-- Celda de Servicio con Badge para móvil -->
+                        <td class="px-6 py-4 text-sm font-medium text-gray-900 sm:whitespace-nowrap">
+                            <div class="flex flex-col">
+                                <span><?php echo htmlspecialchars($integration['name']); ?></span>
                                 <span
-                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <?php echo $integration['company_enabled'] ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'; ?>">
+                                    class="sm:hidden mt-1 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <?php echo $integration['company_enabled'] ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'; ?>">
                                     <?php echo $integration['company_enabled'] ? 'Habilitado' : 'Deshabilitado'; ?>
                                 </span>
-                            </td>
+                            </div>
+                        </td>
 
-                            <!-- Celda de Acción -->
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                <button type="button"
-                                    class="w-full sm:w-auto inline-flex justify-center items-center px-3 py-1 border border-transparent text-xs font-medium rounded shadow-sm text-white <?php echo $integration['company_enabled'] ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'; ?> focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                    data-integration-id="<?php echo $integration['integration_id']; ?>"
-                                    data-company-enabled="<?php echo !$integration['company_enabled']; ?>">
-                                    <?php echo $integration['company_enabled'] ? 'Deshabilitar' : 'Habilitar'; ?>
-                                </button>
-                            </td>
-                        </tr>
+                        <!-- Celda de Estado (solo desktop) -->
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden sm:table-cell">
+                            <span
+                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <?php echo $integration['company_enabled'] ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'; ?>">
+                                <?php echo $integration['company_enabled'] ? 'Habilitado' : 'Deshabilitado'; ?>
+                            </span>
+                        </td>
+
+                        <!-- Celda de Acción -->
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <button type="button"
+                                class="w-full sm:w-auto inline-flex justify-center items-center px-3 py-1 border border-transparent text-xs font-medium rounded shadow-sm text-white <?php echo $integration['company_enabled'] ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'; ?> focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                data-integration-id="<?php echo $integration['integration_id']; ?>"
+                                data-company-enabled="<?php echo !$integration['company_enabled']; ?>"
+                                data-integration-name="<?php echo htmlspecialchars($integration['name']); ?>">
+                                <?php echo $integration['company_enabled'] ? 'Deshabilitar' : 'Habilitar'; ?>
+                            </button>
+                        </td>
+                    </tr>
                     <?php endforeach; ?>
                 </tbody>
             </table>
         </div>
     </form>
 </div>
+
+<?php include dirname(__DIR__, 2) . '/includes/modal-accept-cancel.php';

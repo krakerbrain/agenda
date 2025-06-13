@@ -19,7 +19,7 @@ export class ModalManager {
         }
       }
       modal.classList.remove("hidden", "opacity-0", "pointer-events-none");
-      modal.classList.add("opacity-100");
+      modal.classList.add("flex", "opacity-100");
       const modalContent = modal.querySelector(".bg-white");
       if (modalContent) {
         modalContent.classList.remove("scale-95", "translate-y-4", "opacity-0");

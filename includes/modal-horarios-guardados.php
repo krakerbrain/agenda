@@ -1,6 +1,6 @@
 <!-- Modal wrapper -->
 <div id="saveSchedules"
-    class="fixed inset-0 z-50 flex items-center justify-center hidden pointer-events-none transition-opacity duration-300 opacity-0">
+    class="fixed inset-0 z-50 items-center justify-center hidden pointer-events-none transition-opacity duration-300 opacity-0">
 
     <!-- Fondo oscuro semi-transparente -->
     <div class="absolute inset-0 bg-black opacity-50"></div>
