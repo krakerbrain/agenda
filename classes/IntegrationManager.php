@@ -153,4 +153,22 @@ class IntegrationManager
         $this->db->bind(':companyId', $companyId);
         $this->db->execute();
     }
+
+    public function handleWhatsAppIntegration($company_id, $enable)
+    {
+        try {
+            // WhatsApp tiene integration_id = 1
+            $this->db->query("UPDATE company_integrations 
+                SET enabled = :enabled 
+                WHERE company_id = :company_id AND integration_id = 2");
+
+            $this->db->bind(':enabled', $enable ? 1 : 0);
+            $this->db->bind(':company_id', $company_id);
+
+            return $this->db->execute();
+        } catch (Exception $e) {
+            $this->logger->logError('Error al modificar estado de WhatsApp: ' . $e->getMessage());
+            return false;
+        }
+    }
 }
