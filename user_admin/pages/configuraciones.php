@@ -62,279 +62,315 @@ $current_date->setTime(0, 0, 0);
         font-size: 1.4rem;
     }
 </style>
-<div class="container my-4">
+<div class="max-w-4xl mx-auto my-4 p-4">
     <form id="companyConfigForm">
         <input type="hidden" name="company_id" id="company_id" value="<?= $company_id; ?>">
-        <div class="d-flex align-items-baseline">
-            <h3 class="mb-3">Modo de Horario</h3>
-            <a tabindex="0" role="button" data-bs-trigger="focus" class="btn help" data-bs-toggle="popover"
+        <div class="flex items-baseline">
+            <h3 class="text-xl font-semibold mb-3">Modo de Horario</h3>
+            <button type="button" class="help ml-2" data-bs-toggle="popover" data-bs-trigger="focus"
                 data-bs-title="Modo de horario"
-                data-bs-content="Puedes permitir que el cliente elija libremente la hora de la reserva o puedes elegir bloques de horarios acorde a la duración de los servicios"><i
-                    class="fa fa-circle-question text-primary"></i></a>
+                data-bs-content="Puedes permitir que el cliente elija libremente la hora de la reserva o puedes elegir bloques de horarios acorde a la duración de los servicios">
+                <i class="fa fa-circle-question text-blue-500"></i>
+            </button>
         </div>
-        <div class="form-check">
-            <input class="form-check-input" type="radio" name="schedule_mode" id="freeChoice" value="free"
-                <?php echo $company['schedule_mode'] == 'free' ? 'checked' : ''; ?> disabled>
-            <label class="form-check-label" for="freeChoice">Libre Elección</label>
+        <div class="flex items-center mb-2">
+            <input class="form-radio h-4 w-4 text-blue-600" type="radio" name="schedule_mode" id="freeChoice"
+                value="free" <?php echo $company['schedule_mode'] == 'free' ? 'checked' : ''; ?> disabled>
+            <label class="ml-2 text-gray-700" for="freeChoice">Libre Elección</label>
         </div>
-        <div class="form-check">
-            <input class="form-check-input" type="radio" name="schedule_mode" id="blocks" value="blocks"
+        <div class="flex items-center">
+            <input class="form-radio h-4 w-4 text-blue-600" type="radio" name="schedule_mode" id="blocks" value="blocks"
                 <?php echo $company['schedule_mode'] == 'blocks' ? 'checked' : ''; ?>>
-            <label class="form-check-label" for="blocks">Bloques de Horarios</label>
+            <label class="ml-2 text-gray-700" for="blocks">Bloques de Horarios</label>
         </div>
 
-        <!-- confguración de disponibilidad del calenadario -->
-
-        <div class="d-flex align-items-baseline">
-            <h3 class="mt-4 mb-3">Disponibilidad del calendario</h3>
-            <a tabindex="0" role="button" data-bs-trigger="focus" class="btn help" data-bs-toggle="popover"
+        <!-- configuración de disponibilidad del calendario -->
+        <div class="flex items-baseline mt-6">
+            <h3 class="text-xl font-semibold mb-3">Disponibilidad del calendario</h3>
+            <button type="button" class="help ml-2" data-bs-toggle="popover" data-bs-trigger="focus"
                 data-bs-title="Disponibilidad"
-                data-bs-content="Define un rango de fechas en el que tu empresa estará disponible para reservas. El cliente podrá elegir entre una disponibilidad fija o continua."><i
-                    class="fa fa-circle-question text-primary"></i></a>
+                data-bs-content="Define un rango de fechas en el que tu empresa estará disponible para reservas. El cliente podrá elegir entre una disponibilidad fija o continua.">
+                <i class="fa fa-circle-question text-blue-500"></i>
+            </button>
         </div>
-        <div class="d-flex align-items-center mb-3">
-            <div class="form-check me-3">
-                <input class="form-check-input" type="radio" name="calendar_mode" id="corrido" value="corrido"
-                    <?php echo $company['calendar_mode'] == 'corrido' ? 'checked' : ''; ?>>
-                <label class="form-check-label" for="corrido">Contínuo</label>
+        <div class="flex items-center mb-4">
+            <div class="flex items-center mr-4">
+                <input class="form-radio h-4 w-4 text-blue-600" type="radio" name="calendar_mode" id="corrido"
+                    value="corrido" <?php echo $company['calendar_mode'] == 'corrido' ? 'checked' : ''; ?>>
+                <label class="ml-2 text-gray-700" for="corrido">Contínuo</label>
             </div>
-            <div class="form-check">
-                <input class="form-check-input" type="radio" name="calendar_mode" id="fijo" value="fijo"
+            <div class="flex items-center">
+                <input class="form-radio h-4 w-4 text-blue-600" type="radio" name="calendar_mode" id="fijo" value="fijo"
                     <?php echo $company['calendar_mode'] == 'fijo' ? 'checked' : ''; ?>>
-                <label class="form-check-label" for="fijo">Fijo</label>
+                <label class="ml-2 text-gray-700" for="fijo">Fijo</label>
             </div>
         </div>
 
         <!-- Input para Días Disponibles (Corrido) -->
-        <div id="corridoInput" class="mb-3"
-            style="display: <?php echo ($company['calendar_mode'] == 'corrido') ? 'block' : 'none'; ?>;">
-            <div class="d-flex align-items-baseline">
-                <h5 class="mt-4 mb-3">Configuración de Disponibilidad Continua</h5>
-                <a tabindex="0" role="button" data-bs-trigger="focus" class="btn help" data-bs-toggle="popover"
+        <div id="corridoInput"
+            class="mb-4 <?php echo ($company['calendar_mode'] == 'corrido') ? 'block' : 'hidden'; ?>">
+            <div class="flex items-baseline">
+                <h5 class="text-lg font-medium mt-4 mb-3">Configuración de Disponibilidad Continua</h5>
+                <button type="button" class="help ml-2" data-bs-toggle="popover" data-bs-trigger="focus"
                     data-bs-title="Disponibilidad Continua"
-                    data-bs-content="La cantidad de días que elijas determinará el máximo de días con los que los clientes pueden reservar. Por ejemplo, si seleccionas 20 días, el cliente no podrá hacer una cita con más de 20 días de antelación. Recuerda que cada día se abrirá una nueva fecha disponible."><i
-                        class="fa fa-circle-question text-primary"></i></a>
+                    data-bs-content="La cantidad de días que elijas determinará el máximo de días con los que los clientes pueden reservar. Por ejemplo, si seleccionas 20 días, el cliente no podrá hacer una cita con más de 20 días de antelación. Recuerda que cada día se abrirá una nueva fecha disponible.">
+                    <i class="fa fa-circle-question text-blue-500"></i>
+                </button>
             </div>
-            <div class="mb-3">
-                <label for="calendar_days_available" class="form-label">Días disponibles para reservar:</label>
-                <input type="number" class="form-control" id="calendar_days_available" name="calendar_days_available"
+            <div class="mb-4">
+                <label for="calendar_days_available" class="block text-sm font-medium text-gray-700 mb-1">Días
+                    disponibles para reservar:</label>
+                <input type="number"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    id="calendar_days_available" name="calendar_days_available"
                     value="<?php echo $company['calendar_days_available']; ?>">
             </div>
         </div>
 
         <!-- Configuración de Disponibilidad Fija (Fijo) -->
-        <div id="fijoInput" class="container mb-4"
-            style="display: <?php echo ($company['calendar_mode'] == 'fijo') ? 'block' : 'none'; ?>;">
-            <div class="d-flex align-items-baseline">
-                <h5 class="mt-4 mb-3">Configuración de Disponibilidad Fija</h5>
-                <a tabindex="0" role="button" data-bs-trigger="focus" class="btn help" data-bs-toggle="popover"
+        <div id="fijoInput" class="mb-6 <?php echo ($company['calendar_mode'] == 'fijo') ? 'block' : 'hidden'; ?>">
+            <div class="flex items-baseline">
+                <h5 class="text-lg font-medium mt-4 mb-3">Configuración de Disponibilidad Fija</h5>
+                <button type="button" class="help ml-2" data-bs-toggle="popover" data-bs-trigger="focus"
                     data-bs-title="Disponibilidad Fija"
-                    data-bs-content="La cantidad de días que elijas limitará el periodo durante el cual los clientes pueden hacer reservas. Al seleccionar una fecha de inicio y la cantidad de días, no se podrán realizar reservas fuera del periodo establecido hasta que se abra uno nuevo, ya sea automáticamente o manualmente. El calendario no avanzará hasta que se inicie un nuevo periodo."><i
-                        class="fa fa-circle-question text-primary"></i></a>
+                    data-bs-content="La cantidad de días que elijas limitará el periodo durante el cual los clientes pueden hacer reservas. Al seleccionar una fecha de inicio y la cantidad de días, no se podrán realizar reservas fuera del periodo establecido hasta que se abra uno nuevo, ya sea automáticamente o manualmente. El calendario no avanzará hasta que se inicie un nuevo periodo.">
+                    <i class="fa fa-circle-question text-blue-500"></i>
+                </button>
             </div>
             <!-- Mostrar el periodo actual -->
             <?php if ($company['calendar_mode'] == 'fijo'): ?>
-                <p><strong>Periodo Actual:</strong> del <?php echo $fixed_start_day->format('d-m-Y'); ?> al
+                <p class="mb-4"><strong>Periodo Actual:</strong> del <?php echo $fixed_start_day->format('d-m-Y'); ?> al
                     <?php echo $period_end->format('d-m-Y'); ?></p>
             <?php endif; ?>
-            <div class="mb-3">
-                <label for="fixed_start_date" class="form-label">Fecha de Inicio:</label>
-                <input type="date" class="form-control" id="fixed_start_date" name="fixed_start_date"
-                    value="<?php echo $company['fixed_start_date']; ?>">
+            <div class="mb-4">
+                <label for="fixed_start_date" class="block text-sm font-medium text-gray-700 mb-1">Fecha de
+                    Inicio:</label>
+                <input type="date"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    id="fixed_start_date" name="fixed_start_date" value="<?php echo $company['fixed_start_date']; ?>">
             </div>
-            <div class="mb-3">
-                <label for="fixed_duration" class="form-label">Duración (días):</label>
-                <input type="number" class="form-control" id="fixed_duration" name="fixed_duration" min="1"
-                    value="<?php echo $company['fixed_duration']; ?>">
+            <div class="mb-4">
+                <label for="fixed_duration" class="block text-sm font-medium text-gray-700 mb-1">Duración
+                    (días):</label>
+                <input type="number"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    id="fixed_duration" name="fixed_duration" min="1" value="<?php echo $company['fixed_duration']; ?>">
             </div>
-            <div class="form-check mb-3">
-                <input class="form-check-input" type="checkbox" id="auto_open" name="auto_open"
+            <div class="flex items-center mb-4">
+                <input class="form-checkbox h-4 w-4 text-blue-600" type="checkbox" id="auto_open" name="auto_open"
                     <?php echo $company['auto_open']  ? 'checked' : ''; ?>
                     <?php echo ($company['calendar_mode'] == 'corrido') ? 'disabled' : ''; ?>>
-                <label class="form-check-label" for="auto_open">Abrir automáticamente nuevo periodo al
+                <label class="ml-2 text-gray-700" for="auto_open">Abrir automáticamente nuevo periodo al
                     finalizar</label>
-                <a tabindex="0" role="button" data-bs-trigger="focus" class="btn help ms-2" data-bs-toggle="popover"
+                <button type="button" class="help ml-2" data-bs-toggle="popover" data-bs-trigger="focus"
                     data-bs-title="Nuevo periodo automático"
-                    data-bs-content="Al terminar el periodo actual se iniciará automáticamente un nuevo periodo considerando la cantidad de días preestablecidos. ">
-                    <i class="fa fa-circle-question text-primary"></i>
-                </a>
+                    data-bs-content="Al terminar el periodo actual se iniciará automáticamente un nuevo periodo considerando la cantidad de días preestablecidos.">
+                    <i class="fa fa-circle-question text-blue-500"></i>
+                </button>
             </div>
 
             <!-- Botón "Abrir Nuevo Periodo" con ícono de información -->
-            <div class="d-flex align-items-center mt-3">
-                <button type="button" id="openNewPeriod" class="btn btn-warning" data-bs-toggle="modal"
-                    data-bs-target="#newPeriodModal"
-                    <?php echo ($company['calendar_mode'] == 'corrido') ? 'disabled' : ''; ?>> Abrir Nuevo Periodo
+            <div class="flex items-center mt-4">
+                <button type="button" id="openNewPeriod"
+                    class="px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
+                    <?php echo ($company['calendar_mode'] == 'corrido') ? 'disabled' : ''; ?>>
+                    Abrir Nuevo Periodo
                 </button>
-                <a tabindex="0" role="button" data-bs-trigger="focus" class="btn help ms-2" data-bs-toggle="popover"
+                <button type="button" class="help ml-2" data-bs-toggle="popover" data-bs-trigger="focus"
                     data-bs-title="Abrir Nuevo Periodo"
                     data-bs-content="Si deseas comenzar un nuevo periodo antes de que finalice el actual, haz clic en este botón. El periodo actual se extenderá hasta completar el nuevo.">
-                    <i class="fa fa-circle-question text-primary"></i>
-                </a>
+                    <i class="fa fa-circle-question text-blue-500"></i>
+                </button>
             </div>
         </div>
 
         <!-- Intervalo de horarios -->
-        <div class="d-flex align-items-baseline mt-4">
-            <h3 class="mb-3">Opciones de Intervalo de Horarios</h3>
-            <a tabindex="0" role="button" data-bs-trigger="focus" class="btn help" data-bs-toggle="popover"
+        <div class="flex items-baseline mt-8">
+            <h3 class="text-xl font-semibold mb-3">Opciones de Intervalo de Horarios</h3>
+            <button type="button" class="help ml-2" data-bs-toggle="popover" data-bs-trigger="focus"
                 data-bs-title="Intervalo de Horarios"
-                data-bs-content="Selecciona cómo se organizarán los horarios disponibles para las citas. Puedes elegir intervalos fijos de 30, 45 o 60 minutos, o basar los horarios en la duración del servicio."><i
-                    class="fa fa-circle-question text-primary"></i></a>
+                data-bs-content="Selecciona cómo se organizarán los horarios disponibles para las citas. Puedes elegir intervalos fijos de 30, 45 o 60 minutos, o basar los horarios en la duración del servicio.">
+                <i class="fa fa-circle-question text-blue-500"></i>
+            </button>
         </div>
 
         <!-- Radio para usar la duración del servicio -->
-        <div class="form-check">
-            <input class="form-check-input" type="radio" name="time_step" id="serviceDuration" value=""
+        <div class="flex items-center mb-2">
+            <input class="form-radio h-4 w-4 text-blue-600" type="radio" name="time_step" id="serviceDuration" value=""
                 <?php echo is_null($company['time_step']) ? 'checked' : ''; ?>>
-            <label class="form-check-label" for="serviceDuration">
+            <label class="ml-2 text-gray-700" for="serviceDuration">
                 Según la duración del servicio (Ejemplo: si un servicio dura 2 horas → 9:00 - 11:00, 11:00 - 13:00,
                 etc.)
             </label>
         </div>
 
         <!-- Nota que aparece cuando se selecciona "Según la duración del servicio" -->
-        <div id="serviceDurationNote" class="alert alert-info mt-2"
-            style="display: <?php echo is_null($company['time_step']) ? 'block' : 'none'; ?>;">
-            💡 Nota: Si configuraste una hora de descanso, el sistema intentará no asignar citas en ese periodo.
-            Esto puede hacer que algunos horarios no aparezcan disponibles cuando elijas la opción "Según la duración
-            del servicio".
+        <div id="serviceDurationNote"
+            class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-4 <?php echo is_null($company['time_step']) ? 'block' : 'hidden'; ?>">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <span class="text-blue-500">💡</span>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm text-blue-700">
+                        Nota: Si configuraste una hora de descanso, el sistema intentará no asignar citas en ese
+                        periodo.
+                        Esto puede hacer que algunos horarios no aparezcan disponibles cuando elijas la opción "Según la
+                        duración
+                        del servicio".
+                    </p>
+                </div>
+            </div>
         </div>
 
         <!-- Radio para usar intervalos fijos -->
-        <div class="form-check">
-            <input class="form-check-input" type="radio" name="time_step" id="fixedIntervals" value="fixed"
-                <?php echo !is_null($company['time_step']) ? 'checked' : ''; ?>>
-            <label class="form-check-label" for="fixedIntervals">
+        <div class="flex items-center">
+            <input class="form-radio h-4 w-4 text-blue-600" type="radio" name="time_step" id="fixedIntervals"
+                value="fixed" <?php echo !is_null($company['time_step']) ? 'checked' : ''; ?>>
+            <label class="ml-2 text-gray-700" for="fixedIntervals">
                 Intervalos Fijos (Ejemplo: 9:00 - 10:00, 10:00 - 11:00, etc.)
             </label>
         </div>
 
         <!-- Opciones de intervalo (solo si se seleccionan intervalos fijos) -->
-        <div id="fixedIntervalsOptions" class="ms-4 mb-3"
-            style="display: <?php echo !is_null($company['time_step']) ? 'block' : 'none'; ?>;">
-            <label class="form-label">Selecciona el intervalo:</label>
-            <div class="form-check">
-                <input class="form-check-input" type="radio" name="time_step_value" id="step30" value="30"
-                    <?php echo ($company['time_step'] == 30) ? 'checked' : ''; ?>>
-                <label class="form-check-label" for="step30">30 minutos</label>
+        <div id="fixedIntervalsOptions"
+            class="ml-6 mt-2 mb-4 <?php echo !is_null($company['time_step']) ? 'block' : 'hidden'; ?>">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Selecciona el intervalo:</label>
+            <div class="flex items-center mb-1">
+                <input class="form-radio h-4 w-4 text-blue-600" type="radio" name="time_step_value" id="step30"
+                    value="30" <?php echo ($company['time_step'] == 30) ? 'checked' : ''; ?>>
+                <label class="ml-2 text-gray-700" for="step30">30 minutos</label>
             </div>
-            <div class="form-check">
-                <input class="form-check-input" type="radio" name="time_step_value" id="step45" value="45"
-                    <?php echo ($company['time_step'] == 45) ? 'checked' : ''; ?>>
-                <label class="form-check-label" for="step45">45 minutos</label>
+            <div class="flex items-center mb-1">
+                <input class="form-radio h-4 w-4 text-blue-600" type="radio" name="time_step_value" id="step45"
+                    value="45" <?php echo ($company['time_step'] == 45) ? 'checked' : ''; ?>>
+                <label class="ml-2 text-gray-700" for="step45">45 minutos</label>
             </div>
-            <div class="form-check">
-                <input class="form-check-input" type="radio" name="time_step_value" id="step60" value="60"
-                    <?php echo ($company['time_step'] == 60) ? 'checked' : ''; ?>>
-                <label class="form-check-label" for="step60">60 minutos</label>
+            <div class="flex items-center">
+                <input class="form-radio h-4 w-4 text-blue-600" type="radio" name="time_step_value" id="step60"
+                    value="60" <?php echo ($company['time_step'] == 60) ? 'checked' : ''; ?>>
+                <label class="ml-2 text-gray-700" for="step60">60 minutos</label>
             </div>
         </div>
         <!-- Fin intervalo de horarios -->
 
-
         <!-- Configuración de bloqueo por incidencias -->
-        <div class="container my-4">
-            <div class="row">
-                <div class="d-flex align-items-baseline">
-                    <h3 class="mb-3">Bloqueo por Incidencias</h3>
-                    <a tabindex="0" role="button" data-bs-trigger="focus" class="btn help" data-bs-toggle="popover"
-                        data-bs-title="Bloqueo por Incidencias"
-                        data-bs-content="Puedes configurar el sistema para bloquear automáticamente a usuarios que acumulen un número determinado de incidencias"><i
-                            class="fa fa-circle-question text-primary"></i></a>
-                </div>
-                <div class="col-md-6 mb-2 row">
-                    <div class="form-check form-switch mb-3 d-flex align-items-center">
-                        <input class="form-check-input" type="checkbox" role="switch" id="blockUsersSwitch"
-                            name="block_users"
-                            <?php echo isset($company['block_by_incidents']) && $company['block_by_incidents'] > 0 ? 'checked' : ''; ?>>
-                        <label class="form-check-label ms-2" for="blockUsersSwitch">Bloquear usuarios con más de:
-                        </label>
-
-                        <div id="incidentsThresholdContainer" class="ms-2">
-                            <!-- El input se añadirá dinámicamente aquí -->
-                        </div>
-                    </div>
+        <div class="mt-8">
+            <div class="flex items-baseline">
+                <h3 class="text-xl font-semibold mb-3">Bloqueo por Incidencias</h3>
+                <button type="button" class="help ml-2" data-bs-toggle="popover" data-bs-trigger="focus"
+                    data-bs-title="Bloqueo por Incidencias"
+                    data-bs-content="Puedes configurar el sistema para bloquear automáticamente a usuarios que acumulen un número determinado de incidencias">
+                    <i class="fa fa-circle-question text-blue-500"></i>
+                </button>
+            </div>
+            <div class="flex items-center mb-4">
+                <input
+                    class="form-switch h-5 w-10 rounded-full bg-gray-300 checked:bg-blue-600 transition duration-200 ease-in-out"
+                    type="checkbox" role="switch" id="blockUsersSwitch" name="block_users"
+                    <?php echo isset($company['block_by_incidents']) && $company['block_by_incidents'] > 0 ? 'checked' : ''; ?>>
+                <label class="ml-2 text-gray-700" for="blockUsersSwitch">Bloquear usuarios con más de:</label>
+                <div id="incidentsThresholdContainer" class="ml-2">
+                    <!-- El input se añadirá dinámicamente aquí -->
                 </div>
             </div>
         </div>
         <!-- Fin configuración de bloqueo por incidencias -->
 
         <!-- Configuracion de color de formulario de reserva -->
-        <div class="container my-4">
-            <div class="row">
-                <div class="d-flex align-items-baseline">
-                    <h3 class="mb-3">Color del Formulario</h3>
-                    <a tabindex="0" role="button" data-bs-trigger="focus" class="btn help" data-bs-toggle="popover"
-                        data-bs-title="Color del Formulario"
-                        data-bs-content="Puedes personalizar los colores del formulario de reserva para que se ajusten a la identidad de tu empresa. Puedes ver en el cuadro un ejemplo interactivo de la personalización"><i
-                            class="fa fa-circle-question text-primary"></i></a>
-                </div>
-                <div class="col-md-6 mb-2 row">
-                    <div class="color-inputs d-flex">
-                        <div class="form-floating w-25">
-                            <input type="color" class="form-control" id="background-color" name="background-color"
-                                value="<?php echo $company['bg_color'] ?>" style="height: 70px">
-                            <label for="background-color">Fondo</label>
-                        </div>
-                        <div class="form-floating w-25">
-                            <input type="color" class="form-control" style="height: 70px" id="font-color"
-                                name="font-color" value="<?php echo $company['font_color'] ?>">
-                            <label for="font-color">Texto:</label>
-                        </div>
-                        <div class="form-floating w-25">
-                            <input type="color" class="form-control" style="height: 70px" id="btn-primary-color"
-                                name="btn-primary-color" value="<?php echo $company['btn1'] ?>">
-                            <label for="btn-primary-color">Btn Anterior:</label>
-                        </div>
-                        <div class="form-floating w-25">
-                            <input type="color" class="form-control" style="height: 70px" id="btn-secondary-color"
-                                name="btn-secondary-color" value="<?php echo $company['btn2'] ?>">
-                            <label for="btn-secondary-color">Btn Siguiente:</label>
-                        </div>
+        <div class="mt-8">
+            <div class="flex items-baseline">
+                <h3 class="text-xl font-semibold mb-3">Color del Formulario</h3>
+                <button type="button" class="help ml-2" data-bs-toggle="popover" data-bs-trigger="focus"
+                    data-bs-title="Color del Formulario"
+                    data-bs-content="Puedes personalizar los colores del formulario de reserva para que se ajusten a la identidad de tu empresa. Puedes ver en el cuadro un ejemplo interactivo de la personalización">
+                    <i class="fa fa-circle-question text-blue-500"></i>
+                </button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="color-inputs grid grid-cols-2 gap-4">
+                    <div class="relative">
+                        <label for="background-color"
+                            class="absolute -top-2 left-2 bg-white px-1 text-xs text-gray-600">Fondo</label>
+                        <input type="color" class="w-full h-16 border border-gray-300 rounded-md" id="background-color"
+                            name="background-color" value="<?php echo $company['bg_color'] ?>">
                     </div>
-                    <div class="align-content-end text-md-end">
-                        <button type="button" class="btn btn-primary mt-3" id="resetColors">Restablecer
-                            Colores</button>
+                    <div class="relative">
+                        <label for="font-color"
+                            class="absolute -top-2 left-2 bg-white px-1 text-xs text-gray-600">Texto:</label>
+                        <input type="color" class="w-full h-16 border border-gray-300 rounded-md" id="font-color"
+                            name="font-color" value="<?php echo $company['font_color'] ?>">
+                    </div>
+                    <div class="relative">
+                        <label for="btn-primary-color"
+                            class="absolute -top-2 left-2 bg-white px-1 text-xs text-gray-600">Btn Anterior:</label>
+                        <input type="color" class="w-full h-16 border border-gray-300 rounded-md" id="btn-primary-color"
+                            name="btn-primary-color" value="<?php echo $company['btn1'] ?>">
+                    </div>
+                    <div class="relative">
+                        <label for="btn-secondary-color"
+                            class="absolute -top-2 left-2 bg-white px-1 text-xs text-gray-600">Btn Siguiente:</label>
+                        <input type="color" class="w-full h-16 border border-gray-300 rounded-md"
+                            id="btn-secondary-color" name="btn-secondary-color" value="<?php echo $company['btn2'] ?>">
+                    </div>
+                    <div class="col-span-2">
+                        <button type="button"
+                            class="w-full md:w-auto px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                            id="resetColors">
+                            Restablecer Colores
+                        </button>
                     </div>
                 </div>
                 <!-- Ejemplo de vista de card con estilos seleccionados -->
-                <div class="col-md-6 example-card">
-                    <div class="card" id="example-card">
-                        <div class="card-body">
-                            <h2 class="card-title" id="card-title">Paso 1: Escoge el Servicio</h2>
-                            <div class="mb-3">
-                                <label for="service" class="form-label" id="card-text">Servicio:</label>
-                                <select id="service" name="service" class="form-select mb-4" disabled>
+                <div class="example-card">
+                    <div class="rounded-lg shadow-md p-6" id="example-card">
+                        <div>
+                            <h2 class="text-xl font-bold mb-4" id="card-title">Paso 1: Escoge el Servicio</h2>
+                            <div>
+                                <label for="service" class="block text-sm font-medium mb-1"
+                                    id="card-text">Servicio:</label>
+                                <select id="service" name="service"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm mb-4" disabled>
                                     <option value="" selected>Selecciona un servicio</option>
-
                                 </select>
-                                <button type=" button" class="btn btn-secondary"
-                                    id="btn-primary-example">Anterior</button>
-                                <button type="button" class="btn btn-primary"
-                                    id="btn-secondary-example">Siguiente</button>
+                                <div class="flex space-x-2">
+                                    <button type="button" class="px-4 py-2 rounded-md"
+                                        id="btn-primary-example">Anterior</button>
+                                    <button type="button" class="px-4 py-2 rounded-md"
+                                        id="btn-secondary-example">Siguiente</button>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="d-flex align-items-baseline">
-            <h3 class="mb-3">URL Formulario de Reserva</h3>
-            <a tabindex="0" role="button" data-bs-trigger="focus" class="btn help" data-bs-toggle="popover"
+
+        <div class="flex items-baseline mt-8">
+            <h3 class="text-xl font-semibold mb-3">URL Formulario de Reserva</h3>
+            <button type="button" class="help ml-2" data-bs-toggle="popover" data-bs-trigger="focus"
                 data-bs-title="URL Formulario de Reserva"
-                data-bs-content="Esta es la URL que debes compartir con tus clientes para que puedan hacer reservas en tu empresa. También podrás usarla para crear el botón de reservas de tu pagina web o red social"><i
-                    class="fa fa-circle-question text-primary"></i></a>
+                data-bs-content="Esta es la URL que debes compartir con tus clientes para que puedan hacer reservas en tu empresa. También podrás usarla para crear el botón de reservas de tu pagina web o red social">
+                <i class="fa fa-circle-question text-blue-500"></i>
+            </button>
         </div>
-        <div class="input-group mb-3">
-            <input type="text" class="form-control" id="urlToCopy"
-                value="<?php echo $baseUrl . 'reservas/' . $company['custom_url']; ?>" readonly>
-            <button class="btn btn-outline-secondary copyToClipboard" type="button">Copiar URL</button>
+        <div class="flex mb-6">
+            <input type="text"
+                class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                id="urlToCopy" value="<?php echo $baseUrl . 'reservas/' . $company['custom_url']; ?>" readonly>
+            <button
+                class="px-4 py-2 bg-gray-200 text-gray-700 border border-l-0 border-gray-300 rounded-r-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 copyToClipboard"
+                type="button">
+                Copiar URL
+            </button>
         </div>
-        <button type="submit" class="btn btn-success">Guardar Configuración</button>
+        <button type="submit"
+            class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+            Guardar Configuración
+        </button>
     </form>
     <?php
     include dirname(__DIR__, 2) . '/includes/modal-nuevo-periodo.php';
-    include dirname(__DIR__, 2) . '/includes/modal-configuraciones.php';
+    include dirname(__DIR__, 2) . '/includes/modal-info.php';
     ?>
 </div>

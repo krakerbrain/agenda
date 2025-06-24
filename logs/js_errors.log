@@ -1,2 +1,6 @@
-[2025-06-13 03:36:08] Page: integrations | Error: Failed to fetch dynamically imported module: http://localhost/agenda/assets/js/integrations.js?v=1749778558 | Stack: TypeError: Failed to fetch dynamically imported module: http://localhost/agenda/assets/js/integrations.js?v=1749778558 | URL: http://localhost/agenda/user_admin/index.php | UserAgent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36
-[2025-06-13 03:36:14] Page: integrations | Error: Failed to fetch dynamically imported module: http://localhost/agenda/assets/js/integrations.js?v=1749778558 | Stack: TypeError: Failed to fetch dynamically imported module: http://localhost/agenda/assets/js/integrations.js?v=1749778558 | URL: http://localhost/agenda/user_admin/index.php | UserAgent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36
+[2025-06-24 03:09:48] Page: addUser | Error: bootstrap is not defined | Stack: ReferenceError: bootstrap is not defined
+    at http://localhost/agenda/assets/js/addUser.js?v=1750127624:302:73
+    at Array.map (<anonymous>)
+    at Module.init (http://localhost/agenda/assets/js/addUser.js?v=1750127624:302:47)
+    at ContentLoader.loadModule (http://localhost/agenda/assets/js/navigation/ContentLoader.js:92:59)
+    at async ContentLoader.load (http://localhost/agenda/assets/js/navigation/ContentLoader.js:45:7) | URL: http://localhost/agenda/user_admin/index.php | UserAgent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36

@@ -73,15 +73,15 @@ async function loadAppointments(status, page = 1) {
   }
 }
 
-function getActionButtons(status, id) {
+function getActionButtons(status, id_appointment) {
   let buttons = "";
-  const confirmId = `confirmarBtn${id}`;
-  const deleteId = `eliminarBtn${id}`;
+  const confirmId = `confirmarBtn${id_appointment}`;
+  const deleteId = `eliminarBtn${id_appointment}`;
   // Botón de confirmar (solo para citas pendientes)
   if (status === 0) {
     buttons += `
       <div id="${confirmId}" class="action-btn-container inline-block">
-        <button class="fa-solid fa-square-check action-icon text-green-800 confirm" title="Confirmar reserva" data-id="${id}">
+        <button class="fa-solid fa-square-check action-icon text-green-800 confirm" title="Confirmar reserva" data-id="${id_appointment}">
           <span class="button-text">CONFIRMAR</span>
         </button>
       </div>
@@ -90,7 +90,7 @@ function getActionButtons(status, id) {
   // Botón de eliminar (siempre visible)
   buttons += `
     <div id="${deleteId}" class="action-btn-container inline-block">
-      <button class="fas fa-trash-alt action-icon text-red-500 eliminarReserva" title="Eliminar reserva" data-id="${id}">
+      <button class="fas fa-trash-alt action-icon text-red-500 eliminarReserva" title="Eliminar reserva" data-id="${id_appointment}">
         <span class="button-text">ELIMINAR</span>
       </button>
     </div>`;
