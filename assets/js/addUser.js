@@ -26,52 +26,49 @@ export function init() {
       const userPhoto = user.url_pic || "assets/img/empty_user.png";
 
       usersContainer.innerHTML += `
-        <div class="col-12 mb-4">
-            <div class="card shadow-sm">
-                <div class="row g-0">
-                    <!-- Foto -->
-                    <div class="col-md-2 d-flex align-items-center justify-content-center p-3 bg-light">
-                        <img src="${baseUrl}${userPhoto}" class="img-fluid rounded-circle" style="width: 80px; height: 80px; object-fit: cover;" alt="User photo">
-                    </div>
-                    
-                    <!-- Datos -->
-                    <div class="col-md-10">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div>
-                                    <h5 class="card-title mb-1">${user.name}</h5>
-                                    <p class="text-muted small mb-1">
-                                        <i class="fas fa-envelope me-2"></i>${user.email}
-                                    </p>
-                                    <p class="text-muted small">
-                                        <i class="fas fa-user-tag me-2"></i>${user.role_type}
-                                    </p>
-                                </div>
-                                <div>
-                                    <button class="btn btn-sm btn-outline-primary edit-user me-2" data-id="${user.id}">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-danger remove-user" data-id="${user.id}">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            ${
-                              user.description
-                                ? `
-                            <div class="mt-2 pt-2 border-top">
-                                <p class="card-text">${user.description}</p>
-                            </div>
-                            `
-                                : ""
-                            }
-                        </div>
-                    </div>
+      <div class="w-full">
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+          <div class="flex flex-col sm:flex-row">
+<div class="flex-shrink-0 basis-28 sm:basis-32 flex justify-center items-center bg-gray-100 p-4">
+  <img src="${baseUrl}${userPhoto}" alt="User photo"
+    class="w-20 h-20 rounded-full object-cover border" />
+</div>
+
+
+            <!-- Datos -->
+            <div class="flex-1 p-4">
+              <div class="flex sm:flex-row justify-between sm:items-start">
+                <div>
+                  <h5 class="text-lg font-semibold text-gray-800">${user.name}</h5>
+                  <p class="text-sm text-gray-500 mt-1">
+                    <i class="fas fa-envelope mr-2 text-gray-400"></i>${user.email}
+                  </p>
+                  <p class="text-sm text-gray-500 mt-1">
+                    <i class="fas fa-user-tag mr-2 text-gray-400"></i>${user.role_type}
+                  </p>
                 </div>
+                <div class="mt-3 sm:mt-0 flex gap-2">
+                  <button class="text-blue-600 hover:text-blue-800 transition edit-user" title="Editar" data-id="${user.id}">
+                    <i class="fas fa-edit text-lg"></i>
+                  </button>
+                  <button class="text-red-600 hover:text-red-800 transition remove-user" title="Eliminar" data-id="${user.id}">
+                    <i class="fas fa-trash-alt text-lg"></i>
+                  </button>
+                </div>
+              </div>
+
+              ${
+                user.description
+                  ? `<div class="mt-4 border-t pt-3">
+                      <p class="text-sm text-gray-700">${user.description}</p>
+                    </div>`
+                  : ""
+              }
             </div>
+          </div>
         </div>
-        `;
+      </div>
+    `;
     });
 
     // Event listeners para botones
@@ -110,68 +107,77 @@ export function init() {
     }
   }
 
+  // Cachear elementos del DOM que se usan frecuentemente
+  const userForm = document.getElementById("addUserForm");
+  const profilePreview = userForm.querySelector("#profilePreview");
+  const usernameInput = userForm.querySelector("#username");
+  const emailInput = userForm.querySelector("#correo");
+  const descriptionInput = userForm.querySelector("#descripcion");
+  const userIdInput = userForm.querySelector("#user_id");
+  const roleSelect = document.getElementById("role_id");
+  const passwordGroup = document.querySelector(".passwordGroup");
+  const passwordConfirmGroup = document.querySelector(".passwordConfirmGroup");
+  const roleGroup = document.querySelector("#roleGroup");
+  const cancelEditBtn = document.getElementById("cancelEdit");
+  const submitButtonText = document.querySelector(".button-text-spinner");
+  // Función para cargar usuario
   async function loadUserForEdit(userId) {
     try {
       const response = await fetch(`${baseUrl}user_admin/controllers/users.php?id=${userId}&action=getUserForEdit`, {
         method: "GET",
       });
 
-      const { success, data } = await response.json();
+      const { success, data: user } = await response.json();
 
-      if (success) {
-        const user = data;
-        const userForm = document.getElementById("addUserForm");
-        const profileImg = user.url_pic || "assets/img/empty_user.png";
-        userForm.querySelector("#profilePreview").src = `${baseUrl}${profileImg}`;
-        userForm.querySelector("#username").value = user.name;
-        userForm.querySelector("#correo").value = user.email;
-        document.querySelector("#passwordGroup").classList.add("d-none");
-        document.querySelector("#confirmPasswordGroup").classList.add("d-none");
-        userForm.querySelector("#descripcion").value = user.description || "";
-        userForm.querySelector("#user_id").value = user.id;
-        userForm.querySelector("#role_id").value = user.role_id;
-        document.querySelector("#roleGroup").classList.remove("d-none");
-        const roleSelect = document.getElementById("role_id");
-        if (roleSelect) {
-          for (let i = 0; i < roleSelect.options.length; i++) {
-            if (roleSelect.options[i].value == user.role_id) {
-              roleSelect.selectedIndex = i;
-              break;
-            }
-          }
-        }
-        if (user.role_id == 2) {
-          document.querySelector("#roleGroup").classList.add("d-none");
-        }
-        // Cambiar el texto del botón
-        document.getElementById("addUser").querySelector(".button-text-spinner").textContent = "Actualizar Usuario";
+      if (!success) throw new Error("No se pudo cargar el usuario");
 
-        // Mostrar botón de cancelar
-        document.getElementById("cancelEdit").classList.remove("d-none");
+      // Actualizar UI con los datos del usuario
+      updateUserForm(user);
 
-        // Desplazar al formulario
-        document.getElementById("addUserForm").scrollIntoView({ behavior: "smooth" });
-      }
+      // Cambiar texto del botón y mostrar cancelar
+      submitButtonText.textContent = "Actualizar Usuario";
+      cancelEditBtn.classList.remove("hidden");
+
+      // Desplazar al formulario
+      userForm.scrollIntoView({ behavior: "smooth" });
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Error al cargar usuario:", error);
       alert("Error al cargar usuario para edición");
     }
   }
 
-  document.getElementById("cancelEdit").addEventListener("click", function () {
-    resetUserForm();
-  });
+  // Función para actualizar el formulario con datos del usuario
+  function updateUserForm(user) {
+    profilePreview.src = `${baseUrl}${user.url_pic || "assets/img/empty_user.png"}`;
+    usernameInput.value = user.name;
+    emailInput.value = user.email;
+    descriptionInput.value = user.description || "";
+    userIdInput.value = user.id;
 
-  function resetUserForm() {
-    document.getElementById("addUserForm").reset();
-    document.getElementById("user_id").value = "";
-    document.querySelector("#profilePreview").src = `${baseUrl}assets/img/empty_user.png`;
-    document.querySelector("#passwordGroup").classList.remove("d-none");
-    document.querySelector("#confirmPasswordGroup").classList.remove("d-none");
-    document.getElementById("addUser").querySelector(".button-text-spinner").textContent = "Agregar Usuario";
-    document.getElementById("cancelEdit").classList.add("d-none");
-    // También puedes limpiar la previsualización de la foto si es necesario
+    // Manejar roles
+    if (roleSelect) {
+      roleSelect.value = user.role_id;
+      roleGroup.classList.toggle("hidden", user.role_id == 2);
+    }
+
+    // Ocultar campos de contraseña
+    passwordGroup.classList.add("hidden");
+    passwordConfirmGroup.classList.add("hidden");
   }
+
+  // Función para resetear el formulario
+  function resetUserForm() {
+    userForm.reset();
+    userIdInput.value = "";
+    profilePreview.src = `${baseUrl}assets/img/empty_user.png`;
+    passwordGroup.classList.remove("hidden");
+    passwordConfirmGroup.classList.remove("hidden");
+    submitButtonText.textContent = "Agregar Usuario";
+    cancelEditBtn.classList.add("hidden");
+  }
+
+  // Event listener
+  cancelEditBtn.addEventListener("click", resetUserForm);
 
   async function deleteUser(id) {
     try {
@@ -298,14 +304,14 @@ export function init() {
       reader.readAsDataURL(file);
     }
   });
-  const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
-  const popoverList = [...popoverTriggerList].map((popoverTriggerEl) => new bootstrap.Popover(popoverTriggerEl));
+  // const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
+  // const popoverList = [...popoverTriggerList].map((popoverTriggerEl) => new bootstrap.Popover(popoverTriggerEl));
 }
 function handleInfoModal(title = null, message = null) {
   let titulo = document.getElementById("infoModalLabel");
   let mensaje = document.getElementById("infoModalMessage");
   titulo.textContent = title;
   mensaje.textContent = message;
-  const modal = new bootstrap.Modal(document.getElementById("infoModal"));
+  // const modal = new bootstrap.Modal(document.getElementById("infoModal"));
   modal.show();
 }
