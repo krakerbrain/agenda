@@ -91,11 +91,9 @@ class EmailTemplate
     public function buildEmail($data, $templateType)
     {
         try {
-            // Cargar datos
             $companyData = $this->dataLoader->getCompanyData($data['company_id'], $templateType);
             $serviceData = $this->dataLoader->getServiceData($data['id_service']);
 
-            // Construir cuerpo del correo
             $placeholders = [
                 '{nombre_cliente}' => $data['customer_name'],
                 '{fecha_reserva}' => date('d/m/Y', strtotime($data['date'])),
@@ -107,22 +105,48 @@ class EmailTemplate
             ];
 
             $body = $this->emailBuilder->buildTemplate($templateType, $placeholders);
-
-            // Enviar correo
             $subject = $this->buildSubject($templateType, $data['date']);
 
-            if ($templateType == 'reserva') {
+            // Envío al cliente
+            $this->emailSender->sendEmail(
+                $data['customer_mail'],
+                [
+                    'subject' => $subject,
+                    'body' => $body,
+                    'company_name' => $companyData['name']
+                ],
+                ucfirst($templateType)
+            );
+
+            // Si es tipo 'reserva', enviar alerta normal
+            if ($templateType === 'reserva') {
                 $alertEmailContent = $this->buildAppointmentAlert($data, $companyData, $serviceData);
                 $alertSubject = $alertEmailContent['subject'];
                 $this->emailSender->sendEmail($alertSubject, $alertEmailContent, null);
             }
-            $success = $this->emailSender->sendEmail($data['customer_mail'], ['subject' => $subject, 'body' => $body, 'company_name' => $companyData['name']], ucfirst($templateType));
 
-            return ['success' => $success, 'company_name' => $companyData['name'], 'social_token' => $companyData['social_token']];
+            return ['success' => true, 'company_name' => $companyData['name'], 'social_token' => $companyData['social_token']];
         } catch (Exception $e) {
+            // Si falla el correo al cliente, enviamos alerta de error
+            if ($templateType === 'reserva') {
+                try {
+                    $companyData = $this->dataLoader->getCompanyData($data['company_id'], $templateType);
+                    $serviceData = $this->dataLoader->getServiceData($data['id_service']);
+                    $alert = $this->buildFailedDeliveryAlert($data, $companyData, $serviceData);
+                    $this->emailSender->sendEmail($alert['to'], [
+                        'subject' => $alert['subject'],
+                        'body' => $alert['body'],
+                        'company_name' => $companyData['name']
+                    ], 'Alerta');
+                } catch (Exception $e2) {
+                    error_log("ERROR: No se pudo enviar alerta de error al dueño: " . $e2->getMessage());
+                }
+            }
+
             throw new Exception("Error al construir/enviar correo: " . $e->getMessage());
         }
     }
+
 
     private function buildSubject($templateType, $date)
     {
@@ -174,6 +198,36 @@ class EmailTemplate
             return ['error' => $e->getMessage()];
         }
     }
+
+    public function buildFailedDeliveryAlert($data, $companyData, $serviceData)
+    {
+        try {
+            $userData = $this->dataLoader->getUserData($data['company_id']);
+
+            $placeholders = [
+                '{nombre_cliente}' => $data['customer_name'],
+                '{fecha}' => date('d/m/Y', strtotime($data['date'])),
+                '{hora}' => date('h:i a', strtotime($data['start_time'])),
+                '{nombre_servicio}' => $serviceData['name'],
+                '{telefono_cliente}' => $data['customer_phone'],
+                '{ruta_logo}' => $companyData['logo'],
+                '{nombre_usuario}' => $userData['name'],
+                '{mensaje_error}' => 'Hubo un error al enviar el correo de confirmación al cliente.'
+            ];
+
+            $alertBody = $this->emailBuilder->buildTemplate('error_envio_cliente', $placeholders);
+
+            return [
+                'subject' => '⚠️ Reserva recibida, pero hubo un error',
+                'body' => $alertBody,
+                'to' => $userData['email']
+            ];
+        } catch (Exception $e) {
+            error_log("Error al construir correo de alerta por fallo: " . $e->getMessage());
+            return ['error' => $e->getMessage()];
+        }
+    }
+
 
     public function buildInscriptionAlert($mail)
     {

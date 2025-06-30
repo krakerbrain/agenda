@@ -34,6 +34,14 @@ try {
         }
     }
 
+    // Validar el correo electrónico
+    $emailValidation = validateEmail($data['mail']);
+    if (!$emailValidation['valid']) {
+        echo json_encode(['success' => false, 'message' => $emailValidation['message']]);
+        http_response_code(400); // Bad Request
+        exit;
+    }
+
     // Convertir la duración del servicio a un número entero
     $serviceDuration = (int) $data['service_duration'];
 
@@ -140,4 +148,71 @@ function formatPhoneNumber($telefono)
 
     // Si el número no es válido, lanzar una excepción
     throw new Exception('Número de teléfono inválido.');
+}
+
+/**
+ * Valida una dirección de correo electrónico
+ * 
+ * @param string $email Dirección de correo a validar
+ * @return array Retorna un array con 'valid' (bool) y 'message' (string)
+ */
+function validateEmail($email)
+{
+    // 1. Comprobar que no esté vacío
+    if (empty($email)) {
+        return ['valid' => false, 'message' => 'El correo electrónico no puede estar vacío'];
+    }
+
+    // 2. Validar formato básico con filter_var
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        return ['valid' => false, 'message' => 'El formato del correo electrónico no es válido'];
+    }
+
+    // 3. Dividir en usuario y dominio
+    $parts = explode('@', $email);
+    if (count($parts) !== 2) {
+        return ['valid' => false, 'message' => 'El correo debe contener exactamente un @'];
+    }
+
+    $user = $parts[0];
+    $domain = $parts[1];
+
+    // 4. Validar longitud de usuario y dominio
+    if (strlen($user) > 64) {
+        return ['valid' => false, 'message' => 'La parte antes del @ es demasiado larga (máx. 64 caracteres)'];
+    }
+
+    if (strlen($domain) > 255) {
+        return ['valid' => false, 'message' => 'La parte después del @ es demasiado larga (máx. 255 caracteres)'];
+    }
+
+    // 5. Validar caracteres permitidos en el dominio
+    if (!preg_match('/^[a-zA-Z0-9\-\.]+$/', $domain)) {
+        return ['valid' => false, 'message' => 'El dominio contiene caracteres no permitidos'];
+    }
+
+    // 6. Validar que el dominio tenga al menos un punto
+    if (strpos($domain, '.') === false) {
+        return ['valid' => false, 'message' => 'El dominio debe contener al menos un punto (ej: gmail.com)'];
+    }
+
+    // 7. Validar que no empiece o termine con punto o guión
+    if (preg_match('/^\.|\.$|^-|-$/', $domain)) {
+        return ['valid' => false, 'message' => 'El dominio no puede empezar o terminar con punto o guión'];
+    }
+
+    // 8. Validar que no tenga puntos consecutivos
+    if (strpos($domain, '..') !== false) {
+        return ['valid' => false, 'message' => 'El dominio no puede tener puntos consecutivos'];
+    }
+
+    // 9. Validar extensión de dominio (al menos 2 caracteres)
+    $domainParts = explode('.', $domain);
+    $tld = end($domainParts);
+    if (strlen($tld) < 2) {
+        return ['valid' => false, 'message' => 'La extensión del dominio debe tener al menos 2 caracteres como .com, .cl, etc.'];
+    }
+
+    // Si pasa todas las validaciones
+    return ['valid' => true, 'message' => 'Correo electrónico válido'];
 }

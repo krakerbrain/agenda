@@ -37,17 +37,17 @@ class NotificationLog
         $this->db->execute();
     }
 
-    public function getAllLogsForAppointment($appointmentId)
+    public function getPendingLogsForAppointment($appointmentId)
     {
-
         try {
             $sql = "SELECT * FROM notifications_log 
-            WHERE appointment_id = :appointment_id";
+                WHERE appointment_id = :appointment_id 
+                AND status NOT IN ('sent', 'failed_permanent')";
             $this->db->query($sql);
             $this->db->bind(':appointment_id', $appointmentId);
             return $this->db->resultSet();
         } catch (Exception $e) {
-            throw new Exception("Error al logs para citas: " . $e->getMessage());
+            throw new Exception("Error al recuperar logs pendientes para cita: " . $e->getMessage());
         }
     }
 

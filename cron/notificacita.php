@@ -34,7 +34,7 @@ try {
                 }
             }
 
-            $existingLogs = $notificationLog->getAllLogsForAppointment($appointment['id']);
+            $existingLogs = $notificationLog->getPendingLogsForAppointment($appointment['id']);
 
             // Inicializar estados 
             $wspStatus = 'pending';
@@ -64,9 +64,11 @@ try {
                 }
             }
 
-            // Solo enviar si los estados no son 'sent'
-            $shouldSendWsp = ($wspStatus !== 'sent');
-            $shouldSendEmail = ($emailStatus !== 'sent');
+
+            // Solo enviar si no ha sido enviado y no ha fallado permanentemente
+            $shouldSendWsp = ($wspStatus !== 'sent' && $wspStatus !== 'failed_permanent' && $wspAttempts < 3);
+            $shouldSendEmail = ($emailStatus !== 'sent' && $emailStatus !== 'failed_permanent' && $emailAttempts < 3);
+
 
             if ($shouldSendWsp && $whatsappEnabled) {
                 try {
@@ -129,11 +131,16 @@ try {
 
 function handleNotificationRegister($notificationLog, $appointment_id, $method, $notificationId, $status, $attempts, $type)
 {
+    $newAttempts = $attempts + 1;
+    // Si el nuevo intento llega a 3 y no es éxito, marcar como failed_permanent
+    if ($status !== 'sent' && $newAttempts >= 3) {
+        $status = 'failed_permanent';
+    }
     // Actualizar o crear registro de email
     if ($notificationId) {
         $notificationLog->update($notificationId, [
             'status' => $status,
-            'attempts' => $attempts + 1,
+            'attempts' => $newAttempts,
             'last_attempt' => date('Y-m-d H:i:s'),
         ]);
     } else {
