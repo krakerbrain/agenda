@@ -430,6 +430,16 @@ document.getElementById("appointmentForm").addEventListener("submit", function (
   document.querySelectorAll(".customer-field").forEach((field) => {
     field.disabled = false;
   });
+
+  const emailInput = document.getElementById("mail");
+  const email = emailInput.value;
+
+  if (!isValidEmail(email)) {
+    handleModal("Error", "Por favor ingresa un correo válido (debe incluir un dominio como .com, .cl, etc.)");
+    emailInput.focus();
+    return; // Detiene el flujo
+  }
+
   const form = document.querySelector("#appointmentForm"); // Selecciona un formulario del DOM
   const formData = new FormData(form);
   const scheduleMode = document.getElementById("schedule_mode").value;
@@ -477,9 +487,16 @@ function showConfirmationModal(formData) {
     sendAppointment(formData); // Enviar la reserva
   };
   document.getElementById("cancelReservation").onclick = function () {
-    document.querySelectorAll(".customer-field").forEach((field) => {
-      field.disabled = true;
-    });
+    const editCheckbox = document.getElementById("editCustomer");
+
+    // Si existe el checkbox (es decir, hay datos de cliente)
+    // y NO está marcado, volver a bloquear los campos
+    if (editCheckbox && !editCheckbox.checked) {
+      document.querySelectorAll(".customer-field").forEach((field) => {
+        field.disabled = true;
+      });
+    }
+    // Si no hay checkbox o sí está marcado, no hacemos nada (dejamos campos editables)
   };
 }
 
@@ -572,6 +589,12 @@ async function sendAppointment(formData) {
     buttonText.textContent = "Reservar";
     reservarBtn.disabled = false;
   }
+}
+
+function isValidEmail(email) {
+  // Expresión más estricta: asegura que tenga @ y dominio con punto
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return re.test(email);
 }
 function handleModal(title, message, reload = false) {
   const modal = new bootstrap.Modal(document.getElementById("responseModal")); // Obtener el modal
