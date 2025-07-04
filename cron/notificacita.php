@@ -34,7 +34,7 @@ try {
                 }
             }
 
-            $existingLogs = $notificationLog->getPendingLogsForAppointment($appointment['id']);
+            $existingLogs = $notificationLog->getAllLogsForAppointment($appointment['id']);
 
             // Inicializar estados 
             $wspStatus = 'pending';
