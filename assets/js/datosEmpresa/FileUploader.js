@@ -3,24 +3,16 @@ export class FileUploader {
     this.uploadUrl = uploadUrl;
   }
 
-  async upload(file, extraData = {}, fileName = null) {
-    const formData = new FormData();
-    formData.append("file", file, fileName ?? file.name);
+  async upload(data) {
+    // Si es una instancia de FormData, úsala tal cual
+    const formData = data instanceof FormData ? data : new FormData();
 
-    for (const key in extraData) {
-      formData.append(key, extraData[key]);
-    }
-
-    try {
-      const response = await fetch(this.uploadUrl, {
-        method: "POST",
-        body: formData,
-      });
-      return await response.json();
-    } catch (err) {
-      console.error("Error al subir archivo:", err);
-      return { success: false, error: "Error de red" };
-    }
+    return fetch(this.uploadUrl, {
+      method: "POST",
+      body: formData,
+    })
+      .then((res) => res.json())
+      .catch((err) => ({ success: false, error: err.message }));
   }
 
   validateFile(file, acceptedTypes = [], maxSizeMB = 2) {

@@ -17,19 +17,25 @@ $media = $redesSociales->getSocialForDatosEmpresa();
     <form id="datosEmpresaForm" action="" method="POST" class="space-y-6">
         <input type="hidden" name="logo_url" id="logoUrl" value="">
         <input type="hidden" name="company_id" id="companyId" value="<?php echo $company_id ?>">
-        <input type="hidden" name="company_name" id="companyName" value="">
+        <input type="hidden" name="company_name" id="companyName" value=" ">
         <h4 class="companyName text-2xl font-bold mb-4"></h4>
         <div class="mb-6">
             <div class="mb-2">
-                <img src="" alt="Logo de la Empresa" class="w-32 h-32 object-contain rounded mx-auto logoEmpresa">
+                <img src="" alt="Logo de la Empresa" class="w-32 h-32 object-contain rounded mx-auto" id="preview-logo">
             </div>
-            <div>
-                <label for="logo" class="block text-base font-semibold mb-1">Cambiar Logo</label>
-                <input type="file"
-                    class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200"
-                    id="logo" name="logo">
+
+            <label class="block text-base font-semibold mb-1">Cambiar Logo</label>
+
+            <div id="logoDropzone"
+                class="flex items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition">
+                <p class="text-sm text-gray-500 text-center">
+                    Arrastra aquí el logo o <span class="text-blue-600 underline">haz clic para subir</span>
+                </p>
             </div>
+
+            <input type="file" id="logo" name="logo" class="hidden" accept="image/*">
         </div>
+
         <div class="mb-6">
             <label for="banner" class="block text-base font-semibold mb-1">Subir Banner</label>
             <input type="file"

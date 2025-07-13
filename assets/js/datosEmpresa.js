@@ -15,6 +15,65 @@ export function init() {
   companyManager.load();
   socialManager.load();
 
+  // Manejo del logo drag-and-drop y clic
+  const logoDropzone = document.getElementById("logoDropzone");
+  const logoInput = document.getElementById("logo");
+
+  logoDropzone.addEventListener("click", () => {
+    logoInput.click();
+  });
+
+  logoDropzone.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    logoDropzone.classList.add("bg-gray-200");
+  });
+
+  logoDropzone.addEventListener("dragleave", () => {
+    logoDropzone.classList.remove("bg-gray-200");
+  });
+
+  logoDropzone.addEventListener("drop", async (e) => {
+    e.preventDefault();
+    logoDropzone.classList.remove("bg-gray-200");
+
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith("image/")) {
+      logoInput.files = e.dataTransfer.files;
+      await handleLogoUpload(file, uploader);
+    }
+  });
+
+  logoInput.addEventListener("change", async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      await handleLogoUpload(file, uploader);
+    }
+  });
+
+  async function handleLogoUpload(file, uploader) {
+    // Previsualización inmediata
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      document.getElementById("preview-logo").src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+
+    // Construir FormData manualmente
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("tipo", "logo");
+    formData.append("companyId", document.getElementById("companyId").value);
+    formData.append("nombreEmpresa", document.getElementById("companyName").value || "empresa");
+
+    const result = await uploader.upload(formData);
+
+    if (result.success) {
+      document.getElementById("preview-logo").src = `${baseUrl}${result.imageUrl}`;
+    } else {
+      alert(result.error || "Error al subir logo.");
+    }
+  }
+
   // Guardar empresa
   companyForm.addEventListener("submit", async (e) => {
     e.preventDefault();

@@ -1,6 +1,6 @@
 <?php
-require_once dirname(__DIR__, 2) . '/configs/init.php';
-require_once dirname(__DIR__, 2) . '/classes/FileManager.php';
+require_once dirname(__DIR__, 3) . '/configs/init.php';
+require_once dirname(__DIR__, 3) . '/classes/FileManager.php';
 
 header('Content-Type: application/json');
 

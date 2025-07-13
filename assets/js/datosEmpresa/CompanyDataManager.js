@@ -20,6 +20,8 @@ export class CompanyDataManager {
     this.form.querySelector("#phone").value = data.phone;
     this.form.querySelector("#address").value = data.address;
     this.form.querySelector("#description").textContent = data.description;
+    // debugger;
+    this.form.querySelector("#preview-logo").src = `${baseUrl}${data.logo}`;
     // otros campos...
   }
 

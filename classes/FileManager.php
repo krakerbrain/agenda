@@ -15,12 +15,12 @@ class FileManager
 
     public function uploadLogo($name, $company_id)
     {
-        return $this->uploadImage($_FILES['logo'], $company_id, 'logo', $name);
+        return $this->uploadImage($_FILES['file'], $company_id, 'logo', $name);
     }
 
     public function uploadBanner($company_id)
     {
-        return $this->uploadImage($_FILES['banner'], $company_id, 'banner');
+        return $this->uploadImage($_FILES['file'], $company_id, 'banner');
     }
 
     public function uploadProfilePicture($file, $company_id, $username, $user_id = null)
