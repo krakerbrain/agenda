@@ -3,7 +3,8 @@ require_once dirname(__DIR__) . '/configs/init.php';
 require_once dirname(__DIR__) . '/classes/Appointments.php';
 require_once dirname(__DIR__) . '/classes/EmailTemplate.php';
 require_once dirname(__DIR__) . '/classes/NotificationLog.php';
-require_once dirname(__DIR__) . '/user_admin/send_wsp.php';
+// require_once dirname(__DIR__) . '/user_admin/send_wsp.php';
+require_once dirname(__DIR__) . '/user_admin/send_wsp_twilio.php';
 require_once dirname(__DIR__) . '/classes/IntegrationManager.php';
 
 // Crear instancias de las clases necesarias
@@ -72,7 +73,7 @@ try {
 
             if ($shouldSendWsp && $whatsappEnabled) {
                 try {
-                    $templateName = $type === 'reserva' ? 'registro_reserva' : 'confirmar_reserva';
+                    $templateName = $type === 'reserva' ? 'aviso_reserva' : 'aviso_confirmacion';
                     $wspStatusCode = sendWspReserva(
                         $templateName,
                         $appointment['customer_phone'],
