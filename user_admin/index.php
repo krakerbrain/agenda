@@ -200,7 +200,7 @@ include dirname(__DIR__) . '/partials/head.php';
     <script src="<?php echo $baseUrl; ?>assets/vendors/js/flatpickr/es.js"></script>
     <!-- JavaScript de Cropper.js -->
     <script src="<?php echo $baseUrl; ?>assets/vendors/js/jquery/cropperjs/cropper.min.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
 
 
     <script type="module"

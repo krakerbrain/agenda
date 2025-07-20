@@ -21,8 +21,20 @@ try {
     $companyId = (int)$_POST['companyId'];
     $tipo = $_POST['tipo'] ?? 'banner';
 
-    if (!isset($_FILES['file'])) {
-        throw new Exception("Archivo no encontrado.");
+    // Determinar el nombre del campo de archivo esperado
+    $fileField = match ($tipo) {
+        'logo' => 'logo',
+        'banner' => 'banner',
+        'user_photo' => 'user_photo',
+        default => 'file' // Por defecto
+    };
+
+    if (!isset($_FILES[$fileField])) {
+        // Si no encuentra el campo específico, intenta con 'file' como fallback
+        if (!isset($_FILES['file'])) {
+            throw new Exception("No se recibió ningún archivo.");
+        }
+        $fileField = 'file'; // Usar el fallback
     }
 
     $fileManager = new FileManager();

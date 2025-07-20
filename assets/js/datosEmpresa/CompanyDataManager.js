@@ -16,12 +16,16 @@ export class CompanyDataManager {
   }
 
   populateForm(data) {
+    console.log("Datos de la empresa:", data);
     this.form.querySelector("#companyName").value = data.name;
     this.form.querySelector("#phone").value = data.phone;
     this.form.querySelector("#address").value = data.address;
     this.form.querySelector("#description").textContent = data.description;
     // debugger;
     this.form.querySelector("#preview-logo").src = `${baseUrl}${data.logo}`;
+    this.form.querySelector("#logoUrl").value = `${data.logo}`;
+    this.form.querySelector("#bannerUrl").value = `${data.selected_banner}`;
+    this.form.querySelector("#current-banner").src = `${baseUrl}${data.selected_banner}`;
     // otros campos...
   }
 

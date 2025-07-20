@@ -1,10 +1,12 @@
+// src/js/datosEmpresa/ImageCropper.js
 export class ImageCropper {
-  constructor(imageElement, previewElement, config = {}) {
+  constructor(imageElement, config = {}) {
     this.imageElement = imageElement;
-    this.previewElement = previewElement;
     this.cropper = null;
     this.config = {
-      aspectRatio: 4 / 1,
+      viewMode: 1,
+      autoCropArea: 1,
+      zoomable: true,
       ...config,
     };
   }
@@ -12,17 +14,7 @@ export class ImageCropper {
   init(src) {
     this.imageElement.src = src;
     if (this.cropper) this.cropper.destroy();
-
-    this.cropper = new Cropper(this.imageElement, {
-      viewMode: 1,
-      autoCropArea: 1,
-      zoomable: true,
-      ...this.config,
-      crop: () => {
-        const canvas = this.getCanvas();
-        this.previewElement.src = canvas.toDataURL();
-      },
-    });
+    this.cropper = new Cropper(this.imageElement, this.config);
   }
 
   getCanvas(width = 600, height = 150) {
@@ -40,6 +32,5 @@ export class ImageCropper {
     if (this.cropper) this.cropper.destroy();
     this.cropper = null;
     this.imageElement.src = "#";
-    this.previewElement.src = "#";
   }
 }

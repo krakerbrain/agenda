@@ -9,29 +9,36 @@ $baseUrl = ConfigUrl::get();
 $auth = new JWTAuth();
 $datosUsuario = $auth->validarTokenUsuario();
 
-
 try {
     $company_id = $datosUsuario['company_id'];
     $socials = new RedesSociales($company_id);
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $socialData = $_POST;
+
+        // Verifica que getMaxOrderForCompany() devuelva un valor numérico
+        $maxOrder = $socials->getMaxOrderForCompany();
+        $newOrder = $maxOrder + 1;
+
+        $result = $socials->agregarRedSocial(
+            $socialData['social_network'],
+            $socialData['social_url'],
+            $newOrder
+        );
+
+        echo json_encode(['success' => $result['success'], 'message' => $result['message'] ?? null, 'error' => $result['error'] ?? null]);
+        exit;
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'PUT') {
         $data = json_decode(file_get_contents('php://input'), true);
 
-        if (isset($data['action']) && $data['action'] === 'set_preferred') {
-            // Procesar el cambio de la red preferida
-            if (isset($data['id']) && isset($data['preferida'])) {
-                $socialId = $data['id'];
-                $socials->setPreferredSocial($socialId); // Implementa esta función en tu clase
-
-                echo json_encode(['success' => true, 'message' => 'Red preferida actualizada con éxito.']);
-            } else {
-                echo json_encode(['success' => false, 'message' => 'Error al actualizar la red preferida.']);
+        if (isset($data['order'])) {
+            // Actualizar el orden de múltiples redes sociales
+            foreach ($data['order'] as $item) {
+                $socials->updateSocialOrder($item['id'], $item['order']);
             }
+            echo json_encode(['success' => true, 'message' => 'Orden actualizado con éxito.']);
         } else {
-            // Procesar la adición de una nueva red social
-            $socialData = $_POST;
-            $socials->agregarRedSocial($socialData['social_network'], $socialData['social_url']);
-            echo json_encode(['success' => true, 'message' => 'Red social guardada exitosamente.']);
+            echo json_encode(['success' => false, 'message' => 'Datos de orden no proporcionados.']);
         }
     } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
         $deleteData = json_decode(file_get_contents("php://input"), true);
@@ -42,9 +49,9 @@ try {
             echo json_encode(['success' => true, 'message' => 'Red social eliminada exitosamente.']);
         }
     } else {
-        // Obtener las redes sociales y devolver el JSON
-        header('Content-Type: application/json');
-        echo json_encode(['success' => true, 'data' => $socials->obtenerRedesSociales()]);
+        // Obtener las redes sociales ordenadas por el campo 'orden'
+        $redes = $socials->obtenerRedesSociales();
+        echo json_encode(['success' => true, 'data' => $redes]);
     }
 } catch (Exception $e) {
     echo json_encode(['success' => false, 'error' => 'Error al procesar la solicitud: ' . $e->getMessage()]);
