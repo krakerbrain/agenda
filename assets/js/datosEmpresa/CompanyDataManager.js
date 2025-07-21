@@ -16,7 +16,6 @@ export class CompanyDataManager {
   }
 
   populateForm(data) {
-    console.log("Datos de la empresa:", data);
     this.form.querySelector("#companyName").value = data.name;
     this.form.querySelector("#phone").value = data.phone;
     this.form.querySelector("#address").value = data.address;

@@ -1,5 +1,6 @@
 import { BaseImageManager } from "./BaseImageManager.js";
 import { ImageCropper } from "./ImageCropper.js";
+import { ModalManager } from "../config/ModalManager.js";
 
 export class BannerManager extends BaseImageManager {
   constructor({ baseUrl, uploader }) {
@@ -96,30 +97,23 @@ export class BannerManager extends BaseImageManager {
             customRadio.value = result.fileName;
           }
 
-          this.showNotification("Banner personalizado guardado correctamente", "success");
+          this.showNotification("Banner personalizado guardado correctamente", "Éxito");
         } else {
-          this.showNotification(result.error || "Error al guardar el banner", "error");
+          this.showNotification(result.error || "Error al guardar el banner", "Error");
         }
       } catch (error) {
         console.error("Error:", error);
-        this.showNotification("Error al conectar con el servidor", "error");
+        this.showNotification("Error al conectar con el servidor", "Error");
       }
     });
   }
 
-  showNotification(message, type = "info") {
-    alert(message); // Reemplazar con tu sistema de notificaciones
-    // Implementación básica - puedes reemplazar con tu sistema de notificaciones
-    //   const notification = document.createElement("div");
-    //   notification.className = `fixed top-4 right-4 p-4 rounded-md shadow-lg ${
-    //     type === "error" ? "bg-red-100 text-red-800" : type === "success" ? "bg-green-100 text-green-800" : "bg-blue-100 text-blue-800"
-    //   }`;
-    //   notification.textContent = message;
-    //   document.body.appendChild(notification);
-
-    //   setTimeout(() => {
-    //     notification.remove();
-    //   }, 5000);
-    // }
+  showNotification(message, title) {
+    // Implementar según tu sistema de notificaciones
+    // alert(`${type.toUpperCase()}: ${message}`);
+    ModalManager.show("infoModal", {
+      title: title,
+      message: message,
+    });
   }
 }
