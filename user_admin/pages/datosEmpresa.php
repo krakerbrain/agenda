@@ -168,26 +168,6 @@ $media = $redesSociales->getSocialForDatosEmpresa();
         <!-- Las cards se insertarán aquí dinámicamente -->
         <div id="social-networks" class="space-y-4"></div>
     </div>
-    <!-- <div id="preferedSocial"
-        class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 transition-opacity duration-300 pointer-events-none">
-        <div class="flex items-center justify-center min-h-screen">
-            <div
-                class="bg-white rounded-lg shadow-lg w-full max-w-md mx-auto overflow-hidden transform transition-all duration-300 scale-95">
-                <div class="flex items-center justify-between px-4 py-3 border-b">
-                    <h5 class="text-lg font-semibold" id="preferedSocialLabel">Red Social Favorita</h5>
-                    <button type="button"
-                        class="text-gray-400 hover:text-gray-700 text-2xl leading-none focus:outline-none close-modal"
-                        aria-label="Close">&times;</button>
-                </div>
-                <div class="px-4 py-4 text-gray-700 modal-body"></div>
-                <div class="flex justify-end px-4 py-3 border-t">
-                    <button type="button"
-                        class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded close-modal btn-siguiente"
-                        id="acceptButton">Aceptar</button>
-                </div>
-            </div>
-        </div>
-    </div> -->
 </div>
 <?php include dirname(__DIR__, 2) . '/includes/modal-info.php'; ?>
 <script>
