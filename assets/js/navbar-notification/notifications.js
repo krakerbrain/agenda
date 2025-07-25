@@ -1,3 +1,5 @@
+import { loadIcon, NOTIFICATION_ICONS } from "../helpers/icons.js";
+
 export function init() {
   loadAllNotifications();
 
@@ -13,11 +15,11 @@ async function loadAllNotifications() {
 
     // Mostrar loader mientras se cargan los datos
     container.innerHTML = `
-            <div class="text-center py-4">
-                <div class="spinner-border" role="status">
-                    <span class="visually-hidden">Cargando...</span>
-                </div>
-            </div>`;
+      <div class="text-center py-4">
+        <div class="inline-block h-8 w-8 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin" role="status">
+          <span class="sr-only">Cargando...</span>
+        </div>
+      </div>`;
 
     const response = await fetch(`${baseUrl}user_admin/controllers/notification_controller.php?action=getAll`, { method: "GET" });
 
@@ -31,59 +33,61 @@ async function loadAllNotifications() {
       let html = "";
 
       for (const notification of data.notifications) {
-        const icon = getNotificationIcon(notification.notification_type);
+        const icon = await getNotificationIcon(notification.notification_type);
         const timeAgo = getTimeAgo(notification.created_at);
-        const readClass = notification.is_read ? "read" : "unread";
-        const readBadge = notification.is_read ? `<small class="text-muted">Leído ${getTimeAgo(notification.read_at)}</small>` : '<span class="badge bg-info">Nuevo</span>';
+        const readClass = notification.is_read ? "bg-gray-50 opacity-75" : "bg-white hover:bg-gray-50 cursor-pointer";
+        const readBadge = notification.is_read
+          ? `<small class="text-gray-500 text-sm">Leído ${getTimeAgo(notification.read_at)}</small>`
+          : '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Nuevo</span>';
 
         html += `
-                <div class="list-group-item list-group-item-action ${readClass}" 
-                     data-notification-id="${notification.user_notification_id}">
-                    <div class="d-flex gap-3 w-100 justify-content-between">
-                        <div class="flex-shrink-0 mt-1 text-primary">${icon}</div>
-                        <div class="flex-grow-1">
-                            <div class="d-flex justify-content-between">
-                                <h6 class="mb-1">${notification.title}</h6>
-                                ${readBadge}
-                            </div>
-                            <p class="mb-1">${notification.description.replace(/\n/g, "<br>")}</p>
-                            <div class="d-flex justify-content-between">
-                                <small class="text-muted">Versión ${notification.version}</small>
-                                <small class="text-muted">${timeAgo}</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>`;
+          <div class="border border-gray-200 rounded-lg p-4 mb-2 ${readClass}" 
+               data-notification-id="${notification.user_notification_id}">
+            <div class="flex gap-3 w-full justify-between">
+              <div class="flex-shrink-0 mt-1 text-blue-500">${icon}</div>
+              <div class="flex-grow-1 min-w-0">
+                <div class="flex justify-between items-start gap-2">
+                  <h6 class="mb-1 font-medium text-gray-900 truncate">${notification.title}</h6>
+                  ${readBadge}
+                </div>
+                <p class="mb-1 text-gray-600">${notification.description.replace(/\n/g, "<br>")}</p>
+                <div class="flex justify-between mt-2">
+                  <small class="text-gray-500 text-sm">Versión ${notification.version}</small>
+                  <small class="text-gray-500 text-sm">${timeAgo}</small>
+                </div>
+              </div>
+            </div>
+          </div>`;
       }
 
       container.innerHTML = html;
 
       // Manejar clic en notificaciones
-      container.querySelectorAll(".list-group-item").forEach((item) => {
-        item.addEventListener("click", async function () {
-          if (!this.classList.contains("read")) {
+      container.querySelectorAll("[data-notification-id]").forEach((item) => {
+        if (!item.classList.contains("bg-gray-50")) {
+          item.addEventListener("click", async function () {
             const notificationId = this.dataset.notificationId;
-            await markAsRead(notificationId);
-            this.classList.remove("unread");
-            this.classList.add("read");
+            await markAsRead(notificationId, this);
+            this.classList.remove("bg-white", "hover:bg-gray-50");
+            this.classList.add("bg-gray-50", "opacity-75");
             await updateNotificationCount();
-          }
-        });
+          });
+        }
       });
     } else {
       container.innerHTML = `
-                <div class="text-center py-4 text-muted">
-                    No tienes notificaciones
-                </div>`;
+        <div class="text-center py-4 text-gray-500">
+          No tienes notificaciones
+        </div>`;
     }
   } catch (error) {
     console.error("Error loading notifications:", error);
     const container = document.getElementById("all-notifications-list");
     if (container) {
       container.innerHTML = `
-                <div class="text-center py-4 text-danger">
-                    Error al cargar notificaciones
-                </div>`;
+        <div class="text-center py-4 text-red-500">
+          Error al cargar notificaciones
+        </div>`;
     }
   }
 }
@@ -105,8 +109,11 @@ async function markAllAsRead() {
 
     if (data.success) {
       // Actualizar la UI
-      document.querySelectorAll(".unread").forEach((item) => {
-        item.classList.replace("unread", "read");
+      document.querySelectorAll("[data-notification-id]").forEach((item) => {
+        if (!item.classList.contains("bg-gray-50")) {
+          item.classList.remove("bg-white", "hover:bg-gray-50");
+          item.classList.add("bg-gray-50", "opacity-75");
+        }
       });
 
       // Actualizar contador
@@ -144,9 +151,11 @@ async function updateNotificationCount() {
       if (!badge) {
         // Crear el badge si no existe
         const newBadge = document.createElement("span");
-        newBadge.className = "position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger";
-        newBadge.innerHTML = `${data.count}<span class="visually-hidden">notificaciones no leídas</span>`;
-        icon.parentNode.appendChild(newBadge);
+        newBadge.className =
+          "absolute -top-2 -right-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-500 rounded-full";
+        newBadge.innerHTML = `${data.count}<span class="sr-only">notificaciones no leídas</span>`;
+        icon.parentElement.classList.add("relative");
+        icon.parentElement.appendChild(newBadge);
       } else {
         badge.textContent = data.count;
       }
@@ -158,38 +167,58 @@ async function updateNotificationCount() {
   }
 }
 
-// Función auxiliar para mostrar mensajes (implementación básica)
-function showToast(message, type = "success") {
-  // Implementa tu propio sistema de notificaciones/toasts
-  // Ejemplo básico:
-  const toast = document.createElement("div");
-  toast.className = `toast align-items-center text-white bg-${type === "error" ? "danger" : "success"}`;
-  toast.setAttribute("role", "alert");
-  toast.setAttribute("aria-live", "assertive");
-  toast.setAttribute("aria-atomic", "true");
-  toast.innerHTML = `
-        <div class="d-flex">
-            <div class="toast-body">${message}</div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>`;
-
-  document.getElementById("toast-container").appendChild(toast);
-  const bsToast = new bootstrap.Toast(toast);
-  bsToast.show();
-
-  // Auto-remove after hide
-  toast.addEventListener("hidden.bs.toast", () => {
-    toast.remove();
-  });
+async function getNotificationIcon(type) {
+  try {
+    const iconName = NOTIFICATION_ICONS[type] || NOTIFICATION_ICONS.default;
+    const icon = await loadIcon(iconName, "w-4 h-4 text-blue-500");
+    return icon || '<span class="w-4 h-4 bg-gray-300 rounded-full"></span>';
+  } catch (error) {
+    console.error("Error loading notification icon:", error);
+    return '<span class="w-4 h-4 bg-gray-300 rounded-full"></span>';
+  }
 }
 
-function getNotificationIcon(type) {
-  const icons = {
-    feature: '<i class="bi bi-star-fill"></i>',
-    bugfix: '<i class="bi bi-bug-fill"></i>',
-    announcement: '<i class="bi bi-megaphone-fill"></i>',
-  };
-  return icons[type] || '<i class="bi bi-bell-fill"></i>';
+async function showToast(message, type = "success") {
+  const toastContainer = document.getElementById("toast-container");
+  if (!toastContainer) return;
+
+  try {
+    // Cargar iconos en paralelo
+    const [icon, closeIcon] = await Promise.all([loadIcon(type === "error" ? "x-circle" : "check-circle", "w-5 h-5"), loadIcon("x", "w-5 h-5")]);
+
+    const toast = document.createElement("div");
+    toast.className = `flex items-center w-full max-w-xs p-4 mb-4 text-white rounded-lg shadow ${type === "error" ? "bg-red-500" : "bg-green-500"}`;
+    toast.setAttribute("role", "alert");
+
+    toast.innerHTML = `
+      <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 rounded-lg">
+        ${icon}
+      </div>
+      <div class="ml-3 text-sm font-normal">${message}</div>
+      <button type="button" class="ml-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex h-8 w-8" aria-label="Close">
+        <span class="sr-only">Close</span>
+        ${closeIcon}
+      </button>`;
+
+    toastContainer.appendChild(toast);
+
+    // Auto-remove after delay
+    const timer = setTimeout(() => toast.remove(), 5000);
+
+    // Close button functionality
+    toast.querySelector("button").addEventListener("click", () => {
+      clearTimeout(timer);
+      toast.remove();
+    });
+  } catch (error) {
+    console.error("Error showing toast:", error);
+    // Fallback básico sin iconos
+    const fallbackToast = document.createElement("div");
+    fallbackToast.className = `p-4 mb-4 text-white rounded-lg ${type === "error" ? "bg-red-500" : "bg-green-500"}`;
+    fallbackToast.textContent = message;
+    toastContainer.appendChild(fallbackToast);
+    setTimeout(() => fallbackToast.remove(), 5000);
+  }
 }
 
 function getNotificationBadgeClass(type) {
