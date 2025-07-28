@@ -1,6 +1,6 @@
 /* Estilo para los iconos de acción */
 .action-icon {
-  position: relative; /* Necesario para posicionar el spinner encima */
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -15,9 +15,9 @@
 }
 
 /* Oculta el texto cuando sea necesario */
-.button-text {
+/* .button-text {
   display: none;
-}
+} */
 
 /* Spinner centrado encima del icono */
 .spinner-border {
@@ -99,6 +99,15 @@
     order: 99;
   }
 
+  /* Nueva posición para el estado (encima de la fecha) */
+  tr.body-table td:nth-child(8) {
+    /* Celda de estado */
+    display: flex !important;
+    order: 0; /* Lo colocamos antes que la fecha (order:1) */
+    margin-bottom: 0.5rem;
+    padding: 0 !important;
+  }
+
   /* Mostrar solo los campos esenciales (fecha + hora, nombre, servicio) en orden: fecha + hora, nombre, servicio */
   tr.body-table td:nth-child(6) {
     /* Fecha */
@@ -108,7 +117,6 @@
     font-size: 0.85rem;
     color: #64748b;
     font-weight: 500;
-    margin-bottom: 0.5rem;
     order: 1;
   }
   tr.body-table td:nth-child(3) {
@@ -117,7 +125,6 @@
     font-size: 1.1rem;
     font-weight: 600;
     color: #1e293b;
-    margin-bottom: 0.25rem;
     order: 2;
   }
   tr.body-table td:nth-child(1) {
@@ -129,6 +136,13 @@
     border-bottom: 1px dashed #e2e8f0;
     margin-bottom: 0.75rem;
     order: 3;
+  }
+
+  tr.body-table td:nth-child(9) {
+    /* Celda de estado */
+    display: flex !important;
+    order: 4; /* Lo colocamos antes que la fecha (order:1) */
+    padding: 0 !important;
   }
   /* Ocultar la hora en el expandido */
   tr.body-table.expanded td:nth-child(7) {
@@ -167,8 +181,9 @@
     padding: 0.75rem 0;
   }
 
-  /* Etiquetas para datos expandidos */
-  tr.body-table.expanded td:not(:nth-child(6)):not(:nth-child(3)):not(:nth-child(1)):not(:last-child)::before {
+  tr.body-table.expanded td:nth-child(2)::before,
+  tr.body-table.expanded td:nth-child(4)::before,
+  tr.body-table.expanded td:nth-child(5)::before {
     content: attr(data-cell) ": ";
     font-weight: 600;
     text-transform: capitalize;
@@ -183,11 +198,11 @@
     padding-top: 1rem;
   }
 
-  .actionBtns {
+  /* .actionBtns {
     justify-content: flex-start !important;
     flex-wrap: wrap;
     gap: 0.5rem !important;
-  }
+  } */
 
   tr.head-table-config th {
     display: none;

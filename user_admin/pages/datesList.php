@@ -23,7 +23,7 @@ $auth->validarTokenUsuario();
     <ul class="flex border-b border-gray-200 mb-4" id="myTab" role="tablist">
         <li class="flex-1 mr-2 text-center" role="presentation">
             <button
-                class="inline-flex flex-col md:flex-row items-center justify-center py-2 md:md:px-4 text-sm font-medium text-gray-700 bg-white w-full gap-1 md:gap-2"
+                class="inline-flex flex-col md:flex-row items-center justify-center py-2 md:md:px-4 text-sm font-medium text-gray-700 bg-white w-full gap-1 md:gap-2 cursor-pointer"
                 data-bs-target="#unconfirmed">
                 <span class="text-cyan-500 text-lg md:text-base"><i class="fa-solid fa-clock"></i></span>
                 <span class="text-xs md:text-sm">Por Confirmar</span>
@@ -31,7 +31,7 @@ $auth->validarTokenUsuario();
         </li>
         <li class="flex-1 mr-2 text-center" role="presentation">
             <button
-                class="inline-flex flex-col md:flex-row items-center justify-center py-2 md:px-4 text-sm font-medium text-gray-700 bg-white w-full gap-1 md:gap-2"
+                class="inline-flex flex-col md:flex-row items-center justify-center py-2 md:px-4 text-sm font-medium text-gray-700 bg-white w-full gap-1 md:gap-2 cursor-pointer"
                 data-bs-target="#confirmed">
                 <span class="text-green-500 text-lg md:text-base"><i class="fa-solid fa-check-circle"></i></span>
                 <span class="text-xs md:text-sm">Confirmadas</span>
@@ -39,7 +39,7 @@ $auth->validarTokenUsuario();
         </li>
         <li class="flex-1 mr-2 text-center" role="presentation">
             <button
-                class="inline-flex flex-col md:flex-row items-center justify-center py-2 md:px-4 text-sm font-medium text-gray-700 bg-white w-full gap-1 md:gap-2"
+                class="inline-flex flex-col md:flex-row items-center justify-center py-2 md:px-4 text-sm font-medium text-gray-700 bg-white w-full gap-1 md:gap-2 cursor-pointer"
                 data-bs-target="#past">
                 <span class="text-gray-400 text-lg md:text-base"><i class="fa fa-calendar-xmark"></i></span>
                 <span class="text-xs md:text-sm">Pasadas</span>
@@ -47,7 +47,7 @@ $auth->validarTokenUsuario();
         </li>
         <li class="flex-1 mr-2 text-center" role="presentation">
             <button
-                class="inline-flex flex-col md:flex-row items-center justify-center py-2 md:px-4 text-sm font-medium text-gray-700 bg-white w-full gap-1 md:gap-2"
+                class="inline-flex flex-col md:flex-row items-center justify-center py-2 md:px-4 text-sm font-medium text-gray-700 bg-white w-full gap-1 md:gap-2 cursor-pointer"
                 data-bs-target="#all">
                 <span class="text-blue-500 text-lg md:text-base"><i class="fa-solid fa-list"></i></span>
                 <span class="text-xs md:text-sm">Todas</span>
@@ -55,7 +55,7 @@ $auth->validarTokenUsuario();
         </li>
         <li class="flex-1 mr-2 text-center" role="presentation">
             <button
-                class="inline-flex flex-col md:flex-row items-center justify-center py-2 md:px-4 text-sm font-medium text-gray-700 bg-white w-full gap-1 md:gap-2"
+                class="inline-flex flex-col md:flex-row items-center justify-center py-2 md:px-4 text-sm font-medium text-gray-700 bg-white w-full gap-1 md:gap-2 cursor-pointer"
                 data-bs-target="#events">
                 <span class="text-purple-500 text-lg md:text-base"><i class="fa-solid fa-person-chalkboard"></i></span>
                 <span class="text-xs md:text-sm">Eventos</span>
@@ -78,17 +78,17 @@ $auth->validarTokenUsuario();
         </div>
         <div class="p-4">
             <form id="searchForm" class="flex flex-col sm:flex-row gap-2 pt-2">
-                <input class="form-input form-input-sm border p-1 w-full" type="text" id="service" name="service"
+                <input class="form-input form-input-sm shadow p-1 w-full" type="text" id="service" name="service"
                     placeholder="Buscar servicio..." autocomplete="off">
-                <input class="form-input form-input-sm border p-1 w-full" type="text" id="name" name="name"
+                <input class="form-input form-input-sm shadow p-1 w-full" type="text" id="name" name="name"
                     placeholder="Buscar nombre..." autocomplete="off">
-                <input class="form-input form-input-sm border p-1 w-full" type="text" id="phone" name="phone"
+                <input class="form-input form-input-sm shadow p-1 w-full" type="text" id="phone" name="phone"
                     placeholder="Buscar teléfono..." autocomplete="off">
-                <input class="form-input form-input-sm border p-1 w-full" type="text" id="mail" name="mail"
+                <input class="form-input form-input-sm shadow p-1 w-full" type="text" id="mail" name="mail"
                     placeholder="Buscar correo..." autocomplete="off">
-                <input class="form-input form-input-sm border p-1 w-full" type="date" id="date" name="date">
-                <input class="form-input form-input-sm border p-1 w-full" type="time" id="hour" name="hour">
-                <select class="form-select form-select-sm w-full" id="status" name="status">
+                <input class="form-input form-input-sm shadow p-1 w-full" type="date" id="date" name="date">
+                <input class="form-input form-input-sm shadow p-1 w-full" type="time" id="hour" name="hour">
+                <select class="form-select form-select-sm shadow p-1 w-full" id="status" name="status">
                     <option value="all">Seleccionar estado</option>
                     <option value="1">Confirmada</option>
                     <option value="0">Pendiente</option>
@@ -101,8 +101,8 @@ $auth->validarTokenUsuario();
     </div>
     <!-- Backdrop -->
     <div id="offcanvasSearchBackdrop" class="fixed inset-0 z-40 bg-black opacity-50 hidden"></div>
-    <div class="mt-2 rounded-lg shadow">
-        <div class="flex justify-between items-center bg-white p-4 border-b">
+    <div class="mt-2 rounded-lg">
+        <div class="flex justify-between items-center bg-white p-4">
             <!-- Botón para abrir el offcanvas de búsqueda -->
             <div class="flex justify-end mb-2">
                 <button
@@ -126,7 +126,7 @@ $auth->validarTokenUsuario();
                 </button>
             </div>
         </div>
-        <table class="min-w-full divide-y divide-gray-200 bg-white">
+        <table class="min-w-full bg-white">
             <thead>
                 <tr class="bg-cyan-50 text-cyan-800 text-sm font-semibold head-table">
                     <!-- Columnas dinámicas -->

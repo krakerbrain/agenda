@@ -77,23 +77,30 @@ function getActionButtons(status, id_appointment) {
   let buttons = "";
   const confirmId = `confirmarBtn${id_appointment}`;
   const deleteId = `eliminarBtn${id_appointment}`;
+
   // Botón de confirmar (solo para citas pendientes)
   if (status === 0) {
     buttons += `
-      <div id="${confirmId}" class="action-btn-container inline-block">
-        <button class="fa-solid fa-square-check action-icon text-green-800 confirm" title="Confirmar reserva" data-id="${id_appointment}">
-          <span class="button-text">CONFIRMAR</span>
+      <div id="${confirmId}" class="action-btn-container">
+        <button class="inline-flex flex-col items-center justify-center p-1 text-sm font-medium text-gray-700 w-full cursor-pointer confirm" 
+                title="Confirmar reserva" data-id="${id_appointment}">
+          <span class="text-green-500 text-base"><i class="fa-solid fa-square-check"></i></span>
+          <span class="text-xs">Confirmar</span>
         </button>
       </div>
     `;
   }
+
   // Botón de eliminar (siempre visible)
   buttons += `
-    <div id="${deleteId}" class="action-btn-container inline-block">
-      <button class="fas fa-trash-alt action-icon text-red-500 eliminarReserva" title="Eliminar reserva" data-id="${id_appointment}">
-        <span class="button-text">ELIMINAR</span>
+    <div id="${deleteId}" class="action-btn-container">
+      <button class="inline-flex flex-col items-center justify-center p-1 text-sm font-medium text-gray-700 w-full cursor-pointer eliminarReserva" 
+              title="Eliminar reserva" data-id="${id_appointment}">
+        <span class="text-red-500 text-base"><i class="fas fa-trash-alt"></i></span>
+        <span class="text-xs">Eliminar</span>
       </button>
     </div>`;
+
   return buttons;
 }
 

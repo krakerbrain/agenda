@@ -5,7 +5,7 @@ export class DateFormatter {
     const [day, month, year] = dateString.split("-");
     const date = new Date(year, month - 1, day);
     if (isNaN(date.getTime())) return dateString;
-    const options = { weekday: "long", day: "numeric", month: "long", year: "numeric" };
+    const options = { weekday: "long", day: "numeric", month: "numeric", year: "numeric" };
     return new Intl.DateTimeFormat("es-ES", options).format(date);
   }
 

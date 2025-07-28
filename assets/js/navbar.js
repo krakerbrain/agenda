@@ -102,15 +102,32 @@ export const __testing__ = {
 
 // Lógica para resaltar la sección activa en la navbar
 const navLinks = document.querySelectorAll(".nav-element");
+
+// Resaltar el link activo según sessionStorage al cargar la página
+const lastPage = sessionStorage.getItem("lastpage");
+if (lastPage) {
+  navLinks.forEach((link) => {
+    if (link.id === lastPage) {
+      link.classList.add("bg-gray-200", "text-blue-600", "font-medium");
+      link.classList.remove("text-gray-700");
+    } else {
+      link.classList.remove("bg-gray-200", "text-blue-600", "font-medium");
+      link.classList.add("text-gray-700");
+    }
+  });
+}
+
 navLinks.forEach((link) => {
   link.addEventListener("click", () => {
     // Remove active class from all links
     navLinks.forEach((navLink) => {
       navLink.classList.remove("bg-gray-200", "text-blue-600", "font-medium");
+      navLink.classList.add("text-gray-700");
     });
-
-    link.classList.remove("text-gray-700");
     // Add active class to the clicked link
     link.classList.add("bg-gray-200", "text-blue-600", "font-medium");
+    link.classList.remove("text-gray-700");
+    // Guardar la última página seleccionada
+    sessionStorage.setItem("lastpage", link.id);
   });
 });

@@ -110,7 +110,7 @@ include dirname(__DIR__) . '/partials/head.php';
             <ul class="space-y-1">
                 <?php if ($role_id != 1) { ?>
                     <li>
-                        <a class="nav-element block px-3 py-2 text-blue-600 font-medium rounded hover:bg-gray-100" href="#"
+                        <a class="nav-element block px-3 py-2 text-gray-700 font-medium rounded hover:bg-gray-100" href="#"
                             id="datesList">Lista de citas</a>
                     </li>
                     <li>

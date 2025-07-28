@@ -6,43 +6,31 @@
 
 <!-- Google Authenticate Modal -->
 <div id="googleAuthenticateModal"
-    class="fixed inset-0 z-50 overflow-y-auto hidden opacity-0 transition-all duration-300 ease-in-out">
-    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        <div class="fixed inset-0 transition-opacity" aria-hidden="true">
-            <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+    class="fixed inset-0 z-50 flex items-center justify-center hidden pointer-events-none transition-opacity duration-300 opacity-0 p-4">
+    <div class="absolute inset-0 bg-gray-500 opacity-50 transition-opacity"></div>
+    <div
+        class="bg-white rounded-lg shadow-lg w-full max-w-md mx-auto overflow-hidden transform transition-all duration-300 scale-95 pointer-events-auto">
+        <div class="flex items-center justify-between px-4 py-3 border-b border-[#1B637F]/20">
+            <h5 class="text-lg font-semibold" id="googleAuthenticateModalLabel">Autenticación necesaria</h5>
+            <button type="button"
+                class="text-gray-400 hover:text-gray-700 text-2xl leading-none focus:outline-none close-modal"
+                aria-label="Close">&times;</button>
         </div>
-        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-        <div
-            class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                <div class="sm:flex sm:items-start">
-                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                        <h3 class="border-b pb-2 text-lg leading-6 font-medium text-gray-900"
-                            id="googleAuthenticateModalLabel">
-                            Autenticación necesario</h3>
-                        <div class="mt-2">
-                            <p class="text-sm text-gray-500">Autenticación inválida. Por favor, vuelve a iniciar sesión
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                <button type="button"
-                    class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
-                    id="confirmAuthenticate">
-                    Aceptar
-                </button>
-                <button type="button"
-                    class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-                    id="cancelAutoOpen">
-                    Cerrar
-                </button>
-            </div>
+        <div class="px-4 py-4 text-gray-700">
+            <p>Autenticación inválida. Por favor, vuelve a iniciar sesión</p>
+        </div>
+        <div class="flex justify-end px-4 py-3 border-t border-[#1B637F]/20 space-x-3">
+            <button type="button"
+                class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded close-modal">
+                Cerrar
+            </button>
+            <button type="button" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded"
+                id="confirmAuthenticate">
+                Aceptar
+            </button>
         </div>
     </div>
 </div>
-
 <!-- Info Appointment Modal -->
 <div id="infoAppointment"
     class="fixed inset-0 z-50 items-center justify-center hidden pointer-events-none transition-opacity duration-300 opacity-0">

@@ -17,21 +17,21 @@ export class DatesTableRenderer {
         <td data-cell='servicio' class='data px-2 py-2'>${item.service}</td>
         <td data-cell='categoría' class='data px-2 py-2'>${item.category}</td>
         <td data-cell='nombre' class='data px-2 py-2'>${item.name}</td>
-        <td data-cell='teléfono' class='data px-2 py-2'>
-          <i class="fab fa-whatsapp pe-1" style="font-size:0.85rem"></i>
+        <td data-cell='teléfono' class='data px-2 py-2' nowrap>
+          <i class="fab fa-whatsapp text-green-500" style="font-size:0.85rem"></i>
           <a href="https://wa.me/${item.phone}" target="_blank" class="text-cyan-600 hover:text-cyan-800">+${item.phone}</a>
         </td>
         <td data-cell='correo' class='data px-2 py-2'>
           <a href="mailto:${item.mail}" class="text-cyan-600 hover:text-cyan-800">${item.mail}</a>
         </td>
         ${showProviderColumn ? `<td data-cell='prestador' class='data px-2 py-2'>${item.provider_name}</td>` : ""}
-        <td data-cell='fecha' class='data px-2 py-2 flex items-center gap-2'>
+        <td data-cell='fecha' class='data px-2 py-2'>
           ${DateFormatter.formatDate(item.date)}
           <span class='inline-block ms-4 text-gray-500 md:hidden'>${DateFormatter.formatTimeTo12h(item.start_time)}</span>
         </td>
         <td data-cell='hora' class='data px-2 py-2 hidden md:table-cell'>${DateFormatter.formatTimeTo12h(item.start_time)}</td>
         <td data-cell='estado' class='data px-2 py-2'>${getStatusBadge(item.status)}</td>
-        <td class="px-2 py-2"><div class="actionBtns flex justify-evenly gap-2">${getActionButtons(item.status, item.id_appointment)}</div></td>
+        <td data-cell='acciones' class="px-2 py-2"><div class="actionBtns flex justify-evenly gap-2">${getActionButtons(item.status, item.id_appointment)}</div></td>
         <td class="expand-btn">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
             <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
@@ -75,7 +75,9 @@ export class DatesTableRenderer {
         <td data-cell="servicio" class="data px-2 py-2">${event.event_name}</td>
         <td data-cell="categoria" class="data px-2 py-2">-</td>
         <td data-cell="nombre" class="data px-2 py-2">${event.participant_name}</td>
-        <td data-cell="telefono" class="data px-2 py-2"><i class="fab fa-whatsapp pe-1" style="font-size:0.85rem"></i><a href="https://wa.me/${event.phone}" target="_blank">+${event.phone}</a></td>
+        <td data-cell="telefono" class="data px-2 py-2"><i class="fab fa-whatsapp pe-1 text-green-500" style="font-size:0.85rem"></i><a href="https://wa.me/${
+          event.phone
+        }" target="_blank" class="text-cyan-600 hover:text-cyan-800">+${event.phone}</a></td>
         <td data-cell="correo" class="data px-2 py-2">${event.email}</td>
         <td data-cell="fecha" class="data px-2 py-2">${event.event_date}</td>
                 <td data-cell='hora' class='data px-2 py-2 hidden md:table-cell'>${DateFormatter.formatTimeTo12h(event.event_start_time)}</td>
