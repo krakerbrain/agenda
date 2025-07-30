@@ -9,15 +9,6 @@ $auth->validarTokenUsuario();
 
 ?>
 <link rel="stylesheet" href="<?php echo $baseUrl; ?>assets/css/table.css?v=<?php echo time(); ?>">
-<style>
-    #myTab .active {
-        border-bottom: 1px solid #0e7490;
-    }
-
-    .active button {
-        color: #0e7490;
-    }
-</style>
 
 <div class="mx-auto px-2 w-full">
     <ul class="flex border-b border-gray-200 mb-4" id="myTab" role="tablist">
@@ -126,13 +117,13 @@ $auth->validarTokenUsuario();
                 </button>
             </div>
         </div>
-        <table class="min-w-full bg-white">
+        <table class="min-w-full bg-white appointments-table">
             <thead>
                 <tr class="bg-cyan-50 text-cyan-800 text-sm font-semibold head-table">
                     <!-- Columnas dinámicas -->
                 </tr>
             </thead>
-            <tbody id="tableContent" class="divide-y divide-gray-100">
+            <tbody id="appointmentsContent" class="divide-y divide-gray-100">
                 <!-- Se llenará con JavaScript -->
             </tbody>
         </table>

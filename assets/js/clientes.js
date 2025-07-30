@@ -41,7 +41,7 @@ export function init() {
   new SearchManager("#searchCustomerForm", handleSearch, handleAutocomplete, ["name", "phone", "mail"]);
 
   // Table renderer específico para clientes
-  tableRenderer = new CustomersTableRenderer("#tableContent");
+  tableRenderer = new CustomersTableRenderer("#customersContent");
 
   // Cargar clientes para la pestaña correspondiente al último estado guardado
   loadCustomers();
@@ -74,7 +74,7 @@ async function loadCustomers(page = 1) {
 function fillTableCustomers(data) {
   tableRenderer.render(data, DatesUIHelpers.getCustomerStatusBadge, getActionIcons);
   // Delegación de eventos para los action buttons
-  document.getElementById("tableContent").onclick = function (e) {
+  document.getElementById("customersContent").onclick = function (e) {
     const agendarBtn = e.target.closest(".action-icon[id^='agendar-']");
     const editarBtn = e.target.closest(".action-icon[id^='editar-']");
     const bloquearBtn = e.target.closest(".action-icon[id^='bloquear-']");
@@ -132,22 +132,50 @@ function getActionIcons(customerId, isBlocked) {
 
   if (status === "todos") {
     icons = `
-      <i id="agendar-${customerId}" class="fa-solid fa-calendar-plus action-icon cursor-pointer text-cyan-700 hover:text-cyan-900 text-center" title="Agendar"><span class="button-text">AGENDAR</span></i>
-      <i id="editar-${customerId}" class="fa-solid fa-edit action-icon cursor-pointer text-yellow-600 hover:text-yellow-800 text-center" title="Editar"><span class="button-text">EDITAR</span></i>
-        ${
-          isBlocked === 1
-            ? `<i id="desbloquear-${customerId}" class="fa-solid fa-unlock action-icon cursor-pointer text-green-700 hover:text-green-900 text-center" title="Desbloquear"><span class="button-text">DESBLOQUEAR</span></i>`
-            : `<i id="bloquear-${customerId}" class="fa-solid fa-lock action-icon cursor-pointer text-red-700 hover:text-red-900 text-center" title="Bloquear"><span class="button-text">BLOQUEAR</span></i>`
-        }
-      <i id="eliminar-${customerId}" class="fa-solid fa-trash-alt action-icon cursor-pointer text-red-600 hover:text-red-800 text-center" title="Eliminar"><span class="button-text">ELIMINAR</span></i>
+      <button class="inline-flex flex-col items-center justify-center p-1 text-sm font-medium text-gray-700 cursor-pointer action-icon" 
+          title="Agendar Cita" id="agendar-${customerId}">
+          <span class="text-cyan-700 hover:text-cyan-900 text-base"><i class="fa-solid fa-calendar-plus"></i></span>
+          <span class="text-xs">Agendar</span>
+      </button>
+      <button class="inline-flex flex-col items-center justify-center p-1 text-sm font-medium text-gray-700 cursor-pointer action-icon" 
+          title="Editar" id="editar-${customerId}">
+          <span class="text-yellow-600 hover:text-yellow-800 text-base"><i class="fa-solid fa-edit"></i></span>
+          <span class="text-xs">Editar</span>
+      </button>
+      ${
+        isBlocked === 1
+          ? `<button class="inline-flex flex-col items-center justify-center p-1 text-sm font-medium text-gray-700 cursor-pointer action-icon" 
+              title="Desbloquear" id="desbloquear-${customerId}">
+              <span class="text-green-700 hover:text-green-900 text-base"><i class="fa-solid fa-unlock"></i></span>
+              <span class="text-xs">Desbloquear</span>
+          </button>`
+          : `<button class="inline-flex flex-col items-center justify-center p-1 text-sm font-medium text-gray-700 cursor-pointer action-icon" 
+              title="Bloquear" id="bloquear-${customerId}">
+              <span class="text-red-700 hover:text-red-900 text-base"><i class="fa-solid fa-lock"></i></span>
+              <span class="text-xs">Bloquear</span>
+          </button>`
+      }
+      <button class="inline-flex flex-col items-center justify-center p-1 text-sm font-medium text-gray-700 cursor-pointer action-icon" 
+          title="Eliminar" id="eliminar-${customerId}">
+          <span class="text-red-600 hover:text-red-800 text-base"><i class="fa-solid fa-trash-alt"></i></span>
+          <span class="text-xs">Eliminar</span>
+      </button>
     `;
   } else if (status === "incidencias") {
     icons = `
-      <i id="eliminar-incidencia-${customerId}" class="fa-solid fa-trash-alt action-icon cursor-pointer text-red-600 hover:text-red-800 text-center" title="Eliminar incidencia"><span class="button-text">ELIMINAR INCIDENCIA</span></i>
+      <button class="inline-flex flex-col items-center justify-center p-1 text-sm font-medium text-gray-700 cursor-pointer action-icon" 
+          title="Eliminar incidencia" id="eliminar-incidencia-${customerId}">
+          <span class="text-red-600 hover:text-red-800 text-base"><i class="fa-solid fa-trash-alt"></i></span>
+          <span class="text-xs">Eliminar incidencia</span>
+      </button>
     `;
   } else if (status === "blocked") {
     icons = `
-      <i id="desbloquear-${customerId}" class="fa-solid fa-unlock action-icon cursor-pointer text-green-700 hover:text-green-900 text-center" title="Desbloquear"><span class="button-text">DESBLOQUEAR</span></i>
+      <button class="inline-flex flex-col items-center justify-center p-1 text-sm font-medium text-gray-700 cursor-pointer action-icon" 
+          title="Desbloquear" id="desbloquear-${customerId}">
+          <span class="text-green-700 hover:text-green-900 text-base"><i class="fa-solid fa-unlock"></i></span>
+          <span class="text-xs">Desbloquear</span>
+      </button>
     `;
   }
 

@@ -16,7 +16,7 @@
 
 /* Oculta el texto cuando sea necesario */
 /* .button-text {
-  display: none;
+  font-size: 0.65rem;
 } */
 
 /* Spinner centrado encima del icono */
@@ -69,6 +69,28 @@
 
 /* Estilos para móviles (tableta y menor) */
 @media (max-width: 1000px) {
+  /* Mostrar flecha solo en móviles */
+  .expand-btn {
+    display: flex !important;
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #f8fafc;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #e2e8f0;
+  }
+
+  .expanded .expand-btn {
+    transform: rotate(180deg);
+    background: #f1f5f9;
+  }
+
   table {
     width: 100%;
     border-collapse: collapse;
@@ -98,9 +120,9 @@
     padding: 0.5rem 0;
     order: 99;
   }
-
+  /* APPOINTMENTS */
   /* Nueva posición para el estado (encima de la fecha) */
-  tr.body-table td:nth-child(8) {
+  tr.appointments-row td.cell-status {
     /* Celda de estado */
     display: flex !important;
     order: 0; /* Lo colocamos antes que la fecha (order:1) */
@@ -109,7 +131,7 @@
   }
 
   /* Mostrar solo los campos esenciales (fecha + hora, nombre, servicio) en orden: fecha + hora, nombre, servicio */
-  tr.body-table td:nth-child(6) {
+  tr.appointments-row td.cell-date {
     /* Fecha */
     display: flex;
     align-items: center;
@@ -119,7 +141,7 @@
     font-weight: 500;
     order: 1;
   }
-  tr.body-table td:nth-child(3) {
+  tr.appointments-row td.cell-name {
     /* Nombre */
     display: block;
     font-size: 1.1rem;
@@ -127,7 +149,7 @@
     color: #1e293b;
     order: 2;
   }
-  tr.body-table td:nth-child(1) {
+  tr.appointments-row td.cell-service {
     /* Servicio */
     display: block;
     font-size: 0.95rem;
@@ -138,37 +160,41 @@
     order: 3;
   }
 
-  tr.body-table td:nth-child(9) {
-    /* Celda de estado */
+  tr.appointments-row td.cell-actions {
+    /* Celda de acciones */
     display: flex !important;
-    order: 4; /* Lo colocamos antes que la fecha (order:1) */
+    order: 4;
     padding: 0 !important;
   }
-  /* Ocultar la hora en el expandido */
-  tr.body-table.expanded td:nth-child(7) {
-    display: none !important;
-  }
 
-  /* Mostrar flecha solo en móviles */
-  .expand-btn {
+  /*  CUSTOMERS */
+  /* Nueva posición para el estado (encima de la fecha) */
+  tr.customers-row td.cell-status {
+    /* Celda de estado */
     display: flex !important;
-    position: absolute;
-    top: 1.25rem;
-    right: 1.25rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    background: #f8fafc;
-    border-radius: 50%;
-    width: 28px;
-    height: 28px;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid #e2e8f0;
+    order: 0;
+    margin-bottom: 0.5rem;
+    padding: 0 !important;
   }
 
-  .expanded .expand-btn {
-    transform: rotate(180deg);
-    background: #f1f5f9;
+  tr.customers-row td.cell-name {
+    /* Nombre */
+    display: block;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1e293b;
+    order: 1;
+  }
+
+  tr.customers-row td.cell-actions {
+    /* Celda de acciones */
+    display: flex !important;
+    padding: 0 !important;
+    order: 3;
+  }
+  /* Ocultar la hora en el expandido */
+  tr.body-table.expanded td.cell-time {
+    display: none !important;
   }
 
   /* Mostrar todos los campos cuando está expandido */
@@ -176,21 +202,15 @@
     display: block;
   }
 
-  /* Estilo para los datos expandidos */
-  tr.body-table.expanded td:not(:nth-child(6)):not(:nth-child(3)):not(:nth-child(1)) {
-    padding: 0.75rem 0;
-  }
-
-  tr.body-table.expanded td:nth-child(2)::before,
-  tr.body-table.expanded td:nth-child(4)::before,
-  tr.body-table.expanded td:nth-child(5)::before {
+  tr.body-table.expanded td.cell-category::before,
+  tr.body-table.expanded td.cell-phone::before,
+  tr.body-table.expanded td.cell-mail::before {
     content: attr(data-cell) ": ";
     font-weight: 600;
     text-transform: capitalize;
     color: #64748b;
     display: inline-block;
     min-width: 100px;
-    font-size: 0.9rem;
   }
 
   /* Ajustar botones de acción */

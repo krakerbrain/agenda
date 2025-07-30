@@ -15,25 +15,25 @@ $auth->validarTokenUsuario();
             <button
                 class="inline-flex flex-col md:flex-row items-center justify-center py-2 md:px-4 text-sm font-medium text-gray-700 bg-white w-full gap-1 md:gap-2"
                 data-bs-target="#todos" data-tab-target="todos">
-                <span class="text-cyan-500 text-lg md:text-base"><i class="fa-solid fa-users"></i></span>
-                <span class="text-xs md:text-sm">Todos</span>
+                <span class="text-cyan-500 text-lg md:text-base cursor-pointer"><i class="fa-solid fa-users"></i></span>
+                <span class="text-xs md:text-sm cursor-pointer">Todos</span>
             </button>
         </li>
         <li class="flex-1 mr-2 text-center" role="presentation">
             <button
                 class="inline-flex flex-col md:flex-row items-center justify-center py-2 md:px-4 text-sm font-medium text-gray-700 bg-white w-full gap-1 md:gap-2"
                 data-bs-target="#incidencias" data-tab-target="incidencias">
-                <span class="text-orange-500 text-lg md:text-base"><i
+                <span class="text-orange-500 text-lg md:text-base cursor-pointer"><i
                         class="fa-solid fa-exclamation-triangle"></i></span>
-                <span class="text-xs md:text-sm">Con Incidencias</span>
+                <span class="text-xs md:text-sm cursor-pointer">Con Incidencias</span>
             </button>
         </li>
         <li class="flex-1 mr-2 text-center" role="presentation">
             <button
                 class="inline-flex flex-col md:flex-row items-center justify-center py-2 md:px-4 text-sm font-medium text-gray-700 bg-white w-full gap-1 md:gap-2"
                 data-bs-target="#blocked" data-tab-target="blocked">
-                <span class="text-red-500 text-lg md:text-base"><i class="fa-solid fa-ban"></i></span>
-                <span class="text-xs md:text-sm">Bloqueados</span>
+                <span class="text-red-500 text-lg md:text-base cursor-pointer"><i class="fa-solid fa-ban"></i></span>
+                <span class="text-xs md:text-sm cursor-pointer">Bloqueados</span>
             </button>
         </li>
     </ul>
@@ -51,11 +51,11 @@ $auth->validarTokenUsuario();
         </div>
         <div class="p-4">
             <form id="searchCustomerForm" class="flex flex-col sm:flex-row gap-2 pt-2">
-                <input class="form-input form-input-sm border p-1 w-full" type="text" id="name" name="name"
+                <input class="form-input form-input-sm shadow p-1 w-full" type="text" id="name" name="name"
                     placeholder="Buscar nombre..." autocomplete="off">
-                <input class="form-input form-input-sm border p-1 w-full" type="text" id="phone" name="phone"
+                <input class="form-input form-input-sm shadow p-1 w-full" type="text" id="phone" name="phone"
                     placeholder="Buscar teléfono..." autocomplete="off">
-                <input class="form-input form-input-sm border p-1 w-full" type="text" id="mail" name="mail"
+                <input class="form-input form-input-sm shadow p-1 w-full" type="text" id="mail" name="mail"
                     placeholder="Buscar correo..." autocomplete="off">
                 <button
                     class="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-2 px-4 rounded-md text-sm transition w-full sm:w-auto"
@@ -65,8 +65,8 @@ $auth->validarTokenUsuario();
     </div>
     <!-- Backdrop -->
     <div id="offcanvasSearchBackdrop" class="fixed inset-0 z-40 bg-black opacity-50 hidden"></div>
-    <div class="mt-2 rounded-lg shadow">
-        <div class="flex justify-between items-center bg-white p-4 border-b">
+    <div class="mt-2 rounded-lg">
+        <div class="flex justify-between items-center bg-white p-4 ">
             <!-- Botón para abrir el offcanvas de búsqueda -->
             <div class="flex justify-end mb-2">
                 <button
@@ -90,7 +90,7 @@ $auth->validarTokenUsuario();
                 </button>
             </div>
         </div>
-        <table class="min-w-full divide-y divide-gray-200 bg-white">
+        <table class="min-w-full bg-white customers-table">
             <thead>
                 <tr class="bg-cyan-50 text-cyan-800 text-sm font-semibold head-table">
                     <th>Nombre</th>
@@ -100,7 +100,7 @@ $auth->validarTokenUsuario();
                     <th>Acción</th>
                 </tr>
             </thead>
-            <tbody id="tableContent" class="divide-y divide-gray-100">
+            <tbody id="customersContent" class="divide-y divide-gray-100">
                 <!-- Se llenará con JavaScript -->
             </tbody>
         </table>

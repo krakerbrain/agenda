@@ -121,7 +121,7 @@ export function init() {
       notaDiv.innerHTML = `
         <div class="flex justify-between items-center mb-2">
           <label for="${tipoActual}Nota${index + i}" class="block text-sm font-medium text-gray-700 form-label">Nota ${index + i}:</label>
-          <button type="button" class="eliminarNota inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+          <button type="button" class="eliminarNota inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 cursor-pointer">
             Eliminar Nota
           </button>
         </div>

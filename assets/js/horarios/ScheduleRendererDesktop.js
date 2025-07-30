@@ -27,7 +27,7 @@ export class ScheduleRendererDesktop {
                 ${disabled}>
           + Descanso
         </button>
-        ${day === "Lunes" ? "<button type='button' class='text-cyan-600 hover:text-cyan-800 text-xs underline copy-all ml-2'>Copiar en todos</button>" : ""}
+        ${day === "Lunes" ? "<button type='button' class='text-cyan-600 hover:text-cyan-800 text-xs underline copy-all ml-2 cursor-pointer'>Copiar en todos</button>" : ""}
       </td>
       <input type="hidden" name="schedule[${day}][schedule_id]" value="${schedule_id}">
       <input type="hidden" name="schedule[${day}][day_id]" value="${day_id}">
@@ -50,7 +50,7 @@ export class ScheduleRendererDesktop {
         </div>
       </td>
       <td class='py-2 px-2'>
-        <button type='button' class='remove-break bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded px-3 py-1 text-xs font-medium'>Eliminar</button>
+        <button type='button' class='remove-break bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded px-3 py-1 text-xs font-medium cursor-pointer'>Eliminar</button>
       </td>
     `;
 

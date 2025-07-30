@@ -62,7 +62,10 @@ export class BreakTimeManager {
       if (result.success) {
         // Sólo si eliminó correctamente en BD, eliminar visualmente y habilitar botón
         breakElement.remove();
-        if (descansoBtn) descansoBtn.disabled = false;
+        if (descansoBtn) {
+          descansoBtn.disabled = false;
+          descansoBtn.classList.add("cursor-pointer");
+        }
         // Mostrar mensaje o feedback si quieres, usando ModalManager o similar
       } else {
         // Mostrar error, no eliminar visualmente
@@ -72,7 +75,10 @@ export class BreakTimeManager {
     } else {
       // No hay ID, quizá solo eliminar visualmente sin afectar BD (depende del flujo)
       breakElement.remove();
-      if (descansoBtn) descansoBtn.disabled = false;
+      if (descansoBtn) {
+        descansoBtn.disabled = false;
+        descansoBtn.classList.add("cursor-pointer");
+      }
     }
   }
 

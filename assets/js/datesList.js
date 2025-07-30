@@ -27,7 +27,7 @@ export function init() {
   });
 
   // Table renderer
-  tableRenderer = new DatesTableRenderer("#tableContent");
+  tableRenderer = new DatesTableRenderer("#appointmentsContent");
 
   // Pagination global
   pagination = new Pagination("prevPage", "nextPage", "currentPage", (page) => {

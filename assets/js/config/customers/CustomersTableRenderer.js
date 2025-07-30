@@ -9,19 +9,19 @@ export class CustomersTableRenderer {
     this.tableContent.innerHTML = "";
     data.forEach((customer) => {
       const row = document.createElement("tr");
-      row.className = "body-table text-gray-700 hover:bg-cyan-50 transition";
+      row.className = "body-table customers-row text-gray-700 hover:bg-cyan-50 transition";
       row.innerHTML = `
-        <td data-cell='nombre' class='data px-2 py-2'>
+        <td data-cell='nombre' class='data cell-name px-2 py-2'>
           <a id="customerDetailLink${customer.id}" data-id="${customer.id}" href="#">${customer.name}</a>
         </td>
-        <td data-cell='telefono' class='data px-2 py-2'>
-          <i class="fab fa-whatsapp pe-1" style="font-size:0.85rem"></i>
+        <td data-cell='telefono' class='data cell-phone px-2 py-2'>
+          <i class="fab fa-whatsapp text-green-500" style="font-size:0.85rem"></i>
           <a href="https://wa.me/${customer.phone}" target="_blank" class="text-cyan-600 hover:text-cyan-800">+${customer.phone}</a>
         </td>
-        <td data-cell='correo' class='data px-2 py-2'>${customer.mail}</td>
-        <td data-cell='estado' class='data px-2 py-2'>${getStatusBadge({ blocked: customer.blocked, hasIncidents: customer.has_incidents })}</td>
-        <td data-cell='acciones' class='data px-2 py-2'>
-          <div class="actionBtns flex justify-evenly gap-2">${getActionIcons(customer.id, customer.blocked)}</div>
+        <td data-cell='correo' class='data cell-mail px-2 py-2 text-cyan-600 hover:text-cyan-800'><a href="mailto:${customer.mail}">${customer.mail}</a></td>
+        <td data-cell='estado' class='data cell-status px-2 py-2 text-center'>${getStatusBadge({ blocked: customer.blocked, hasIncidents: customer.has_incidents })}</td>
+        <td data-cell='acciones' class='data cell-actions px-2 py-2'>
+          <div class="actionBtns flex justify-center gap-2">${getActionIcons(customer.id, customer.blocked)}</div>
         </td>
         <td class="expand-btn">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
@@ -29,6 +29,12 @@ export class CustomersTableRenderer {
           </svg>
         </td>
       `;
+      // Evento expandir/colapsar
+      const expandBtn = row.querySelector(".expand-btn");
+      expandBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        row.classList.toggle("expanded");
+      });
       this.tableContent.appendChild(row);
     });
     this.updateTableHeaders();

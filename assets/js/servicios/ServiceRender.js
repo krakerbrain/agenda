@@ -136,7 +136,7 @@ export class ServiceRender {
                    name="service_enabled[${serviceId}]" ${isChecked}>
           </label>
         </div>
-        <button type="button" class="text-red-600 hover:text-red-800 delete-service text-base" 
+        <button type="button" class="text-red-600 hover:text-red-800 delete-service text-base cursor-pointer" 
                 ${serviceName == "" ? "disabled" : ""} title="Eliminar servicio">
           <i class="fas fa-trash-alt"></i>
         </button>
@@ -183,7 +183,7 @@ export class ServiceRender {
       </div>
       
       <div class="mb-3">
-        <button type="button" class="w-full bg-cyan-50 hover:bg-cyan-100 text-cyan-700 border border-cyan-200 rounded-md px-4 py-2 text-sm font-medium transition-colors add-category" 
+        <button type="button" class="w-full bg-cyan-50 hover:bg-cyan-100 text-cyan-700 border border-cyan-200 rounded-md px-4 py-2 text-sm font-medium transition-colors add-category cursor-pointer" 
                 data-service-id="${serviceId}">
           <i class="fas fa-plus mr-2"></i>Agregar Categoría
         </button>
@@ -193,7 +193,7 @@ export class ServiceRender {
               <!-- Botón para guardar en una sección separada de acción final -->
 <div class="flex justify-end mt-4"> <!-- Contenedor flex alineado a la derecha -->
   <button type="submit" 
-          class="w-full sm:w-auto bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded transition-colors">
+          class="w-full sm:w-auto bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded transition-colors cursor-pointer">
       <i class="fas fa-save mr-2"></i>
       Guardar Configuración
   </button>
@@ -226,7 +226,7 @@ export class ServiceRender {
     categoryElement.innerHTML = `
       <div class="flex justify-between items-start mb-2">
         <span class="text-xs font-medium text-gray-600">CATEGORÍA</span>
-        <button type="button" class="text-red-600 hover:text-red-800 remove-category">
+        <button type="button" class="text-red-600 hover:text-red-800 remove-category cursor-pointer">
           <i class="fas fa-trash-alt"></i>
         </button>
       </div>
