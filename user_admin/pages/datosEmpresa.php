@@ -62,6 +62,8 @@ $media = $redesSociales->getSocialForDatosEmpresa();
                         class="flex items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition mt-2">
                         <p class="text-sm text-gray-500 text-center">
                             Arrastra aquí el banner o <span class="text-blue-600 underline">haz clic para subir</span>
+                            <small class="block text-gray-400 mt-1">El banner tiene una medida pero si quieres ajustar
+                                la imagen puedes hacerlo con la rueda del mouse</small>
                             <small class="block text-gray-400 mt-1">Recomendado: 1200×300px</small>
                         </p>
                     </div>
@@ -158,7 +160,6 @@ $media = $redesSociales->getSocialForDatosEmpresa();
             </div>
         </form>
     </div>
-
     <!-- Nueva sección de redes sociales como cards -->
     <div class="mt-8 space-y-4" id="social-networks-container">
         <div class="flex items-center space-x-2 mb-4">

@@ -292,26 +292,26 @@ $current_date->setTime(0, 0, 0);
                     <div class="relative">
                         <label for="background-color"
                             class="absolute -top-2 left-2 bg-white px-1 text-xs text-gray-600">Fondo</label>
-                        <input type="color" class="w-full h-16 border border-gray-300 rounded-md" id="background-color"
-                            name="background-color" value="<?php echo $company['bg_color'] ?>">
+                        <input type="color" class="w-full h-16 rounded-md" id="background-color" name="background-color"
+                            value="<?php echo $company['bg_color'] ?>">
                     </div>
                     <div class="relative">
                         <label for="font-color"
                             class="absolute -top-2 left-2 bg-white px-1 text-xs text-gray-600">Texto:</label>
-                        <input type="color" class="w-full h-16 border border-gray-300 rounded-md" id="font-color"
-                            name="font-color" value="<?php echo $company['font_color'] ?>">
+                        <input type="color" class="w-full h-16 rounded-md" id="font-color" name="font-color"
+                            value="<?php echo $company['font_color'] ?>">
                     </div>
                     <div class="relative">
                         <label for="btn-primary-color"
                             class="absolute -top-2 left-2 bg-white px-1 text-xs text-gray-600">Btn Anterior:</label>
-                        <input type="color" class="w-full h-16 border border-gray-300 rounded-md" id="btn-primary-color"
+                        <input type="color" class="w-full h-16 rounded-md" id="btn-primary-color"
                             name="btn-primary-color" value="<?php echo $company['btn1'] ?>">
                     </div>
                     <div class="relative">
                         <label for="btn-secondary-color"
                             class="absolute -top-2 left-2 bg-white px-1 text-xs text-gray-600">Btn Siguiente:</label>
-                        <input type="color" class="w-full h-16 border border-gray-300 rounded-md"
-                            id="btn-secondary-color" name="btn-secondary-color" value="<?php echo $company['btn2'] ?>">
+                        <input type="color" class="w-full h-16 rounded-md" id="btn-secondary-color"
+                            name="btn-secondary-color" value="<?php echo $company['btn2'] ?>">
                     </div>
                     <div class="col-span-2">
                         <button type="button"

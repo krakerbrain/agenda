@@ -21,7 +21,7 @@ if ($user_count > 1) {
         <div class="mb-6">
             <label for="userSelect" class="block text-sm font-medium text-gray-700 mb-2">Selecciona el usuario</label>
             <select id="userSelect"
-                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring focus:ring-cyan-200 focus:ring-opacity-50">
+                class="block rounded-md border border-gray-300 shadow-sm focus:border-cyan-500 focus:ring focus:ring-cyan-200 focus:ring-opacity-50 p-1">
                 <?php foreach ($users as $user) : ?>
                     <option value="<?= $user['id'] ?>" <?= $datosUsuario['role_id'] == $user['role_id'] ? 'selected' : '' ?>>
                         <?= $user['name'] ?></option>
@@ -31,7 +31,7 @@ if ($user_count > 1) {
     <?php else : ?>
         <input type="hidden" id="userSelect" value="<?= $datosUsuario['user_id'] ?>">
     <?php endif; ?>
-    <form id="workScheduleForm" method="POST" class="border border-gray-200 p-6 rounded-lg bg-white shadow">
+    <form id="workScheduleForm" method="POST">
         <div id="unsavedChangesAlert"
             class="hidden mb-4 p-4 rounded bg-yellow-100 text-yellow-800 items-center justify-between gap-4">
             <div>

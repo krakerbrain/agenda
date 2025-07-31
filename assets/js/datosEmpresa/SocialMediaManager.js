@@ -84,6 +84,7 @@ export class SocialMediaManager {
       TikTok: "tiktok",
       Pinterest: "pinterest",
       WhatsApp: "whatsapp",
+      Web: "www",
     };
 
     const iconClass = icons[socialName] || "globe";

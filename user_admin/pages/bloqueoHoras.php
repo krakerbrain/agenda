@@ -28,23 +28,23 @@ if ($user_count > 1) {
         </div>
 
         <?php if ($user_count > 1 && $datosUsuario['role_id'] == 2) : ?>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
-                    <label for="userSelect" class="block text-sm font-medium text-gray-700 mb-1">Selecciona el
-                        usuario</label>
-                    <select name="user_id" id="userSelect"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                        <?php foreach ($users as $user) : ?>
-                            <option value="<?= $user['id'] ?>"
-                                <?= $datosUsuario['role_id'] == $user['role_id'] ? 'selected' : '' ?>>
-                                <?= $user['name'] ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+                <label for="userSelect" class="block text-sm font-medium text-gray-700 mb-1">Selecciona el
+                    usuario</label>
+                <select name="user_id" id="userSelect"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    <?php foreach ($users as $user) : ?>
+                    <option value="<?= $user['id'] ?>"
+                        <?= $datosUsuario['role_id'] == $user['role_id'] ? 'selected' : '' ?>>
+                        <?= $user['name'] ?>
+                    </option>
+                    <?php endforeach; ?>
+                </select>
             </div>
+        </div>
         <?php else : ?>
-            <input type="hidden" name="user_id" id="userSelect" value="<?= $datosUsuario['user_id'] ?>">
+        <input type="hidden" name="user_id" id="userSelect" value="<?= $datosUsuario['user_id'] ?>">
         <?php endif; ?>
 
         <!-- Selección de fecha y horas -->
@@ -75,7 +75,7 @@ if ($user_count > 1) {
         </div>
 
         <button type="submit"
-            class="w-full md:w-auto px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 mb-8">
+            class="w-full md:w-auto px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 mb-8 cursor-pointer">
             Guardar Hora Bloqueada
         </button>
     </form>

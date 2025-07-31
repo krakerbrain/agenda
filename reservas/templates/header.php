@@ -78,7 +78,7 @@
             font-weight: bold;
             /* Sombra para mejorar la legibilidad */
             text-align: center;
-            display: <?php echo (!empty($selected_banner) && preg_match('/^assets\/img\/banners\/user_\d+\/banner_user_prefered_\d+\.png$/', $selected_banner)) ? 'none' : 'block';
+            display: <?php echo (!empty($selected_banner)) ? 'none' : 'block';
                         ?>;
 
         }
@@ -220,13 +220,13 @@
                     <div class="company-info"><?php echo htmlspecialchars($company['address']); ?></div>
                     <div class="company-info"><i class="fas fa-phone" style="font-size: 0.6rem;"></i>
                         <?php echo htmlspecialchars($company['phone']); ?></div>
-                    <div class="social-icons">
-                        <?php foreach ($socialNetworks as $socials) : ?>
-                            <a href="<?php echo htmlspecialchars($socials['url']); ?>" target="_blank"
-                                title="<?php echo htmlspecialchars($socials['name']); ?>"><i
-                                    class="<?php echo htmlspecialchars($socials['icon_class']); ?>"></i></a>
-                        <?php endforeach; ?>
-                    </div>
+                </div>
+                <div class="social-icons text-end">
+                    <?php foreach ($socialNetworks as $socials) : ?>
+                        <a href="<?php echo htmlspecialchars($socials['url']); ?>" target="_blank"
+                            title="<?php echo htmlspecialchars($socials['name']); ?>"><i
+                                class="<?php echo htmlspecialchars($socials['icon_class']); ?>"></i></a>
+                    <?php endforeach; ?>
                 </div>
             </div>
             <div class="text-md-start text-center">

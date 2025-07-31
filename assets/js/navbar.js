@@ -83,6 +83,17 @@ export function offCanvas() {
       navOffcanvas.closeCanvas();
     });
   });
+
+  // Cerrar offcanvas al hacer click fuera del menú
+  document.addEventListener("click", (e) => {
+    const offcanvasMenu = document.getElementById("offcanvasMenu");
+    const offcanvasToggle = document.getElementById("offcanvasToggle");
+
+    // Verificar si el click fue fuera del menú y del botón toggle
+    if (!offcanvasMenu.contains(e.target) && !offcanvasToggle.contains(e.target)) {
+      navOffcanvas.closeCanvas();
+    }
+  });
 }
 
 // Inicialización cuando el DOM está listo

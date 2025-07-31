@@ -7,6 +7,13 @@ export class ImageCropper {
       viewMode: 1,
       autoCropArea: 1,
       zoomable: true,
+      ready: () => {
+        // Forzar el tamaño del crop box al inicializar
+        this.cropper.setCropBoxData({
+          width: config.minCropBoxWidth || 600,
+          height: config.minCropBoxHeight || 150,
+        });
+      },
       ...config,
     };
   }

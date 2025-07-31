@@ -10,7 +10,7 @@ $auth->validarTokenUsuario();
 ?>
 <link rel="stylesheet" href="<?php echo $baseUrl; ?>assets/css/table.css?v=<?php echo time(); ?>">
 
-<div class="mx-auto px-2 w-full">
+<div class="mx-auto px-2 max-w-7xl">
     <ul class="flex border-b border-gray-200 mb-4" id="myTab" role="tablist">
         <li class="flex-1 mr-2 text-center" role="presentation">
             <button
@@ -44,14 +44,14 @@ $auth->validarTokenUsuario();
                 <span class="text-xs md:text-sm">Todas</span>
             </button>
         </li>
-        <li class="flex-1 mr-2 text-center" role="presentation">
+        <!-- <li class="flex-1 mr-2 text-center" role="presentation">
             <button
                 class="inline-flex flex-col md:flex-row items-center justify-center py-2 md:px-4 text-sm font-medium text-gray-700 bg-white w-full gap-1 md:gap-2 cursor-pointer"
                 data-bs-target="#events">
                 <span class="text-purple-500 text-lg md:text-base"><i class="fa-solid fa-person-chalkboard"></i></span>
                 <span class="text-xs md:text-sm">Eventos</span>
             </button>
-        </li>
+        </li> -->
     </ul>
 
 

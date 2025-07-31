@@ -20,9 +20,18 @@ $user_count = $userData->count_company_users($datosUsuario['company_id']);
 if ($user_count > 1) {
     $users = $userData->get_all_users($datosUsuario['company_id']);
 }
-
 $notificationData = new Notifications(); // Asume que tienes esta clase
 $unread_count = $notificationData->getUnreadCount($datosUsuario['user_id']);
+$logoDir = dirname(__DIR__) . '/assets/img/uploads/logo-' . $datosUsuario['company_id'] . '/';
+
+if (is_dir($logoDir)) {
+    $archivos = glob($logoDir . '*');
+    if (!empty($archivos)) {
+        // Tomar el primer archivo encontrado (asumiendo que solo hay uno)
+        $logoArchivo = basename($archivos[0]);
+        $company_logo = $baseUrl . 'assets/img/uploads/logo-' . $datosUsuario['company_id'] . '/' . $logoArchivo;
+    }
+}
 
 include dirname(__DIR__) . '/partials/head.php';
 ?>
@@ -37,9 +46,15 @@ include dirname(__DIR__) . '/partials/head.php';
     <!-- Navbar -->
     <header class="sticky top-0 z-50 bg-gray-100 shadow-sm">
         <nav class="container mx-auto px-2 py-3 flex items-center justify-between max-w-7xl">
-            <a class="text-xl font-semibold titulo" href="#"></a>
-
-            <div class="flex items-center space-x-4">
+            <div class="flex items-center space-x-3">
+                <img src="https://agendarium.com/assets/img/landing/logo/Isotipo-Agendarium.svg" alt="Logo Agendarium"
+                    class="h-8 w-auto md:h-10">
+                <?php if (isset($company_logo) && !empty($company_logo)): ?>
+                    <img src="<?php echo $company_logo; ?>" alt="logo" class="h-8">
+                <?php endif; ?>
+            </div>
+            <a class="md:text-xl titulo" href="#"></a>
+            <div class="flex items-center">
                 <!-- Notification Dropdown -->
                 <div class="relative">
                     <button class="relative p-1 text-gray-700 hover:text-gray-900 focus:outline-none"
@@ -154,10 +169,10 @@ include dirname(__DIR__) . '/partials/head.php';
                             <a class="nav-element block px-3 py-2 text-gray-700 rounded hover:bg-gray-100" href="#"
                                 id="integrations">Servicios Integrados</a>
                         </li>
-                        <li>
+                        <!-- <li>
                             <a class="nav-element block px-3 py-2 text-gray-700 rounded hover:bg-gray-100" href="#"
                                 id="eventos_unicos">Eventos Únicos</a>
-                        </li>
+                        </li> -->
                         <li>
                             <a class="nav-element block px-3 py-2 text-gray-700 rounded hover:bg-gray-100" href="#"
                                 id="bloqueoHoras">Bloqueo de horas</a>
@@ -193,7 +208,7 @@ include dirname(__DIR__) . '/partials/head.php';
     <!-- Backdrop -->
     <div id="offcanvasBackdrop" class="fixed inset-0 z-40 bg-black opacity-50 hidden"></div>
 
-    <div id="main-content" class="container max-w-7xl mx-auto px-4 py-6"></div>
+    <div id="main-content" class="container mx-auto px-4 py-6"></div>
 
     <!-- Usado en configuracion de eventos únicos para múltiples fechas -->
     <script src="<?php echo $baseUrl; ?>assets/vendors/js/flatpickr/flatpickr.min.js"></script>

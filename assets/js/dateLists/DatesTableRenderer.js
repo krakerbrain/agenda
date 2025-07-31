@@ -28,7 +28,7 @@ export class DatesTableRenderer {
           ${DateFormatter.formatDate(item.date)}
           <span class='inline-block ms-4 text-gray-500 md:hidden'>${DateFormatter.formatTimeTo12h(item.start_time)}</span>
         </td>
-        <td data-cell='hora' class='data cell-time px-2 py-2 hidden md:table-cell'>${DateFormatter.formatTimeTo12h(item.start_time)}</td>
+        <td data-cell='hora' class='data cell-time px-2 py-2 hidden md:table-cell' nowrap>${DateFormatter.formatTimeTo12h(item.start_time)}</td>
         <td data-cell='estado' class='data cell-status px-2 py-2'>${getStatusBadge(item.status)}</td>
         <td data-cell='acciones' class="cell-actions px-2 py-2"><div class="actionBtns flex justify-evenly gap-2">${getActionButtons(item.status, item.id_appointment)}</div></td>
         <td class="expand-btn">

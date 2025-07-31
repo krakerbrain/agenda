@@ -4,7 +4,7 @@ export class ScheduleRendererMobile {
     const tableBody = document.getElementById("scheduleTableBodyMobile");
 
     const card = document.createElement("div");
-    card.classList.add("p-4", "bg-white", "rounded-lg", "shadow", "space-y-3", "work-day");
+    card.classList.add("p-4", "bg-white", "rounded-lg", "shadow", "space-y-3", "work-day", "border", "border-gray-300", "mb-4");
 
     const checked = is_enabled === 1 ? "checked" : "";
     const disabled = is_enabled === 1 ? "" : "disabled";
@@ -54,8 +54,8 @@ export class ScheduleRendererMobile {
         <input type='time' class='border rounded px-2 py-1 w-full' name='schedule[${day}][break_start]' value='${break_start}' required>
         <input type='time' class='border rounded px-2 py-1 w-full' name='schedule[${day}][break_end]' value='${break_end}' required>
       </div>
-      <div>
-        <button type='button' class='remove-break bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded px-3 py-1 text-xs font-medium'>Eliminar</button>
+      <div class="mt-3">
+        <button type='button' class='remove-break bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded px-3 py-1 text-xs font-medium'>Eliminar descanso</button>
       </div>
     `;
 

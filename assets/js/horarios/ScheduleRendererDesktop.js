@@ -50,7 +50,7 @@ export class ScheduleRendererDesktop {
         </div>
       </td>
       <td class='py-2 px-2'>
-        <button type='button' class='remove-break bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded px-3 py-1 text-xs font-medium cursor-pointer'>Eliminar</button>
+        <button type='button' class='remove-break bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded px-3 py-1 text-xs font-medium cursor-pointer'>Eliminar descanso</button>
       </td>
     `;
 
