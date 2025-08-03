@@ -1,14 +1,17 @@
+// ModalManager for handling notifications
+import { ModalManager } from "./config/ModalManager.js";
+
 export function init() {
   fetchBlockedDays();
   const hourRange = document.getElementById("hour-range");
 
   document.getElementById("all-day").addEventListener("change", function () {
     if (this.checked) {
-      hourRange.style.display = "none";
+      hourRange.classList.add("hidden");
       document.getElementById("start-hour").required = false;
       document.getElementById("end-hour").required = false;
     } else {
-      hourRange.style.display = "flex";
+      hourRange.classList.remove("hidden");
       document.getElementById("start-hour").required = true;
       document.getElementById("end-hour").required = true;
     }
@@ -46,13 +49,13 @@ export function init() {
       const result = await response.json();
 
       if (result.success) {
-        handleModal("Fecha bloqueada correctamente.");
+        handleModal("Fecha bloqueada correctamente.", "Éxito");
         // Limpiar formulario
         hourRange.style.display = "none";
         document.getElementById("block-date-form").reset();
         fetchBlockedDays(user_id);
       } else {
-        handleModal(result.message);
+        handleModal(result.message, "Error");
       }
     } catch (error) {
       console.error("Error:", error);
@@ -67,7 +70,7 @@ export function init() {
     if (success) {
       updateBlockedDatesTable(data);
     } else {
-      handleModal(result.message || "Error al obtener los días bloqueados.");
+      handleModal(result.message || "Error al obtener los días bloqueados.", "Error");
     }
   }
 
@@ -78,31 +81,47 @@ export function init() {
     });
   }
   function updateBlockedDatesTable(blockedDays) {
-    const tbody = document.getElementById("blocked-dates-list");
-    tbody.innerHTML = ""; // Limpiar la tabla
+    const container = document.getElementById("blocked-dates-list");
+    container.innerHTML = ""; // Limpiar el contenedor
 
     if (blockedDays.length === 0) {
-      tbody.innerHTML = `
-          <tr>
-              <td colspan="4" class="text-center">No hay fechas bloqueadas.</td>
-          </tr>
-      `;
+      container.innerHTML = `
+            <div class="col-span-full text-center py-4 text-gray-500">
+                No hay fechas bloqueadas.
+            </div>
+        `;
       return;
     }
 
     blockedDays.forEach((day) => {
-      const row = `
-          <tr>
-              <td>${day.date}</td>
-              <td>${day.start_time || "Todo el día"}</td>
-              <td>${day.end_time || "Todo el día"}</td>
-              <td class="text-center text-md-start">
-                  <button class="btn btn-danger btn-sm deleteBlockedDay" data-token="${day.token}" title="Eliminar fecha bloqueada"> <i class="fas fa-trash-alt"></i></button>
-              </td>
-          </tr>
-      `;
-      tbody.innerHTML += row;
+      const card = `
+            <div class="relative bg-white rounded-lg shadow p-4 border border-gray-200 hover:shadow-md transition-shadow">
+                <!-- Botón de eliminar en esquina superior derecha -->
+                <button class="absolute top-2 right-2 text-red-500 hover:text-red-700 deleteBlockedDay" 
+                        data-token="${day.token}" 
+                        title="Eliminar fecha bloqueada">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+                
+                <!-- Contenido de la card -->
+                <div class="space-y-2">
+                    <div class="flex items-center">
+                        <i class="fa fa-calendar-alt text-gray-500 mr-2"></i>
+                        <span class="font-medium">${day.date}</span>
+                    </div>
+                    
+                    <div class="flex items-center">
+                        <i class="fa fa-clock text-gray-500 mr-2"></i>
+                        <span>${day.start_time || "Todo el día"}</span>
+                        ${day.start_time ? " - " + day.end_time : ""}
+                    </div>
+                </div>
+            </div>
+        `;
+      container.innerHTML += card;
     });
+
+    // Agregar event listeners a los botones de eliminar
     document.querySelectorAll(".deleteBlockedDay").forEach((button) => {
       button.addEventListener("click", function (event) {
         const token = this.getAttribute("data-token");
@@ -126,24 +145,23 @@ export function init() {
       const result = await response.json();
 
       if (result.success) {
-        handleModal("Fecha desbloqueada correctamente.");
+        handleModal("Fecha desbloqueada correctamente.", "Éxito");
         let user_id = document.querySelector("#userSelect").value;
         fetchBlockedDays(user_id);
       } else {
-        handleModal(result.message);
+        handleModal(result.message, "Error");
       }
     } catch (error) {
       console.error("Error:", error);
     }
   }
 
-  function handleModal(message) {
-    const modal = new bootstrap.Modal(document.getElementById("modalErrorBlockHour"));
-    const modalBody = document.getElementById("responseMessage");
-    modalBody.innerHTML = message;
-    modal.show();
+  function handleModal(message, title = "Información") {
+    ModalManager.show("infoModal", {
+      title: title,
+      message: message,
+    });
   }
 
-  const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
-  const popoverList = [...popoverTriggerList].map((popoverTriggerEl) => new bootstrap.Popover(popoverTriggerEl));
+  ModalManager.setupCloseListeners();
 }

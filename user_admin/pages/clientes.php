@@ -8,42 +8,91 @@ $auth = new JWTAuth();
 $auth->validarTokenUsuario();
 
 ?>
-
-<div class="container mt-4">
-    <ul class="nav nav-tabs" id="customerTab" role="tablist">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#todos" role="tab">Todos</button>
+<link rel="stylesheet" href="<?php echo $baseUrl; ?>assets/css/table.css?v=<?php echo time(); ?>">
+<div class="mx-auto px-2 max-w-6xl">
+    <ul class="flex border-b border-gray-200 mb-4" id="customerTab" role="tablist">
+        <li class="flex-1 mr-2 text-center" role="presentation">
+            <button
+                class="inline-flex flex-col md:flex-row items-center justify-center py-2 md:px-4 text-sm font-medium text-gray-700 bg-white w-full gap-1 md:gap-2"
+                data-bs-target="#todos" data-tab-target="todos">
+                <span class="text-cyan-500 text-lg md:text-base cursor-pointer"><i class="fa-solid fa-users"></i></span>
+                <span class="text-xs md:text-sm cursor-pointer">Todos</span>
+            </button>
         </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#incidencias" role="tab">Con
-                Incidencias</button>
+        <li class="flex-1 mr-2 text-center" role="presentation">
+            <button
+                class="inline-flex flex-col md:flex-row items-center justify-center py-2 md:px-4 text-sm font-medium text-gray-700 bg-white w-full gap-1 md:gap-2"
+                data-bs-target="#incidencias" data-tab-target="incidencias">
+                <span class="text-orange-500 text-lg md:text-base cursor-pointer"><i
+                        class="fa-solid fa-exclamation-triangle"></i></span>
+                <span class="text-xs md:text-sm cursor-pointer">Con Incidencias</span>
+            </button>
         </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#blocked" role="tab">Bloqueados</button>
+        <li class="flex-1 mr-2 text-center" role="presentation">
+            <button
+                class="inline-flex flex-col md:flex-row items-center justify-center py-2 md:px-4 text-sm font-medium text-gray-700 bg-white w-full gap-1 md:gap-2"
+                data-bs-target="#blocked" data-tab-target="blocked">
+                <span class="text-red-500 text-lg md:text-base cursor-pointer"><i class="fa-solid fa-ban"></i></span>
+                <span class="text-xs md:text-sm cursor-pointer">Bloqueados</span>
+            </button>
         </li>
     </ul>
-    <form id="searchCustomerForm" class="d-lg-flex justify-content-between pt-2">
-        <div class="w-100">
-            <input class="form-control form-control-sm" type="text" id="name" name="name" placeholder="Buscar nombre..."
-                autocomplete="off">
+    <!-- Offcanvas para el formulario de búsqueda -->
+    <div id="offcanvasSearch"
+        class="fixed inset-x-0 top-0 z-50 h-auto bg-white shadow-lg transform -translate-y-full transition-transform duration-300 ease-in-out overflow-y-auto">
+        <div class="flex items-center justify-between px-4 py-3 border-b">
+            <h5 class="text-lg font-medium">Filtro de búsqueda</h5>
+            <button id="offcanvasSearchClose" class="text-gray-500 hover:text-gray-700 focus:outline-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
         </div>
-        <div class="w-100">
-            <input class="form-control form-control-sm" type="text" id="phone" name="phone"
-                placeholder="Buscar teléfono..." autocomplete="off">
+        <div class="p-4">
+            <form id="searchCustomerForm" class="flex flex-col sm:flex-row gap-2 pt-2">
+                <input class="form-input form-input-sm shadow p-1 w-full" type="text" id="name" name="name"
+                    placeholder="Buscar nombre..." autocomplete="off">
+                <input class="form-input form-input-sm shadow p-1 w-full" type="text" id="phone" name="phone"
+                    placeholder="Buscar teléfono..." autocomplete="off">
+                <input class="form-input form-input-sm shadow p-1 w-full" type="text" id="mail" name="mail"
+                    placeholder="Buscar correo..." autocomplete="off">
+                <button
+                    class="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-2 px-4 rounded-md text-sm transition w-full sm:w-auto"
+                    type="submit" id="searchButton">Buscar</button>
+            </form>
         </div>
-        <div class="w-100">
-            <input class="form-control form-control-sm" type="text" id="mail" name="mail" placeholder="Buscar correo..."
-                autocomplete="off">
+    </div>
+    <!-- Backdrop -->
+    <div id="offcanvasSearchBackdrop" class="fixed inset-0 z-40 bg-black opacity-50 hidden"></div>
+    <div class="mt-2 rounded-lg">
+        <div class="flex justify-between items-center bg-white p-4 ">
+            <!-- Botón para abrir el offcanvas de búsqueda -->
+            <div class="flex justify-end mb-2">
+                <button
+                    class="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-2 px-4 rounded-md text-sm transition flex items-center gap-2"
+                    type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSearch"
+                    aria-controls="offcanvasSearch" id="offcanvasToggleSearch">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <span class="hidden sm:inline">Filtros de búsqueda</span>
+                </button>
+            </div>
+            <div id="paginator" class="flex justify-end items-center gap-2 py-2 pe-2">
+                <button id="prevPage"
+                    class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded disabled:opacity-50 transition"
+                    title="Ir a la página anterior" disabled>
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <span id="currentPage" class="text-sm font-medium">Página 1</span>
+                <button id="nextPage"
+                    class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded disabled:opacity-50 transition">
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
         </div>
-        <div class="w-25">
-            <button class="btn btn-sm btn-primary w-100" type="submit" id="searchButton">Buscar</button>
-        </div>
-    </form>
-
-    <div class="table-responsive">
-        <table class="table table-striped table-hover">
+        <table class="min-w-full bg-white customers-table">
             <thead>
-                <tr class="head-table">
+                <tr class="bg-cyan-50 text-cyan-800 text-sm font-semibold head-table">
                     <th>Nombre</th>
                     <th>Teléfono</th>
                     <th>Correo</th>
@@ -51,21 +100,10 @@ $auth->validarTokenUsuario();
                     <th>Acción</th>
                 </tr>
             </thead>
-            <tbody id="tableContent">
+            <tbody id="customersContent" class="divide-y divide-gray-100">
                 <!-- Se llenará con JavaScript -->
             </tbody>
-            <div id="paginator" class="text-end pt-1">
-                <button id="prevPage" class="btn btn-sm btn-success" title="Ir a la página anterior" disabled>
-                    <i class="fas fa-arrow-left"></i> <!-- Icono de flecha izquierda -->
-                </button>
-                <span id="currentPage" class="page-indicator">Página 1</span>
-                <button id="nextPage" class="btn btn-sm btn-success" title="Ir a la página siguiente">
-                    <i class="fas fa-arrow-right"></i> <!-- Icono de flecha derecha -->
-                </button>
-            </div>
         </table>
     </div>
 </div>
-<!-- agregar un modal para clientes -->
-<?php include dirname(__DIR__, 2) . '/includes/customer-modal.php';
-?>
+<?php include dirname(__DIR__, 2) . '/includes/customer-modal.php'; ?>

@@ -47,7 +47,7 @@ include_once dirname(__DIR__, 2) . '/landing/partials/head.php';
     </div>
     <!-- Modal para mostrar mensaje de activación -->
     <div id="activationModal"
-        class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50 transition-opacity duration-300 ease-out">
+        class="fixed inset-0 z-50 hidden items-center justify-center bg-black opacity-50 transition-opacity duration-300 ease-out">
         <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full text-center">
             <h2 id="modalTitle" class="text-xl font-bold mb-4"></h2>
             <p id="modalMessage" class="text-gray-700 mb-4"></p>

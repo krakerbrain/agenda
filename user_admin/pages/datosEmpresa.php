@@ -13,184 +13,164 @@ $redesSociales = new RedesSociales($company_id);
 $media = $redesSociales->getSocialForDatosEmpresa();
 
 ?>
-<div class="container mt-5">
-    <form id="datosEmpresaForm" action="" method="POST">
+<div class="max-w-4xl mx-auto mt-8">
+    <form id="datosEmpresaForm" action="" method="POST" class="space-y-6">
         <input type="hidden" name="logo_url" id="logoUrl" value="">
+        <input type="hidden" name="banner_url" id="bannerUrl" value="">
         <input type="hidden" name="company_id" id="companyId" value="<?php echo $company_id ?>">
-        <input type="hidden" name="company_name" id="companyName" value="">
-        <h4 class="companyName"></h4>
-        <div class="mb-3">
-            <div class="">
-                <img src="" alt="Logo de la Empresa" class="img-fluid w-25 logoEmpresa">
+        <input type="hidden" name="company_name" id="companyName" value=" ">
+        <h4 class="companyName text-2xl font-bold mb-4"></h4>
+        <div class="mb-6">
+            <div class="mb-2">
+                <img src="" alt="Logo de la Empresa" class="w-32 h-32 object-contain rounded mx-auto" id="preview-logo">
             </div>
-            <div class="">
-                <label for="logo" class="form-label" style="font-size: 1.2rem; font-weight: bold;">Cambiar Logo</label>
-                <input type="file" class="form-control" id="logo" name="logo">
-            </div>
-        </div>
-        <!-- Campo para subir el banner -->
-        <div class="mb-3">
-            <label for="banner" class="form-label" style="font-size: 1.2rem; font-weight: bold;">Subir Banner</label>
-            <input type="file" class="form-control" id="banner" name="banner" accept="image/*">
-            <small class="form-text text-muted">Sube una imagen y ajústala al área del banner.</small>
-        </div>
 
-        <!-- Contenedor para la imagen subida -->
-        <div class="mb-3">
-            <div id="image-container" style="display: none; max-width: 600px; margin: 0 auto;">
-                <img id="image-to-crop" src="#" alt="Imagen subida" style="max-width: 100%;">
+            <label class="block text-base font-semibold mb-1">Cambiar Logo</label>
+
+            <div id="logoDropzone"
+                class="flex items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition">
+                <p class="text-sm text-gray-500 text-center">
+                    Arrastra aquí el logo o <span class="text-blue-600 underline">haz clic para subir</span>
+                </p>
             </div>
+
+            <input type="file" id="logo" name="logo" class="hidden" accept="image/*">
         </div>
 
-        <!-- Área de previsualización del banner -->
-        <div class="mb-3">
-            <label class="form-label">Previsualización del Banner</label>
-            <div id="banner-preview"
-                style="max-width: 600px; width: 100%; height: 150px; overflow: hidden; background-color: #f0f0f0;">
-                <img id="cropped-image" src="#" alt="Banner recortado"
-                    style="width: 100%; height: 100%; object-fit: cover; display: none;">
+        <div class="mb-6">
+            <!-- Vista previa del banner actual -->
+            <div class="mb-4">
+                <label class="block text-base font-semibold mb-2">Banner Actual</label>
+                <img src="<?php echo $baseUrl . 'assets/img/banners/banner_vacio.png' ?>" alt="Banner Actual"
+                    class="w-full h-40 object-cover rounded-lg border border-gray-200" id="current-banner">
             </div>
-        </div>
 
-        <!-- Botón para guardar el banner -->
-        <button type="button" id="save-banner" class="btn btn-primary" style="display: none;">Guardar Banner</button>
+            <!-- Selector de banner (personalizado o predeterminado) -->
+            <div class="mb-6">
+                <label class="block text-base font-semibold mb-2">Cambiar Banner</label>
 
-        <!-- Selección de imágenes -->
-        <div class="mb-3">
-            <label class="form-label">Seleccionar un banner predeterminado</label>
+                <!-- Opción 1: Subir banner personalizado -->
+                <div class="mb-4 p-4 border border-gray-200 rounded-lg">
+                    <div class="flex items-center mb-2">
+                        <input class="form-radio text-blue-600" type="radio" name="selected-banner" id="banner-custom"
+                            value="custom">
+                        <label class="ml-2 font-medium" for="banner-custom">Banner Personalizado</label>
+                    </div>
 
-            <div class="row" id="default-banners-container">
-                <div class="col-md-6 mb-3">
-                    <div class="card">
-                        <img id="saved-cropped-image"
-                            src="<?php echo $baseUrl . 'assets/img/banners/banner_vacio.png'; ?>" class="card-img-top"
-                            alt="Banner Personalizado">
-                        <div class="card-body text-center">
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="selected-banner" id="banner-custom"
-                                    value="custom">
-                                <label class="form-check-label" for="banner-custom">
-                                    Seleccionar
-                                </label>
+                    <!-- Dropzone para subir banner -->
+                    <div id="bannerDropzone"
+                        class="flex items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition mt-2">
+                        <p class="text-sm text-gray-500 text-center">
+                            Arrastra aquí el banner o <span class="text-blue-600 underline">haz clic para subir</span>
+                            <small class="block text-gray-400 mt-1">El banner tiene una medida pero si quieres ajustar
+                                la imagen puedes hacerlo con la rueda del mouse</small>
+                            <small class="block text-gray-400 mt-1">Recomendado: 1200×300px</small>
+                        </p>
+                    </div>
+                    <input type="file" id="banner" name="banner" class="hidden" accept="image/*">
+
+                    <!-- Editor de banner (oculto inicialmente) -->
+                    <div id="banner-editor-container" class="hidden">
+                        <div class="mb-3">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Recortar Banner</label>
+                            <div class="border rounded-lg overflow-hidden">
+                                <img id="image-to-crop" src="#" alt="Imagen para recortar" class="max-w-full">
                             </div>
                         </div>
+                        <button id="save-custom-banner" type="button"
+                            class="mt-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700">
+                            Guardar Banner Recortado
+                        </button>
                     </div>
                 </div>
-                <?php
-                // Array de imágenes predeterminadas
-                $defaultBanners = [
-                    'default_belleza.png',
-                    'default_salud.png',
-                    'default_deportes.png'
-                ];
-                foreach ($defaultBanners as $banner) : ?>
-                    <div class="col-md-6 mb-3">
-                        <div class="card">
-                            <img src="<?php echo $baseUrl . 'assets/img/banners/' . $banner; ?>" class="card-img-top"
-                                alt="Banner Predeterminado">
-                            <div class="card-body text-center">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="selected-banner"
-                                        id="banner-<?php echo $banner; ?>" value="<?php echo $banner; ?>">
-                                    <label class="form-check-label" for="banner-<?php echo $banner; ?>">
-                                        Seleccionar
-                                    </label>
-                                </div>
+
+                <!-- Opción 2: Banners predeterminados -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <?php
+                    $defaultBanners = [
+                        'default_belleza.png',
+                        'default_salud.png',
+                        'default_deportes.png'
+                    ];
+                    foreach ($defaultBanners as $banner): ?>
+                        <div class="p-4 border border-gray-200 rounded-lg hover:border-blue-300 transition">
+                            <div class="flex items-center mb-2">
+                                <input class="form-radio text-blue-600" type="radio" name="selected-banner"
+                                    id="banner-<?php echo $banner; ?>" value="<?php echo $banner; ?>">
+                                <label class="ml-2 font-medium" for="banner-<?php echo $banner; ?>">
+                                    <?php echo str_replace(['default_', '.png'], '', $banner); ?>
+                                </label>
                             </div>
+                            <img src="<?php echo $baseUrl . 'assets/img/banners/' . $banner; ?>"
+                                class="w-full h-24 object-cover rounded border border-gray-200 mt-2"
+                                alt="Banner <?php echo $banner; ?>">
                         </div>
-                    </div>
-                <?php endforeach; ?>
+                    <?php endforeach; ?>
+                </div>
             </div>
         </div>
-        <!-- Teléfono y Dirección -->
-        <div class="row mb-3">
-            <div class="col-md-6">
-                <label for="phone" class="form-label">Teléfono</label>
-                <input type="tel" class="form-control" id="phone" name="phone" placeholder="Número de teléfono"
-                    value="+56912345678" title="El formato usado es +56912345678">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div>
+                <label for="phone" class="block text-base font-semibold mb-1">Teléfono</label>
+                <input type="tel"
+                    class="block w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    id="phone" name="phone" placeholder="Número de teléfono" value="+56912345678"
+                    title="El formato usado es +56912345678">
             </div>
-            <div class="col-md-6">
-                <label for="address" class="form-label">Dirección</label>
-                <input type="text" class="form-control" id="address" name="address"
-                    placeholder="Dirección de la empresa" value="">
-            </div>
-        </div>
-
-        <!-- Descripción de la Empresa -->
-        <div class="row mb-3">
-            <div class="col-md-12">
-                <label for="description" class="form-label">Descripción</label>
-                <textarea class="form-control" id="description" name="description" rows="2" maxlength="150"
-                    placeholder="Descripción breve de la empresa (máximo 150 caracteres)"></textarea>
-                <div class="form-text">Máximo 150 caracteres.</div>
+            <div>
+                <label for="address" class="block text-base font-semibold mb-1">Dirección</label>
+                <input type="text"
+                    class="block w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    id="address" name="address" placeholder="Dirección de la empresa" value="">
             </div>
         </div>
-
-        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+        <div class="mb-6">
+            <label for="description" class="block text-base font-semibold mb-1">Descripción</label>
+            <textarea
+                class="block w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                id="description" name="description" rows="2" maxlength="150"
+                placeholder="Descripción breve de la empresa (máximo 150 caracteres)"></textarea>
+            <div class="text-gray-400 text-sm">Máximo 150 caracteres.</div>
+        </div>
+        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">Guardar
+            Cambios</button>
     </form>
-    <div class="container mt-4">
-        <form id="social-form">
-            <div class="row mb-3">
-                <div class="col-md-4">
-                    <label for="social-network" class="form-label">Red Social</label>
-                    <select id="social-network" name="social_network" class="form-select">
+    <div class="mt-8">
+        <form id="social-form" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label for="social-network" class="block text-base font-semibold mb-1">Red Social</label>
+                    <select id="social-network" name="social_network"
+                        class="block w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <?php foreach ($media as $red) { ?>
                             <option value="<?php echo $red['id'] ?>"><?php echo $red['name'] ?></option>
                         <?php } ?>
                     </select>
-
                 </div>
-                <div class="col-md-4">
-                    <label for="social-url" class="form-label">URL</label>
-                    <input type="text" id="social-url" name="social_url" class="form-control"
+                <div>
+                    <label for="social-url" class="block text-base font-semibold mb-1">URL</label>
+                    <input type="text" id="social-url" name="social_url"
+                        class="block w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                         placeholder="Ingrese la URL">
                 </div>
-                <div class="col-md-4 d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary">Agregar</button>
+                <div class="flex items-end">
+                    <button type="submit"
+                        class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition w-full">Agregar</button>
                 </div>
             </div>
         </form>
     </div>
-    <div class="container mt-4">
-        <table class="table">
-            <thead>
-                <tr class="head-table">
-                    <th>Red Social</th>
-                    <th>URL</th>
-                    <th class="text-center">Red preferida
-                        <button id="edit-preferred" class="btn btn-link p-0" title="Editar Red Preferida">
-                            <i class="fas fa-pencil-alt"></i>
-                        </button>
-                        <!-- <a tabindex="0" role="button" data-bs-trigger="focus" class="btn help" data-bs-toggle="popover"
-                            data-bs-title="Red preferida"
-                            data-bs-content="Presiona en el ícono del lápiz para que puedas seleccionar tu red social preferida o página web. La función de ésto es que en el mensaje de Whatsapp de confirmación hay un botón que lleva al usuario a ver tu red social o página web"><i
-                                class="fa fa-circle-question text-primary"></i></a> -->
-                    </th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody id="social-networks">
-                <!-- Aquí se cargarán las redes sociales -->
-            </tbody>
-        </table>
-    </div>
-    <div class="modal fade" id="preferedSocial" tabindex="-1" aria-labelledby="preferedSocialLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="preferedSocialLabel">Red Social Favorita</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body"></div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary btn-siguiente" id="acceptButton"
-                        data-bs-dismiss="modal">Aceptar</button>
-                </div>
-            </div>
+    <!-- Nueva sección de redes sociales como cards -->
+    <div class="mt-8 space-y-4" id="social-networks-container">
+        <div class="flex items-center space-x-2 mb-4">
+            <span class="text-sm font-medium text-gray-500">Arrastra las cards para reordenar</span>
         </div>
-    </div>
 
+        <!-- Las cards se insertarán aquí dinámicamente -->
+        <div id="social-networks" class="space-y-4"></div>
+    </div>
 </div>
+<?php include dirname(__DIR__, 2) . '/includes/modal-info.php'; ?>
 <script>
     const baseUrl = '<?php echo $baseUrl ?>';
 </script>

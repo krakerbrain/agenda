@@ -43,13 +43,13 @@
                     <div class="company-name mb-2"><?php echo htmlspecialchars($company['name']); ?></div>
                     <div class="company-info"><?php echo htmlspecialchars($company['address']); ?></div>
                     <div class="company-info">Teléfono: <?php echo htmlspecialchars($company['phone']); ?></div>
-                    <div class="mt-3 social-icons">
-                        <?php foreach ($socialNetworks as $socials) : ?>
-                            <a href="<?php echo htmlspecialchars($socials['url']); ?>" target="_blank"
-                                title="<?php echo htmlspecialchars($socials['name']); ?>"><i
-                                    class="<?php echo htmlspecialchars($socials['icon_class']); ?>"></i></a>
-                        <?php endforeach; ?>
-                    </div>
+                </div>
+                <div class="mt-3 text-end social-icons">
+                    <?php foreach ($socialNetworks as $socials) : ?>
+                        <a href="<?php echo htmlspecialchars($socials['url']); ?>" target="_blank"
+                            title="<?php echo htmlspecialchars($socials['name']); ?>"><i
+                                class="<?php echo htmlspecialchars($socials['icon_class']); ?>"></i></a>
+                    <?php endforeach; ?>
                 </div>
             </div>
         </div>

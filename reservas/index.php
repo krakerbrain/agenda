@@ -68,14 +68,7 @@ $secondary_color = $style['secondary_color'];
 $background_color = $style['background_color'];
 $button_color = $style['button_color'];
 $border_color = $style['border_color'];
-
-if (strpos($company['selected_banner'], "default_") === 0) {
-    // Es un banner predeterminado
-    $selected_banner = "assets/img/banners/" . $company['selected_banner'];
-} else {
-    // Es un banner personalizado (subido por el usuario)
-    $selected_banner = "assets/img/banners/user_" . $company['id'] . "/" . $company['selected_banner'];
-}
+$selected_banner = $company['selected_banner'];
 
 $calendar_days_available = $company['calendar_days_available'] ?? $company['fixed_duration'];
 

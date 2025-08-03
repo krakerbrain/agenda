@@ -1,55 +1,60 @@
-<!-- Estilos adicionales -->
-<style>
-.disabled-day {
-    opacity: 0.5;
-}
-
-.day {
-    padding: 5px;
-    border-radius: 4px;
-}
-
-.day:hover:not(.disabled-day) {
-    background-color: #f8f9fa;
-}
-</style>
-<div class="container mt-4">
-    <!-- Selector de Usuario -->
-    <div class="row mb-4">
-        <div class="col-md-6">
-            <label for="userSelect" class="form-label">Seleccionar Usuario</label>
-            <select id="userSelect" class="form-select">
-                <!-- Opciones de usuarios se cargarán dinámicamente -->
-            </select>
-        </div>
-    </div>
-
-    <!-- Tabla de Servicios Disponibles -->
-    <div class="card">
-        <div class="card-header">
-            <h5>Servicios Disponibles</h5>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table id="servicesTable" class="table table-hover table-striped">
-                    <thead>
-                        <tr class="head-table">
-                            <th width="5%">Asignar</th>
-                            <th width="35%">Servicio</th>
-                            <th width="60%">Días Disponibles</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Contenido se cargará dinámicamente -->
-                    </tbody>
-                </table>
+<div class="max-w-4xl mx-auto">
+    <!-- Card contenedora principal -->
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col" style="height: 80vh;">
+        <!-- Header con controles -->
+        <div
+            class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex flex-col sm:flex-row justify-between items-end sm:items-center gap-4">
+            <div class="w-full sm:w-auto">
+                <label for="userSelect" class="block text-sm font-medium text-gray-700 mb-1">Seleccionar Usuario</label>
+                <select id="userSelect"
+                    class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    <!-- Opciones de usuarios se cargarán dinámicamente -->
+                </select>
             </div>
+
+            <button id="saveAssignments"
+                class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                Guardar Asignaciones
+            </button>
         </div>
-        <div class="card-footer text-end">
-            <button id="saveAssignments" class="btn btn-primary">Guardar Asignaciones</button>
+
+        <!-- Contenido con scroll -->
+        <div class="flex-1 overflow-y-auto p-6">
+            <div id="servicesContainer" class="grid gap-4 sm:grid-cols-2">
+                <!-- Contenido se cargará dinámicamente -->
+            </div>
+
+            <!-- Mensaje cuando no hay servicios -->
+            <div id="noServicesMessage" class="hidden text-center py-10 text-gray-500">
+                Seleccione un usuario para ver los servicios disponibles
+            </div>
         </div>
     </div>
 </div>
 
-<?php include dirname(__DIR__, 2) . '/includes/modal-info.php';
-?>
+<!-- Estilos adicionales -->
+<style>
+    .disabled-day {
+        opacity: 0.5;
+    }
+
+    .day {
+        padding: 0.3125rem;
+        border-radius: 0.25rem;
+    }
+
+    .day:hover:not(.disabled-day) {
+        background-color: #f9fafb;
+    }
+
+    .service-card {
+        transition: all 0.2s ease;
+    }
+
+    .service-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+</style>
+
+<?php include dirname(__DIR__, 2) . '/includes/modal-info.php'; ?>

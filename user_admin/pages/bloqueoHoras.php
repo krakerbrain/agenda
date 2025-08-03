@@ -17,74 +17,81 @@ if ($user_count > 1) {
 ?>
 
 <!-- Fechas bloqueadas -->
-<form id="block-date-form" class="mb-4">
-    <div class="text-end">
-        <a tabindex="0" role="button" data-bs-trigger="focus" class="btn help" data-bs-toggle="popover"
-            data-bs-title="Fechas Bloqueadas"
-            data-bs-content="Puedes bloquear fechas específicas o un rango de horas para que no se puedan hacer reservas en esos días">
-            <i class="fa fa-circle-question text-primary" style="font-size: 1.5rem;"></i>
-        </a>
-    </div>
-    <?php if ($user_count > 1 && $datosUsuario['role_id'] == 2) : ?>
-        <div class="row mb-3">
-            <div class="col-md-6">
-                <label for="userSelect" class="form-label">Selecciona el usuario</label>
-                <select name="user_id" id="userSelect" class="form-select">
-                    <?php foreach ($users as $user) : ?>
-                        <!-- si datosUsuario['id'] == $user['id'] entonces se selecciona -->
-                        <option value="<?= $user['id'] ?>"
-                            <?= $datosUsuario['role_id'] == $user['role_id'] ? 'selected' : '' ?>>
-                            <?= $user['name'] ?></option>
-                    <?php endforeach; ?>
+<div class="max-w-4xl mx-auto mt-8">
+    <form id="block-date-form" class="mb-8">
+        <div class="flex justify-end">
+            <a tabindex="0" role="button" data-bs-trigger="focus" class="help" data-bs-toggle="popover"
+                data-bs-title="Fechas Bloqueadas"
+                data-bs-content="Puedes bloquear fechas específicas o un rango de horas para que no se puedan hacer reservas en esos días">
+                <i class="fa fa-circle-question text-blue-600 text-2xl"></i>
+            </a>
+        </div>
 
+        <?php if ($user_count > 1 && $datosUsuario['role_id'] == 2) : ?>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+                <label for="userSelect" class="block text-sm font-medium text-gray-700 mb-1">Selecciona el
+                    usuario</label>
+                <select name="user_id" id="userSelect"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    <?php foreach ($users as $user) : ?>
+                    <option value="<?= $user['id'] ?>"
+                        <?= $datosUsuario['role_id'] == $user['role_id'] ? 'selected' : '' ?>>
+                        <?= $user['name'] ?>
+                    </option>
+                    <?php endforeach; ?>
                 </select>
             </div>
         </div>
-    <?php else : ?>
+        <?php else : ?>
         <input type="hidden" name="user_id" id="userSelect" value="<?= $datosUsuario['user_id'] ?>">
-    <?php endif; ?>
-    <!-- Selección de fecha y horas -->
-    <div class="mb-3">
-        <label for="block-date" class="form-label">Seleccionar Fecha</label>
-        <input type="date" id="block-date" name="block_date" class="form-control" required>
-    </div>
+        <?php endif; ?>
 
-    <div class="form-check mb-3">
-        <input type="checkbox" class="form-check-input" id="all-day" name="all_day" checked>
-        <label class="form-check-label" for="all-day">Todo el día</label>
-    </div>
-
-    <div id="hour-range" class="row mb-3" style="display: none;">
-        <div class="col">
-            <label for="start-hour" class="form-label">Inicio</label>
-            <input type="time" id="start-hour" name="start_hour" class="form-control">
+        <!-- Selección de fecha y horas -->
+        <div class="mb-4">
+            <label for="block-date" class="block text-sm font-medium text-gray-700 mb-1">Seleccionar Fecha</label>
+            <input type="date" id="block-date" name="block_date"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                required>
         </div>
-        <div class="col">
-            <label for="end-hour" class="form-label">Término</label>
-            <input type="time" id="end-hour" name="end_hour" class="form-control">
+
+        <div class="flex items-center mb-4">
+            <input type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                id="all-day" name="all_day">
+            <label for="all-day" class="ml-2 block text-sm text-gray-700">Todo el día</label>
+        </div>
+
+        <div id="hour-range" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+                <label for="start-hour" class="block text-sm font-medium text-gray-700 mb-1">Inicio</label>
+                <input type="time" id="start-hour" name="start_hour"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            </div>
+            <div>
+                <label for="end-hour" class="block text-sm font-medium text-gray-700 mb-1">Término</label>
+                <input type="time" id="end-hour" name="end_hour"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            </div>
+        </div>
+
+        <button type="submit"
+            class="w-full md:w-auto px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 mb-8 cursor-pointer">
+            Guardar Hora Bloqueada
+        </button>
+    </form>
+
+    <div class="mt-8">
+        <!-- Listado de fechas bloqueadas -->
+        <div class="mt-8">
+            <h5 class="text-lg font-medium text-gray-900 mb-4">Listado de Fechas y Horas Bloqueadas</h5>
+
+            <div id="blocked-dates-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Mensaje cuando no hay fechas -->
+                <div class="col-span-full text-center py-4 text-gray-500">
+                    No hay fechas bloqueadas.
+                </div>
+            </div>
         </div>
     </div>
-
-    <button type="submit" class="btn btn-primary mb-4">Guardar Hora Bloqueada</button>
-</form>
-<div>
-    <!-- Tabla para mostrar fechas y horas bloqueadas -->
-    <h5 class="mb-3">Listado de Fechas y Horas Bloqueadas</h5>
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Fecha</th>
-                <th>Inicio</th>
-                <th>Término</th>
-                <th>Acción</th>
-            </tr>
-        </thead>
-        <tbody id="blocked-dates-list">
-            <tr>
-                <td colspan="4" class="text-center">No hay fechas bloqueadas.</td>
-            </tr>
-        </tbody>
-    </table>
 </div>
-<?php include dirname(__DIR__, 2) . '/includes/modal-block-hour.php';
-?>
+<?php include dirname(__DIR__, 2) . '/includes/modal-info.php'; ?>

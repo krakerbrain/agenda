@@ -1,8 +1,31 @@
-let tempServiceCounter = 1;
+import { ServiceRender } from "./servicios/serviceRender.js";
+import { ModalManager } from "./config/ModalManager.js";
+
+let serviceRender;
 
 export function init() {
+  // Inicializar el renderizador de tablas
+  serviceRender = new ServiceRender("servicesContainer");
   const form = document.getElementById("servicesForm");
-  const tableBody = document.getElementById("servicesTableBody");
+
+  // Manejador de eventos delegado para eliminar servicios
+  document.addEventListener("click", async (e) => {
+    if (e.target.closest(".delete-service")) {
+      e.preventDefault();
+      const card = e.target.closest("[data-service-id]");
+      const serviceId = card.dataset.serviceId;
+      await deleteService(serviceId, card);
+    }
+
+    if (e.target.closest(".remove-category")) {
+      e.preventDefault();
+      const categoryElement = e.target.closest(".category-item");
+      await removeCategory(categoryElement);
+    }
+  });
+
+  setupAddServiceButton();
+  ModalManager.setupCloseListeners();
 
   async function loadServices() {
     try {
@@ -12,66 +35,28 @@ export function init() {
       const data = await response.json();
 
       if (data.success) {
-        // Limpiar el cuerpo de la tabla
-        tableBody.innerHTML = "";
+        // Limpiar el contenedor ANTES de renderizar
+        const container = document.getElementById("servicesContainer");
+        container.innerHTML = ""; // Limpiar todo el contenido
 
-        const { services, schedules } = data.data; // Extraer services y schedules
-
-        // Procesar los días habilitados/deshabilitados a partir de schedules
+        const { services, schedules } = data.data;
         const daysStatus = processSchedules(schedules);
+
         if (services.length > 0) {
-          // Llenar la página con los datos obtenidos
           services.forEach((service) => {
-            addService(service, schedules, daysStatus); // Pasar schedules a addService
+            serviceRender.renderService(service, schedules, daysStatus);
           });
         }
-        // Añadir una fila en blanco para un nuevo servicio
-        addEmptyServiceRow();
       }
     } catch (error) {
-      console.error("Error:", error);
-      alert("Hubo un error al cargar los servicios.");
+      handleError(error, "Error al cargar los servicios.");
     }
   }
 
   loadServices();
 
-  function validateAndCleanForm() {
-    const tableBody = document.getElementById("servicesTableBody");
-    let hasValidData = false;
-
-    tableBody.querySelectorAll(".service-row").forEach((serviceRow) => {
-      const serviceName = serviceRow.querySelector("input[name^='service_name']").value.trim();
-      const serviceDuration = serviceRow.querySelector("input[name^='service_duration']").value.trim();
-
-      if (!serviceName || !serviceDuration) {
-        serviceRow.remove();
-        let nextSibling = serviceRow.nextElementSibling;
-        while (nextSibling && nextSibling.classList.contains("category-item")) {
-          const categoryRow = nextSibling;
-          nextSibling = categoryRow.nextElementSibling;
-          categoryRow.remove();
-        }
-      } else {
-        hasValidData = true;
-      }
-    });
-
-    if (!hasValidData) {
-      alert("Debe ingresar al menos un servicio válido con su nombre y duración.");
-    }
-
-    return hasValidData;
-  }
-
   form.addEventListener("submit", async function (event) {
     event.preventDefault();
-
-    const isValid = validateAndCleanForm();
-
-    if (!isValid) {
-      return; // No enviar la solicitud si no hay datos válidos
-    }
 
     const formData = new FormData(form);
     try {
@@ -82,76 +67,14 @@ export function init() {
       const data = await response.json();
 
       if (data.success) {
-        const modal = new bootstrap.Modal(document.getElementById("saveServices"));
-        modal.show();
+        ModalManager.show("saveServices");
         loadServices(); // Recargar los datos después de guardar
       }
     } catch (error) {
       console.error("Error en la respuesta del servidor:", error);
-      alert("Hubo un error al guardar la configuración.");
+      handleError(error, "Error al guardar los servicios. Por favor, inténtelo de nuevo.");
     }
   });
-
-  // Función para añadir una fila de servicio en blanco
-  function addEmptyServiceRow() {
-    const emptyServiceRow = document.createElement("tr");
-    emptyServiceRow.classList.add("service-row");
-    emptyServiceRow.classList.add("body-table");
-    const tempServiceId = `new-service-${tempServiceCounter}`;
-    emptyServiceRow.innerHTML = `
-      <td data-cell="Habilitado" class="data">
-        <div class="form-check form-switch">
-            <input type="checkbox" class="form-check-input" name="service_enabled[${tempServiceId}]">
-        </div>
-      </td>
-      <td data-cell="nombre servicio" class="data"><input type="text" class="form-control" name="service_name[${tempServiceId}]" value=""></td>
-    <td data-cell="horas duración" class="data">
-      <div class="time-input d-flex align-items-center justify-content-xl-center gap-2">
-        <div class="time-field">
-            <input type="number" id="hours" name="service_duration_hours[${tempServiceId}]" class="form-control time-box" min="0" step="1" value="0">
-            <label for="hours" class="time-label">Horas</label>
-        </div>
-        <div class="time-field">
-            <input type="number" id="minutes" name="service_duration_minutes[${tempServiceId}]" class="form-control time-box" min="0" max="59" step="1" value="0">
-            <label for="minutes" class="time-label">Minutos</label>
-        </div>
-      </div>
-    </td>
-      <td data-cell="observaciones" class="data"><textarea class="form-control" name="service_observations[${tempServiceId}]"></textarea></td>
-      <td data-cell="agrega categorías" class="data">
-        <button type="button" class="btn btn-outline-primary btn-sm add-category" data-service-id="${tempServiceId}">+Categoría</button>
-      </td>
-      <td data-cell="días disponibles" class="data">
-        <div class="days-container d-flex gap-1">
-          ${generateDaysCheckboxes([], tempServiceId)}
-        </div>
-      </td>
-      <td>
-        <button type="button" class="btn btn-danger btn-sm delete-service" disabled>Eliminar</button>
-      </td>
-    `;
-    tableBody.appendChild(emptyServiceRow);
-    tempServiceCounter++;
-
-    // Registrar el evento de agregar categoría
-    emptyServiceRow.querySelector(".add-category").addEventListener("click", function () {
-      addCategory(this);
-    });
-  }
-
-  // Llamar a la función para agregar una fila de servicio en blanco al cargar la página
-  // addEmptyServiceRow();
-
-  document.getElementById("addServiceButton").addEventListener("click", addService);
-
-  document.querySelectorAll(".remove-category").forEach((button) => {
-    button.addEventListener("click", function () {
-      removeCategory(this);
-    });
-  });
-
-  const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
-  const popoverList = [...popoverTriggerList].map((popoverTriggerEl) => new bootstrap.Popover(popoverTriggerEl));
 }
 
 function processSchedules(schedules) {
@@ -164,219 +87,38 @@ function processSchedules(schedules) {
   return daysStatus; // Retorna un objeto donde el key es el día (1-7) y el valor es true o false
 }
 
-function addService(service = null, schedules = {}, daysStatus = {}) {
-  const tableBody = document.getElementById("servicesTableBody");
+function setupAddServiceButton() {
+  let addServiceBtn = document.getElementById("addServiceButton");
 
-  // Valores por defecto
-  let serviceId,
-    serviceName = "",
-    serviceDuration = { hours: 0, minutes: 0 }, // Valores predeterminados como objeto
-    serviceObservations = "",
-    serviceDays = [];
+  addServiceBtn.addEventListener("click", createNewService);
+}
 
-  if (service && typeof service === "object" && !service.isTrusted) {
-    serviceId = service.service_id;
-    serviceName = service.service_name;
-    serviceDuration = service.duration_formatted || { hours: 0, minutes: 0 };
-    serviceObservations = service.observations;
-    serviceDays = service.available_days || []; // Array de días disponibles
-  } else {
-    serviceId = `new-service-${tempServiceCounter}`;
-    tempServiceCounter++;
+export function createNewService() {
+  if (!serviceRender) {
+    serviceRender = new ServiceRender("servicesContainer");
   }
 
-  // Crear una fila para el servicio
-  const serviceRow = createServiceRow(serviceId, serviceName, serviceDuration, serviceObservations, serviceDays, schedules, daysStatus, service?.is_enabled);
+  const newService = {
+    // Datos vacíos para nuevo servicio
+    service_id: `new-service-${Date.now()}`,
+    service_name: "",
+    duration_formatted: { hours: 0, minutes: 0 },
+    observations: "",
+    available_days: [],
+    is_enabled: true,
+    categories: [],
+  };
 
-  // Añadir la fila a la tabla
-  tableBody.appendChild(serviceRow);
+  serviceRender.renderService(newService);
 
-  // Añadir eventos para eliminar servicio y agregar categoría
-  serviceRow.querySelector(".delete-service").addEventListener("click", function () {
-    const modal = new bootstrap.Modal(document.getElementById("deleteServiceModal"));
-
-    // Agrega la clase 'ondelete-service' al serviceRow que se va a eliminar
-    const serviceRow = this.closest(".service-row");
-    serviceRow.classList.add("ondelete-service");
-
-    modal.show();
-  });
-
-  serviceRow.querySelector(".add-category").addEventListener("click", function () {
-    addCategory(this);
-  });
-
-  // Manejar el clic en el botón de confirmar
-  document.getElementById("confirmServiceDelete").addEventListener("click", function () {
-    // Obtén el elemento con la clase 'ondelete-service'
-    const serviceRow = document.querySelector(".ondelete-service");
-
-    if (serviceRow) {
-      // Llama a deleteService pasando el serviceRow con la clase 'ondelete-service'
-      deleteService(serviceRow);
-
-      // Quita la clase 'ondelete-service' del elemento
-      serviceRow.classList.remove("ondelete-service");
-    }
-
-    // Cierra el modal
-    bootstrap.Modal.getInstance(document.getElementById("deleteServiceModal")).hide();
-  });
-
-  // Añadir las categorías si el servicio tiene alguna
-  if (service && service.categories) {
-    service.categories.forEach((category) => {
-      addCategoryToService(serviceId, category);
-    });
-  }
-
-  // Inicializar tooltips para los días deshabilitados
-  const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-  [...tooltipTriggerList].map((tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl));
+  // Hacer scroll al nuevo servicio
+  const container = document.getElementById("servicesContainer");
+  const lastService = container.lastElementChild;
+  lastService.scrollIntoView({ behavior: "smooth", block: "nearest" });
 }
 
-// Crear la fila del servicio
-function createServiceRow(serviceId, serviceName, serviceDuration, serviceObservations, serviceDays, schedules, dayStatus, isEnabled) {
-  const daysStatus = Object.keys(schedules).length === 0 ? "" : getAvailableDays(serviceDays, schedules);
-  const serviceRow = document.createElement("tr");
-  serviceRow.classList.add("service-row");
-  serviceRow.classList.add("body-table");
-  const isChecked = isEnabled ? "checked" : "";
-  // Extrae las horas y minutos de serviceDuration
-  const hours = serviceDuration.hours || 0;
-  const minutes = serviceDuration.minutes || 0;
-
-  serviceRow.innerHTML = `
-    <td data-cell="Habilitado" class="data">
-      <div class="form-check form-switch">
-        <input type="checkbox" class="form-check-input" name="service_enabled[${serviceId}]" ${isChecked}>
-      </div>
-    </td>
-    <td data-cell="nombre servicio" class="data"><input type="text" class="form-control" name="service_name[${serviceId}]" value="${serviceName}"></td>
-        <td data-cell="horas duración" class="data">
-      <div class="time-input d-flex align-items-center justify-content-xl-center gap-2">
-        <div class="time-field">
-            <input type="number" id="hours-${serviceId}" name="service_duration_hours[${serviceId}]" class="form-control time-box" min="0" step="1" value="${hours}">
-            <label for="hours-${serviceId}" class="time-label">Horas</label>
-        </div>
-        <div class="time-field">
-            <input type="number" id="minutes-${serviceId}" name="service_duration_minutes[${serviceId}]" class="form-control time-box" min="0" max="59" step="1" value="${minutes}">
-            <label for="minutes-${serviceId}" class="time-label">Minutos</label>
-        </div>
-      </div>
-    </td>
-    <td data-cell="observaciones" class="data"><textarea class="form-control" name="service_observations[${serviceId}]">${serviceObservations}</textarea></td>
-    <td data-cell="agrega categorías" class="data">
-      <button type="button" class="btn btn-outline-primary btn-sm add-category" data-service-id="${serviceId}">+Categoría</button>
-    </td>
-    <td data-cell="días disponibles" class="data">
-      <div class="days-container d-flex gap-1">
-      ${generateDaysCheckboxes(daysStatus, serviceId)}
-      </div>
-    </td>
-    <td>
-      <button type="button" class="btn btn-danger btn-sm delete-service" ${serviceName == "" ? "disabled" : ""}>Eliminar</button>
-    </td>
-  `;
-
-  return serviceRow;
-}
-
-// Generar los checkboxes para los días (1 al 7 siempre)
-function generateDaysCheckboxes(daysStatus, serviceId) {
-  const daysOfWeek = ["L", "M", "M", "J", "V", "S", "D"];
-
-  return daysOfWeek
-    .map((day, index) => {
-      const dayId = index + 1; // Los días empiezan desde 1
-      const { enabled = true, checked = false } = daysStatus[dayId] || {}; // Si no hay datos en daysStatus, habilitado por defecto
-      const disabledClass = !enabled ? "disabled-day" : ""; // Clase para días deshabilitados
-      const tooltipAttributes = !enabled ? `tabindex="0" data-bs-toggle="tooltip" title="Día no disponible. Habilitarlo en Horarios"` : "";
-
-      return `
-      <div class="day align-items-center d-flex flex-column text-center ${disabledClass}" ${tooltipAttributes}>
-       <input type="checkbox" class="form-check-input" name="available_service_day[${serviceId}][]" value="${dayId}" ${checked ? "checked" : ""} ${!enabled ? "disabled" : ""}>
-        <label class="mt-1">${day}</label>
-      </div>`;
-    })
-    .join("");
-}
-
-function getAvailableDays(serviceDays, schedules) {
-  // Crea un objeto para almacenar el estado de los días (habilitado y marcado)
-  const daysStatus = {};
-
-  // Recorre los días de la semana (1-7) y aplica la lógica
-  for (let i = 1; i <= 7; i++) {
-    const isDayEnabled = schedules.some((schedule) => schedule.day_id === i && schedule.is_enabled);
-    const isChecked = serviceDays.includes(i) && isDayEnabled; // Solo checked si está habilitado y marcado
-
-    daysStatus[i] = {
-      day: i,
-      enabled: isDayEnabled,
-      checked: isChecked,
-    };
-  }
-
-  return daysStatus;
-}
-
-function addCategoryToService(serviceId, category) {
-  const tableBody = document.getElementById("servicesTableBody");
-  const categoryRow = document.createElement("tr");
-  const categoryId = category.category_id;
-  categoryRow.classList.add("category-item");
-  categoryRow.classList.add("body-table");
-  categoryRow.innerHTML = `
-    <td></td>
-    <td class="text-center">CATEGORÍA</td>
-    <td data-cell="nombre categoría" class="data"><input type="text" class="form-control mb-1" name="category_name[${serviceId}][${categoryId}]" value="${category.category_name}" placeholder="Nombre de la Categoría"></td>
-    <td data-cell="descripción categoría" class="data"><textarea class="form-control mb-1" name="category_description[${serviceId}][${categoryId}]" placeholder="Descripción de la Categoría">${category.category_description}</textarea></td>
-    <td><button type="button" class="btn btn-outline-danger btn-sm remove-category">Eliminar</button></td>
-  `;
-  tableBody.appendChild(categoryRow);
-
-  // Registrar el evento de eliminación de la categoría
-  categoryRow.querySelector(".remove-category").addEventListener("click", function () {
-    // categoryRow.remove();
-    removeCategory(this);
-  });
-}
-
-function addCategory(button) {
-  const serviceId = button.getAttribute("data-service-id");
-  const row = button.closest(".service-row");
-  const categoryId = `new-category-${tempServiceCounter}`;
-  const categoryRow = document.createElement("tr");
-  categoryRow.classList.add("category-item");
-  categoryRow.classList.add("body-table");
-  categoryRow.innerHTML = `
-      <td></td>
-      <td class="text-center">Agregar categoría</td>
-      <td data-cell="nombre categoría" class="data"><input type="text" class="form-control mb-1" name="category_name[${serviceId}][${categoryId}]" value="" placeholder="Nombre de la Categoría"></td>
-      <td data-cell="descripción categoría" class="data"><textarea class="form-control mb-1" name="category_description[${serviceId}][${categoryId}]" placeholder="Descripción de la Categoría"></textarea></td>
-      <td><button type="button" class="btn btn-outline-danger btn-sm remove-category">Eliminar</button></td>
-  `;
-  row.insertAdjacentElement("afterend", categoryRow);
-
-  // Registrar el evento de eliminación de la nueva categoría
-  categoryRow.querySelector(".remove-category").addEventListener("click", function () {
-    removeCategory(this);
-  });
-  tempServiceCounter++;
-}
-
-async function deleteService(button) {
-  // Encuentra la fila del servicio a eliminar
-  // const serviceRow = button.closest(".service-row");
-
-  // Encuentra el id del servicio
-  const serviceId = button
-    // .closest(".service-row")
-    .querySelector("input[name^='service_name']")
-    .name.match(/\[(.*?)\]/)[1];
-
-  // Enviar solicitud al backend para verificar si el servicio tiene citas agendadas
+// Funciones de eliminación
+async function deleteService(serviceId, cardElement) {
   try {
     const response = await fetch(`${baseUrl}user_admin/controllers/services.php`, {
       method: "DELETE",
@@ -388,67 +130,48 @@ async function deleteService(button) {
     const result = await response.json();
 
     if (result.success) {
-      // Encuentra todas las filas de categorías asociadas a este servicio
-      const categories = document.querySelectorAll(`input[name^='category_name[${serviceId}]']`);
-      categories.forEach((categoryInput) => {
-        const categoryRow = categoryInput.closest(".category-item");
-        if (categoryRow) {
-          categoryRow.remove();
-        }
-      });
-
-      // Elimina la fila del servicio
-      // serviceRow.remove();
-      const modal = new bootstrap.Modal(document.getElementById("deletedServiceModal"));
-      modal.show();
-      button.remove();
+      cardElement.remove();
+      ModalManager.show("deletedServiceModal");
     } else {
-      alert(result.message);
+      handleError(error, "Error al eliminar el servicio. Por favor, inténtelo de nuevo.");
     }
   } catch (error) {
     console.error("Error eliminando el servicio:", error);
-    alert("Hubo un error al intentar eliminar el servicio. Por favor, inténtalo de nuevo.");
+    handleError(error, "Error al eliminar el servicio. Por favor, inténtelo de nuevo.");
   }
 }
 
-async function removeCategory(button) {
-  const categoryRow = button.closest(".category-item");
-
-  // Encuentra el id de la categoría usando una expresión regular para capturar ambos valores dentro de los corchetes
-  const nameAttribute = categoryRow.querySelector("input[name^='category_name']").name;
+async function removeCategory(categoryElement) {
+  const nameAttribute = categoryElement.querySelector("input[name^='category_name']").name;
   const matches = nameAttribute.match(/\[(\d+)\]\[(\d+)\]/);
 
-  if (matches) {
-    const serviceId = matches[1];
-    const categoryId = matches[2];
+  if (matches && !matches[2].includes("new")) {
+    try {
+      const response = await fetch(`${baseUrl}user_admin/controllers/services.php`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: `category_id=${matches[2]}`,
+      });
+      const result = await response.json();
 
-    // Verificar si la categoría es nueva (ID temporal) o existente
-    if (categoryId.includes("new-category")) {
-      // Solo eliminar del DOM
-      categoryRow.remove();
-    } else {
-      try {
-        // Enviar solicitud al backend para eliminar la categoría existente
-        const response = await fetch(`${baseUrl}user_admin/controllers/services.php`, {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-          body: `category_id=${categoryId}`,
-        });
-        const result = await response.json();
-
-        if (result.success) {
-          categoryRow.remove();
-        } else {
-          alert(result.message);
-        }
-      } catch (error) {
-        console.error("Error eliminando la categoría:", error);
-        alert("Hubo un error al intentar eliminar la categoría. Por favor, inténtalo de nuevo.");
+      if (!result.success) {
+        handleError(error, "Error al eliminar la categoría. Por favor, inténtelo de nuevo.");
+        return;
       }
+    } catch (error) {
+      console.error("Error eliminando la categoría:", error);
+      handleError(error, "Error al eliminar la categoría. Por favor, inténtelo de nuevo.");
+      return;
     }
-  } else {
-    categoryRow.remove();
   }
+  categoryElement.remove();
+}
+
+function handleError(error, customMessage = null) {
+  console.error("Error:", error);
+  const errorMessage = document.getElementById("errorMessage");
+  errorMessage.textContent = customMessage || error.message || "Ha ocurrido un error inesperado";
+  ModalManager.show("errorModal");
 }

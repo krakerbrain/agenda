@@ -59,6 +59,13 @@ try {
         echo json_encode(['success' => false, 'message' => 'No se encontró la cita para eliminar']);
     }
 } catch (Exception $e) {
+    // Verificar si es el error 410 de Google (recurso ya eliminado)
+    if (strpos($e->getMessage(), '410') !== false) {
+        // Considerar esto como éxito ya que el recurso ya no existe
+        echo json_encode(['success' => true, 'message' => 'Evento eliminado exitosamente']);
+        http_response_code(200);
+        exit;
+    }
     // Intentar obtener el mensaje de error
     $errorResponse = $e->getMessage();
     // Intentar extraer el JSON del mensaje de error

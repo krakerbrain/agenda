@@ -1,0 +1,6 @@
+INFO: Inicio cron notificación cita 2025-07-04 03:03:53
+ERROR: Error en el cron de notificaciones: Error al enviar correo: Error al construir/enviar correo: Error al enviar el correo: SMTP Error: data not accepted.SMTP server error: DATA command failed Detail: Daily user sending limit exceeded. For more information on Gmail
+sending limits go to
+ https://support.google.com/a/answer/166852 d2e1a72fcca58-74ce359ead0sm898560b3a.8 - gsmtp
+ SMTP code: 550 Additional SMTP info: 5.4.5
+INFO: Cron finalizado 2025-07-04 03:04:27

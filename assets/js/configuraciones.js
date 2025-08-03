@@ -1,3 +1,5 @@
+import { ModalManager } from "./config/ModalManager.js";
+
 export function init() {
   const form = document.getElementById("companyConfigForm");
   if (form) {
@@ -12,20 +14,29 @@ export function init() {
 
       const { success, errors } = await response.json();
       if (success) {
-        handleModal("modalReloadConfig", "Configuración guardada correctamente.");
+        // Usamos el modal genérico para mensajes de éxito
+        ModalManager.show("infoModal", {
+          title: "Éxito",
+          message: "Configuración guardada correctamente.",
+        });
       } else {
-        // Aquí manejamos los errores
         if (errors) {
-          // Unimos los errores en un string separado por saltos de línea
           const errorMessage = errors.join("\n");
-          handleModal("modalErrorConfig", `Hubo un error al guardar la configuración:\n${errorMessage}`);
+          ModalManager.show("infoModal", {
+            title: "Error",
+            message: `Hubo un error al guardar la configuración:\n${errorMessage}`,
+          });
         } else {
-          handleModal("modalErrorConfig", "Hubo un error al guardar la configuración.");
+          ModalManager.show("infoModal", {
+            title: "Error",
+            message: "Hubo un error al guardar la configuración.",
+          });
         }
       }
     });
   }
 
+  // Resto de event listeners para colores (sin cambios)
   document.getElementById("background-color").addEventListener("input", function () {
     document.getElementById("example-card").style.backgroundColor = this.value;
   });
@@ -45,30 +56,30 @@ export function init() {
     document.getElementById("btn-secondary-example").style.backgroundColor = this.value;
   });
 
+  // Copiar URL al portapapeles
   document.querySelector(".copyToClipboard").addEventListener("click", function () {
-    // Selecciona el input que contiene la URL
-    var copyText = document.getElementById("urlToCopy");
-
-    // Selecciona el texto dentro del input
+    const copyText = document.getElementById("urlToCopy");
     copyText.select();
-    copyText.setSelectionRange(0, 99999); // Para dispositivos móviles
+    copyText.setSelectionRange(0, 99999);
 
-    // Copia el texto al portapapeles
     navigator.clipboard
       .writeText(copyText.value)
       .then(() => {
-        // Opción: muestra una handleModala o un mensaje para confirmar la copia
-        handleModal("modalErrorConfig", "URL copiada al portapapeles: " + copyText.value);
+        ModalManager.show("infoModal", {
+          title: "URL copiada",
+          message: "URL copiada al portapapeles: " + copyText.value,
+        });
       })
       .catch((error) => {
         console.error("Error:", error);
-        handleModal("modalErrorConfig", "Hubo un error al copiar la URL al portapapeles.");
+        ModalManager.show("infoModal", {
+          title: "Error",
+          message: "Hubo un error al copiar la URL al portapapeles.",
+        });
       });
   });
 
-  const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
-  const popoverList = [...popoverTriggerList].map((popoverTriggerEl) => new bootstrap.Popover(popoverTriggerEl));
-
+  // Resetear colores (sin cambios)
   document.getElementById("resetColors").addEventListener("click", function () {
     document.getElementById("background-color").value = "#bebdff";
     document.getElementById("font-color").value = "#525252";
@@ -84,6 +95,7 @@ export function init() {
     document.getElementById("btn-secondary-example").style.color = "#525252";
   });
 
+  // Cambio entre modos de calendario (sin cambios)
   const radios = document.querySelectorAll('input[name="calendar_mode"]');
   radios.forEach((radio) => {
     radio.addEventListener("change", function () {
@@ -97,66 +109,66 @@ export function init() {
     });
   });
 
-  // modal de agregar nuevo period
+  // Configurar nuevo periodo
   document.getElementById("diasSeleccionados").textContent = document.getElementById("fixed_duration").value;
-  const newPeriodModal = new bootstrap.Modal(document.getElementById("newPeriodModal"));
+
+  document.getElementById("openNewPeriod").addEventListener("click", function () {
+    // Abrir modal para configurar nuevo periodo
+    ModalManager.show("newPeriodModal");
+  });
+
   document.getElementById("confirmNewPeriod").addEventListener("click", async function () {
-    const diasPEriodo = document.getElementById("fixed_duration").value;
+    const diasPeriodo = document.getElementById("fixed_duration").value;
 
     const response = await fetch(`${baseUrl}user_admin/controllers/configuraciones_calendario.php`, {
       method: "POST",
       body: JSON.stringify({
         action: "newPeriod",
-        dias: diasPEriodo,
+        dias: diasPeriodo,
       }),
     });
 
     const { success, message } = await response.json();
     if (success) {
-      newPeriodModal.hide();
-      handleModal("modalReloadConfig", message);
+      ModalManager.hide("newPeriodModal");
+      // Usamos el modal genérico para mostrar el mensaje de éxito
+      ModalManager.show("infoModal", {
+        title: "Éxito",
+        message: message,
+      });
+      setTimeout(() => {
+        location.reload(); // Recargar la página para reflejar los cambios
+      }, 2000);
     }
   });
 
+  // Manejo de apertura automática
   document.getElementById("auto_open").addEventListener("change", function (event) {
-    // Verifica si el checkbox fue marcado
     if (event.target.checked) {
-      // Prevenir que el checkbox se marque inmediatamente
       event.preventDefault();
-      // Mostrar el modal de confirmación
-      const modal = new bootstrap.Modal(document.getElementById("autoOpenModal"));
-      modal.show();
+      // Mostramos el modal específico para confirmación de apertura automática
+      ModalManager.show("autoOpenModal");
     }
   });
 
-  // Manejar el clic en el botón de confirmar
   document.getElementById("confirmAutoOpen").addEventListener("click", function () {
     const checkbox = document.getElementById("auto_open");
-    // Marca el checkbox
     checkbox.checked = true;
-    // Cierra el modal
-    bootstrap.Modal.getInstance(document.getElementById("autoOpenModal")).hide();
+    ModalManager.hide("autoOpenModal");
   });
 
-  // Manejar el clic en el botón de cancelar
   document.getElementById("cancelAutoOpen").addEventListener("click", function () {
     const checkbox = document.getElementById("auto_open");
-    // Desmarca el checkbox si se cancela
     checkbox.checked = false;
+    ModalManager.hide("autoOpenModal");
   });
 
-  function handleModal(modal, message) {
-    const modalSelected = new bootstrap.Modal(document.getElementById(modal));
-    const modalBody = document.getElementById(modal + "responseMessage");
-    modalBody.innerHTML = message;
-    modalSelected.show();
-  }
+  // Recargar página al aceptar (sin cambios)
+  // document.getElementById("modalAceptarBtn").addEventListener("click", function () {
+  //   location.reload();
+  // });
 
-  document.getElementById("modalAceptarBtn").addEventListener("click", function () {
-    const modal = new bootstrap.Modal(document.getElementById("modalErrorConfig"));
-    location.reload();
-  });
-
+  // Toggle entre opciones de intervalos (sin cambios)
   const fixedIntervalsRadio = document.getElementById("fixedIntervals");
   const serviceDurationRadio = document.getElementById("serviceDuration");
   const fixedIntervalsOptions = document.getElementById("fixedIntervalsOptions");
@@ -175,36 +187,26 @@ export function init() {
   fixedIntervalsRadio.addEventListener("change", toggleOptions);
   serviceDurationRadio.addEventListener("change", toggleOptions);
 
-  // const blockUsersSwitch = document.getElementById("blockUsersSwitch");
-  // const incidentsThresholdContainer = document.getElementById("incidentsThresholdContainer");
-
-  // blockUsersSwitch.addEventListener("change", function () {
-  //   if (this.checked) {
-  //     incidentsThresholdContainer.style.display = "inline-block";
-  //   } else {
-  //     incidentsThresholdContainer.style.display = "none";
-  //   }
-  // });
-
+  // Bloqueo por incidencias (sin cambios)
   const blockUsersSwitch = document.getElementById("blockUsersSwitch");
   const incidentsThresholdContainer = document.getElementById("incidentsThresholdContainer");
 
   blockUsersSwitch.addEventListener("change", function () {
-    // Si el checkbox está marcado, mostramos el input
     if (blockUsersSwitch.checked) {
-      // Verifica si el input ya existe, si no, lo creamos
       if (!document.getElementById("blockAfterIncidents")) {
         const inputHTML = `
-        <input type="number" class="form-control form-control-sm d-inline-block" 
-               style="width: 60px;" id="blockAfterIncidents" name="incidents_threshold" 
+        <input type="number" class="w-16 px-2 py-1 border border-gray-300 rounded-md inline-block" 
+               id="blockAfterIncidents" name="incidents_threshold" 
                min="1" value="2">
-        <label for="blockAfterIncidents" class="ms-1">Incidencias</label>
+        <label for="blockAfterIncidents" class="ml-1 text-gray-700">Incidencias</label>
       `;
         incidentsThresholdContainer.innerHTML = inputHTML;
       }
     } else {
-      // Si el checkbox no está marcado, eliminamos el input
       incidentsThresholdContainer.innerHTML = "";
     }
   });
+
+  // Configurar listeners para cerrar los modales
+  ModalManager.setupCloseListeners();
 }

@@ -1,30 +1,70 @@
+import { ModalManager } from "./config/ModalManager.js";
+import { ScheduleRendererDesktop } from "./horarios/ScheduleRendererDesktop.js";
+import { ScheduleRendererMobile } from "./horarios/ScheduleRendererMobile.js";
+import { BreakTimeManager } from "./horarios/BreakTimeManager.js";
+
 export function init() {
   const form = document.getElementById("workScheduleForm");
-  const tableBody = document.getElementById("scheduleTableBody");
-  // obtener value de usario selected
-
   let initialSchedules = [];
 
-  async function getHorarios(user_id = null) {
-    let userIdUrl = user_id !== null ? `?user_id=${user_id}` : "";
+  function addScheduleToTable(horario) {
+    const desktopRow = ScheduleRendererDesktop.addScheduleRow(horario);
+    const mobileCard = ScheduleRendererMobile.addScheduleCard(horario);
 
-    const response = await fetch(`${baseUrl}user_admin/controllers/schedulesController.php${userIdUrl}`, {
-      method: "GET",
-    });
-    const { success, data } = await response.json();
+    setupScheduleEventListeners(desktopRow, mobileCard, horario.day);
 
-    if (success) {
-      // Guardar una copia de los datos iniciales
-      initialSchedules = JSON.parse(JSON.stringify(data)); // Copia profunda para evitar referencias
-      // Limpiar el cuerpo de la tabla
-      tableBody.innerHTML = "";
-
-      if (data.length > 0) {
-        data.forEach((horario) => {
-          addScheduleToTable(horario);
-        });
-      }
+    if (horario.break_start && horario.break_end && horario.is_enabled) {
+      addExistingBreakTime(desktopRow, mobileCard, horario.day, horario.break_start, horario.break_end);
     }
+  }
+
+  function setupScheduleEventListeners(desktopRow, mobileCard, day) {
+    BreakTimeManager.setBaseUrl(baseUrl);
+    // Eventos para desktop
+    desktopRow.querySelector(".descanso").addEventListener("click", () => {
+      BreakTimeManager.addNewBreakTime(desktopRow.querySelector(".descanso"), day);
+    });
+
+    desktopRow.querySelector(".form-checkbox").addEventListener("change", async (e) => {
+      changeDayStatus(e, day);
+    });
+
+    // Eventos para mobile
+    mobileCard.querySelector(".descanso").addEventListener("click", () => {
+      BreakTimeManager.addNewBreakTime(mobileCard.querySelector(".descanso"), day);
+    });
+
+    mobileCard.querySelector(".form-checkbox").addEventListener("change", async (e) => {
+      changeDayStatus(e, day);
+    });
+
+    // Botón copiar en todos
+    const copyAllDesktop = desktopRow.querySelector(".copy-all");
+    const copyAllMobile = mobileCard.querySelector(".copy-all");
+
+    if (copyAllDesktop) copyAllDesktop.addEventListener("click", copiarEnTodos);
+    if (copyAllMobile) copyAllMobile.addEventListener("click", copiarEnTodos);
+  }
+
+  function addExistingBreakTime(desktopRow, mobileCard, day, break_start, break_end) {
+    const desktopBreak = ScheduleRendererDesktop.addBreakTimeElement(desktopRow, day, break_start, break_end);
+    const mobileBreak = ScheduleRendererMobile.addBreakTimeElement(mobileCard, day, break_start, break_end);
+
+    desktopBreak.querySelector(".remove-break").addEventListener("click", () => {
+      BreakTimeManager.removeBreakTime(desktopBreak);
+    });
+
+    mobileBreak.querySelector(".remove-break").addEventListener("click", () => {
+      BreakTimeManager.removeBreakTime(mobileBreak);
+    });
+
+    desktopRow.querySelector(".descanso").disabled = true;
+    mobileCard.querySelector(".descanso").disabled = true;
+  }
+
+  function limpiarContenedoresHorario() {
+    document.getElementById("scheduleTableBodyDesktop").innerHTML = "";
+    document.getElementById("scheduleTableBodyMobile").innerHTML = "";
   }
 
   // evento chaange para userSelect
@@ -34,29 +74,69 @@ export function init() {
       await getHorarios(userId);
     });
   }
+  async function getHorarios(user_id = null) {
+    let userIdUrl = user_id !== null ? `?user_id=${user_id}` : "";
+
+    const response = await fetch(`${baseUrl}user_admin/controllers/schedulesController.php${userIdUrl}`, {
+      method: "GET",
+    });
+    const { success, data } = await response.json();
+
+    if (success) {
+      initialSchedules = JSON.parse(JSON.stringify(data));
+      limpiarContenedoresHorario();
+
+      if (data.length > 0) {
+        data.forEach((horario) => {
+          addScheduleToTable(horario);
+        });
+      }
+    }
+  }
 
   function getCurrentSchedules() {
-    const rows = Array.from(tableBody.querySelectorAll("tr.work-day")); // Filas de la tabla
-    return rows.map((row) => {
-      const day = row.querySelector("td[data-cell='día']").textContent.trim();
-      const schedule_id = row.querySelector("input[name^='schedule[" + day + "][schedule_id]']").value;
-      const day_id = row.querySelector("input[name^='schedule[" + day + "][day_id]']").value;
-      const is_enabled = row.querySelector("input[name^='schedule[" + day + "][is_enabled]']").checked ? 1 : 0;
-      const work_start = row.querySelector("input[name^='schedule[" + day + "][start]']").value;
-      const work_end = row.querySelector("input[name^='schedule[" + day + "][end]']").value;
+    // Buscar el contenedor visible
+    const scheduleBodies = document.querySelectorAll(".schedule-body");
+    let visibleContainer = null;
 
-      const break_start = row.querySelector("input[name^='schedule[" + day + "][break_start]']") ? row.querySelector("input[name^='schedule[" + day + "][break_start]']").value : null;
-      const break_end = row.querySelector("input[name^='schedule[" + day + "][break_end]']") ? row.querySelector("input[name^='schedule[" + day + "][break_end]']").value : null;
+    scheduleBodies.forEach((container) => {
+      const style = window.getComputedStyle(container);
+      if (style.display !== "none") {
+        visibleContainer = container;
+      }
+    });
+
+    if (!visibleContainer) return [];
+
+    const rows = Array.from(visibleContainer.querySelectorAll(".work-day"));
+
+    return rows.map((row) => {
+      const isMobile = row.tagName === "DIV";
+      const dayElement = isMobile
+        ? row.querySelector("span") // Primer span es el día en mobile
+        : row.querySelector("td[data-cell='día']"); // En desktop
+
+      const day = dayElement?.textContent.trim() || "";
+
+      const getInputValue = (namePart) => {
+        const input = row.querySelector(`input[name^="schedule[${day}][${namePart}]"]`);
+        return input ? input.value : null;
+      };
+
+      const getChecked = (namePart) => {
+        const input = row.querySelector(`input[name^="schedule[${day}][${namePart}]"]`);
+        return input && input.checked ? 1 : 0;
+      };
 
       return {
-        schedule_id,
-        day_id,
+        schedule_id: getInputValue("schedule_id"),
+        day_id: getInputValue("day_id"),
         day,
-        is_enabled,
-        work_start,
-        work_end,
-        break_start,
-        break_end,
+        is_enabled: getChecked("is_enabled"),
+        work_start: getInputValue("start"),
+        work_end: getInputValue("end"),
+        break_start: getInputValue("break_start"),
+        break_end: getInputValue("break_end"),
       };
     });
   }
@@ -67,10 +147,12 @@ export function init() {
   });
 
   function showSaveAlert(haveChanges) {
+    const alertBox = document.getElementById("unsavedChangesAlert");
+
     if (haveChanges) {
-      document.getElementById("unsavedChangesAlert").classList.remove("d-none");
+      alertBox.classList.remove("hidden");
     } else {
-      document.getElementById("unsavedChangesAlert").classList.add("d-none");
+      alertBox.classList.add("hidden");
     }
   }
 
@@ -90,146 +172,6 @@ export function init() {
       );
     });
   }
-
-  function addScheduleToTable(horario) {
-    const { schedule_id, day_id, day, work_start, work_end, break_start, break_end, is_enabled } = horario;
-
-    const tableBody = document.getElementById("scheduleTableBody");
-    const tr = document.createElement("tr");
-    tr.classList.add("work-day");
-    tr.classList.add("body-table");
-    const copiaTodo = day === "Lunes" ? "<button type='button' class='btn btn-link copy-all'>Copiar en todos</button>" : "";
-    const checked = is_enabled === 1 ? "checked" : "";
-    const disabled = is_enabled === 1 ? "" : "disabled";
-
-    tr.innerHTML = `
-      <tr class='work-day'>
-      <input type='hidden' name='schedule[${day}][schedule_id]' value='${schedule_id}'>
-        <td data-cell="día" class="data">${day}
-          <input type='hidden' name='schedule[${day}][day_id]' value='${day_id}'>
-        </td>
-        <td data-cell="estado" class="data">
-          <div class='form-check form-switch'>
-            <input class='form-check-input' type='checkbox' ${checked}>
-            <input type='hidden' name='schedule[${day}][is_enabled]' value='${is_enabled}'>
-          </div>
-        </td>
-        <td data-cell="Inicio Jornada" class="data">
-          <input type='time' class='form-control' name='schedule[${day}][start]' value='${work_start}' ${disabled}>
-        </td>
-        <td data-cell="Fin Jornada" class="data">
-          <input type='time' class='form-control' name='schedule[${day}][end]' value='${work_end}'${disabled}>
-        </td>
-        <td>
-          <button type='button' name='schedule[${day}]' class='btn btn-outline-primary btn-sm descanso' ${disabled}>+ Descanso</button>
-        </td>
-        <td data-cell="">
-          ${copiaTodo}
-        </td>
-      </tr>
-    `;
-
-    tableBody.appendChild(tr);
-
-    tr.querySelector(".descanso").addEventListener("click", () => {
-      addNewBreakTime(tr.querySelector(".descanso"), day);
-    });
-
-    tr.querySelector(".form-check-input").addEventListener("change", async (e) => {
-      changeDayStatus(e, day);
-    });
-
-    // Si hay un horario de descanso, agregar la fila del descanso
-    if (break_start && break_end && is_enabled) {
-      addBreakTimeElement(tr, day, break_start, break_end);
-    }
-    document.querySelector(".copy-all").addEventListener("click", copiarEnTodos);
-  }
-  function addNewBreakTime(button, day) {
-    const tr = button.closest(".work-day");
-    const breakRow = document.createElement("tr");
-    breakRow.classList.add("break-row");
-    breakRow.classList.add("body-table");
-
-    breakRow.innerHTML = `
-      <td colspan="2">Hora de descanso</td>
-      <td class='break-time'>
-        <input type='time' class='form-control' name='schedule[${day}][break_start]' value='' required>
-      </td>
-      <td>
-        <input type='time' class='form-control' name='schedule[${day}][break_end]' value='' required>
-      </td>
-      <td>
-        <button type='button' class='btn btn-outline-danger btn-sm remove-break'>Eliminar</button>
-      </td>
-      <td></td>
-    `;
-
-    button.disabled = true;
-    tr.parentNode.insertBefore(breakRow, tr.nextSibling);
-
-    breakRow.querySelector(".remove-break").addEventListener("click", () => {
-      removeBreakTime(breakRow);
-    });
-  }
-
-  function addBreakTimeElement(tr, day, break_start, break_end) {
-    const breakRow = document.createElement("tr");
-    breakRow.classList.add("break-row");
-    breakRow.classList.add("body-table");
-
-    breakRow.innerHTML = `
-      <td colspan="2">Hora de descanso</td>
-      <td data-cell="inicio descanso" class='break-time data'>
-        <input type='time' class='form-control' name='schedule[${day}][break_start]' value='${break_start}' required>
-      </td>
-      <td data-cell="fin descanso" class="data">
-        <input type='time' class='form-control' name='schedule[${day}][break_end]' value='${break_end}' required>
-      </td>
-      <td>
-        <button type='button' class='btn btn-outline-danger btn-sm remove-break'>Eliminar</button>
-      </td>
-      <td></td>
-    `;
-
-    tr.parentNode.insertBefore(breakRow, tr.nextSibling);
-
-    breakRow.querySelector(".remove-break").addEventListener("click", () => {
-      removeBreakTime(breakRow);
-    });
-
-    tr.querySelector(".descanso").disabled = true;
-  }
-
-  function removeBreakTime(breakRow) {
-    const tr = breakRow.previousElementSibling;
-    const scheduleId = tr.querySelector("input[name*='schedule_id']").value;
-    breakRow.remove();
-    tr.querySelector(".descanso").disabled = false;
-
-    async function removeBreakTimeFromDB(scheduleId) {
-      try {
-        const response = await fetch(`${baseUrl}user_admin/controllers/schedulesController.php`, {
-          method: "POST",
-          body: JSON.stringify({ action: "remove_break", scheduleId }),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-
-        const { success, message } = await response.json();
-
-        if (success) {
-          alert(message);
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    }
-
-    removeBreakTimeFromDB(scheduleId);
-  }
-
   function changeDayStatus(e, day) {
     const workDay = e.target.closest(".work-day");
     const descansoButton = workDay.querySelector(".descanso");
@@ -242,10 +184,14 @@ export function init() {
         }
       });
       descansoButton.removeAttribute("disabled");
+      descansoButton.classList.remove("disabled:opacity-50");
+      descansoButton.classList.add("hover:bg-cyan-100");
     } else {
       workDay.querySelector("input[name='schedule[" + day + "][start]']").setAttribute("disabled", "");
       workDay.querySelector("input[name='schedule[" + day + "][end]']").setAttribute("disabled", "");
       descansoButton.setAttribute("disabled", "");
+      descansoButton.classList.add("disabled:opacity-50");
+      descansoButton.classList.remove("hover:bg-cyan-100");
       workDay.querySelector("input[name='schedule[" + day + "][is_enabled]']").value = 0;
 
       if (workDay.nextElementSibling && workDay.nextElementSibling.classList.contains("break-row")) {
@@ -254,9 +200,21 @@ export function init() {
     }
   }
 
+  function isMobileView() {
+    return window.innerWidth < 768; // o el breakpoint que uses
+  }
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
+    // Eliminar inputs del formato no visible
+    if (isMobileView()) {
+      // Estás en mobile: borra la tabla desktop
+      document.getElementById("scheduleTableBodyDesktop").innerHTML = "";
+    } else {
+      // Estás en desktop: borra los cards mobile
+      document.getElementById("scheduleTableBodyMobile").innerHTML = "";
+    }
     const formData = new FormData(form);
+
     let userId = document.getElementById("userSelect").value;
 
     try {
@@ -268,12 +226,17 @@ export function init() {
       const { success, message } = await response.json();
 
       if (success) {
-        const modal = new bootstrap.Modal(document.getElementById("saveSchedules"));
-        modal.show();
+        document.getElementById("responseMessage").innerHTML = `<p>Horario guardado exitosamente</p>`;
+        ModalManager.show("saveSchedules");
         showSaveAlert(false);
         getHorarios(userId);
+      } else {
+        document.getElementById("responseMessage").innerHTML = `<p class='text-red-600'>${message || "Error al guardar horarios"}</p>`;
+        ModalManager.show("saveSchedules");
       }
     } catch (error) {
+      document.getElementById("responseMessage").innerHTML = `<p class='text-red-600'>Ocurrió un error inesperado</p>`;
+      ModalManager.show("saveSchedules");
       console.error(error);
     }
   });
@@ -292,15 +255,22 @@ export function init() {
       const { success, message } = await response.json();
 
       if (success) {
-        alert(message);
+        document.getElementById("responseMessage").innerHTML = `<p>${message}</p>`;
+        ModalManager.show("saveSchedules");
         getHorarios(userId);
       } else {
-        alert("Error al copiar los horarios: " + message);
+        document.getElementById("responseMessage").innerHTML = `<p class='text-red-600'>${message || "Error al copiar los horarios"}</p>`;
+        ModalManager.show("saveSchedules");
       }
     } catch (error) {
+      document.getElementById("responseMessage").innerHTML = `<p class='text-red-600'>Ocurrió un error inesperado</p>`;
+      ModalManager.show("saveSchedules");
       console.error(error);
     }
   }
+
+  // --- Cierre de modal con ModalManager ---
+  ModalManager.setupCloseListeners();
 
   getHorarios();
 }

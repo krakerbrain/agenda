@@ -7,69 +7,47 @@ $baseUrl = ConfigUrl::get();
 $auth = new JWTAuth();
 $auth->validarTokenUsuario();
 ?>
-<style>
-*/ .time-field {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
 
-.time-label {
-    font-size: 0.75rem;
-    /* Tamaño pequeño para el texto */
-    margin-bottom: 0.25rem;
-    /* Separación entre la etiqueta y el input */
-    color: #6c757d;
-    /* Color neutro */
-}
-
-.time-box {
-    width: 50px;
-    /* Ancho del campo */
-    text-align: center;
-    padding: 0.25rem;
-}
-</style>
-<div class="container text-end">
-    <a tabindex="0" role="button" data-bs-trigger="focus" class="btn" data-bs-placement="left" data-bs-toggle="popover"
-        data-bs-title="Servicios"
-        data-bs-content="Aquí podrá configurar todos los servicios que prestes con sus categorías, descripciones y duración de los servicios (en horas). Estos servicios más las configuraciones del calendario le permitiran a su cliente hacer correctamente la reserva">
-        <i class="fa fa-circle-question text-primary" style="font-size: 1.5rem;"></i>
-    </a>
-</div>
-<div class="container">
-    <form id="servicesForm" method="POST" class="border p-4 rounded">
-        <input type="hidden" value="" id="tempId">
-        <table class="table table-borderless table-striped table-sm">
-            <thead>
-                <tr class="head-table">
-                    <!-- agegrar tooltip con icono i de información y el texto define si el servicio esta disponible o no para todos los usaurios -->
-                    <th>Habilitado<i class="fa fa-info-circle ps-1" data-bs-toggle="tooltip" data-bs-placement="top"
-                            title="Define si el servicio está disponible para todos los usuarios"></i></th>
-                    <th>Nombre del Servicio</th>
-                    <th class="text-center">Duración</th>
-                    <th>Observaciones</th>
-                    <th>Categorías</th>
-                    <th>Días Disponible</th>
-                    <th>Acción</th>
-                </tr>
-            </thead>
-            <tbody id="servicesTableBody">
-
-
-            </tbody>
-        </table>
-        <!-- Botón para agregar servicio más cerca de la tabla -->
-        <button type="button" class="btn btn-outline-primary mb-4" id="addServiceButton">
-            <i class="fa fa-plus"></i> Agregar Nuevo Servicio
-        </button>
-        <!-- Botón para guardar en una sección separada de acción final -->
-        <div class="d-flex justify-content-end mt-3">
-            <button type="submit" class="btn btn-success">
-                <i class="fa fa-save"></i> Guardar Configuración
+<div class="max-w-4xl mx-auto">
+    <!-- Card contenedora principal -->
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col" style="height: 85vh;">
+        <!-- Header con controles fijos -->
+        <div
+            class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sticky top-0 z-10">
+            <!-- Botón de agregar servicio -->
+            <button type="button" id="addServiceButton"
+                class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer">
+                <!-- w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 -->
+                <i class="fa fa-plus mr-2"></i> Agregar Nuevo Servicio
             </button>
+
+            <!-- Botón de ayuda (opcional) -->
+            <div class="hidden sm:block">
+                <a tabindex="0" role="button" class="btn" data-bs-trigger="focus" data-bs-placement="left"
+                    data-bs-toggle="popover" data-bs-title="Servicios"
+                    data-bs-content="Aquí podrá configurar todos los servicios que prestes con sus categorías, descripciones y duración de los servicios (en horas). Estos servicios más las configuraciones del calendario le permitirán a su cliente hacer correctamente la reserva">
+                    <i class="fa fa-circle-question text-blue-500 text-2xl hover:text-blue-600"></i>
+                </a>
+            </div>
         </div>
-    </form>
-    <?php include dirname(__DIR__, 2) . '/includes/modal-servicios.php';
-    ?>
+
+        <!-- Contenido con scroll - una sola columna -->
+        <div class="flex-1 overflow-y-auto p-6">
+            <form id="servicesForm" method="POST" class="space-y-6">
+                <input type="hidden" value="" id="tempId">
+
+                <!-- Contenedor de servicios - una card por línea -->
+                <div id="servicesContainer" class="space-y-6">
+                    <!-- Las cards de servicios se cargarán aquí dinámicamente -->
+                </div>
+
+                <!-- Mensaje cuando no hay servicios -->
+                <div id="noServicesMessage" class="text-center py-10 text-gray-500 hidden">
+                    No hay servicios configurados. Haz clic en "Agregar Nuevo Servicio" para comenzar.
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
+
+<?php include dirname(__DIR__, 2) . '/includes/modal-servicios.php'; ?>

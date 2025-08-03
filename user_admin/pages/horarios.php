@@ -14,51 +14,55 @@ if ($user_count > 1) {
     $users = $userData->get_all_users($datosUsuario['company_id']);
 }
 
+
 ?>
-
-<div class="container my-5">
+<div class="max-w-4xl mx-auto my-8 px-2 w-full">
     <?php if ($user_count > 1 && $datosUsuario['role_id'] == 2) : ?>
-        <div class="row mb-3">
-            <div class="col-md-6">
-                <label for="userSelect" class="form-label">Selecciona el usuario</label>
-                <select id="userSelect" class="form-select">
-                    <?php foreach ($users as $user) : ?>
-                        <!-- si datosUsuario['id'] == $user['id'] entonces se selecciona -->
-                        <option value="<?= $user['id'] ?>"
-                            <?= $datosUsuario['role_id'] == $user['role_id'] ? 'selected' : '' ?>>
-                            <?= $user['name'] ?></option>
-                    <?php endforeach; ?>
-
-                </select>
-            </div>
+        <div class="mb-6">
+            <label for="userSelect" class="block text-sm font-medium text-gray-700 mb-2">Selecciona el usuario</label>
+            <select id="userSelect"
+                class="block rounded-md border border-gray-300 shadow-sm focus:border-cyan-500 focus:ring focus:ring-cyan-200 focus:ring-opacity-50 p-1">
+                <?php foreach ($users as $user) : ?>
+                    <option value="<?= $user['id'] ?>" <?= $datosUsuario['role_id'] == $user['role_id'] ? 'selected' : '' ?>>
+                        <?= $user['name'] ?></option>
+                <?php endforeach; ?>
+            </select>
         </div>
     <?php else : ?>
         <input type="hidden" id="userSelect" value="<?= $datosUsuario['user_id'] ?>">
     <?php endif; ?>
-    <form id="workScheduleForm" method="POST" class="border p-4 rounded">
-        <div id="unsavedChangesAlert" class="alert alert-warning d-none" role="alert">
-            <strong>Recuerda guardar los cambios antes de salir.</strong>
-            Si sales sin guardar, perderás los cambios realizados.
-            <button type="submit" class="btn btn-primary btn-sm">Guardar Configuración</button>
+    <form id="workScheduleForm" method="POST">
+        <div id="unsavedChangesAlert"
+            class="hidden mb-4 p-4 rounded bg-yellow-100 text-yellow-800 items-center justify-between gap-4">
+            <div>
+                <strong>Recuerda guardar los cambios antes de salir.</strong>
+                <span class="block text-sm">Si sales sin guardar, perderás los cambios realizados.</span>
+            </div>
+            <button type="submit"
+                class="bg-cyan-600 hover:bg-cyan-700 text-white font-semibold px-4 py-2 rounded text-sm">Guardar
+                Configuración</button>
         </div>
-
-        <table class="table table-borderless table-striped table-sm">
-            <thead>
-                <tr class="head-table">
-                    <th>Día</th>
-                    <th>Estado</th>
-                    <th>Inicio de la jornada</th>
-                    <th>Fin de la jornada</th>
-                    <th>Acción</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody id="scheduleTableBody">
-
-            </tbody>
-        </table>
-        <button type="submit" class="btn btn-primary mt-3">Guardar Configuración</button>
+        <div class="overflow-x-auto rounded-lg">
+            <table class="hidden md:table min-w-full divide-y divide-gray-200 bg-white">
+                <thead class="table-header-group">
+                    <tr class="bg-cyan-50 text-cyan-800 text-sm font-semibold">
+                        <th class="px-3 py-2">Estado</th>
+                        <th class="px-3 py-2">Día</th>
+                        <th class="px-3 py-2">Jornada</th>
+                        <th class="px-3 py-2">Acción</th>
+                    </tr>
+                </thead>
+                <tbody id="scheduleTableBodyDesktop" class="schedule-body divide-y divide-gray-100">
+                    <!-- Desktop rows -->
+                </tbody>
+            </table>
+            <div id="scheduleTableBodyMobile" class="schedule-body md:hidden space-y-2 mt-2">
+                <!-- Mobile cards -->
+            </div>
+        </div>
+        <button type="submit"
+            class="mt-6 bg-cyan-600 hover:bg-cyan-700 text-white font-semibold px-6 py-2 rounded shadow">Guardar
+            Configuración</button>
     </form>
-    <?php include dirname(__DIR__, 2) . '/includes/modal-horarios-guardados.php';
-    ?>
+    <?php include dirname(__DIR__, 2) . '/includes/modal-horarios-guardados.php'; ?>
 </div>

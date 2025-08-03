@@ -1,17 +1,6 @@
-body {
-  font-size: 0.85rem;
-}
-
-.actionBtns {
-  display: flex;
-  justify-content: space-evenly;
-}
-
 /* Estilo para los iconos de acción */
 .action-icon {
-  font-size: 1.1rem;
-  cursor: pointer;
-  position: relative; /* Necesario para posicionar el spinner encima */
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -26,9 +15,9 @@ body {
 }
 
 /* Oculta el texto cuando sea necesario */
-.button-text {
-  display: none;
-}
+/* .button-text {
+  font-size: 0.65rem;
+} */
 
 /* Spinner centrado encima del icono */
 .spinner-border {
@@ -46,17 +35,204 @@ body {
   top: 5px !important;
 }
 
-/* Responsive: ocultar cabecera de tabla en pantallas pequeñas */
+.expand-btn {
+  display: none;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-in-out forwards;
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.3s ease-in-out forwards;
+}
+
+/* Estilos para móviles (tableta y menor) */
 @media (max-width: 1000px) {
+  /* Mostrar flecha solo en móviles */
+  .expand-btn {
+    display: flex !important;
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #f8fafc;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #e2e8f0;
+  }
+
+  .expanded .expand-btn {
+    transform: rotate(180deg);
+    background: #f1f5f9;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  /* Ocultar cabecera */
   tr.head-table th {
     display: none;
   }
 
+  /* Cada fila como tarjeta */
+  tr.body-table {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    position: relative;
+    background: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+
+  /* Ocultar todos los td por defecto */
   tr.body-table td {
+    display: none;
+    padding: 0.5rem 0;
+    order: 99;
+  }
+  /* APPOINTMENTS */
+  /* Nueva posición para el estado (encima de la fecha) */
+  tr.appointments-row td.cell-status {
+    /* Celda de estado */
+    display: flex !important;
+    order: 0; /* Lo colocamos antes que la fecha (order:1) */
+    margin-bottom: 0.5rem;
+    padding: 0 !important;
+  }
+
+  /* Mostrar solo los campos esenciales (fecha + hora, nombre, servicio) en orden: fecha + hora, nombre, servicio */
+  tr.appointments-row td.cell-date {
+    /* Fecha */
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: #64748b;
+    font-weight: 500;
+    order: 1;
+  }
+  tr.appointments-row td.cell-name {
+    /* Nombre */
+    display: block;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1e293b;
+    order: 2;
+  }
+  tr.appointments-row td.cell-service {
+    /* Servicio */
+    display: block;
+    font-size: 0.95rem;
+    color: #475569;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px dashed #e2e8f0;
+    margin-bottom: 0.75rem;
+    order: 3;
+  }
+
+  tr.appointments-row td.cell-actions {
+    /* Celda de acciones */
+    display: flex !important;
+    order: 4;
+    padding: 0 !important;
+  }
+
+  /*  CUSTOMERS */
+  /* Nueva posición para el estado (encima de la fecha) */
+  tr.customers-row td.cell-status {
+    /* Celda de estado */
+    display: flex !important;
+    order: 0;
+    margin-bottom: 0.5rem;
+    padding: 0 !important;
+  }
+
+  tr.customers-row td.cell-name {
+    /* Nombre */
+    display: block;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1e293b;
+    order: 1;
+  }
+
+  tr.customers-row td.cell-actions {
+    /* Celda de acciones */
+    display: flex !important;
+    padding: 0 !important;
+    order: 3;
+  }
+  /* Ocultar la hora en el expandido */
+  tr.body-table.expanded td.cell-time {
+    display: none !important;
+  }
+
+  /* Mostrar todos los campos cuando está expandido */
+  tr.body-table.expanded td {
     display: block;
   }
 
-  .data::before {
+  tr.body-table.expanded td.cell-category::before,
+  tr.body-table.expanded td.cell-phone::before,
+  tr.body-table.expanded td.cell-mail::before {
+    content: attr(data-cell) ": ";
+    font-weight: 600;
+    text-transform: capitalize;
+    color: #64748b;
+    display: inline-block;
+    min-width: 100px;
+  }
+
+  /* Ajustar botones de acción */
+  tr.body-table.expanded td:last-child {
+    padding-top: 1rem;
+  }
+
+  /* .actionBtns {
+    justify-content: flex-start !important;
+    flex-wrap: wrap;
+    gap: 0.5rem !important;
+  } */
+
+  tr.head-table-config th {
+    display: none;
+  }
+
+  tr.body-table-config td {
+    display: block;
+  }
+
+  .body-table-config .data::before {
     content: attr(data-cell) ": ";
     font-weight: 700;
     text-transform: capitalize;

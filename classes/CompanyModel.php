@@ -50,7 +50,8 @@ class CompanyModel
         $this->db->query("SELECT sn.name, sn.icon_class, csn.url 
                           FROM company_social_networks csn 
                           JOIN social_networks sn ON csn.social_network_id = sn.id 
-                          WHERE csn.company_id = :company_id");
+                          WHERE csn.company_id = :company_id
+                          ORDER BY csn.orden ASC");
         $this->db->bind(':company_id', $companyId);
         return $this->db->resultSet();
     }
