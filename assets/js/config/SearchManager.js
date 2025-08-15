@@ -16,6 +16,8 @@ export class SearchManager {
 
   init() {
     if (!this.form) return;
+
+    // Submit
     this.form.addEventListener("submit", (e) => {
       e.preventDefault();
       const formData = new FormData(this.form);
@@ -23,11 +25,21 @@ export class SearchManager {
         this.onSearch(formData);
       }
     });
-    // Autocompletado en los campos indicados
+
+    // Autocompletado
     this.autocompleteFields.forEach((id) => {
       const input = this.form.querySelector(`#${id}`);
       if (input) {
         input.addEventListener("input", (e) => {
+          // Validar si hay más de un input lleno
+          const filledInputs = Array.from(this.form.elements)
+            .filter((el) => ["input", "select"].includes(el.tagName.toLowerCase()))
+            .filter((el) => el.value);
+
+          if (filledInputs.length > 2) {
+            return; // No hacer nada si hay más de un input lleno
+          }
+
           if (typeof this.onAutocomplete === "function") {
             this.onAutocomplete(e);
           }

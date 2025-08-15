@@ -11,7 +11,7 @@ import { DatesUIHelpers } from "./dateLists/DatesUIHelpers.js";
 import { ModalManager } from "./config/ModalManager.js";
 
 // --- Modular class instances ---
-let tableRenderer, pagination, searchManager, tabManager;
+let tableRenderer, pagination, searchManager, tabManager, searchOffcanvasManager;
 
 export function init() {
   // Tabs usando TabManager
@@ -37,7 +37,20 @@ export function init() {
 
   // SearchManager global para datesList
   searchManager = new SearchManager("#searchForm", handleSearch, handleAutocomplete, ["service", "name", "phone", "mail", "date", "hour", "status"]);
+  flatpickr("#date", {
+    dateFormat: "Y-m-d",
+    allowInput: true, // permite escribir la fecha manualmente
+    disableMobile: true,
+  });
 
+  flatpickr("#hour", {
+    enableTime: true, // habilita selección de hora
+    noCalendar: true, // sin calendario
+    dateFormat: "H:i", // formato hora
+    time_24hr: true, // formato 24 horas
+    allowInput: true, // permite escribir manualmente
+    disableMobile: true, // fuerza usar Flatpickr en móvil
+  });
   offCanvas();
   // Initial load
   const savedStatus = sessionStorage.getItem("status") || "unconfirmed";
@@ -281,6 +294,11 @@ async function loadAppointmentsWithSearch(searchParams) {
     const { success, data } = await response.json();
     if (success) {
       if (savedStatus !== "events") {
+        if (Array.isArray(data) && data.length > 0) {
+          if (searchOffcanvasManager) {
+            searchOffcanvasManager.closeCanvas();
+          }
+        }
         tableRenderer.renderAppointments(data, undefined, DatesUIHelpers.getStatusBadge, getActionButtons);
       } else {
         tableRenderer.renderEventTable(data, DatesUIHelpers.getStatusBadge, getActionButtons);
@@ -299,6 +317,11 @@ function handleAutocomplete(e) {
     fetch(`${baseUrl}user_admin/controllers/autocomplete.php?input=${input}&query=${query}&tab=${savedStatus}`)
       .then((res) => res.json())
       .then((data) => {
+        if (Array.isArray(data.data) && data.data.length > 0) {
+          if (searchOffcanvasManager) {
+            searchOffcanvasManager.closeCanvas();
+          }
+        }
         if (savedStatus !== "events") {
           tableRenderer.renderAppointments(data.data, undefined, DatesUIHelpers.getStatusBadge, getActionButtons);
         } else {
@@ -363,7 +386,7 @@ async function autocomplete(e) {
 
 function offCanvas() {
   // Superior (buscador en datesList)
-  const searchOffcanvas = new OffcanvasManager({
+  searchOffcanvasManager = new OffcanvasManager({
     toggleSelector: "#offcanvasToggleSearch",
     menuSelector: "#offcanvasSearch",
     closeSelector: "#offcanvasSearchClose",
