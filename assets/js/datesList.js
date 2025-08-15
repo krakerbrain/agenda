@@ -39,7 +39,7 @@ export function init() {
   searchManager = new SearchManager("#searchForm", handleSearch, handleAutocomplete, ["service", "name", "phone", "mail", "date", "hour", "status"]);
   flatpickr("#date", {
     dateFormat: "Y-m-d",
-    allowInput: true, // permite escribir la fecha manualmente
+    allowInput: false, // permite escribir la fecha manualmente
     disableMobile: true,
   });
 
@@ -48,7 +48,7 @@ export function init() {
     noCalendar: true, // sin calendario
     dateFormat: "H:i", // formato hora
     time_24hr: true, // formato 24 horas
-    allowInput: true, // permite escribir manualmente
+    allowInput: false, // permite escribir manualmente
     disableMobile: true, // fuerza usar Flatpickr en móvil
   });
   offCanvas();
