@@ -214,6 +214,70 @@ class Appointments
         return $this->db->resultSet();
     }
 
+    public function searchAppointmentsAdvanced($company_id, $filters = [], $tab = 'all')
+    {
+        $querySql = 'SELECT a.id as id_appointment, a.*, s.name AS service, c.*, 
+                        DATE_FORMAT(a.date, "%d-%m-%Y") as date
+                 FROM appointments a
+                 INNER JOIN services s ON a.id_service = s.id
+                 INNER JOIN customers c ON a.customer_id = c.id
+                 INNER JOIN company_customers cc ON c.id = cc.customer_id
+                 WHERE a.company_id = :company
+                   AND cc.company_id = :company
+                   AND status != 2';
+
+        // Filtrar según tab
+        if ($tab === 'unconfirmed') {
+            $querySql .= ' AND a.status = 0 AND a.date >= CURDATE()';
+        } elseif ($tab === 'confirmed') {
+            $querySql .= ' AND a.status = 1 AND a.date >= CURDATE()';
+        } elseif ($tab === 'past') {
+            $querySql .= ' AND a.date < CURDATE()';
+        }
+
+        // Filtros dinámicos
+        $bindings = [];
+        foreach ($filters as $field => $value) {
+            if (!$value) continue; // saltar campos vacíos
+            switch ($field) {
+                case 'service':
+                    $querySql .= ' AND s.name LIKE :service';
+                    $bindings[':service'] = "%$value%";
+                    break;
+                case 'name':
+                    $querySql .= ' AND c.name LIKE :name';
+                    $bindings[':name'] = "%$value%";
+                    break;
+                case 'phone':
+                    $querySql .= ' AND c.phone LIKE :phone';
+                    $bindings[':phone'] = "%$value%";
+                    break;
+                case 'mail':
+                    $querySql .= ' AND c.mail LIKE :mail';
+                    $bindings[':mail'] = "%$value%";
+                    break;
+                case 'date':
+                    $querySql .= ' AND DATE(a.date) = :date';
+                    $bindings[':date'] = $value;
+                    break;
+                case 'hour':
+                    $querySql .= ' AND TIME(a.start_time) = :hour';
+                    $bindings[':hour'] = $value;
+                    break;
+            }
+        }
+
+        // Preparar y ejecutar
+        $this->db->query($querySql);
+        $this->db->bind(':company', $company_id);
+        foreach ($bindings as $param => $val) {
+            $this->db->bind($param, $val);
+        }
+
+        return $this->db->resultSet();
+    }
+
+
     public function get_paginated_appointments($company_id, $user_id, $user_role, $status, $offset, $limit)
     {
         $query = 'SELECT a.id as id_appointment, a.*, s.name AS service, c.id as id_customer, c.*, 

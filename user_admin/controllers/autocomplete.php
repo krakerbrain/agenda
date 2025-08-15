@@ -15,23 +15,54 @@ try {
     $company_id = $datosUsuario['company_id'];
 
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-        $input = isset($_GET['input']) ? $_GET['input'] : '';
-        $query = isset($_GET['query']) ? $_GET['query'] : '';
-        $tab = isset($_GET['tab']) ? $_GET['tab'] : '';
-        $status = isset($_GET['status']) ? $_GET['status'] : null;
+        $tab = $_GET['tab'] ?? '';
+
+        // Detectamos si es autocompletado (viene input+query) o búsqueda completa
+        $isAutocomplete = isset($_GET['input']) && isset($_GET['query']);
 
         switch ($tab) {
             case 'customers':
                 $customers = new Customers();
-                $data = $customers->searchCustomers($company_id, $input, $query, $status);
+                $data = $customers->searchCustomers(
+                    $company_id,
+                    $_GET['input'] ?? '',
+                    $_GET['query'] ?? '',
+                    $_GET['status'] ?? null
+                );
                 break;
+
             case 'events':
                 $events = new UniqueEvents();
-                $data = $events->searchEventInscriptions($company_id, $input, $query);
+                $data = $events->searchEventInscriptions(
+                    $company_id,
+                    $_GET['input'] ?? '',
+                    $_GET['query'] ?? ''
+                );
                 break;
+
             default:
                 $appointments = new Appointments();
-                $data = $appointments->searchAppointments($company_id, $input, $query, $tab);
+                if ($isAutocomplete) {
+                    // Mantener autocompletado: un solo campo
+                    $data = $appointments->searchAppointments(
+                        $company_id,
+                        $_GET['input'] ?? '',
+                        $_GET['query'] ?? '',
+                        $tab
+                    );
+                } else {
+                    // Búsqueda avanzada: varios filtros
+                    $filters = [
+                        'service' => $_GET['service'] ?? null,
+                        'name'    => $_GET['name'] ?? null,
+                        'phone'   => $_GET['phone'] ?? null,
+                        'mail'    => $_GET['mail'] ?? null,
+                        'date'    => $_GET['date'] ?? null,
+                        'hour'    => $_GET['hour'] ?? null,
+                        'status'  => $_GET['status'] ?? null,
+                    ];
+                    $data = $appointments->searchAppointmentsAdvanced($company_id, $filters, $tab);
+                }
                 break;
         }
 

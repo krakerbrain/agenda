@@ -1,4 +1,4 @@
-import { ServiceRender } from "./servicios/serviceRender.js";
+import { ServiceRender } from "./servicios/ServiceRender.js";
 import { ModalManager } from "./config/ModalManager.js";
 
 let serviceRender;

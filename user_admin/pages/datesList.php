@@ -77,8 +77,24 @@ $auth->validarTokenUsuario();
                     placeholder="Buscar teléfono..." autocomplete="off">
                 <input class="form-input form-input-sm shadow p-1 w-full" type="text" id="mail" name="mail"
                     placeholder="Buscar correo..." autocomplete="off">
-                <input class="form-input form-input-sm shadow p-1 w-full" type="date" id="date" name="date">
-                <input class="form-input form-input-sm shadow p-1 w-full" type="time" id="hour" name="hour">
+
+                <div class="relative w-full">
+                    <input type="text" id="date" name="date" placeholder="Seleccionar fecha..." data-input
+                        class="form-input form-input-sm shadow p-2 w-full pr-10 rounded-md focus:ring-2 focus:ring-cyan-500 focus:outline-none">
+                    <a class="absolute right-2 text-base p-1 text-gray-500 hover:text-gray-700" data-toggle
+                        title="Seleccionar fecha">
+                        <i class="fas fa-calendar"></i>
+                    </a>
+                </div>
+                <!-- Hora con Flatpickr -->
+                <div class="relative w-full">
+                    <input type="text" id="hour" name="hour" placeholder="Seleccionar hora..." data-input
+                        class="form-input form-input-sm shadow p-2 w-full pr-10 rounded-md focus:ring-2 focus:ring-cyan-500 focus:outline-none">
+                    <a class="absolute right-2 text-base p-1 text-gray-500 hover:text-gray-700" data-toggle
+                        title="Seleccionar hora">
+                        <i class="fas fa-clock"></i>
+                    </a>
+                </div>
                 <select class="form-select form-select-sm shadow p-1 w-full" id="status" name="status">
                     <option value="all">Seleccionar estado</option>
                     <option value="1">Confirmada</option>
