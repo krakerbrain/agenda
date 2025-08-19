@@ -105,7 +105,7 @@ include_once dirname(__DIR__, 2) . '/landing/partials/head.php';
     </div>
     <!-- Modal de respuesta -->
     <div id="responseModal"
-        class="fixed inset-0 bg-black opacity-50 flex items-center justify-center z-50 opacity-0 pointer-events-none transition-opacity duration-300 ease-out">
+        class="fixed inset-0 z-50 flex items-center justify-center hidden pointer-events-none transition-opacity duration-300 opacity-0 p-4">
         <div class="bg-white rounded-lg shadow-lg max-w-md w-full p-6 text-center">
             <h2 class="text-xl font-bold text-[#1B637F] mb-4">Registro exitoso</h2>
             <p id="responseMessage" class="text-gray-700 mb-6">Tu empresa fue creada correctamente.</p>
