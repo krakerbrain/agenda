@@ -72,25 +72,29 @@ function renderCompanies(companies) {
     const row = document.createElement("tr");
     // Verifica si el logo es null o está vacío
     const companyLogo = company.logo ? `${baseUrl}${company.logo}` : `${baseUrl}assets/img/no_logo.png`;
+    row.className = "hover:bg-gray-100 transition-colors";
     row.innerHTML = `
-          <td data-cell="id" class="data">${company.id}</td>
-          <td data-cell="Habilitado" class="data">
-              <div class="form-check form-switch">
-                  <input type="checkbox" class="form-check-input" ${company.is_active ? "checked" : ""}>
-              </div>
-          </td>
-          <td data-cell="logo" class="data"><img src="${companyLogo}" alt="Logo" style="width:70px"></td>
-          <td data-cell="nombre" class="data">${company.name}</td>
-          <td data-cell="url" class="data"><a href="${baseUrl}reservas/${company.custom_url}" target="_blank">URL FORM</a></td>
-          <td data-cell="accion">
-              <button class="btn btn-danger btn-sm eliminarCompania" title="Eliminar compañía" data-id="${company.id}">
-                  <i class="fas fa-times"></i>
-                  <span class="spinner-border spinner-border-sm d-none" aria-hidden="true"></span>
-                  <span class="button-text"></span>
-              </button>
-          </td>
-      `;
-
+      <td data-cell="id" class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${company.id}</td>
+      <td data-cell="Habilitado" class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
+        <label class="inline-flex items-center cursor-pointer">
+          <input type="checkbox" class="sr-only peer form-check-input" ${company.is_active ? "checked" : ""}>
+          <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500 rounded-full peer peer-checked:bg-blue-600 transition-all"></div>
+          <div class="absolute ml-1 mt-1 w-4 h-4 bg-white rounded-full shadow transform peer-checked:translate-x-5 transition-transform"></div>
+        </label>
+      </td>
+      <td data-cell="logo" class="px-4 py-3 whitespace-nowrap text-sm text-gray-700"><img src="${companyLogo}" alt="Logo" class="w-16 h-16 object-contain rounded border border-gray-200"></td>
+      <td data-cell="nombre" class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${company.name}</td>
+      <td data-cell="url" class="px-4 py-3 whitespace-nowrap text-sm text-blue-600 underline"><a href="${baseUrl}reservas/${company.custom_url}" target="_blank">URL FORM</a></td>
+      <td data-cell="accion" class="px-4 py-3 whitespace-nowrap text-sm">
+        <button class="eliminarCompania inline-flex items-center px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded shadow transition-colors focus:outline-none focus:ring-2 focus:ring-red-400" title="Eliminar compañía" data-id="${
+          company.id
+        }">
+          <i class="fas fa-times"></i>
+          <span class="ml-2 spinner-border spinner-border-sm hidden" aria-hidden="true"></span>
+          <span class="button-text"></span>
+        </button>
+      </td>
+    `;
     tbody.appendChild(row);
   });
 }
