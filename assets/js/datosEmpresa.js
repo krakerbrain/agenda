@@ -60,9 +60,14 @@ export function init() {
     e.preventDefault();
     try {
       const result = await companyManager.save();
-      showNotification(result.message || "Datos guardados correctamente", "Éxito");
-      companyManager.load();
-      socialManager.load();
+
+      // Asegurarte de que siempre exista result.message
+      showNotification(result.message || (result.success ? "Datos guardados correctamente" : "Ocurrió un error"), result.success ? "Éxito" : "Error");
+
+      if (result.success) {
+        companyManager.load();
+        socialManager.load();
+      }
     } catch (error) {
       showNotification("Error al guardar: " + error.message, "Error");
       console.error("Error al guardar:", error);

@@ -22,24 +22,32 @@ try {
             'data' => $companyData
         ]);
     } else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        // Validar y formatear teléfono
-        $fomattedPhone = formatPhoneNumber($_POST['phone'] ?? '');
+        try {
+            // Solo formatear teléfono si se envió
+            $formattedPhone = isset($_POST['phone']) && $_POST['phone'] !== ''
+                ? formatPhoneNumber($_POST['phone'])
+                : null;
 
-        // Actualizar los datos de la empresa
-        $data = [
-            'phone' => $fomattedPhone,
-            'address' => $_POST['address'] ?? null,
-            'description' => $_POST['description'] ?? null,
-            'logo' => $_POST['logo_url'] ?? null,
-            'selected_banner' => $_POST['banner_url'] ?? null
-        ];
+            $data = [
+                'phone' => $formattedPhone,
+                'address' => $_POST['address'] ?? null,
+                'description' => $_POST['description'] ?? null,
+                'logo' => $_POST['logo_url'] ?? null,
+                'selected_banner' => $_POST['banner_url'] ?? null
+            ];
 
-        $companyManager->updateCompanyData($company_id, $data);
+            $companyManager->updateCompanyData($company_id, $data);
 
-        echo json_encode([
-            'success' => true,
-            'message' => 'Datos de la empresa actualizados correctamente'
-        ]);
+            echo json_encode([
+                'success' => true,
+                'message' => 'Datos de la empresa actualizados correctamente'
+            ]);
+        } catch (Exception $e) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Error al procesar la solicitud: ' . $e->getMessage()
+            ]);
+        }
     }
 } catch (Exception $e) {
     echo json_encode([
