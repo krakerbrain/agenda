@@ -174,6 +174,7 @@
         }
     </style>
     <link rel="stylesheet" href="<?php echo $baseUrl; ?>assets/css/dist/output.css">
+    <link rel="stylesheet" href="<?php echo $baseUrl; ?>assets/css/spinner.css">
     <!-- Tailwind CSS (antes de otras hojas de estilo) -->
     <!-- <script src="https://cdn.tailwindcss.com"></script> -->
     <script>

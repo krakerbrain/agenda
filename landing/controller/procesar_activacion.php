@@ -6,30 +6,48 @@ $userId = $_POST['user_id'] ?? null;
 $password = $_POST['password'] ?? '';
 $password2 = $_POST['password2'] ?? '';
 $token = $_POST['token'] ?? '';
+$email = $_POST['email'] ?? '';
+
+header('Content-Type: application/json'); // Devolver JSON
 
 if (!$userId || !$token || !$password || !$password2) {
-    die("Faltan datos requeridos.");
+    echo json_encode([
+        'success' => false,
+        'message' => 'Faltan datos requeridos.'
+    ]);
+    exit;
 }
 
 if ($password !== $password2) {
-    die("Las contraseñas no coinciden.");
+    echo json_encode([
+        'success' => false,
+        'message' => 'Las contraseñas no coinciden.'
+    ]);
+    exit;
 }
 
 try {
     $user = new Users();
-    // Actualizar la contraseña
     $result = $user->update_user_password($userId, $password);
 
-    // Eliminar el token
     $tokenService = new ActivationTokenService();
     $tokenService->deleteToken($token);
 
     if ($result) {
-        echo "✅ Cuenta activada correctamente. Ya puedes iniciar sesión.";
-        // Puedes redirigir aquí si deseas: header("Location: login.php");
+        echo json_encode([
+            'success' => true,
+            'message' => 'Cuenta activada correctamente. Ya puedes iniciar sesión.',
+            'email' => $email
+        ]);
     } else {
-        echo "❌ Error al activar la cuenta. Intenta nuevamente.";
+        echo json_encode([
+            'success' => false,
+            'message' => 'Error al activar la cuenta. Intenta nuevamente.'
+        ]);
     }
 } catch (Exception $e) {
-    echo "❌ Ocurrió un error: " . $e->getMessage();
+    echo json_encode([
+        'success' => false,
+        'message' => 'Ocurrió un error: ' . $e->getMessage()
+    ]);
 }

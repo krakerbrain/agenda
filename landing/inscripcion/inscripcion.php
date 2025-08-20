@@ -104,19 +104,15 @@ include_once dirname(__DIR__, 2) . '/landing/partials/head.php';
         </div>
     </div>
     <!-- Modal de respuesta -->
-    <div id="responseModal"
-        class="fixed inset-0 z-50 items-center justify-center hidden pointer-events-none transition-opacity duration-300 opacity-0 p-4">
-        <div class="bg-white rounded-lg shadow-lg max-w-md w-full p-6 text-center">
-            <h2 class="text-xl font-bold text-[#1B637F] mb-4">Registro exitoso</h2>
-            <p id="responseMessage" class="text-gray-700 mb-6">Tu empresa fue creada correctamente.</p>
-            <button onclick="closeModal()"
-                class="bg-[#1B637F] hover:bg-[#2B819F] text-white font-semibold px-4 py-2 rounded">
-                Cerrar
-            </button>
-        </div>
+    <?php include dirname(__DIR__, 2) . '/includes/modal-info.php'; ?>
+    <!-- Overlay Loading spinner -->
+    <div id="loadingOverlay" class="fixed inset-0 hidden bg-black opacity-50  items-center justify-center  z-50">
+        <span class="loader"></span>
     </div>
+
     <?php
     include_once dirname(__DIR__, 2) . '/landing/partials/footer.php';
     ?>
     <script src="<?php echo $baseUrl; ?>assets/js/landing/index.js?v=<?php echo time(); ?>"></script>
-    <script src="<?php echo $baseUrl; ?>assets/js/landing/inscripcion.js?v=<?php echo time(); ?>"></script>
+    <script type="module" src="<?php echo $baseUrl; ?>assets/js/landing/inscripcion.js?v=<?php echo time(); ?>">
+    </script>
