@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // 5. Construir correo con plantilla
         $template = new EmailTemplate();
-        $emailContent = $template->buildActivationEmail($owner_name, $token);
+        $emailContent = $template->buildActivationEmail($owner_name, $token, $email);
 
         // 6. Enviar correo
         $emailSender = new EmailSender();

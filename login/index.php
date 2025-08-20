@@ -68,7 +68,9 @@ include '../partials/head-login.php';
                     </span>
                     <input type="email" name="usuario" id="usuario"
                         class="flex-1 py-2 px-2 outline-none text-gray-800 min-w-0 w-full" placeholder="Ingrese correo"
-                        autocomplete="email" required />
+                        autocomplete="email" required
+                        value="<?= isset($_GET['email']) ? htmlspecialchars($_GET['email']) : '' ?>" />
+
                 </div>
                 <div class="flex items-center border rounded-md bg-white/80 w-full overflow-hidden">
                     <span class="px-3 text-gray-400">

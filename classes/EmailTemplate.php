@@ -421,7 +421,7 @@ class EmailTemplate
         }
     }
 
-    public function buildActivationEmail($nombre, $token)
+    public function buildActivationEmail($nombre, $token, $email)
     {
         try {
             $templatePath = dirname(__DIR__) . '/correos_template/correo_activacion.php';
@@ -434,7 +434,7 @@ class EmailTemplate
 
             $placeholders = [
                 '{{nombre}}' => htmlspecialchars($nombre),
-                '{{activation_url}}' => ConfigUrl::get() . 'landing/inscripcion/activar-cuenta.php?token=' . urlencode($token),
+                '{{activation_url}}' => ConfigUrl::get() . 'landing/inscripcion/activar-cuenta.php?token=' . urlencode($token) . '&email=' . urlencode($email),
                 '{{logo_url}}' => 'https://agendarium.com/assets/img/landing/logo/Isotipo-Agendarium.png',
                 '{{current_year}}' => date('Y')
             ];
