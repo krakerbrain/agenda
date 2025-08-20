@@ -126,6 +126,11 @@ class UserRegistrationService
         }
     }
 
+    public function emailExists(string $email): bool
+    {
+        return $this->users->emailExists($email);
+    }
+
 
     public function updateUrlPic($user_id, $url_pic)
     {

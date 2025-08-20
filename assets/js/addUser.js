@@ -312,6 +312,5 @@ function handleInfoModal(title = null, message = null) {
   let mensaje = document.getElementById("infoModalMessage");
   titulo.textContent = title;
   mensaje.textContent = message;
-  // const modal = new bootstrap.Modal(document.getElementById("infoModal"));
   modal.show();
 }
