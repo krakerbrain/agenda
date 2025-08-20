@@ -258,6 +258,15 @@ class Users
         return $this->db->single();
     }
 
+    public function emailExists(string $email): bool
+    {
+        $this->db->query("SELECT COUNT(*) AS total FROM users WHERE email = :email");
+        $this->db->bind(':email', $email);
+        $row = $this->db->single(); // obtiene un array asociativo con 'total'
+        return $row['total'] > 0;
+    }
+
+
     public function save_password_reset_token($userId, $token, $expires)
     {
         $this->db->query("INSERT INTO password_resets (user_id, token, expires_at) VALUES (:user_id, :token, :expires_at)");

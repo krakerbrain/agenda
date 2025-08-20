@@ -85,7 +85,9 @@ let modalVideo;
 // Función que genera el HTML del modal con el video correspondiente
 function getModalTemplate(videoSrc) {
   return `
-        <div id="video-modal" class="fixed inset-0 bg-black opacity-50 z-50 flex items-center justify-center p-2 md:p-4">
+        <div id="video-modal" class="fixed inset-0 z-50 flex items-center justify-center p-2 md:p-4">
+    <!-- overlay -->
+    <div class="absolute inset-0 bg-black opacity-50"></div>
             <div class="relative w-full h-full max-w-6xl">
                 <div class="absolute inset-0 flex items-center justify-center">
                     <video controls class="w-full h-full object-contain" id="modal-video" playsinline>

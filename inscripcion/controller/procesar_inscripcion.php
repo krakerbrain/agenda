@@ -13,6 +13,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $name = $_POST['business_name'];
         $owner_name = $_POST['owner_name'];
         $email = $_POST['email'];
+        $userService = new UserRegistrationService();
+
+        // 1.2 Validar correo
+        if ($userService->emailExists($email)) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'El correo ya está registrado. Por favor usa otro.'
+            ]);
+            exit;
+        }
 
         // 2. Crear empresa
         $companyManager = new CompanyManager();
@@ -25,8 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $company_id = $companyResult['company_id'];
 
         // 3. Crear usuario principal (puedes usar un método como registerInitialUser)
-        $userManager = new UserRegistrationService();
-        $userResult = $userManager->registerInitialUserFromWeb($owner_name, $email, $company_id);
+        $userResult = $userService->registerInitialUserFromWeb($owner_name, $email, $company_id);
 
         if (!$userResult['success']) {
             throw new Exception($userResult['error']);
