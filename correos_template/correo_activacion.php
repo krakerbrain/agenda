@@ -5,17 +5,27 @@
         </td>
     </tr>
     <tr>
-        <td style="padding: 20px; background-color: #f9f9f9;">
-            <h2 style="color: #1B637F;">¡Bienvenido, {{nombre}}!</h2>
-            <p>Para activar tu cuenta, haz clic en el botón de abajo:</p>
-            <p style="text-align: center; margin: 30px 0;">
-                <a href="{{activation_url}}"
-                    style="background-color: #1B637F; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px;">
-                    Activar mi cuenta
-                </a>
-            </p>
-            <p>Este enlace expira en 24 horas.</p>
-            <p>Gracias por unirte a Agendarium.</p>
+        <td align="center" style="padding: 20px; background-color: #f9f9f9;">
+            <table width="600" style="max-width: 600px; margin: auto; text-align: center;">
+                <tr>
+                    <td>
+                        <h2 style="color: #1B637F;">¡Bienvenido, {{nombre}}!</h2>
+                        <p style="line-height: 1.5; font-size: 16px; color: #333;">
+                            Para activar tu cuenta, haz clic en el botón de abajo:
+                        </p>
+                        <div style="margin: 30px 0;">
+                            <a href="{{activation_url}}"
+                                style="background-color: #1B637F; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">
+                                Activar mi cuenta
+                            </a>
+                        </div>
+                        <p style="line-height: 1.5; font-size: 14px; color: #555;">
+                            Este enlace expira en 24 horas.<br>
+                            Gracias por unirte a Agendarium.
+                        </p>
+                    </td>
+                </tr>
+            </table>
         </td>
     </tr>
     <tr>
