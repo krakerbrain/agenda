@@ -13,9 +13,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $name = $_POST['business_name'];
         $owner_name = $_POST['owner_name'];
         $email = $_POST['email'];
+        $telefono = $_POST['phone'] ?? '';
+
         $userService = new UserRegistrationService();
 
-        // 1.2 Validar correo
+        // 1.1 Validar teléfono
+        if (empty($telefono)) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'El teléfono es obligatorio.'
+            ]);
+            exit;
+        }
+
+        // 1.2 Formatear y validar teléfono
+        $companyManager = new CompanyManager();
+        try {
+            $telefono = $companyManager->formatPhoneNumber($telefono);
+        } catch (Exception $e) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Teléfono inválido: ' . $e->getMessage()
+            ]);
+            exit;
+        }
+
+        // 1.3 Validar correo
         if ($userService->emailExists($email)) {
             echo json_encode([
                 'success' => false,
@@ -25,8 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         // 2. Crear empresa
-        $companyManager = new CompanyManager();
-        $companyResult = $companyManager->registerNewCompanyFromWeb($name);
+        $companyResult = $companyManager->registerNewCompanyFromWeb($name, $telefono); // <-- aquí agregamos el teléfono
 
         if (!$companyResult['success']) {
             throw new Exception($companyResult['error']);
@@ -34,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $company_id = $companyResult['company_id'];
 
-        // 3. Crear usuario principal (puedes usar un método como registerInitialUser)
+        // 3. Crear usuario principal
         $userResult = $userService->registerInitialUserFromWeb($owner_name, $email, $company_id);
 
         if (!$userResult['success']) {

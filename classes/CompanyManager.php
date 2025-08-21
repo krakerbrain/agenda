@@ -169,7 +169,7 @@ class CompanyManager
         }
     }
 
-    public function registerNewCompanyFromWeb($name)
+    public function registerNewCompanyFromWeb($name, $telefono)
     {
         $token = bin2hex(random_bytes(16));
 
@@ -177,10 +177,11 @@ class CompanyManager
             $this->db->beginTransaction();
 
             // Insertar la empresa solo con nombre
-            $sql = "INSERT INTO companies (name, is_active, token) VALUES (:name, 1, :token)";
+            $sql = "INSERT INTO companies (name, phone, is_active, token) VALUES (:name, :phone, 1, :token)";
             $this->db->query($sql);
             $this->db->bind(':name', $name);
             $this->db->bind(':token', $token);
+            $this->db->bind(':phone', $telefono);
             $this->db->execute();
 
             $company_id = $this->db->lastInsertId();
@@ -216,7 +217,7 @@ class CompanyManager
     }
 
 
-    private function formatPhoneNumber($telefono)
+    public function formatPhoneNumber($telefono)
     {
         // Eliminar espacios en blanco, guiones y paréntesis, pero mantener el símbolo "+"
         $telefono = preg_replace('/[\s\-\(\)]/', '', $telefono);

@@ -31,37 +31,53 @@ include_once dirname(__DIR__, 2) . '/landing/partials/head.php';
 
                 <form id="companyForm" action="<?php echo $baseUrl; ?>inscripcion/procesar" method="POST"
                     enctype="multipart/form-data" class="space-y-6">
+
                     <!-- Nombre del Negocio -->
                     <div>
-                        <label for="business_name" class="block text-sm font-medium text-gray-700 mb-1">Nombre del
-                            Negocio*</label>
+                        <label for="business_name" class="block text-sm font-medium text-gray-700 mb-1">
+                            Nombre del Negocio*
+                        </label>
                         <input type="text" id="business_name" name="business_name" required
                             class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-[#1B637F] focus:ring-2 focus:ring-[#1B637F]/50">
                     </div>
 
                     <!-- Nombre del Dueño -->
                     <div>
-                        <label for="owner_name" class="block text-sm font-medium text-gray-700 mb-1">Nombre del
-                            Dueño/Usuario Principal*</label>
+                        <label for="owner_name" class="block text-sm font-medium text-gray-700 mb-1">
+                            Nombre del Dueño/Usuario Principal*
+                        </label>
                         <input type="text" id="owner_name" name="owner_name" required
                             class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-[#1B637F] focus:ring-2 focus:ring-[#1B637F]/50">
                     </div>
 
+                    <!-- Teléfono -->
+                    <div>
+                        <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">
+                            Teléfono / WhatsApp*
+                        </label>
+                        <input type="tel" id="phone" name="phone" required pattern="[0-9+ ]{8,15}"
+                            placeholder="+56 9 1234 5678"
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-[#1B637F] focus:ring-2 focus:ring-[#1B637F]/50">
+                        <p class="text-xs text-gray-500 mt-1">Incluye el código de país (ej: +56 para Chile).</p>
+                    </div>
+
                     <!-- Email -->
                     <div>
-                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Correo
-                            Electrónico*</label>
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
+                            Correo Electrónico*
+                        </label>
                         <input type="email" id="email" name="email" required
                             class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-[#1B637F] focus:ring-2 focus:ring-[#1B637F]/50">
                     </div>
+
                     <!-- Botón -->
                     <button type="submit"
                         class="mt-6 w-full bg-[#1B637F] hover:bg-[#2B819F] text-white font-bold py-3 px-4 rounded-lg transition-colors">
                         Crear cuenta de empresa
                     </button>
                 </form>
-
             </div>
+
 
             <!-- Columna derecha: Beneficios -->
             <div class="bg-[#F8FAFC] rounded-xl p-6 md:p-8 border border-gray-200">
