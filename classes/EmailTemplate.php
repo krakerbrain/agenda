@@ -449,4 +449,30 @@ class EmailTemplate
             throw new Exception("Error al construir el correo de activación");
         }
     }
+
+    public function buildWelcomeEmail($email)
+    {
+        try {
+            $templatePath = dirname(__DIR__) . '/correos_template/correo_bienvenida.php';
+
+            if (!file_exists($templatePath)) {
+                throw new Exception("Plantilla de bienvenida no encontrada");
+            }
+
+            $template = file_get_contents($templatePath);
+
+            $placeholders = [
+                '{{current_year}}' => date('Y')
+            ];
+
+            $finalBody = $this->emailBuilder->buildTemplate('bienvenida', $placeholders);
+
+            return [
+                'subject' => '¡Bienvenido a Agendarium!',
+                'body' => $finalBody
+            ];
+        } catch (Exception $e) {
+            throw new Exception("Error al construir el correo de bienvenida");
+        }
+    }
 }

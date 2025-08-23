@@ -73,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // 6. Enviar correo
         $emailSender = new EmailSender();
-        $emailSender->sendInscriptionMail($emailContent['subject'], $email, $emailContent['body']);
+        $emailSender->sendStandardEmail($emailContent['subject'], $email, $emailContent['body']);
 
         echo json_encode([
             'success' => true,
