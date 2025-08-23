@@ -90,13 +90,14 @@ class EmailSender
         }
     }
     // Método para enviar correos de alerta de inscripcion
-    public function sendInscriptionMail($subject, $to, $mailContent)
+    public function sendStandardEmail($subject, $to, $mailContent)
     {
+        $encodedSubject = mb_encode_mimeheader($mailContent['subject'], 'UTF-8', 'B', "\n");
         try {
             $this->mail->setFrom('agendaroad@gmail.com', 'INSCRIPCION - Agendarium');
             $this->mail->addAddress($to);
             $this->mail->isHTML(true);
-            $this->mail->Subject = $subject;
+            $this->mail->Subject = $encodedSubject;
             $this->mail->Body = $mailContent;
 
             $this->mail->send();

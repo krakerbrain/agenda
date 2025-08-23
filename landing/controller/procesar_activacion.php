@@ -34,6 +34,14 @@ try {
     $tokenService->deleteToken($token);
 
     if ($result) {
+        // Construir correo con plantilla
+        $template = new EmailTemplate();
+        $emailContent = $template->buildWelcomeEmail($email);
+
+        // Enviar correo
+        $emailSender = new EmailSender();
+        $emailSender->sendStandardEmail($emailContent['subject'], $email, $emailContent['body']);
+
         echo json_encode([
             'success' => true,
             'message' => 'Cuenta activada correctamente. Ya puedes iniciar sesión.',
