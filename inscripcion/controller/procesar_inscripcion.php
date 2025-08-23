@@ -4,6 +4,7 @@ require_once dirname(__DIR__, 2) . '/classes/UserRegistrationService.php';
 require_once dirname(__DIR__, 2) . '/access-token/seguridad/ActivationTokenService.php';
 require_once dirname(__DIR__, 2) . '/classes/EmailTemplate.php';
 require_once dirname(__DIR__, 2) . '/classes/EmailSender.php';
+require_once dirname(__DIR__, 2) . '/error-monitor/logger.php';
 
 header('Content-Type: application/json');
 
@@ -80,6 +81,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'message' => 'Cuenta creada correctamente. Te enviamos un correo para activar tu cuenta.'
         ]);
     } catch (Exception $e) {
+        // Guardar información detallada en el log
+        logErrorToFile(
+            'inscription_error.log',
+            "Error en inscripción: " . $e->getMessage() .
+                " | File: " . $e->getFile() .
+                " | Line: " . $e->getLine() .
+                " | Trace: " . $e->getTraceAsString()
+        );
         echo json_encode([
             'success' => false,
             'message' => "Error inesperado: " . $e->getMessage()
