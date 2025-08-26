@@ -87,9 +87,8 @@ class JWTAuth
     public function generarTokenCita($company_id, $appointment_id)
     {
         $payload = [
-            "company_id" => $company_id,
-            "appointment_id" => $appointment_id,
-            "created_at" => time()
+            "iat" => time(),                    // fecha de emisión
+            "exp" => time() + 48 * 3600              // expira en 1 hora
         ];
 
         return JWT::encode($payload, $this->key, 'HS256');
@@ -101,14 +100,16 @@ class JWTAuth
         try {
             $decoded = JWT::decode($token, new Key($this->key, 'HS256'));
 
-            if (is_object($decoded) && isset($decoded->appointment_id)) {
+            if (is_object($decoded)) {
                 return [
-                    'valid' => true,
-                    'company_id' => $decoded->company_id,
-                    'appointment_id' => $decoded->appointment_id,
-                    'created_at' => $decoded->created_at
+                    'valid' => true
                 ];
             }
+        } catch (\Firebase\JWT\ExpiredException $e) {
+            return [
+                'valid' => false,
+                'error' => 'Token expirado'
+            ];
         } catch (Exception $e) {
             return [
                 'valid' => false,
@@ -118,6 +119,8 @@ class JWTAuth
 
         return ['valid' => false, 'error' => 'Token inválido'];
     }
+
+
 
     // Función para invalidar sesión
     private function invalidarSesion()

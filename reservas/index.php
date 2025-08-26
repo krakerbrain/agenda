@@ -81,10 +81,10 @@ include __DIR__ . '/templates/header.php';
 // Renderizar el contenido según la vista
 if ($view === 'details') {
     // Obtener detalles de la pre-reserva, por ejemplo, usando 'reservation_id'
-    if (isset($_GET['reservation_id'])) {
-        $reservation_id = intval($_GET['reservation_id']);
+    if (isset($_GET['appointment_id'])) {
+        $reservation_id = $_GET['appointment_id'];
         $appointment = new Appointments();
-        $reservation = $appointment->get_appointment($reservation_id);
+        $reservation = $appointment->get_appointment_token($reservation_id);
         if ($reservation) {
 
             // Aquí deberías obtener los detalles de la reserva desde la base de datos
