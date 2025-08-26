@@ -85,8 +85,8 @@ try {
                         $type,
                         $appointment['customer_phone'],
                         $appointment['customer_name'],
-                        $appointment['date'],
-                        $appointment['start_time'],
+                        $appointment['appointment_date'],
+                        $appointment['appointment_time'],
                         $appointment['company_name'],
                         $appointment['appointment_token']
                     );
@@ -99,24 +99,16 @@ try {
                     error_log("ERROR: Falló envío WhatsApp ({$type}) cita {$appointment['id']}: " . $e->getMessage() . PHP_EOL, 3, __DIR__ . '/log/notifica_abono.log');
                 }
 
-                // Registrar o actualizar log
-                if ($n['id']) {
-                    $notificationLog->update($n['id'], [
-                        'status' => $status,
-                        'attempts' => $n['attempts'] + 1,
-                        'last_attempt' => date('Y-m-d H:i:s')
-                    ]);
-                } else {
-                    $notificationLog->create([
-                        'appointment_id' => $appointment['id'],
-                        'type' => $type,
-                        'method' => 'whatsapp',
-                        'status' => $status,
-                        'attempts' => 1,
-                        'last_attempt' => date('Y-m-d H:i:s'),
-                        'created_at' => date('Y-m-d H:i:s')
-                    ]);
-                }
+                // Ahora centralizamos el manejo de intentos y status
+                handleNotification(
+                    $notificationLog,
+                    $appointment['id'],
+                    'whatsapp',
+                    $n['id'],
+                    $status,
+                    $n['attempts'],
+                    $type
+                );
             };
 
             // Enviar 24h si corresponde
@@ -134,4 +126,28 @@ try {
     error_log("INFO: Cron notifica_abono finalizado " . date('Y-m-d H:i:s') . PHP_EOL, 3, __DIR__ . '/log/notifica_abono.log');
 } catch (Exception $e) {
     error_log("ERROR: Cron notifica_abono: " . $e->getMessage() . PHP_EOL, 3, __DIR__ . '/log/notifica_abono.log');
+}
+
+function handleNotification($notificationLog, $appointment_id, $method, $notificationId, $status, $attempts, $type)
+{
+    $newAttempts = $attempts + 1;
+
+    if ($status !== 'sent' && $newAttempts >= 3) {
+        $status = 'failed_permanent';
+    }
+
+    $data = [
+        'appointment_id' => $appointment_id,
+        'type'           => $type,
+        'method'         => $method,
+        'status'         => $status,
+        'attempts'       => $notificationId ? $newAttempts : 1,
+        'last_attempt'   => date('Y-m-d H:i:s'),
+    ];
+
+    if ($notificationId) {
+        $notificationLog->update($notificationId, $data);
+    } else {
+        $notificationLog->create($data);
+    }
 }

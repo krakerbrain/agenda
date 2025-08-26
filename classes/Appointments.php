@@ -396,7 +396,7 @@ class Appointments
                    a.appointment_token,
                    cu.name as customer_name, 
                    cu.phone as customer_phone, 
-                   a.date as appointment_date, 
+                   DATE_FORMAT(a.date, "%d-%m-%Y") as appointment_date,
                    a.start_time as appointment_time, 
                    a.created_at,
                    c.id as company_id,
