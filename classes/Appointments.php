@@ -34,9 +34,13 @@ class Appointments
             // Obtener el ID de la cita recién creada
             $appointmentId = $this->db->lastInsertId();
 
+            // Obtener la URL amigable desde companies
+            $company = new CompanyManager();
+            $custom_url = $company->getCompanyCustomUrl($data['company_id']);
+
             // Generar el token para la cita usando el ID
             $jwtAuth = new JWTAuth();
-            $appointmentToken = $jwtAuth->generarTokenCita($data['company_id'], $appointmentId);
+            $appointmentToken = $jwtAuth->generarTokenCita($custom_url);
 
             // Actualizar la cita con el token generado
             $this->db->query('UPDATE appointments SET appointment_token = :token WHERE id = :id');

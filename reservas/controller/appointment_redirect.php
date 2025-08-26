@@ -10,9 +10,7 @@ if (isset($_GET['token'])) {
     $result = $jwtAuth->validarTokenCita($token);
 
     if ($result['valid']) {
-        // Obtener la URL amigable desde companies
-        $company = new CompanyManager();
-        $custom_url = $company->getCompanyCustomUrl($result['company_id']);
+        $custom_url = $result['custom_url'];
 
         // Construir la URL completa usando ConfigUrl
         $fullUrl = ConfigUrl::get() . "reservas/$custom_url?view=details&appointment_id={$token}";

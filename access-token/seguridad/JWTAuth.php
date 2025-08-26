@@ -84,9 +84,10 @@ class JWTAuth
     }
 
     // Función para generar un token de cita
-    public function generarTokenCita($company_id, $appointment_id)
+    public function generarTokenCita($custom_url)
     {
         $payload = [
+            "custom_url" => $custom_url,
             "iat" => time(),                    // fecha de emisión
             "exp" => time() + 48 * 3600              // expira en 1 hora
         ];
@@ -102,7 +103,8 @@ class JWTAuth
 
             if (is_object($decoded)) {
                 return [
-                    'valid' => true
+                    'valid' => true,
+                    'custom_url' => $decoded->custom_url
                 ];
             }
         } catch (\Firebase\JWT\ExpiredException $e) {
