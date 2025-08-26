@@ -15,7 +15,7 @@ if (isset($_GET['token'])) {
         $custom_url = $company->getCompanyCustomUrl($result['company_id']);
 
         // Construir la URL completa usando ConfigUrl
-        $fullUrl = ConfigUrl::get() . "reservas/$custom_url?view=details&reservation_id={$result['appointment_id']}";
+        $fullUrl = ConfigUrl::get() . "reservas/$custom_url?view=details&appointment_id={$token}";
 
         // Redireccionar a la URL final
         header("Location: $fullUrl");

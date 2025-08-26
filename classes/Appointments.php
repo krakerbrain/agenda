@@ -344,9 +344,12 @@ class Appointments
     {
         try {
             //code...
-
-
-            $this->db->query('SELECT id FROM appointments WHERE  appointment_token = :token');
+            $this->db->query('SELECT s.name as service, a.*, c.name as customer_name FROM appointments a
+                            JOIN customers c
+                            ON a.customer_id = c.id
+                            JOIN services s
+                            ON a.id_service = s.id
+                            WHERE  appointment_token = :token');
             $this->db->bind(':token', $token);
             return $this->db->single();
         } catch (Exception $e) {
@@ -356,6 +359,7 @@ class Appointments
 
     public function getUnconfirmedAppointment($type = 'reserva')
     {
+        // status se refiere a confirmada o no
         try {
             $condition = $type === 'reserva'
                 ? ' AND a.aviso_reserva = 0'
@@ -379,6 +383,39 @@ class Appointments
             throw new Exception("Error al obtener citas no confirmadas: " . $e->getMessage());
         }
     }
+
+    public function getPendingAbonoAppointments()
+    {
+        try {
+            $this->db->query('
+            SELECT a.id, 
+                   a.appointment_token,
+                   cu.name as customer_name, 
+                   cu.phone as customer_phone, 
+                   a.date as appointment_date, 
+                   a.start_time as appointment_time, 
+                   a.created_at,
+                   c.id as company_id,
+                   c.name as company_name
+            FROM appointments a
+            JOIN customers cu ON a.customer_id = cu.id
+            JOIN company_customers cc ON cu.id = cc.customer_id
+            JOIN companies c ON c.id = a.company_id
+            WHERE cc.company_id = c.id
+              AND a.status = 0
+              AND a.aviso_reserva = 1
+              AND a.aviso_confirmada = 0
+              AND a.created_at >= DATE_SUB(NOW(), INTERVAL 1 WEEK)
+            ORDER BY a.created_at ASC
+        ');
+
+            return $this->db->resultSet();
+        } catch (Exception $e) {
+            throw new Exception("Error al obtener citas pendientes de abono: " . $e->getMessage());
+        }
+    }
+
+
 
     // Obtener todas las citas en el rango de fechas
     public function getAppointmentsByDateRange($company_id, $start_date, $end_date)

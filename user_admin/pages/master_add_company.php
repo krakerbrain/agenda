@@ -7,102 +7,108 @@ $baseUrl = ConfigUrl::get();
 $auth = new JWTAuth();
 $auth->validarTokenUsuario();
 ?>
-<div class="container mt-5">
-    <!-- Formulario Agregar Empresa -->
-    <div class="row mb-4">
-        <div class="col-md-6 offset-md-3">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h4 class="card-title mb-4 text-center">Agregar Empresa</h4>
-                    <form id="addCompanyForm">
-                        <div class="mb-3">
-                            <label for="business_name" class="form-label">Nombre de la Empresa:</label>
-                            <input type="text" class="form-control" id="business_name" name="business_name" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="logo" class="form-label">Logo (opcional):</label>
-                            <input type="file" class="form-control" id="logo" name="logo">
-                        </div>
-                        <div>
-                            <label for="phone" class="form-label">Teléfono:</label>
-                            <input type="tel" class="form-control" id="phone" name="phone" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="address" class="form-label">Dirección:</label>
-                            <input type="text" class="form-control" id="address" name="address" required>
-                        </div>
-                        <!-- Descripción de la Empresa -->
-                        <div class="mb-3">
-                            <div class="">
-                                <label for="description" class="form-label">Descripción</label>
-                                <textarea class="form-control" id="description" name="description" rows="2"
-                                    maxlength="120"
-                                    placeholder="Descripción breve de la empresa (máximo 120 caracteres)">Empresa dedicada a...</textarea>
-                                <div class="form-text">Máximo 120 caracteres.</div>
-                            </div>
-                        </div>
 
-                        <div class="text-center">
-                            <button type="submit" class="btn btn-primary" id="addCompany">
-                                <span class="spinner-border spinner-border-sm d-none" aria-hidden="true"></span>
-                                <span class="button-text">Agregar Empresa</span>
-                            </button>
-                        </div>
-                    </form>
+<div class="max-w-4xl mx-auto px-4 py-8">
+    <!-- Formulario Agregar Empresa -->
+    <div class="mb-8">
+        <div class="bg-white rounded-2xl shadow-md p-6">
+            <form id="addCompanyForm" class="space-y-4">
+                <div>
+                    <label for="business_name" class="block text-sm font-medium mb-1">Nombre de la Empresa:</label>
+                    <input type="text" id="business_name" name="business_name"
+                        class="w-full rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm p-1"
+                        required>
                 </div>
-            </div>
+
+                <div>
+                    <label for="logo" class="block text-sm font-medium mb-1">Logo (opcional):</label>
+                    <input type="file" id="logo" name="logo"
+                        class="w-full text-sm text-gray-700 border border-gray-300 rounded-md cursor-pointer focus:outline-none p-1">
+                </div>
+
+                <div>
+                    <label for="phone" class="block text-sm font-medium mb-1">Teléfono:</label>
+                    <input type="tel" id="phone" name="phone"
+                        class="w-full rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm p-1"
+                        required>
+                </div>
+
+                <div>
+                    <label for="address" class="block text-sm font-medium mb-1">Dirección:</label>
+                    <input type="text" id="address" name="address"
+                        class="w-full rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm p-1"
+                        required>
+                </div>
+
+                <div>
+                    <label for="description" class="block text-sm font-medium mb-1">Descripción</label>
+                    <textarea id="description" name="description" rows="2" maxlength="120"
+                        placeholder="Descripción breve de la empresa (máximo 120 caracteres)"
+                        class="w-full rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm p-1">Empresa dedicada a...</textarea>
+                    <p class="text-xs text-gray-500 mt-1">Máximo 120 caracteres.</p>
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" id="addCompany"
+                        class="inline-flex items-center px-4 py-2 rounded-md border bg-blue-600 text-white hover:bg-blue-700 transition disabled:opacity-50">
+                        <span class="hidden spinner-border spinner-border-sm mr-2" aria-hidden="true"></span>
+                        <span class="button-text">Agregar Empresa</span>
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
     <!-- Formulario Agregar Usuario Inicial -->
-    <div class="row mb-4">
-        <div class="col-md-6 offset-md-3">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h4 class="card-title mb-4 text-center">Agregar Usuario Inicial</h4>
-                    <form id="addUserForm" autocomplete="off">
-                        <div class="mb-3">
-                            <input type="hidden" class="form-control" id="role_id" name="role_id" value="2">
-                        </div>
-                        <div class="mb-3">
-                            <label for="company_id" class="form-label">ID de la Empresa:</label>
-                            <input type="text" class="form-control" id="company_id" name="company_id" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="username" class="form-label">Nombre de Usuario:</label>
-                            <input type="text" class="form-control" id="username" name="usuario" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Correo Electrónico:</label>
-                            <input type="email" class="form-control" id="email" name="correo" autocomplete="nope"
-                                required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Contraseña:</label>
-                            <input type="password" class="form-control" id="password" name="password"
-                                autocomplete="new-password" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="password2" class="form-label">Repetir Contraseña:</label>
-                            <input type="password" class="form-control" id="password2" name="password2"
-                                autocomplete="new-password" required>
-                        </div>
+    <div>
+        <div class="bg-white rounded-2xl shadow-md p-6">
+            <h4 class="text-xl font-semibold text-center mb-6">Agregar Usuario Inicial</h4>
+            <form id="addUserForm" autocomplete="off" class="space-y-4">
+                <input type="hidden" id="role_id" name="role_id" value="2">
 
-                        <div class="text-center">
-                            <button type="submit" class="btn btn-primary" id="addUser">
-                                <span class="spinner-border spinner-border-sm d-none" aria-hidden="true"></span>
-                                <span class="button-text">Agregar Usuario</span>
-                            </button>
-                        </div>
-                    </form>
+                <div>
+                    <label for="company_id" class="block text-sm font-medium mb-1">ID de la Empresa:</label>
+                    <input type="text" id="company_id" name="company_id"
+                        class="w-full rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm p-1"
+                        required>
                 </div>
-            </div>
+
+                <div>
+                    <label for="username" class="block text-sm font-medium mb-1">Nombre de Usuario:</label>
+                    <input type="text" id="username" name="usuario"
+                        class="w-full rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm p-1"
+                        required>
+                </div>
+
+                <div>
+                    <label for="email" class="block text-sm font-medium mb-1">Correo Electrónico:</label>
+                    <input type="email" id="email" name="correo" autocomplete="off"
+                        class="w-full rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm p-1"
+                        required>
+                </div>
+
+                <div>
+                    <label for="password" class="block text-sm font-medium mb-1">Contraseña:</label>
+                    <input type="password" id="password" name="password" autocomplete="new-password"
+                        class="w-full rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm p-1"
+                        required>
+                </div>
+
+                <div>
+                    <label for="password2" class="block text-sm font-medium mb-1">Repetir Contraseña:</label>
+                    <input type="password" id="password2" name="password2" autocomplete="new-password"
+                        class="w-full rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm p-1"
+                        required>
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" id="addUser"
+                        class="inline-flex items-center px-4 py-2 rounded-md border bg-blue-600 text-white hover:bg-blue-700 transition disabled:opacity-50">
+                        <span class="hidden spinner-border spinner-border-sm mr-2" aria-hidden="true"></span>
+                        <span class="button-text">Agregar Usuario</span>
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
-</script>
-</body>
-
-</html>

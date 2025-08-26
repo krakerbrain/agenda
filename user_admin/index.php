@@ -195,6 +195,10 @@ include dirname(__DIR__) . '/partials/head.php';
                         <a class="nav-element block px-3 py-2 text-gray-700 rounded hover:bg-gray-100" href="#"
                             id="master_add_notification">Notificaciones</a>
                     </li>
+                    <li>
+                        <a class="nav-element block px-3 py-2 text-gray-700 font-medium rounded hover:bg-gray-100" href="#"
+                            id="master_feature_flags">Feature Flags</a>
+                    </li>
                 <?php } ?>
                 <li>
                     <a class="nav-element block px-3 py-2 text-gray-700 rounded hover:bg-gray-100" href="#"
