@@ -29,7 +29,7 @@ try {
 
         // 1. Verificar si la compañía tiene habilitado el feature flag
         if (!$featureManager->isEnabled($companyId, 'notifica_abono')) {
-            error_log("INFO: Notificación de abono deshabilitada para compañía $companyId" . PHP_EOL, 3, __DIR__ . '/log/notifica_abono.log');
+            // error_log("INFO: Notificación de abono deshabilitada para compañía $companyId" . PHP_EOL, 3, __DIR__ . '/log/notifica_abono.log');
             continue;
         }
 
