@@ -4,6 +4,7 @@ require_once dirname(__DIR__, 2) . '/access-token/seguridad/JWTAuth.php';
 require_once dirname(__DIR__, 2) . '/classes/Appointments.php';
 require_once dirname(__DIR__, 2) . '/classes/Users.php';
 require_once dirname(__DIR__, 2) . '/classes/ConfigUrl.php';
+require_once dirname(__DIR__, 2) . '/classes/NotificationLog.php';
 
 $baseUrl = ConfigUrl::get();
 $auth = new JWTAuth();
@@ -49,6 +50,24 @@ try {
             $offset,
             $limit
         );
+
+        $notificationLog = new NotificationLog();
+
+        foreach ($appointmentsData as &$appt) {
+            $logs = $notificationLog->getAllLogsForAppointment($appt['id_appointment']);
+            $appt['abono_badge'] = ''; // valor por defecto
+
+            foreach ($logs as $log) {
+                if ($log['type'] === 'abono_24h' && $log['status'] === 'sent') {
+                    $appt['abono_badge'] = '+24h sin abono';
+                }
+                if ($log['type'] === 'abono_48h' && $log['status'] === 'sent') {
+                    $appt['abono_badge'] = '+48h sin abono';
+                }
+            }
+        }
+
+        // luego enviar el JSON
 
         header('Content-Type: application/json');
         echo json_encode([
