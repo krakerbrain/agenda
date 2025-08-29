@@ -24,9 +24,9 @@ class EmailSender
         $this->mail->SMTPAuth = true;
         $this->mail->Username = $_ENV["SMTP_USER"]; // Tu dirección de correo de Gmail
         $this->mail->Password = $_ENV["SMTP_PASS"]; // Tu contraseña de Gmail
-        if ($_ENV["APP_ENV"] == 'local') {
-            $this->mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
-            $this->mail->Port = 465;
+        $this->mail->SMTPSecure = $_ENV["MAIL_ENCRYPTION"] ?? PHPMailer::ENCRYPTION_STARTTLS;
+        $this->mail->Port = $_ENV["MAIL_PORT"] ?? 587;
+        if ($_ENV["APP_ENV"] != 'local') {
             $this->mail->SMTPOptions = [
                 'ssl' => [
                     'verify_peer' => false,
@@ -34,9 +34,6 @@ class EmailSender
                     'allow_self_signed' => true,
                 ],
             ];
-        } else {
-            $this->mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-            $this->mail->Port = 587;
         }
     }
 
