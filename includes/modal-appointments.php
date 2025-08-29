@@ -6,7 +6,7 @@
 
 <!-- Google Authenticate Modal -->
 <div id="googleAuthenticateModal"
-    class="fixed inset-0 z-50 flex items-center justify-center hidden pointer-events-none transition-opacity duration-300 opacity-0 p-4">
+    class="fixed inset-0 z-50 items-center justify-center hidden pointer-events-none transition-opacity duration-300 opacity-0 p-4">
     <div class="absolute inset-0 bg-gray-500 opacity-50 transition-opacity"></div>
     <div
         class="bg-white rounded-lg shadow-lg w-full max-w-md mx-auto overflow-hidden transform transition-all duration-300 scale-95 pointer-events-auto">

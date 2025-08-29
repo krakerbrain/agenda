@@ -81,18 +81,21 @@ try {
                 if (!$shouldSend) return;
 
                 try {
-                    // $wspStatusCode = sendRememberWsp(
-                    //     $type,
-                    //     $appointment['customer_phone'],
-                    //     $appointment['customer_name'],
-                    //     $appointment['appointment_date'],
-                    //     $appointment['appointment_time'],
-                    //     $appointment['company_name'],
-                    //     $appointment['appointment_token']
-                    // );
-                    // $status = ($wspStatusCode == 200 || $wspStatusCode == 201) ? 'sent' : 'failed';
-                    // para pruebas, simular siempre éxito
-                    $status = 'sent';
+                    if ($_ENV["APP_ENV"] != 'local') {
+                        $wspStatusCode = sendRememberWsp(
+                            $type,
+                            $appointment['customer_phone'],
+                            $appointment['customer_name'],
+                            $appointment['appointment_date'],
+                            $appointment['appointment_time'],
+                            $appointment['company_name'],
+                            $appointment['appointment_token']
+                        );
+                        $status = ($wspStatusCode == 200 || $wspStatusCode == 201) ? 'sent' : 'failed';
+                    } else {
+                        // para pruebas, simular siempre éxito
+                        $status = 'sent';
+                    }
                     error_log("INFO: Enviando WhatsApp ({$type}) cita {$appointment['id']} a {$appointment['customer_phone']}" . PHP_EOL, 3, __DIR__ . '/log/notifica_abono.log');
                 } catch (Exception $e) {
                     $status = 'failed';
