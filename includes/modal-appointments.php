@@ -117,6 +117,13 @@
                                         negocio canceló la reserva.</label>
                                 </div>
                                 <div class="flex items-center">
+                                    <input id="reason-business-cancel" name="reason" type="radio"
+                                        value="El negocio canceló la reserva."
+                                        class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                                    <label for="reason-business-cancel" class="ml-2 block text-sm text-gray-700">No pagó
+                                        el abono.</label>
+                                </div>
+                                <div class="flex items-center">
                                     <input id="reason-other" name="reason" type="radio" value="Otro"
                                         class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
                                     <label for="reason-other" class="ml-2 block text-sm text-gray-700">Otro</label>

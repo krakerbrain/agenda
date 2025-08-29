@@ -73,9 +73,9 @@ async function loadAppointments(status, page = 1) {
     if (success) {
       appointmentsStore.setAppointments(data); // Guardar en el store modular
       if (status === "events") {
-        tableRenderer.renderEventTable(data, DatesUIHelpers.getStatusBadge, getActionButtons);
+        tableRenderer.renderEventTable(data, getActionButtons);
       } else {
-        tableRenderer.renderAppointments(data, show_provider_column, DatesUIHelpers.getStatusBadge, getActionButtons);
+        tableRenderer.renderAppointments(data, show_provider_column, getActionButtons);
       }
       pagination.currentPage = page;
       const hasMoreData = data.length === limit;

@@ -1,12 +1,13 @@
 // Clase para renderizar la tabla de citas y eventos
 import { DateFormatter } from "./DateFormatter.js";
+import { DatesUIHelpers } from "./DatesUIHelpers.js";
 
 export class DatesTableRenderer {
   constructor(tableContentSelector) {
     this.tableContent = document.querySelector(tableContentSelector);
   }
 
-  renderAppointments(data, showProviderColumn, getStatusBadge, getActionButtons) {
+  renderAppointments(data, showProviderColumn, getActionButtons) {
     if (!Array.isArray(data)) data = [];
     this.tableContent.innerHTML = "";
     data.forEach((item) => {
@@ -29,7 +30,14 @@ export class DatesTableRenderer {
           <span class='inline-block ms-4 text-gray-500 md:hidden'>${DateFormatter.formatTimeTo12h(item.start_time)}</span>
         </td>
         <td data-cell='hora' class='data cell-time px-2 py-2 hidden md:table-cell' nowrap>${DateFormatter.formatTimeTo12h(item.start_time)}</td>
-        <td data-cell='estado' class='data cell-status px-2 py-2'>${getStatusBadge(item.status)}</td>
+        <td data-cell='estado' class='data cell-status px-2 py-2 w-32'>
+          ${DatesUIHelpers.renderBadges(
+            DatesUIHelpers.getStatusBadges({
+              status: item.status,
+              abono_badge: item.abono_badge,
+            })
+          )}
+        </td>
         <td data-cell='acciones' class="cell-actions px-2 py-2"><div class="actionBtns flex justify-evenly gap-2">${getActionButtons(item.status, item.id_appointment)}</div></td>
         <td class="expand-btn">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
