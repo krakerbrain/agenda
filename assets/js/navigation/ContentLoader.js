@@ -1,10 +1,12 @@
-import { ConfigService } from "../config/ConfigService.js"; // Ajusta el path
+import { ConfigService } from "../config/ConfigService.js";
+import { ErrorLogger } from "./ErrorLogger.js";
 
 export class ContentLoader {
   constructor({ fetch = window.fetch.bind(window), APP_VERSION = "1.0.0" } = {}) {
     this.fetch = fetch;
     this.APP_VERSION = APP_VERSION;
     this.moduleCache = {};
+    this.logger = new ErrorLogger("ContentLoader"); // 👈 logger único para esta clase
   }
 
   async load(page, mainContent) {
@@ -45,7 +47,14 @@ export class ContentLoader {
       await this.loadModule(page);
     } catch (error) {
       console.error(`Error loading ${page}:`, error);
-      this.handleError(mainContent, page, error);
+
+      // 👇 Usar solo logger
+      this.logger.log("Error en load()", error, { page });
+
+      // Mantener redirección en caso de sesión expirada
+      if (error.message.includes("SESSION_EXPIRED") || error.message.includes("401")) {
+        window.location.href = `${ConfigService.baseUrl}login/index.php`;
+      }
     }
   }
 
@@ -55,43 +64,15 @@ export class ContentLoader {
     return !!doc.getElementById("loginForm");
   }
 
-  handleError(mainContent, page, error) {
-    // --- Enviar log al backend ---
-    try {
-      fetch(`${ConfigService.baseUrl}error-monitor/log_js_error.php`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          page,
-          error: error.message,
-          stack: error.stack,
-          url: window.location.href,
-          userAgent: navigator.userAgent,
-          time: new Date().toISOString(),
-        }),
-      });
-    } catch (e) {
-      // No hacer nada si falla el log
-    }
-
-    if (error.message.includes("SESSION_EXPIRED") || error.message.includes("401")) {
-      window.location.href = `${ConfigService.baseUrl}login/index.php`;
-    } else {
-      mainContent.innerHTML = `<div class="error">Error al cargar ${page}: ${error.message}</div>`;
-    }
-  }
-
   async loadModule(page) {
-    // if (this.moduleCache[page]) return;
-
     const modulePath = this.getModulePath(page);
     try {
-      // Solo usa la versión de la app, no el timestamp
       const module = await import(`${modulePath}?v=${this.APP_VERSION}`);
       this.moduleCache[page] = module;
       if (typeof module.init === "function") await module.init();
     } catch (error) {
       console.error(`Error loading module ${page}:`, error);
+      this.logger.log("Error en loadModule()", error, { page, modulePath });
       throw error;
     }
   }
@@ -129,6 +110,7 @@ export class ContentLoader {
       titleElement.textContent = navLink.innerHTML;
     } else {
       console.warn(`No se encontró el título o el enlace para la página: ${page}`);
+      this.logger.log("No se pudo actualizar título", null, { page });
     }
   }
 }
