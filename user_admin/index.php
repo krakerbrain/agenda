@@ -36,11 +36,12 @@ if (is_dir($logoDir)) {
 include dirname(__DIR__) . '/partials/head.php';
 ?>
 <script>
-    const baseUrl = '<?php echo $baseUrl; ?>';
-    const role_id = <?php echo $role_id; ?>;
-    window.APP_VERSION = '<?= $versionManager->getVersion() ?>';
+const baseUrl = '<?php echo $baseUrl; ?>';
+const role_id = <?php echo $role_id; ?>;
+window.APP_VERSION = '<?= $versionManager->getVersion() ?>';
 </script>
-<link rel="stylesheet" href="<?php echo $baseUrl; ?>assets/css/dist/output.css">
+<link rel="stylesheet"
+    href="<?php echo $baseUrl; ?>assets/css/dist/output.css?v=<?php echo $versionManager->getVersion() ?>">
 
 <body class="text-sm" data-base-url="<?php echo htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8'); ?>">
     <!-- Navbar -->
@@ -50,7 +51,7 @@ include dirname(__DIR__) . '/partials/head.php';
                 <img src="https://agendarium.com/assets/img/landing/logo/Isotipo-Agendarium.svg" alt="Logo Agendarium"
                     class="h-8 w-auto md:h-10">
                 <?php if (isset($company_logo) && !empty($company_logo)): ?>
-                    <img src="<?php echo $company_logo; ?>" alt="logo" class="h-8">
+                <img src="<?php echo $company_logo; ?>" alt="logo" class="h-8">
                 <?php endif; ?>
             </div>
             <a class="md:text-xl titulo" href="#"></a>
@@ -65,10 +66,10 @@ include dirname(__DIR__) . '/partials/head.php';
                                 d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                         </svg>
                         <?php if ($unread_count > 0): ?>
-                            <span
-                                class="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 flex items-center justify-center text-white text-xs">
-                                <?php echo $unread_count; ?>
-                            </span>
+                        <span
+                            class="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 flex items-center justify-center text-white text-xs">
+                            <?php echo $unread_count; ?>
+                        </span>
                         <?php endif; ?>
                     </button>
 
@@ -124,81 +125,81 @@ include dirname(__DIR__) . '/partials/head.php';
         <div class="p-4">
             <ul class="space-y-1">
                 <?php if ($role_id != 1) { ?>
-                    <li>
-                        <a class="nav-element block px-3 py-2 text-gray-700 font-medium rounded hover:bg-gray-100" href="#"
-                            id="datesList">Lista de citas</a>
-                    </li>
-                    <li>
-                        <a class="nav-element block px-3 py-2 text-gray-700 rounded hover:bg-gray-100" href="#"
-                            id="clientes">Clientes</a>
-                    </li>
-                    <?php if ($datosUsuario['role_id'] == 2) : ?>
-                        <li>
-                            <a class="nav-element block px-3 py-2 text-gray-700 rounded hover:bg-gray-100" href="#"
-                                id="horarios">Horarios</a>
-                        </li>
-                        <li>
-                            <a class="nav-element block px-3 py-2 text-gray-700 rounded hover:bg-gray-100" href="#"
-                                id="servicios">Servicios</a>
-                        </li>
-                        <?php if ($user_count >= 2) : ?>
-                            <li>
-                                <a class="nav-element block px-3 py-2 text-gray-700 rounded hover:bg-gray-100" href="#"
-                                    id="services_assign">Asignar Servicios</a>
-                            </li>
-                        <?php endif; ?>
-                        <li>
-                            <a class="nav-element block px-3 py-2 text-gray-700 rounded hover:bg-gray-100" href="#"
-                                id="correos">Correos</a>
-                        </li>
-                        <li>
-                            <a class="nav-element block px-3 py-2 text-gray-700 rounded hover:bg-gray-100" href="#"
-                                id="datosEmpresa">Datos
-                                Empresa</a>
-                        </li>
-                        <li>
-                            <a class="nav-element block px-3 py-2 text-gray-700 rounded hover:bg-gray-100" href="#"
-                                id="addUser">Agregar
-                                Usuario</a>
-                        </li>
-                        <li>
-                            <a class="nav-element block px-3 py-2 text-gray-700 rounded hover:bg-gray-100" href="#"
-                                id="configuraciones">Otras configuraciones</a>
-                        </li>
-                        <li>
-                            <a class="nav-element block px-3 py-2 text-gray-700 rounded hover:bg-gray-100" href="#"
-                                id="integrations">Servicios Integrados</a>
-                        </li>
-                        <!-- <li>
+                <li>
+                    <a class="nav-element block px-3 py-2 text-gray-700 font-medium rounded hover:bg-gray-100" href="#"
+                        id="datesList">Lista de citas</a>
+                </li>
+                <li>
+                    <a class="nav-element block px-3 py-2 text-gray-700 rounded hover:bg-gray-100" href="#"
+                        id="clientes">Clientes</a>
+                </li>
+                <?php if ($datosUsuario['role_id'] == 2) : ?>
+                <li>
+                    <a class="nav-element block px-3 py-2 text-gray-700 rounded hover:bg-gray-100" href="#"
+                        id="horarios">Horarios</a>
+                </li>
+                <li>
+                    <a class="nav-element block px-3 py-2 text-gray-700 rounded hover:bg-gray-100" href="#"
+                        id="servicios">Servicios</a>
+                </li>
+                <?php if ($user_count >= 2) : ?>
+                <li>
+                    <a class="nav-element block px-3 py-2 text-gray-700 rounded hover:bg-gray-100" href="#"
+                        id="services_assign">Asignar Servicios</a>
+                </li>
+                <?php endif; ?>
+                <li>
+                    <a class="nav-element block px-3 py-2 text-gray-700 rounded hover:bg-gray-100" href="#"
+                        id="correos">Correos</a>
+                </li>
+                <li>
+                    <a class="nav-element block px-3 py-2 text-gray-700 rounded hover:bg-gray-100" href="#"
+                        id="datosEmpresa">Datos
+                        Empresa</a>
+                </li>
+                <li>
+                    <a class="nav-element block px-3 py-2 text-gray-700 rounded hover:bg-gray-100" href="#"
+                        id="addUser">Agregar
+                        Usuario</a>
+                </li>
+                <li>
+                    <a class="nav-element block px-3 py-2 text-gray-700 rounded hover:bg-gray-100" href="#"
+                        id="configuraciones">Otras configuraciones</a>
+                </li>
+                <li>
+                    <a class="nav-element block px-3 py-2 text-gray-700 rounded hover:bg-gray-100" href="#"
+                        id="integrations">Servicios Integrados</a>
+                </li>
+                <!-- <li>
                             <a class="nav-element block px-3 py-2 text-gray-700 rounded hover:bg-gray-100" href="#"
                                 id="eventos_unicos">Eventos Únicos</a>
                         </li> -->
-                        <li>
-                            <a class="nav-element block px-3 py-2 text-gray-700 rounded hover:bg-gray-100" href="#"
-                                id="bloqueoHoras">Bloqueo de horas</a>
-                        </li>
-                        <li>
-                            <a class="nav-element block px-3 py-2 text-gray-700 rounded hover:bg-gray-100" href="#"
-                                id="notificaciones">Notificaciones del sistema</a>
-                        </li>
-                    <?php endif; ?>
+                <li>
+                    <a class="nav-element block px-3 py-2 text-gray-700 rounded hover:bg-gray-100" href="#"
+                        id="bloqueoHoras">Bloqueo de horas</a>
+                </li>
+                <li>
+                    <a class="nav-element block px-3 py-2 text-gray-700 rounded hover:bg-gray-100" href="#"
+                        id="notificaciones">Notificaciones del sistema</a>
+                </li>
+                <?php endif; ?>
                 <?php } else { ?>
-                    <li>
-                        <a class="nav-element block px-3 py-2 text-gray-700 rounded hover:bg-gray-100" href="#"
-                            id="master_add_company">Agrega Empresa</a>
-                    </li>
-                    <li>
-                        <a class="nav-element block px-3 py-2 text-gray-700 rounded hover:bg-gray-100" href="#"
-                            id="master_company_list">Lista de Empresas</a>
-                    </li>
-                    <li>
-                        <a class="nav-element block px-3 py-2 text-gray-700 rounded hover:bg-gray-100" href="#"
-                            id="master_add_notification">Notificaciones</a>
-                    </li>
-                    <li>
-                        <a class="nav-element block px-3 py-2 text-gray-700 font-medium rounded hover:bg-gray-100" href="#"
-                            id="master_feature_flags">Feature Flags</a>
-                    </li>
+                <li>
+                    <a class="nav-element block px-3 py-2 text-gray-700 rounded hover:bg-gray-100" href="#"
+                        id="master_add_company">Agrega Empresa</a>
+                </li>
+                <li>
+                    <a class="nav-element block px-3 py-2 text-gray-700 rounded hover:bg-gray-100" href="#"
+                        id="master_company_list">Lista de Empresas</a>
+                </li>
+                <li>
+                    <a class="nav-element block px-3 py-2 text-gray-700 rounded hover:bg-gray-100" href="#"
+                        id="master_add_notification">Notificaciones</a>
+                </li>
+                <li>
+                    <a class="nav-element block px-3 py-2 text-gray-700 font-medium rounded hover:bg-gray-100" href="#"
+                        id="master_feature_flags">Feature Flags</a>
+                </li>
                 <?php } ?>
                 <li>
                     <a class="nav-element block px-3 py-2 text-gray-700 rounded hover:bg-gray-100" href="#"

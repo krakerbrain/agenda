@@ -1,5 +1,5 @@
 import { ConfigService } from "../config/ConfigService.js";
-import { ErrorLogger } from "./ErrorLogger.js";
+import { ErrorLogger } from "../config/ErrorLogger.js";
 
 export class ContentLoader {
   constructor({ fetch = window.fetch.bind(window), APP_VERSION = "1.0.0" } = {}) {
