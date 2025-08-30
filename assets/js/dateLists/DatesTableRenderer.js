@@ -1,16 +1,27 @@
 // Clase para renderizar la tabla de citas y eventos
 import { DateFormatter } from "./DateFormatter.js";
 import { DatesUIHelpers } from "./DatesUIHelpers.js";
+import { ErrorLogger } from "../config/ErrorLogger.js"; // <-- importa
 
 export class DatesTableRenderer {
   constructor(tableContentSelector) {
     this.tableContent = document.querySelector(tableContentSelector);
+    this.logger = new ErrorLogger("datesList_renderer"); // <-- logger propio
   }
 
   renderAppointments(data, showProviderColumn, getActionButtons) {
-    if (!Array.isArray(data)) data = [];
+    if (!Array.isArray(data)) {
+      this.logger.log("Datos inválidos en renderAppointments", null, { received: data });
+      data = [];
+    }
+
     this.tableContent.innerHTML = "";
     data.forEach((item) => {
+      if (!item) {
+        this.logger.log("Item inválido en citas", null, { received: item });
+        return;
+      }
+
       const row = document.createElement("tr");
       row.className = "body-table appointments-row text-gray-700 hover:bg-cyan-50 transition";
       row.innerHTML = `
