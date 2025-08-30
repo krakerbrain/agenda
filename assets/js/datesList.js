@@ -9,9 +9,10 @@ import { SpinnerManager } from "./config/SpinnerManager.js";
 import { appointmentsStore } from "./dateLists/state.js";
 import { DatesUIHelpers } from "./dateLists/DatesUIHelpers.js";
 import { ModalManager } from "./config/ModalManager.js";
+import { ErrorLogger } from "./config/ErrorLogger.js";
 
 // --- Modular class instances ---
-let tableRenderer, pagination, searchManager, tabManager, searchOffcanvasManager;
+let tableRenderer, pagination, searchManager, tabManager, searchOffcanvasManager, logger;
 
 export function init() {
   // Tabs usando TabManager
@@ -56,6 +57,9 @@ export function init() {
   const savedStatus = sessionStorage.getItem("status") || "unconfirmed";
   loadAppointments(savedStatus);
   setupActionButtonDelegation();
+
+  // Error Logger instance
+  logger = new ErrorLogger("datesList");
 }
 
 let currentPage = 1;
@@ -80,9 +84,14 @@ async function loadAppointments(status, page = 1) {
       pagination.currentPage = page;
       const hasMoreData = data.length === limit;
       pagination.updateControls(hasMoreData);
+
+      if (Array.isArray(data) && data.length === 0) {
+        logger.log("Respuesta sin datos", null, { url, status, page });
+      }
     }
   } catch (error) {
     console.error("Error al obtener citas:", error);
+    logger.log("Error en loadAppointments", error, { status, page });
   }
 }
 

@@ -39,3 +39,4 @@ node_modules/
 
 # Ignore Tailwind CSS output files
 /landing/tailwind.css
+/logs
